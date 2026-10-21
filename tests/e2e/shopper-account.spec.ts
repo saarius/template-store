@@ -22,6 +22,33 @@ test("storefront /account supports both instant demo opt-out and verified email 
   await expect(page).toHaveURL(/\/account$/u);
   await expect(page.getByRole("heading", { name: "Account", exact: true })).toBeVisible();
   await expect(page.locator("[data-account-demo-card]")).toBeVisible();
+
+  const signedOutLayout = await page.evaluate(() => {
+    const stamp = document.querySelector("[data-account-signed-out] [data-account-stamp-card]");
+    const vault = document.querySelector("[data-account-signed-out] [data-account-vault-card]");
+    if (!(stamp instanceof HTMLElement) || !(vault instanceof HTMLElement)) return null;
+    const stampStyle = getComputedStyle(stamp);
+    const vaultStyle = getComputedStyle(vault);
+    const stampRect = stamp.getBoundingClientRect();
+    const vaultRect = vault.getBoundingClientRect();
+    const horizontalGap = Math.max(vaultRect.left - stampRect.right, stampRect.left - vaultRect.right);
+    const verticalGap = Math.max(vaultRect.top - stampRect.bottom, stampRect.top - vaultRect.bottom);
+    return {
+      stampBg: stampStyle.backgroundColor,
+      vaultBg: vaultStyle.backgroundColor,
+      vaultShadow: vaultStyle.boxShadow,
+      separated: horizontalGap >= 20 || verticalGap >= 20,
+      noOverflow: document.documentElement.scrollWidth <= window.innerWidth,
+    };
+  });
+  expect(signedOutLayout).toEqual({
+    stampBg: "rgb(252, 251, 248)",
+    vaultBg: "rgb(27, 42, 74)",
+    vaultShadow: "rgb(217, 56, 30) 0px 7px 0px 0px",
+    separated: true,
+    noOverflow: true,
+  });
+
   await page.screenshot({ path: resolve(root, "account-signed-out.png") });
 
   // 1. Path 2: Opt-Out Instant Demo Account (No PIN required, zero marketing lead capture)
@@ -33,11 +60,54 @@ test("storefront /account supports both instant demo opt-out and verified email 
   await expect(page.locator('[data-account-order="ord_demo_shopper_1001"]')).toBeVisible();
   await expect(page.locator("[data-account-order-number]")).toContainText("Order #1001");
   await expect(page.locator("[data-account-order-total]")).toHaveText("$38.00");
+
+  const orderLine = page.locator(
+    '.account-order-card__lines [data-account-order-line="demo-hosted-shirt"]',
+  );
+  await expect(orderLine).toBeVisible();
+  const orderLineImage = orderLine.locator("[data-account-order-line-image]");
+  await expect(orderLineImage).toBeVisible();
+  await expect(orderLineImage).toHaveAttribute("src", "/images/products/shirt.svg");
+  const thumbLoaded = await orderLineImage.evaluate(
+    (img) => img instanceof HTMLImageElement && img.complete && img.naturalWidth > 0,
+  );
+  expect(thumbLoaded).toBe(true);
+  await expect(orderLine.locator("[data-account-order-line-sku]")).toHaveText(
+    "SKU: DEMO-HOSTED-SHIRT",
+  );
+  await expect(orderLine.locator("[data-account-order-line-variant]")).toHaveText(
+    "Heavyweight Cotton · Regular Fit",
+  );
+
+  const signedInLayout = await page.evaluate(() => {
+    const vault = document.querySelector("[data-account-signed-in] [data-account-vault-card]");
+    const ordersStamp = document.querySelector("[data-account-signed-in] [data-account-orders]");
+    if (!(vault instanceof HTMLElement) || !(ordersStamp instanceof HTMLElement)) return null;
+    const vaultStyle = getComputedStyle(vault);
+    const stampStyle = getComputedStyle(ordersStamp);
+    const vaultRect = vault.getBoundingClientRect();
+    const stampRect = ordersStamp.getBoundingClientRect();
+    return {
+      stampBg: stampStyle.backgroundColor,
+      vaultBg: vaultStyle.backgroundColor,
+      vaultShadow: vaultStyle.boxShadow,
+      verticalSeparation: stampRect.top - vaultRect.bottom >= 20,
+      noOverflow: document.documentElement.scrollWidth <= window.innerWidth,
+    };
+  });
+  expect(signedInLayout).toEqual({
+    stampBg: "rgb(252, 251, 248)",
+    vaultBg: "rgb(27, 42, 74)",
+    vaultShadow: "rgb(217, 56, 30) 0px 7px 0px 0px",
+    verticalSeparation: true,
+    noOverflow: true,
+  });
+
   await expect(page.locator("[data-account-profile-name]")).toHaveValue("Alex Rivera");
   await expect(page.locator("[data-account-profile-line1]")).toHaveValue("742 Evergreen Terrace");
   await page.screenshot({ path: resolve(root, "account-demo-signed-in.png") });
 
-  const leadsAfterDemo = await (await request.get("/api/proof/shopper-account")).json() as {
+  const leadsAfterDemo = (await (await request.get("/api/proof/shopper-account")).json()) as {
     leads: Array<{ email: string }>;
   };
   expect(leadsAfterDemo.leads.some((lead) => lead.email === "shopper@example.com")).toBe(false);
@@ -80,9 +150,9 @@ test("storefront /account supports both instant demo opt-out and verified email 
   await page.locator("[data-account-start]").click();
   await expect(page.locator("[data-account-verify-form]")).toBeVisible();
 
-  const proofState = await (
+  const proofState = (await (
     await request.get(`/api/proof/shopper-account?email=${encodeURIComponent(testEmail)}`)
-  ).json() as {
+  ).json()) as {
     email: { code: string | null } | null;
     leads: Array<{ email: string }>;
   };
@@ -99,7 +169,7 @@ test("storefront /account supports both instant demo opt-out and verified email 
   await expect(page.locator("[data-account-orders-empty]")).toBeVisible();
   await page.screenshot({ path: resolve(root, "account-verified-otp-signed-in.png") });
 
-  const leadsAfterVerify = await (await request.get("/api/proof/shopper-account")).json() as {
+  const leadsAfterVerify = (await (await request.get("/api/proof/shopper-account")).json()) as {
     leads: Array<{ email: string; optInSource: string; verificationCount: number }>;
   };
   expect(leadsAfterVerify.leads).toContainEqual(

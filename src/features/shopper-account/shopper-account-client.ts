@@ -1,5 +1,6 @@
 import {
   PLAYGROUND_DEMO_SESSION_ENDPOINT,
+  SHOPPER_CATALOG_SNAPSHOT_ENDPOINT,
   SHOPPER_ORDERS_ENDPOINT,
   SHOPPER_PROFILE_ENDPOINT,
   SHOPPER_SESSION_HEADER,
@@ -9,9 +10,11 @@ import {
   clearStoredShopperSession,
   formatOrderMoney,
   readStoredShopperSession,
+  resolveOrderLinePresentation,
   saveStoredShopperSession,
   unwrapPluginEnvelope,
   type ShopperDeliveryAddress,
+  type ShopperOrderCatalogSnapshot,
   type ShopperOrderItem,
   type ShopperProfile,
   type StoredShopperSession,
@@ -88,15 +91,46 @@ function populateProfileForm(root: Element, profile: ShopperProfile): void {
   setFieldValue(root, "[data-account-profile-country]", delivery?.country ?? "US");
 }
 
-function renderOrderItemMarkup(order: ShopperOrderItem): string {
+export function renderOrderItemMarkup(
+  order: ShopperOrderItem,
+  snapshots?: ReadonlyMap<string, ShopperOrderCatalogSnapshot>,
+): string {
   const label = order.number !== null ? `Order #${order.number}` : `Order ${order.orderId}`;
   const statusText = order.status === "completed" ? "Completed" : "Processing";
   const paidDate = order.paidAt ? order.paidAt.slice(0, 10) : "Paid";
   const linesMarkup = order.lines
-    .map(
-      (line) =>
-        `<li data-account-order-line="${escapeHtml(line.catalogItemId)}">${escapeHtml(line.name)} × ${line.quantity} — <strong>${escapeHtml(formatOrderMoney(line.unitPrice))}</strong></li>`,
-    )
+    .map((line) => {
+      const resolved = resolveOrderLinePresentation(line, {
+        order,
+        snapshot: snapshots?.get(line.catalogItemId) ?? null,
+      });
+      const thumbMarkup = resolved.thumbnailUrl
+        ? `<div class="account-order-line__thumb" data-account-order-line-thumb><img class="account-order-line__thumb-img" src="${escapeHtml(resolved.thumbnailUrl)}" alt="${escapeHtml(resolved.thumbnailAlt)}" width="56" height="56" loading="lazy" decoding="async" data-account-order-line-image /></div>`
+        : `<div class="account-order-line__thumb account-order-line__thumb--placeholder" data-account-order-line-thumb aria-hidden="true"><span class="account-order-line__thumb-fallback">No image</span></div>`;
+
+      const badges: string[] = [];
+      if (resolved.sku) {
+        badges.push(
+          `<span class="account-order-line__badge account-order-line__badge--sku" data-account-order-line-sku>SKU: ${escapeHtml(resolved.sku)}</span>`,
+        );
+      }
+      if (resolved.variantLabel) {
+        badges.push(
+          `<span class="account-order-line__badge account-order-line__badge--variant" data-account-order-line-variant>${escapeHtml(resolved.variantLabel)}</span>`,
+        );
+      }
+      if (resolved.fulfillmentLabel) {
+        badges.push(
+          `<span class="account-order-line__badge account-order-line__badge--fulfillment" data-account-order-line-fulfillment>${escapeHtml(resolved.fulfillmentLabel)}</span>`,
+        );
+      }
+      const metaMarkup =
+        badges.length > 0
+          ? `<div class="account-order-line__meta" data-account-order-line-meta>${badges.join("")}</div>`
+          : "";
+
+      return `<li class="account-order-line" data-account-order-line="${escapeHtml(line.catalogItemId)}">${thumbMarkup}<div class="account-order-line__body"><div class="account-order-line__main"><span class="account-order-line__title">${escapeHtml(line.name)} × ${line.quantity}</span> — <strong class="account-order-line__price" data-account-order-line-price>${escapeHtml(resolved.unitPriceText)}</strong></div>${metaMarkup}</div></li>`;
+    })
     .join("");
   const delivery = order.delivery;
   const deliveryText = delivery
@@ -113,7 +147,11 @@ function renderOrderItemMarkup(order: ShopperOrderItem): string {
   </article>`;
 }
 
-function renderOrders(root: Element, orders: readonly ShopperOrderItem[]): void {
+function renderOrders(
+  root: Element,
+  orders: readonly ShopperOrderItem[],
+  snapshots?: ReadonlyMap<string, ShopperOrderCatalogSnapshot>,
+): void {
   const list = root.querySelector("[data-account-orders-list]");
   const empty = root.querySelector("[data-account-orders-empty]");
   if (empty instanceof HTMLElement) {
@@ -123,8 +161,44 @@ function renderOrders(root: Element, orders: readonly ShopperOrderItem[]): void 
     if (orders.length === 0) {
       list.replaceChildren();
     } else {
-      list.innerHTML = orders.map(renderOrderItemMarkup).join("");
+      list.innerHTML = orders
+        .map((order) => renderOrderItemMarkup(order, snapshots))
+        .join("");
     }
+  }
+}
+
+async function fetchOrderCatalogSnapshots(
+  orders: readonly ShopperOrderItem[],
+): Promise<ReadonlyMap<string, ShopperOrderCatalogSnapshot>> {
+  const seen = new Set<string>();
+  for (const order of orders) {
+    for (const line of order.lines) {
+      const id = line.catalogItemId?.trim();
+      if (id && seen.size < 20) {
+        seen.add(id);
+      }
+    }
+  }
+  if (seen.size === 0) return new Map();
+  try {
+    const query = encodeURIComponent([...seen].join(","));
+    const response = await fetch(`${SHOPPER_CATALOG_SNAPSHOT_ENDPOINT}?ids=${query}`, {
+      method: "GET",
+      headers: { accept: "application/json" },
+    });
+    if (!response.ok) return new Map();
+    const raw = (await response.json().catch(() => null)) as unknown;
+    if (!isRecord(raw) || !Array.isArray(raw.products)) return new Map();
+    const map = new Map<string, ShopperOrderCatalogSnapshot>();
+    for (const entry of raw.products) {
+      if (isRecord(entry) && typeof entry.id === "string" && typeof entry.found === "boolean") {
+        map.set(entry.id, entry as unknown as ShopperOrderCatalogSnapshot);
+      }
+    }
+    return map;
+  } catch {
+    return new Map();
   }
 }
 
@@ -202,9 +276,10 @@ async function loadSignedInDashboard(
   const rawOrders = Array.isArray(ordersRes.body.orders)
     ? (ordersRes.body.orders as ShopperOrderItem[])
     : [];
+  const snapshots = await fetchOrderCatalogSnapshots(rawOrders);
   showSignedInState(root, true, profile.email);
   populateProfileForm(root, profile);
-  renderOrders(root, rawOrders);
+  renderOrders(root, rawOrders, snapshots);
   return true;
 }
 

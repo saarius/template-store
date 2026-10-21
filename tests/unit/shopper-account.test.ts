@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { COMMERCE_RUNTIME_ID } from "../../src/features/commerce-profile/selected.js";
 import {
@@ -19,8 +21,11 @@ import {
   formatOrderMoney,
   isValidShopperSessionToken,
   readStoredShopperSession,
+  resolveOrderLinePresentation,
   saveStoredShopperSession,
   unwrapPluginEnvelope,
+  type ShopperOrderCatalogSnapshot,
+  type ShopperOrderItem,
   type ShopperSessionStorage,
 } from "../../src/features/shopper-account/index.js";
 import {
@@ -41,6 +46,9 @@ import {
   type D1DatabaseLike,
   type LeadsDurableObjectNamespaceLike,
 } from "../../src/features/shopper-account/playground-runtime.js";
+import { renderOrderItemMarkup } from "../../src/features/shopper-account/shopper-account-client.js";
+
+const root = resolve(import.meta.dirname, "../..");
 
 function createMemoryStorage(): ShopperSessionStorage {
   const store = new Map<string, string>();
@@ -280,13 +288,16 @@ describe("shopper-account browser session and public routes", () => {
 
     // Durable Object SQLite binding (PLAYGROUND_LEADS_DB -> EmDashPreviewDB)
     const doQueries: Array<{ name: string; sql: string; params?: unknown[] }> = [];
-    const doRows = new Map<string, {
-      email: string;
-      first_verified_at: string;
-      last_verified_at: string;
-      opt_in_source: string;
-      verification_count: number;
-    }>();
+    const doRows = new Map<
+      string,
+      {
+        email: string;
+        first_verified_at: string;
+        last_verified_at: string;
+        opt_in_source: string;
+        verification_count: number;
+      }
+    >();
     const mockDoNamespace: LeadsDurableObjectNamespaceLike = {
       idFromName(name: string) {
         return name;
@@ -378,5 +389,168 @@ describe("shopper-account browser session and public routes", () => {
     expect(readCapturedProofLeads().map((lead) => lead.email)).toContain(
       "reload.proof@example.com",
     );
+  });
+
+  it("resolves product thumbnails, SKU badges, and variant metadata from catalog snapshots and order lines", () => {
+    const demoShirt = resolveOrderLinePresentation({
+      catalogItemId: "demo-hosted-shirt",
+      name: "Dinkus Demo Heavyweight T-Shirt",
+      quantity: 1,
+      unitPrice: { currency: "USD", minor: "3800" },
+    });
+    expect(demoShirt).toEqual({
+      catalogItemId: "demo-hosted-shirt",
+      name: "Dinkus Demo Heavyweight T-Shirt",
+      quantity: 1,
+      unitPriceText: "$38.00",
+      thumbnailUrl: "/images/products/shirt.svg",
+      thumbnailAlt: "Dinkus Demo Heavyweight T-Shirt thumbnail",
+      sku: "DEMO-HOSTED-SHIRT",
+      variantLabel: "Heavyweight Cotton · Regular Fit",
+      fulfillmentLabel: "Physical",
+    });
+
+    const variantChoiceOrder = {
+      choices: [
+        {
+          productId: "demo-hosted-hoodie",
+          catalogItemId: "demo-hosted-hoodie-m",
+          selections: [
+            {
+              optionId: "size",
+              optionLabel: "Size",
+              valueId: "m",
+              valueLabel: "Medium",
+            },
+          ],
+          fulfillment: "physical" as const,
+        },
+      ],
+    };
+    const snapshot: ShopperOrderCatalogSnapshot = {
+      id: "demo-hosted-hoodie-m",
+      found: true,
+      name: "Dinkus Demo Fleece Hoodie",
+      sku: "DEMO-HOSTED-HOODIE-M",
+      fulfillment: "physical",
+    };
+    const hoodieVariant = resolveOrderLinePresentation(
+      {
+        catalogItemId: "demo-hosted-hoodie-m",
+        name: "Dinkus Demo Fleece Hoodie",
+        quantity: 2,
+        unitPrice: { currency: "USD", minor: "6400" },
+      },
+      { order: variantChoiceOrder, snapshot },
+    );
+    expect(hoodieVariant).toEqual({
+      catalogItemId: "demo-hosted-hoodie-m",
+      name: "Dinkus Demo Fleece Hoodie",
+      quantity: 2,
+      unitPriceText: "$64.00",
+      thumbnailUrl: "/images/products/hoodie.svg",
+      thumbnailAlt: "Dinkus Demo Fleece Hoodie thumbnail",
+      sku: "DEMO-HOSTED-HOODIE-M",
+      variantLabel: "Size: Medium",
+      fulfillmentLabel: "Physical",
+    });
+
+    const unmappedNoMeta = resolveOrderLinePresentation({
+      catalogItemId: "custom-unmapped-item",
+      name: "Mystery Parcel",
+      quantity: 1,
+      unitPrice: { currency: "USD", minor: "1500" },
+      thumbnailUrl: "javascript:alert(1)",
+    });
+    expect(unmappedNoMeta.thumbnailUrl).toBeNull();
+    expect(unmappedNoMeta.sku).toBeNull();
+    expect(unmappedNoMeta.variantLabel).toBeNull();
+  });
+
+  it("renders thumbnail and variant metadata on .account-order-card__lines", () => {
+    const order: ShopperOrderItem = {
+      orderId: "ord_demo_shopper_1001",
+      receiptId: "rcpt_demo_shopper_1001",
+      number: 1001,
+      status: "processing",
+      paidAt: "2026-10-20T12:00:00.000Z",
+      total: { currency: "USD", minor: "3800" },
+      lines: [
+        {
+          catalogItemId: "demo-hosted-shirt",
+          name: "Dinkus Demo Heavyweight T-Shirt",
+          quantity: 1,
+          unitPrice: { currency: "USD", minor: "3800" },
+        },
+      ],
+      delivery: {
+        name: "Demo Shopper",
+        line1: "742 Evergreen Terrace",
+        city: "Springfield",
+        region: "OR",
+        postalCode: "97477",
+        country: "US",
+      },
+      phone: "555-0199",
+    };
+    const snapshots = new Map<string, ShopperOrderCatalogSnapshot>([
+      [
+        "demo-hosted-shirt",
+        {
+          id: "demo-hosted-shirt",
+          found: true,
+          name: "Dinkus Demo Heavyweight T-Shirt",
+          sku: "DEMO-HOSTED-SHIRT",
+          fulfillment: "physical",
+        },
+      ],
+    ]);
+
+    const markup = renderOrderItemMarkup(order, snapshots);
+    expect(markup).toContain('class="account-order-card__lines"');
+    expect(markup).toContain('data-account-order-line="demo-hosted-shirt"');
+    expect(markup).toContain('data-account-order-line-image');
+    expect(markup).toContain('src="/images/products/shirt.svg"');
+    expect(markup).toContain('data-account-order-line-sku>SKU: DEMO-HOSTED-SHIRT</span>');
+    expect(markup).toContain(
+      'data-account-order-line-variant>Heavyweight Cotton · Regular Fit</span>',
+    );
+    expect(markup).toContain('data-account-order-line-fulfillment>Physical</span>');
+  });
+
+  it("preserves all FEATURE_MAP.md selectors and vault/stamp card separation on ShopperAccount.astro", () => {
+    const componentSource = readFileSync(
+      resolve(root, "src/features/shopper-account/ShopperAccount.astro"),
+      "utf8",
+    );
+    for (const selector of [
+      "data-shopper-account",
+      "data-account-signed-out",
+      "data-account-start-form",
+      "data-account-email",
+      "data-account-opt-in",
+      "data-account-start",
+      "data-account-verify-form",
+      "data-account-code",
+      "data-account-verify",
+      "data-account-demo-card",
+      "data-account-demo-signin",
+      "data-account-signed-in",
+      "data-account-welcome",
+      "data-account-current-email",
+      "data-account-signout",
+      "data-account-orders",
+      "data-account-orders-empty",
+      "data-account-orders-list",
+      "data-account-profile-form",
+      "data-account-profile-save",
+      "data-account-profile-clear",
+    ]) {
+      expect(componentSource).toContain(selector);
+    }
+    expect(componentSource).toContain("account-card--vault");
+    expect(componentSource).toContain("account-card--stamp");
+    expect(componentSource).toContain("0 7px 0 0");
+    expect(componentSource).toContain("#fcfbf8");
   });
 });
