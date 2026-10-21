@@ -5,6 +5,7 @@ import {
   guestCartItemCount,
   guestReturnQueryIsPresent,
   isSafeGuestCartProductId,
+  isSafeOrderLineImageUrl,
   loadGuestCartIntent,
   parseGuestCartQuantityInput,
   parseGuestCartSnapshotResponse,
@@ -28,6 +29,9 @@ import {
   type GuestCartReadNotice,
   type GuestCartView,
   type GuestCheckoutContact,
+  type GuestCheckoutDelivery,
+  type GuestCheckoutOrderLine,
+  type GuestCheckoutRetention,
   type GuestCheckoutTransport,
   type GuestCheckoutWireResult,
 } from "./index.js";
@@ -380,53 +384,68 @@ function renderCart(root: Element): void {
   renderNav();
 }
 
+function checkoutStatusFailureText(code: string | undefined): string {
+  switch (code) {
+    case "CHECKOUT_STATUS_CAPABILITY_DENIED":
+      return "Checkout status is unavailable right now. Keep this tab open and try again (Reference: status-capability).";
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_401":
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_403":
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_404":
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_422":
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_429":
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_500":
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_502":
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_503":
+    case "CHECKOUT_STATUS_UPSTREAM_HTTP_504":
+      return `Checkout status is unavailable right now. Keep this tab open and try again (Reference: ${code.toLowerCase().replace(/^checkout_/, "").replaceAll("_", "-")}).`;
+    case "CHECKOUT_STATUS_UPSTREAM_UNREACHABLE":
+      return "Checkout status is unavailable right now. Keep this tab open and try again (Reference: status-upstream-unreachable).";
+    case "CHECKOUT_STATUS_UPSTREAM_INVALID":
+      return "Checkout status is unavailable right now. Keep this tab open and try again (Reference: status-upstream-invalid).";
+    default:
+      return "Checkout status is unavailable right now. Keep this tab open and try again.";
+  }
+}
+
 function checkoutFailureText(failure: string | null): string {
-  if (failure === "timeout" || failure === "network") {
-    return "Checkout start may have reached Commerce. Check status before trying again.";
+  if (failure === "storage-unavailable") {
+    return "Browser storage is required to retain a safe checkout capability.";
   }
-  if (failure === "association" || failure === "attempt-active") {
-    return "This checkout is still tied to the original attempt. Check status before retrying.";
+  if (failure === "attempt-active") {
+    return "An earlier checkout is still saved. Check checkout status before starting again.";
   }
-  return "Checkout is not available yet. Try again when Commerce is available.";
+  if (failure === "timeout") {
+    return "Contacting Commerce timed out. Check checkout status before trying again.";
+  }
+  return "Commerce checkout could not be reached. Check checkout status before trying again.";
 }
 
-function checkoutStatusFailureText(code?: string): string {
-  const references: Record<string, string> = {
-    CHECKOUT_STATUS_HOST_ORIGIN: "status-host-origin",
-    CHECKOUT_STATUS_ORIGIN_DENIED: "status-origin",
-    CHECKOUT_STATUS_CAPABILITY_DENIED: "status-capability",
-    CHECKOUT_STATUS_NOT_FOUND: "status-not-found",
-    CHECKOUT_STATUS_UNAVAILABLE: "status-unavailable",
-    CHECKOUT_STATUS_UPSTREAM_REDIRECT: "status-upstream-redirect",
-    CHECKOUT_STATUS_UPSTREAM_HTTP: "status-upstream-http",
-    CHECKOUT_STATUS_RESPONSE_INVALID: "status-response",
-    CHECKOUT_STATUS_FETCH_FAILED: "status-fetch",
-  };
-  const http = code?.match(/^CHECKOUT_STATUS_UPSTREAM_HTTP_([45][0-9]{2})$/u);
-  const reference = http && http[0] === code
-    ? `status-upstream-http-${http[1]}`
-    : code && Object.hasOwn(references, code) ? references[code] : undefined;
-  return "Checkout status is unavailable. Your existing checkout remains protected." +
-    (reference ? ` Reference: ${reference}.` : "");
-}
-
-function commerceErrorText(error: { code: string; message: string; reason?: string; minimum?: { currency: string; minor: string } }): string {
-  if (error.code !== "COUPON_UNAVAILABLE") return error.message;
+function commerceErrorText(error: {
+  code: string;
+  message: string;
+  reason?: string;
+  minimum?: { currency: "USD"; minor: string };
+}): string {
+  if (error.code === "COUPON_UNAVAILABLE") return "Coupons aren't available right now.";
+  if (error.code === "INVALID_CART" && /delivery|shipping|address|postal|country/i.test(error.message)) {
+    return "Enter your delivery address to continue.";
+  }
+  if (error.code !== "INVALID_COUPON") return "Commerce refused to start checkout for this cart.";
+  if (error.reason === "minimum-not-met" && error.minimum) {
+    const cents = BigInt(error.minimum.minor);
+    const amount = `$${(cents / 100n).toString()}.${(cents % 100n).toString().padStart(2, "0")}`;
+    return `Add more to reach the ${amount} minimum for this coupon.`;
+  }
   const wording: Record<string, string> = {
-    "not-found": "That coupon code isn't valid.",
+    "not-found": "That coupon code wasn't recognized.",
     "not-started": "That coupon isn't active yet.",
     expired: "That coupon has expired.",
-    "no-qualifying-items": "That coupon doesn't apply to the items in your cart.",
-    "used-up": "That coupon has been fully used.",
-    "try-later": "We can't check coupons right now. Try again, or remove the coupon.",
-    "not-applicable": "That coupon can't be used for this order.",
+    "minimum-not-met": "This order doesn't meet the coupon's minimum.",
+    "no-qualifying-items": "None of the items in your cart qualify for that coupon.",
+    "used-up": "That coupon has reached its usage limit.",
+    "try-later": "That coupon is busy right now. Try again in a moment.",
+    "not-applicable": "That coupon doesn't apply to this order.",
   };
-  if (error.reason === "minimum-not-met" && error.minimum?.currency === "USD") {
-    const minor = Number(error.minimum.minor);
-    if (Number.isSafeInteger(minor) && minor >= 0) {
-      return `Spend $${(minor / 100).toFixed(2)} on qualifying items to use this coupon.`;
-    }
-  }
   return wording[error.reason ?? ""] ?? "That coupon can't be used for this order.";
 }
 
@@ -758,14 +777,108 @@ function checkoutStorage() {
   }
 }
 
-function confirmedOrderMarkup(root: HTMLElement, result: GuestCheckoutWireResult): void {
-  if (!result.ok || !checkoutCanConfirm(result)) return;
-  const order = result.checkout.order! as {
-    orderId: string;
-    lines: readonly { id: string; quantity: number; name?: string; variant?: string; unitPrice?: { currency: string; minor: string } }[];
-    total?: unknown;
-    test?: boolean;
+export function resolveOrderLineThumbnail(
+  line: Pick<GuestCheckoutOrderLine, "id" | "name" | "sku" | "imageUrl">,
+): string {
+  if (isSafeOrderLineImageUrl(line.imageUrl)) return line.imageUrl.trim();
+  const key = `${line.id} ${line.sku ?? ""} ${line.name ?? ""}`.toLowerCase();
+  if (/\bhoodie\b/u.test(key)) return "/images/products/hoodie.svg";
+  if (/\b(?:cap|hat)\b/u.test(key)) return "/images/products/cap.svg";
+  if (/\bbeanie\b/u.test(key)) return "/merch/beanie.svg";
+  if (/\bmug\b/u.test(key)) return "/images/products/mug.svg";
+  if (/\b(?:tote|bag)\b/u.test(key)) return "/images/products/tote.svg";
+  if (/\b(?:throw|blanket)\b/u.test(key)) return "/images/products/throw.svg";
+  if (/\btray\b/u.test(key)) return "/images/products/tray.svg";
+  if (/\bsocks?\b/u.test(key)) return "/images/products/socks.svg";
+  if (/\bbottle\b/u.test(key)) return "/images/products/bottle.svg";
+  return "/images/products/shirt.svg";
+}
+
+export function formatConfirmedDeliveryAddress(delivery: GuestCheckoutDelivery): string {
+  const locality = [delivery.city, delivery.region, delivery.postalCode].filter(Boolean).join(" ");
+  return [delivery.line1, delivery.line2, locality, delivery.country].filter(Boolean).join(", ");
+}
+
+function formatCheckoutMoneyValue(value: { currency: string; minor: string }): string | null {
+  const minor = Number(value.minor);
+  if (!Number.isSafeInteger(minor)) return null;
+  const amount = minor / 100;
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: value.currency,
+    }).format(amount);
+  } catch {
+    return `${value.currency} ${amount.toFixed(2)}`;
+  }
+}
+
+export type ConfirmedOrderDestination = Readonly<{
+  email: string | null;
+  recipient: string | null;
+  address: string | null;
+  delivery: GuestCheckoutDelivery | null;
+  shippingMethod: string | null;
+}>;
+
+export function resolveConfirmedOrderDestination(
+  result: GuestCheckoutWireResult,
+  retention?: GuestCheckoutRetention | null,
+): ConfirmedOrderDestination | null {
+  if (!result.ok || !checkoutCanConfirm(result) || !result.checkout.order) return null;
+  const order = result.checkout.order;
+  const email = order.contact?.email ?? result.checkout.contact?.email ?? retention?.contact?.email ?? null;
+  const delivery = order.delivery ??
+    order.contact?.delivery ??
+    result.checkout.delivery ??
+    result.checkout.contact?.delivery ??
+    retention?.contact?.delivery ??
+    null;
+  const recipient = delivery?.name ?? null;
+  const address = delivery ? formatConfirmedDeliveryAddress(delivery) : null;
+  const checkoutRecord = result.checkout as unknown as Record<string, unknown>;
+  const pricing = checkoutRecord.pricing && typeof checkoutRecord.pricing === "object"
+    ? checkoutRecord.pricing as Record<string, unknown>
+    : null;
+  const shippingObj = pricing?.shipping && typeof pricing.shipping === "object"
+    ? pricing.shipping as Record<string, unknown>
+    : null;
+  const chargeObj = shippingObj?.charge && typeof shippingObj.charge === "object"
+    ? shippingObj.charge as Record<string, unknown>
+    : null;
+  const shippingChargeText = chargeObj &&
+    typeof chargeObj.currency === "string" &&
+    typeof chargeObj.minor === "string" &&
+    /^-?\d+$/u.test(chargeObj.minor)
+    ? formatCheckoutMoneyValue({ currency: chargeObj.currency, minor: chargeObj.minor })
+    : null;
+  const shippingMode = typeof shippingObj?.mode === "string" ? shippingObj.mode : null;
+  const explicitShippingMethod = order.shippingMethod ?? result.checkout.shippingMethod ?? null;
+  const derivedShippingMethod = explicitShippingMethod ??
+    (shippingMode === "free"
+      ? "Free shipping"
+      : shippingMode === "flat"
+        ? (shippingChargeText ? `Flat rate (${shippingChargeText})` : "Flat rate shipping")
+        : (delivery && shippingChargeText
+          ? (chargeObj?.minor === "0" ? "Free shipping" : `Standard shipping (${shippingChargeText})`)
+          : null));
+  if (!email && !recipient && !address && !derivedShippingMethod) return null;
+  return {
+    email,
+    recipient,
+    address,
+    delivery,
+    shippingMethod: derivedShippingMethod,
   };
+}
+
+export function confirmedOrderMarkup(
+  root: HTMLElement,
+  result: GuestCheckoutWireResult,
+  retention?: GuestCheckoutRetention | null,
+): void {
+  if (!result.ok || !checkoutCanConfirm(result)) return;
+  const order = result.checkout.order!;
   const orderNumber = root.querySelector("[data-guest-checkout-order-number]");
   if (orderNumber instanceof HTMLElement) {
     orderNumber.textContent = `Order ${order.orderId.replace(/^order:/u, "")}`;
@@ -778,15 +891,35 @@ function confirmedOrderMarkup(root: HTMLElement, result: GuestCheckoutWireResult
   if (items instanceof HTMLElement) {
     items.replaceChildren(...order.lines.map((line) => {
       const row = document.createElement("li");
+      row.className = "guest-checkout-item";
+      row.dataset.guestCheckoutItem = line.id;
+      if (line.sku) row.dataset.guestCheckoutItemSku = line.sku;
+      const thumb = document.createElement("img");
+      thumb.className = "guest-checkout-item-thumb";
+      thumb.setAttribute("data-guest-checkout-item-thumb", "");
+      thumb.setAttribute("data-guest-checkout-item-thumbnail", "");
+      thumb.src = resolveOrderLineThumbnail(line);
+      thumb.alt = line.imageAlt ?? `${line.name ?? line.id} thumbnail`;
+      thumb.width = 56;
+      thumb.height = 56;
+      thumb.loading = "lazy";
+      thumb.decoding = "async";
+      row.append(thumb);
       const label = document.createElement("span");
-      label.textContent = `${line.name ?? line.id} × ${line.quantity}`;
+      label.className = "guest-checkout-item-details";
+      label.setAttribute("data-guest-checkout-item-details", "");
+      label.textContent = `${line.name ?? line.id} \u00d7 ${line.quantity}`;
       if (line.variant) {
         const variant = document.createElement("small");
+        variant.className = "guest-checkout-item-variant";
+        variant.setAttribute("data-guest-checkout-item-variant", "");
         variant.textContent = line.variant;
         label.append(variant);
       }
       row.append(label);
       const amount = document.createElement("span");
+      amount.className = "guest-checkout-item-amount";
+      amount.setAttribute("data-guest-checkout-item-amount", "");
       const unitMinor = line.unitPrice && /^-?\d+$/u.test(line.unitPrice.minor)
         ? Number(line.unitPrice.minor)
         : NaN;
@@ -795,10 +928,29 @@ function confirmedOrderMarkup(root: HTMLElement, result: GuestCheckoutWireResult
         : null;
       amount.textContent = minor === null || !line.unitPrice
         ? ""
-        : formatMoney({ currency: line.unitPrice.currency, minor: String(minor) }) ?? "";
+        : formatCheckoutMoneyValue({ currency: line.unitPrice.currency, minor: String(minor) }) ?? "";
       row.append(amount);
       return row;
     }));
+  }
+  const destinationSection = root.querySelector("[data-guest-checkout-destination]");
+  if (destinationSection instanceof HTMLElement) {
+    const destination = resolveConfirmedOrderDestination(result, retention);
+    destinationSection.hidden = !destination;
+    const bindField = (rowSelector: string, valueSelector: string, text: string | null) => {
+      const rowEl = destinationSection.querySelector(rowSelector);
+      const valEl = destinationSection.querySelector(valueSelector);
+      if (rowEl instanceof HTMLElement) rowEl.hidden = !text;
+      if (valEl instanceof HTMLElement) valEl.textContent = text ?? "";
+    };
+    bindField("[data-guest-checkout-email-row]", "[data-guest-checkout-email]", destination?.email ?? null);
+    bindField("[data-guest-checkout-recipient-row]", "[data-guest-checkout-recipient]", destination?.recipient ?? null);
+    bindField("[data-guest-checkout-address-row]", "[data-guest-checkout-address]", destination?.address ?? null);
+    bindField(
+      "[data-guest-checkout-shipping-method-row]",
+      "[data-guest-checkout-shipping-method]",
+      destination?.shippingMethod ?? null,
+    );
   }
   const totals = root.querySelector("[data-guest-checkout-order-totals]");
   if (!(totals instanceof HTMLElement)) return;
@@ -807,26 +959,13 @@ function confirmedOrderMarkup(root: HTMLElement, result: GuestCheckoutWireResult
     ? checkout.pricing as Record<string, unknown>
     : null;
   const total = order.total ?? checkout.total;
-  function formatMoney(value: { currency: string; minor: string }): string | null {
-    const minor = Number(value.minor);
-    if (!Number.isSafeInteger(minor)) return null;
-    const amount = minor / 100;
-    try {
-      return new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: value.currency,
-      }).format(amount);
-    } catch {
-      return `${value.currency} ${amount.toFixed(2)}`;
-    }
-  }
   const money = (value: unknown, freeShipping = false): string | null => {
     if (!value || typeof value !== "object") return null;
     const minor = (value as Record<string, unknown>).minor;
     const currency = (value as Record<string, unknown>).currency;
     if (typeof minor !== "string" || !/^-?\d+$/u.test(minor) || typeof currency !== "string") return null;
     if (freeShipping && minor === "0") return "Free";
-    return formatMoney({ currency, minor });
+    return formatCheckoutMoneyValue({ currency, minor });
   };
   const rows: Array<[string, unknown]> = [
     ["Subtotal", pricing?.merchandiseSubtotal],
@@ -936,7 +1075,7 @@ export function hydrateGuestCheckoutReturn(): void {
     if (result.ok && checkoutCanConfirm(result)) {
       if (order instanceof HTMLElement) {
         order.hidden = false;
-        confirmedOrderMarkup(root, result);
+        confirmedOrderMarkup(root, result, readGuestCheckoutRetention(checkoutStorage()) ?? retention);
       }
       if (initialContact instanceof HTMLElement) initialContact.hidden = true;
       if (retry instanceof HTMLAnchorElement) retry.hidden = true;
@@ -968,6 +1107,11 @@ export function hydrateGuestCheckoutReturn(): void {
     }
     if (exhausted && result.ok && result.checkout.state === "pending") {
       setFailureState();
+      setMessage(
+        "Status checks are temporarily limited. Check your confirmation email or refresh later.",
+        true,
+      );
+      if (statusRetry instanceof HTMLButtonElement) statusRetry.hidden = false;
     }
     finishCheck();
   };
