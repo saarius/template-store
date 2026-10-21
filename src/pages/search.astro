@@ -83,8 +83,32 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
           <p class="search-rail__eyebrow">EmDash FTS5 Discovery</p>
           <h1>Search the store</h1>
           <p class="search-rail__deck">
-            Full-text search across published products, product categories, and storefront pages.
+            Instant live search and server-rendered FTS5 results across published products, product categories, and storefront pages.
           </p>
+
+          <form method="get" action="/search" class="search-pill-bar" role="search" data-search-form>
+            <input
+              id="store-search-query"
+              type="search"
+              name="q"
+              value={query}
+              placeholder="Search products..."
+              aria-label="Search query"
+            />
+            <button type="submit">GO</button>
+          </form>
+
+          <div class="search-rail__live" data-live-search-stage>
+            <span class="search-rail__live-label">Instant dropdown (&lt;LiveSearch /&gt;)</span>
+            <LiveSearch
+              placeholder="Search products, categories, and pages..."
+              collections={searchableCollections}
+              routeMap={routeMap}
+              searchPage="/search"
+              class="store-live-search"
+            />
+          </div>
+
           <div class="search-rail__scopes" aria-label="Indexed collections">
             <span class="search-scope-pill">products</span>
             <span class="search-scope-pill">categories</span>
@@ -100,34 +124,9 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
           </nav>
         </aside>
 
-        <section class="search-stage" aria-label="Live search">
-          <div class="search-stage__box" data-live-search-stage>
-            <label class="search-stage__label" for="store-search-query">
-              Live search (instant dropdown) or submit a query
-            </label>
-            <LiveSearch
-              placeholder="Search products, categories, and pages..."
-              collections={searchableCollections}
-              routeMap={routeMap}
-              searchPage="/search"
-              class="store-live-search"
-            />
-          </div>
-
-          <form method="get" action="/search" class="search-stage__form" role="search" data-search-form>
-            <input
-              id="store-search-query"
-              type="search"
-              name="q"
-              value={query}
-              placeholder="Filter by keyword (e.g. tee, hoodie, cap, shipping)..."
-              aria-label="Search query"
-            />
-            <button type="submit">Search</button>
-          </form>
-
-          {query.length >= 2 && (
-            <section class="search-results" aria-label="Search results" data-search-results>
+        <section class="search-stage" aria-label="Search results stage">
+          {query.length >= 2 ? (
+            <div class="search-results" aria-label="Search results" data-search-results>
               <header class="search-results__header">
                 <h2>
                   Results for <q>{query}</q>
@@ -157,7 +156,17 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
                   ))}
                 </ul>
               )}
-            </section>
+            </div>
+          ) : (
+            <div class="search-results" data-search-prompt>
+              <header class="search-results__header">
+                <h2>Query the catalog</h2>
+                <span class="search-results__count">FTS5 READY</span>
+              </header>
+              <p class="search-results__empty">
+                Enter two or more characters in the search bar on the left to filter published products, categories, and storefront pages.
+              </p>
+            </div>
           )}
         </section>
       </div>
@@ -173,17 +182,17 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
   }
   .search-vault {
     display: grid;
-    grid-template-columns: minmax(16rem, 4fr) minmax(0, 8fr);
-    gap: 1.5rem;
+    grid-template-columns: minmax(20rem, 5fr) minmax(0, 7fr);
+    gap: 1.75rem;
     align-items: start;
   }
   .search-rail {
-    padding: 1.5rem;
-    border: 1.5px solid var(--store-ink-border);
+    padding: 1.75rem;
+    border: 2px solid var(--store-ink-border);
     border-radius: var(--store-radius-card);
     background: var(--store-vault-bg);
     color: var(--store-vault-ink);
-    box-shadow: 4px 4px 0 var(--store-shadow);
+    box-shadow: 7px 7px 0 var(--store-accent);
   }
   .search-rail__eyebrow {
     margin: 0 0 0.5rem;
@@ -203,8 +212,77 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
   .search-rail__deck {
     margin: 0 0 1.15rem;
     color: var(--store-vault-muted);
-    font-size: 0.94rem;
+    font-size: 0.92rem;
     line-height: 1.55;
+  }
+  .search-pill-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.15rem;
+    padding: 0.35rem 0.45rem 0.35rem 1rem;
+    border: 1.5px solid var(--store-accent);
+    border-radius: 999px;
+    background: #0b111d;
+    box-shadow: 3px 3px 0 var(--store-accent);
+  }
+  .search-pill-bar input {
+    flex: 1 1 10rem;
+    min-width: 0;
+    padding: 0.35rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--store-vault-ink);
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    outline: none;
+  }
+  .search-pill-bar input::placeholder {
+    color: var(--store-vault-muted);
+    font-weight: 400;
+  }
+  .search-pill-bar button {
+    padding: 0.42rem 0.95rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--store-accent);
+    color: var(--store-accent-ink);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+  .search-rail__live {
+    margin-bottom: 1.15rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--store-vault-line);
+    border-radius: var(--store-radius-card);
+    background: var(--store-vault-surface);
+  }
+  .search-rail__live-label {
+    display: block;
+    margin: 0 0 0.45rem;
+    color: var(--store-vault-muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .search-rail :global(.store-live-search) {
+    display: block;
+    width: 100%;
+  }
+  .search-rail :global(.emdash-live-search-input) {
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--store-vault-line);
+    border-radius: 999px;
+    background: #0b111d;
+    color: var(--store-vault-ink);
+    font: inherit;
+    font-size: 0.86rem;
   }
   .search-rail__scopes {
     display: flex;
@@ -213,13 +291,13 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
     margin-bottom: 1.25rem;
   }
   .search-scope-pill {
-    padding: 0.25rem 0.55rem;
+    padding: 0.25rem 0.65rem;
     border: 1px solid var(--store-vault-line);
-    border-radius: var(--store-radius-pill);
+    border-radius: 999px;
     background: var(--store-vault-surface);
     color: var(--store-vault-ink);
     font-family: var(--font-mono);
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
   }
@@ -242,59 +320,12 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
     display: grid;
     gap: 1.25rem;
   }
-  .search-stage__box,
-  .search-stage__form,
   .search-results {
-    padding: 1.35rem;
-    border: 1.5px solid var(--store-ink-border);
+    padding: 1.65rem;
+    border: 2px solid var(--store-ink-border);
     border-radius: var(--store-radius-card);
     background: var(--store-surface);
-    box-shadow: 4px 4px 0 var(--store-shadow);
-  }
-  .search-stage__label {
-    display: block;
-    margin: 0 0 0.6rem;
-    color: var(--store-muted);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .search-stage :global(.store-live-search) {
-    display: block;
-    width: 100%;
-  }
-  .search-stage :global(.emdash-live-search-input) {
-    padding: 0.75rem 0.95rem;
-    border: 1.5px solid var(--store-ink-border);
-    border-radius: var(--store-radius-pill);
-    font: inherit;
-  }
-  .search-stage__form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-  }
-  .search-stage__form input {
-    flex: 1 1 14rem;
-    min-width: 0;
-    padding: 0.7rem 0.9rem;
-    border: 1.5px solid var(--store-ink-border);
-    border-radius: var(--store-radius-pill);
-    background: var(--store-surface);
-    color: inherit;
-    font: inherit;
-  }
-  .search-stage__form button {
-    padding: 0.7rem 1.2rem;
-    border: 1.5px solid var(--store-ink-border);
-    border-radius: var(--store-radius-pill);
-    background: var(--dinkus-action-background);
-    color: var(--dinkus-action-color);
-    font: inherit;
-    font-weight: 800;
-    cursor: pointer;
+    box-shadow: 5px 5px 0 var(--store-shadow);
   }
   .search-results__header {
     display: flex;
@@ -304,33 +335,35 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
     gap: 0.75rem;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--store-line);
+    border-bottom: 2px solid var(--store-ink-border);
   }
   .search-results__header h2 {
     margin: 0;
     font-size: 1.35rem;
   }
   .search-results__count {
-    color: var(--store-muted);
+    color: var(--store-accent);
     font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 700;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
   }
   .search-results__list {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    gap: 0.75rem;
+    gap: 0;
   }
   .search-results__item {
-    border: 1px solid var(--store-line);
-    border-radius: var(--store-radius-pill);
-    background: var(--store-bg);
+    border-bottom: 1px solid var(--store-line);
+  }
+  .search-results__item:last-child {
+    border-bottom: 0;
   }
   .search-results__link {
     display: block;
-    padding: 0.85rem 1rem;
+    padding: 0.95rem 0.25rem;
     color: inherit;
     text-decoration: none;
   }
@@ -345,18 +378,18 @@ const canonical = canonicalUrl("/search", Astro.site, Astro.url);
     gap: 0.75rem;
   }
   .search-results__badge {
-    padding: 0.15rem 0.5rem;
-    border: 1px solid var(--store-line);
-    border-radius: var(--store-radius-pill);
-    background: var(--store-surface);
-    color: var(--store-muted);
+    padding: 0.2rem 0.6rem;
+    border: 1.5px solid var(--store-ink-border);
+    border-radius: 999px;
+    background: var(--store-bg);
+    color: var(--store-ink);
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
   }
   .search-results__snippet {
-    margin: 0.4rem 0 0;
+    margin: 0.35rem 0 0;
     color: var(--store-muted);
     font-size: 0.9rem;
     line-height: 1.5;

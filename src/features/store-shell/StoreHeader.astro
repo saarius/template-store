@@ -71,7 +71,16 @@ const linkProps = (item: StoreMenuItem) => ({
   )}
   <nav class="store-header__nav" aria-label="Store">
     <span class="store-header__status">{profile === "proof" ? "Demo store" : "Store"}</span>
-    <a class="store-header__search" href="/search" data-store-search-nav aria-current={path === "/search" ? "page" : undefined}>Search</a>
+    <form class="store-header__search-pill" method="get" action="/search" role="search" data-store-search-nav>
+      <input
+        class="store-header__search-input"
+        type="search"
+        name="q"
+        placeholder="Search products..."
+        aria-label="Search products"
+      />
+      <button class="store-header__search-go" type="submit">GO</button>
+    </form>
     <a class="store-header__account" href="/account" data-shopper-account-nav aria-current={path === "/account" ? "page" : undefined}>Account</a>
     <GuestCartNav />
   </nav>
