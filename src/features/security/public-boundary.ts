@@ -20,6 +20,9 @@ const EXACT_ALLOWED_PATHS = new Set([
   "/api/checkout/status",
   "/shipping",
   "/returns",
+  "/search",
+  "/_emdash/api/search",
+  "/_emdash/api/search/suggest",
   "/feeds/google-merchant.xml",
   "/feeds/meta-catalog.csv",
 ]);
@@ -55,6 +58,7 @@ function slashlessCollectionPath(pathname: string): string | undefined {
     pathname === "/account/" ||
     pathname === "/shipping/" ||
     pathname === "/returns/" ||
+    pathname === "/search/" ||
     pathname === "/feeds/google-merchant.xml/" ||
     pathname === "/feeds/meta-catalog.csv/"
   ) {

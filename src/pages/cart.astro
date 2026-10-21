@@ -1,5 +1,6 @@
 ---
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import { GuestCart } from "../features/guest-cart/ui.ts";
 import { acquireGuestCheckoutAdmission } from "../features/guest-cart/checkout-admission.js";
 import { STORE_TITLE, readStorefrontProfile } from "../features/store-shell/index.js";
@@ -37,5 +38,6 @@ const effectiveAdmission = playgroundAdmission ?? checkoutAdmission;
       {sandboxCheckout && <SandboxCheckoutNotice />}
       <GuestCart checkoutAdmission={playgroundAdmission ?? (isPlayground ? undefined : checkoutAdmission ?? undefined)} />
     </main>
+    <StoreFooter profile={profile} />
   </body>
 </html>

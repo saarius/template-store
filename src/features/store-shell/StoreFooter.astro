@@ -1,0 +1,199 @@
+---
+import {
+  getMenuWithCacheHint,
+  getSiteSettingsWithCacheHint,
+  getWidgetAreaWithCacheHint,
+  sanitizeHref,
+} from "emdash";
+import { WidgetArea } from "emdash/ui";
+import { STORE_DESCRIPTION, STORE_TITLE } from "./index.js";
+import {
+  FALLBACK_FOOTER_POLICIES_LINKS,
+  FALLBACK_FOOTER_SHOP_LINKS,
+  FOOTER_POLICIES_MENU_NAME,
+  FOOTER_SHOP_MENU_NAME,
+  PRESET_COOKIE_NAME,
+  THEME_COOKIE_NAME,
+  isCurrentMenuItem,
+  isStorePresetName,
+  isStoreThemeMode,
+  type StoreMenuItem,
+  type StorePresetName,
+  type StoreThemeMode,
+} from "./store-menu.js";
+
+interface Props {
+  profile: string;
+}
+
+const { profile } = Astro.props;
+const path = Astro.url.pathname;
+
+const settingsResult = await getSiteSettingsWithCacheHint().catch(() => null);
+if (settingsResult?.cacheHint && Astro.cache?.enabled) {
+  Astro.cache.set(settingsResult.cacheHint);
+}
+const siteSettings = settingsResult?.data ?? null;
+const brandTitle = siteSettings?.title?.trim() || STORE_TITLE;
+const brandTagline = siteSettings?.tagline?.trim() || STORE_DESCRIPTION;
+
+const shopMenuResult = await getMenuWithCacheHint(FOOTER_SHOP_MENU_NAME).catch(() => null);
+if (shopMenuResult?.cacheHint && Astro.cache?.enabled) {
+  Astro.cache.set(shopMenuResult.cacheHint);
+}
+const shopMenuItems: readonly Pick<StoreMenuItem, "label" | "url">[] =
+  shopMenuResult?.data?.items?.length ? shopMenuResult.data.items : FALLBACK_FOOTER_SHOP_LINKS;
+const shopNavSource = shopMenuResult?.data?.items?.length ? "cms" : "fallback";
+
+const policiesMenuResult = await getMenuWithCacheHint(FOOTER_POLICIES_MENU_NAME).catch(() => null);
+if (policiesMenuResult?.cacheHint && Astro.cache?.enabled) {
+  Astro.cache.set(policiesMenuResult.cacheHint);
+}
+const policiesMenuItems: readonly Pick<StoreMenuItem, "label" | "url">[] =
+  policiesMenuResult?.data?.items?.length ? policiesMenuResult.data.items : FALLBACK_FOOTER_POLICIES_LINKS;
+const policiesNavSource = policiesMenuResult?.data?.items?.length ? "cms" : "fallback";
+
+const footerAreaResult = await getWidgetAreaWithCacheHint("footer").catch(() => null);
+const hasSeededFooterWidgets = Boolean(footerAreaResult?.data?.widgets?.length);
+
+const cookieTheme = Astro.cookies.get(THEME_COOKIE_NAME)?.value;
+const activeTheme: StoreThemeMode = isStoreThemeMode(cookieTheme) ? cookieTheme : "light";
+
+const cookiePreset = Astro.cookies.get(PRESET_COOKIE_NAME)?.value;
+const activePreset: StorePresetName = isStorePresetName(cookiePreset) ? cookiePreset : "aizome";
+---
+<footer class="store-footer" data-store-footer>
+  <div class="store-footer__inner">
+    <div class="store-footer__grid">
+      <div class="store-footer__brand" data-footer-brand>
+        <a class="store-footer__brand-mark" href="/">{brandTitle}</a>
+        <p class="store-footer__tagline">{brandTagline}</p>
+        <p class="store-footer__provenance" data-footer-provenance>
+          Transactional facts remain in Commerce{profile === "proof" ? " and Inventory" : ""}; EmDash owns the
+          surrounding composition.
+        </p>
+      </div>
+
+      <nav
+        class="store-footer__nav"
+        aria-label="Footer shop"
+        data-footer-shop-nav
+        data-nav-source={shopNavSource}
+      >
+        <h2 class="store-footer__heading">Shop</h2>
+        <ul class="store-footer__nav-list">
+          {shopMenuItems.map((item) => (
+            <li>
+              <a
+                href={sanitizeHref(item.url)}
+                aria-current={isCurrentMenuItem(item, path) ? "page" : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div
+        class="store-footer__widgets"
+        data-footer-widget-column
+        data-footer-policies-nav
+        data-nav-source={policiesNavSource}
+      >
+        {hasSeededFooterWidgets ? (
+          <WidgetArea name="footer" />
+        ) : (
+          <nav aria-label="Policies and tools">
+            <h2 class="store-footer__heading">Policies &amp; tools</h2>
+            <ul class="store-footer__nav-list">
+              {policiesMenuItems.map((item) => (
+                <li>
+                  <a
+                    href={sanitizeHref(item.url)}
+                    aria-current={isCurrentMenuItem(item, path) ? "page" : undefined}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+      </div>
+
+      <div class="store-theme-dock" data-footer-theme-dock>
+        <div class="store-switcher-group" role="group" aria-label="Color theme" data-theme-switcher>
+          <span class="store-switcher-group__label">Theme</span>
+          <div class="store-switcher-pills">
+            <button
+              type="button"
+              class="store-switcher-pill"
+              data-theme-choice="light"
+              aria-pressed={activeTheme === "light" ? "true" : "false"}
+            >
+              Light
+            </button>
+            <button
+              type="button"
+              class="store-switcher-pill"
+              data-theme-choice="dark"
+              aria-pressed={activeTheme === "dark" ? "true" : "false"}
+            >
+              Dark
+            </button>
+            <button
+              type="button"
+              class="store-switcher-pill"
+              data-theme-choice="system"
+              aria-pressed={activeTheme === "system" ? "true" : "false"}
+            >
+              System
+            </button>
+          </div>
+        </div>
+
+        {profile === "proof" && (
+          <div class="store-switcher-group" role="group" aria-label="Stitch palette preset" data-preset-switcher>
+            <span class="store-switcher-group__label">Stitch preset</span>
+            <div class="store-switcher-pills">
+              <button
+                type="button"
+                class="store-switcher-pill"
+                data-preset-choice="aizome"
+                aria-pressed={activePreset === "aizome" ? "true" : "false"}
+              >
+                Aizome
+              </button>
+              <button
+                type="button"
+                class="store-switcher-pill"
+                data-preset-choice="forest"
+                aria-pressed={activePreset === "forest" ? "true" : "false"}
+              >
+                Forest
+              </button>
+              <button
+                type="button"
+                class="store-switcher-pill"
+                data-preset-choice="cobalt"
+                aria-pressed={activePreset === "cobalt" ? "true" : "false"}
+              >
+                Cobalt
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <div class="store-footer__meta">
+      <p>&copy; {new Date().getUTCFullYear()} {brandTitle}. Powered by EmDash &amp; DinkusKit Commerce.</p>
+      <p>Theme tokens via <code>src/styles/tokens.css</code> &middot; Brand overrides in <code>src/styles/theme.css</code></p>
+    </div>
+  </div>
+</footer>
+<script>
+  import { hydrateStoreTheme } from "./theme-client.ts";
+  hydrateStoreTheme();
+</script>

@@ -97,6 +97,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     (slashlessPath === "/account" ||
       slashlessPath === "/shipping" ||
       slashlessPath === "/returns" ||
+      slashlessPath === "/search" ||
       slashlessPath.startsWith("/feeds/")) &&
     (context.request.method === "GET" || context.request.method === "HEAD")
   ) {

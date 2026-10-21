@@ -66,21 +66,21 @@ const COMING_SOON_SHIPPING_COUNTRIES = ["Canada", "United Kingdom", "Australia",
   .guest-cart-subtotal[hidden]{display:none}
   .guest-cart-subtotal{display:flex;justify-content:space-between;gap:1rem;max-width:32rem;margin:1rem 0 0;padding-top:1rem;border-top:1px solid var(--store-line);font-size:1.25rem}
   .guest-cart-checkout{margin-top:2rem}
-  .guest-cart-contact{display:grid;gap:.5rem;max-width:34rem;margin:0 0 1rem;padding:1rem;border:1px solid var(--store-line);border-radius:.65rem}
+  .guest-cart-contact{display:grid;gap:.5rem;max-width:34rem;margin:0 0 1rem;padding:1.15rem;border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:var(--store-surface);box-shadow:3px 3px 0 var(--store-shadow)}
   .guest-cart-contact p{margin:0 0 .5rem}
   .guest-cart-contact h2{font-size:1.15rem;margin:.75rem 0 0}
   .guest-cart-contact span{color:var(--store-muted);font-size:.9em}
-  .guest-cart-contact input,.guest-cart-contact select{width:100%;box-sizing:border-box;padding:.6rem;border:1px solid var(--store-line);border-radius:.35rem;background:var(--store-surface);font:inherit}
-  .guest-cart-contact input:focus-visible,.guest-cart-contact select:focus-visible{outline:3px solid #215cc8;outline-offset:2px}
-  .guest-cart-coupon{display:grid;gap:.5rem;max-width:34rem;margin:0 0 1rem;padding:1rem;border:1px dashed var(--store-line);border-radius:.65rem;color:var(--store-muted)}
+  .guest-cart-contact input,.guest-cart-contact select{width:100%;box-sizing:border-box;padding:.6rem;border:1.5px solid var(--store-ink-border);border-radius:.35rem;background:var(--store-surface);color:inherit;font:inherit}
+  .guest-cart-contact input:focus-visible,.guest-cart-contact select:focus-visible{outline:3px solid var(--store-focus-ring);outline-offset:2px}
+  .guest-cart-coupon{display:grid;gap:.5rem;max-width:34rem;margin:0 0 1rem;padding:1rem;border:1.5px dashed var(--store-line);border-radius:var(--store-radius-card);color:var(--store-muted)}
   .guest-cart-coupon input{width:100%;box-sizing:border-box;padding:.6rem;border:1px solid var(--store-line);border-radius:.35rem;background:transparent;font:inherit;cursor:not-allowed}
   .guest-cart-coupon p{margin:0;font-size:.9em}
   .guest-cart-coupon input::placeholder{color:var(--store-muted);opacity:1}
-  .guest-cart-checkout button{margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1px solid var(--store-line);border-radius:.4rem;background:var(--store-surface);font:inherit;font-weight:800}
-  .guest-cart-checkout [data-guest-cart-resume]{display:inline-block;margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1px solid var(--store-line);border-radius:.4rem;background:var(--store-surface);color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:.2em}
+  .guest-cart-checkout button{margin:.4rem .6rem .4rem 0;padding:.75rem 1.1rem;border:1.5px solid var(--store-ink-border);border-radius:.4rem;background:var(--store-surface);color:inherit;font:inherit;font-weight:800;box-shadow:3px 3px 0 var(--store-shadow)}
+  .guest-cart-checkout [data-guest-cart-resume]{display:inline-block;margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1.5px solid var(--store-ink-border);border-radius:.4rem;background:var(--store-surface);color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:.2em}
   .guest-cart-checkout [data-guest-cart-resume][hidden]{display:none}
-  [data-guest-cart-checkout]:disabled{color:var(--store-muted);cursor:not-allowed}
-  .guest-cart :global([data-guest-cart-line]){padding:1.5rem;border:1px solid var(--store-line);border-radius:.85rem;background:var(--store-surface);min-width:0;overflow-wrap:anywhere}
+  [data-guest-cart-checkout]:disabled{color:var(--store-muted);box-shadow:none;cursor:not-allowed}
+  .guest-cart :global([data-guest-cart-line]){padding:1.5rem;border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:var(--store-surface);box-shadow:4px 4px 0 var(--store-shadow);min-width:0;overflow-wrap:anywhere}
   .guest-cart :global([data-guest-cart-line] h2){font-size:1.5rem;margin:0 0 1rem}
   .guest-cart :global(.price){display:flex;gap:.65rem;flex-wrap:wrap;font-size:1.4rem}
   .guest-cart :global(s){color:var(--store-muted)}

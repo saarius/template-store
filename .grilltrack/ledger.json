@@ -3,12 +3,11 @@
   "created_at": "2026-10-08T19:35:31+00:00",
   "current_focus": {
     "cadence": "sequential",
-    "confirmed": true,
-    "confirmed_at": "2026-10-21T02:54:32+00:00",
-    "domain": "shopper-accounts-playground",
-    "started_at": "2026-10-21T02:54:31+00:00",
-    "status": "confirmed",
-    "summary": "Add store-local shopper accounts (/account, StoreHeader entry, /cart prefill) and two-path playground sign-in (verified email OTP + PLAYGROUND_LEADS_DB opt-in vs instant no-PIN shopper@example.com demo opt-out)."
+    "confirmed": false,
+    "domain": "storefront-visual-language",
+    "started_at": "2026-10-21T16:33:09+00:00",
+    "status": "grilling",
+    "summary": ""
   },
   "decisions": [
     {
@@ -4029,5 +4028,5 @@
   "status": "active",
   "title": "Reconcile current main into PR43 checkout repair",
   "track_id": "gt-join-2082043c036aa939e706c9c093908348",
-  "updated_at": "2026-10-21T13:56:06+00:00"
+  "updated_at": "2026-10-21T16:33:09+00:00"
 }

@@ -75,7 +75,42 @@ test("the seeded main menu leads from every store page to the shop and its categ
     await page.goto(path);
     await expect(page.locator("[data-store-main-nav] a")).toHaveCount(6);
     await expect(page.locator("[data-store-header] [data-guest-cart-nav]")).toBeVisible();
+    await expect(page.locator("[data-store-footer]")).toBeVisible();
   }
+
+  // Shared StoreFooter renders <WidgetArea name="footer" /> with all 3 widget types,
+  // footer_shop menu, and the cookie-persisted theme switcher.
+  await page.goto("/");
+  const footer = page.locator("[data-store-footer]");
+  await expect(footer.locator("[data-footer-shop-nav]")).toHaveAttribute("data-nav-source", "cms");
+  const widgetArea = footer.locator('[data-widget-area="footer"]');
+  await expect(widgetArea).toBeVisible();
+  await expect(widgetArea.locator('[data-widget-type="content"]')).toHaveCount(1);
+  await expect(widgetArea.locator('[data-widget-type="menu"]')).toHaveCount(1);
+  await expect(widgetArea.locator('[data-widget-type="component"] form.widget-search')).toHaveCount(1);
+
+  const darkBtn = footer.locator('[data-theme-choice="dark"]');
+  const lightBtn = footer.locator('[data-theme-choice="light"]');
+  await darkBtn.click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(darkBtn).toHaveAttribute("aria-pressed", "true");
+  await lightBtn.click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+
+  // Reusable Portable Text section renders on /shipping and /returns.
+  await page.goto("/shipping");
+  await expect(page.locator('[data-policy-support-section="policy-support-note"]')).toHaveAttribute(
+    "data-section-source",
+    "cms",
+  );
+  await expect(
+    page.locator('[data-policy-support-section="policy-support-note"] h3'),
+  ).toHaveText("Garment care & policy provenance");
+
+  // /search route renders <LiveSearch> and SSR FTS5 results.
+  await page.goto("/search?q=Everyday");
+  await expect(page.locator("emdash-live-search")).toBeVisible();
+  await expect(page.locator('[data-search-result="everyday-tee"]')).toBeVisible();
 
   if (phone) {
     // The narrowest supported phone keeps brand, cart and Menu on screen.

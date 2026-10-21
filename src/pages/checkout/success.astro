@@ -1,5 +1,6 @@
 ---
 import StoreHeader from "../../features/store-shell/StoreHeader.astro";
+import StoreFooter from "../../features/store-shell/StoreFooter.astro";
 import { getSiteSettings } from "emdash";
 import { GuestCheckoutReturn } from "../../features/guest-cart/ui.ts";
 import { STORE_TITLE, readStorefrontProfile } from "../../features/store-shell/index.js";
@@ -47,6 +48,7 @@ const sandboxCheckout = showsSandboxCheckoutNotice({ profile, isPlayground, isDe
       {sandboxCheckout && <p class="store-sandbox-notice" role="note" data-sandbox-checkout-return>Test mode checkout. {SANDBOX_SESSION_NOTICE}</p>}
       <GuestCheckoutReturn contactHref={contactHref} />
     </main>
+    <StoreFooter profile={profile} />
   </body>
 </html>
 
