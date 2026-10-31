@@ -33,6 +33,8 @@ export interface PublicCommerceProduct {
 
 export interface PublicCommerceVariant {
   id: string;
+  /** Concrete member fact when projected by Commerce; absent on older artifacts. */
+  fulfillment?: "physical" | "digital";
   /** Option label to value label, e.g. [["Size", "Small"]]. */
   selections: readonly (readonly [string, string])[];
   unitMinor: string;

@@ -73,6 +73,8 @@ function variantMembers(variants: unknown): PublicCommerceVariant[] {
     if (!selections.length) continue;
     members.push({
       id: member.catalogItemId,
+      ...(member.fulfillment === "physical" || member.fulfillment === "digital"
+        ? { fulfillment: member.fulfillment } : {}),
       selections,
       unitMinor: minor,
       priceText: formatUsdMinor(minor),
@@ -266,6 +268,7 @@ export function cartLineProduct(item: PublicCommerceProduct, itemId: string): Pu
     name: `${item.name} \u2014 ${member.selections.map(([, value]) => value).join(" / ")}`,
     // Commerce projects no member SKU; the product's SKU would name a different item.
     sku: "",
+    fulfillment: member.fulfillment ?? item.fulfillment,
     price: { listable: true, regularText: member.priceText, saleText: null, unitMinor: member.unitMinor },
     availability: { ...member.availability, listable: true },
   };
