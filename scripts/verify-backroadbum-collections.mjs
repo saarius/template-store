@@ -51,10 +51,11 @@ try {
     await page.getByRole('link', { name: /Creekside Camp Mug/ }).click();
     await page.waitForURL(origin + '/products/creekside-camp-mug');
     await page.getByRole('button', { name: 'Add to cart', exact: true }).click();
+    await page.getByText('Added to cart.', { exact: true }).waitFor();
     await visit('/cart');
-    assert.ok((await page.locator('main').textContent()).includes('Creekside Camp Mug'));
+    await page.locator('[data-guest-cart-line]').filter({ hasText: 'Creekside Camp Mug' }).waitFor();
     await page.reload();
-    assert.ok((await page.locator('main').textContent()).includes('Creekside Camp Mug'));
+    await page.locator('[data-guest-cart-line]').filter({ hasText: 'Creekside Camp Mug' }).waitFor();
     await visit('/categories/hats');
     assert.equal(await page.locator('[data-commerce-product]').count(), 0);
     assert.match(await page.locator('[data-commerce-empty]').textContent(), /No gear/);
