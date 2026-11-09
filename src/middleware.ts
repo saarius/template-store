@@ -11,6 +11,7 @@ import {
 } from "./features/security/public-boundary.js";
 import { acquireGuestCheckoutAdmission, canDispatchInstalledGuestCheckout } from "./features/guest-cart/checkout-admission.js";
 import { GUEST_CHECKOUT_STATUS_ENDPOINT } from "./features/guest-cart/checkout-protocol.js";
+import { merchantCheckoutClosed, merchantCheckoutPath, merchantOperator } from "./features/guest-cart/merchant-policy.js";
 import {
    ensurePlaygroundDemoCatalog,
 } from "./features/playground/demo-commerce-seed.js";
@@ -96,6 +97,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
     applySecurityHeaders(response.headers);
     return response;
   }
+  const merchantClosed = merchantCheckoutClosed();
+  const operator = merchantClosed && merchantOperator((context.locals as { user?: unknown }).user);
+  if (merchantClosed && pathForms.some(merchantCheckoutPath) && !operator) {
+    const response = Response.json({ error: "Checkout is not available yet." }, { status: 503, headers: { "Cache-Control": "no-store" } });
+    applySecurityHeaders(response.headers);
+    return response;
+  }
   if (context.url.pathname === "/cart/") {
     const response = new Response(null, {
       status: 302,
@@ -163,6 +171,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   async function checkoutRouteAdmitted(): Promise<boolean> {
     const installed = { runtime: context.locals.emdash, request: context.request };
+    if (operator) return canDispatchInstalledGuestCheckout(installed);
     // Readiness is advisory for new checkout entry. An existing capability must
     // still reach Commerce's current start/status checks when the advisory is stale.
     return pathForms.some((path) => path.endsWith("/prepare"))

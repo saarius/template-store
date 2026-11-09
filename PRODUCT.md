@@ -5,7 +5,7 @@
 web
 
 ## Stack
-Owner-required EmDash + DinkusKit template-store, Commerce, Payments and Ship; Node 24. SQLite and local uploads on this server, with systemd and Caddy HTTPS. Registry sandbox bundles only for commerce plugins.
+Owner-required EmDash + DinkusKit template-store, Commerce, Payments and Ship; Node 24. SQLite and local uploads on this server, with systemd and Caddy HTTPS. Registry sandbox bundles only for commerce plugins. Commerce's Backroad Bum TEST profile isolates the merchant issuer and exact-host grant from generic DinkusKit Connect; public rollout remains independently gated.
 
 ## Users
 Inferred from the owner brief: people planning short backroad trips, looking for practical camp and travel gear. A second audience is merchants and developers exercising the demo checkout and following the public experiment.

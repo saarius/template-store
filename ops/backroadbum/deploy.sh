@@ -16,6 +16,9 @@ trap 'if [[ "$(readlink -f "$root/current" || true)" != "$release" ]]; then rm -
 trap 'exit 130' INT
 trap 'exit 143' TERM
 cd "$repo"
+export DINKUS_PAIRED_COMMERCE_DIR="$(node scripts/backroadbum-commerce.mjs)"
+export BACKROADBUM_MERCHANT_PROFILE=1
+export BACKROADBUM_CHECKOUT_ENABLED=0
 pnpm exec astro build --outDir "$release"
 # External Node dependencies resolve from this parent of every release.
 ln -sfn "$repo/node_modules" "$root/node_modules"

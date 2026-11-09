@@ -1,4 +1,5 @@
 import { COMMERCE_REGISTRY_RUNTIME_ID } from "./checkout-protocol.js";
+import { merchantCheckoutClosed } from "./merchant-policy.js";
 
 export const SUPPORTED_GUEST_CHECKOUT_ROUTES = [
   "checkout/guest/prepare",
@@ -199,6 +200,8 @@ export function canDispatchInstalledGuestCheckout(
 export async function acquireGuestCheckoutAdmission(
   context: InstalledCheckoutReadinessContext,
 ): Promise<GuestCheckoutAdmission> {
+  // A ready binding is not proof of a complete merchant payment/order journey.
+  if (merchantCheckoutClosed()) return null;
   const readiness = await readInstalledCheckoutReadiness(context);
   if (!readiness || readiness.status !== "supported" || readiness.mode !== "test") {
     return null;
