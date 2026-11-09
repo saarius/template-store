@@ -1,90 +1,37 @@
 ---
-import StoreFooter from "../../features/store-shell/StoreFooter.astro";
-import StoreHeader from "../../features/store-shell/StoreHeader.astro";
-import { getEmDashCollection } from "emdash";
-import MerchCatalog from "../../features/store-shell/MerchCatalog.astro";
-import { acquireGuestCheckoutAdmission } from "../../features/guest-cart/checkout-admission.js";
-import { playgroundCheckoutAdmission, playgroundCheckoutConfigured, playgroundEnvOf } from "../../features/playground-checkout/index.js";
-import { storeBannerText } from "../../features/store-shell/checkout-copy.js";
-import { readCommerceCatalog } from "../../features/commerce-catalog/index.js";
-import { STORE_TITLE, categoryPath, loadStorefrontRouteContext } from "../../features/store-shell/index.js";
-import { leftCommerceCatalog, withoutRemovedProducts } from "../../features/store-shell/merch-catalog.js";
-import { orderCategoryProducts } from "../../features/store-shell/category-product-order.js";
-import { commercePageLinks, hydrateProductCollectionMembership, readProductEntries } from "../../features/store-shell/product-routes.js";
-import "../../features/store-shell/global.css";
+import BackroadPage from '../../features/store-shell/BackroadPage.astro';
+import CollectionNav from '../../features/store-shell/CollectionNav.astro';
+import CommerceCatalog from '../../features/commerce-catalog/CommerceCatalog.astro';
+import { getEmDashCollection } from 'emdash';
+import { readCommerceCatalog } from '../../features/commerce-catalog/index.js';
+import { acquireGuestCheckoutAdmission } from '../../features/guest-cart/checkout-admission.js';
+import { hydrateProductCollectionMembership } from '../../features/store-shell/product-routes.js';
+import { shopCollections } from '../../features/store-shell/backroad-collections.js';
 
-const productCollection = await getEmDashCollection<"products", Record<string, unknown>>("products", { status: "published" });
-const products = { ...productCollection, entries: await hydrateProductCollectionMembership(productCollection.entries) };
-const categoryEntries = await getEmDashCollection<"categories", Record<string, unknown>>("categories", { status: "published" });
-// Commerce keeps which page sells each product (template-no-commerce-box-20261029), so the catalog is read first.
-let catalogRead = false;
-const catalog = await readCommerceCatalog({ runtime: Astro.locals.emdash, request: Astro.request })
-  .then((products) => { catalogRead = true; return products; })
-  .catch(() => []);
-const productLinks = readProductEntries(products.entries, categoryEntries.entries, commercePageLinks(catalog));
-const { profile, demonstrations, collections } = await loadStorefrontRouteContext(
-  products.entries.filter((entry) => productLinks.products.some((product) => product.id === entry.id)),
-  categoryEntries.entries,
-);
-const listedCategory = collections.find((group) => group.slug === Astro.params.slug);
-if (!listedCategory) Astro.response.status = 404;
-const isPlayground = Boolean((Astro.locals as { __playgroundDb?: unknown }).__playgroundDb);
-// A configured playground admits its sandbox checkout, as the cart page does.
-const checkoutAvailable = Boolean(playgroundCheckoutAdmission(isPlayground, playgroundCheckoutConfigured(playgroundEnvOf(Astro.locals)))) ||
-  Boolean(await acquireGuestCheckoutAdmission({
-    runtime: Astro.locals.emdash,
-    request: Astro.request,
-  }).catch(() => null));
-// Shipping stores show linked Commerce products with their real availability
-// and price instead of calling them previews.
-const commerceById = new Map(profile === "shipping" && listedCategory ? catalog.map((product) => [product.id, product]) : []);
-// A product whose Commerce product left the catalog (archived) leaves the
-// category too. If the catalog can't be read, nothing is dropped.
-const removedEntryIds = new Set(profile === "shipping" && catalogRead
-  ? productLinks.products
-    .filter((product) => leftCommerceCatalog(product.commerceItemId, commerceById.has(product.commerceItemId)))
-    .map((product) => product.id)
-  : []);
-const visibleCategory = listedCategory ? withoutRemovedProducts([listedCategory], removedEntryIds)[0] : undefined;
-const category = visibleCategory ? await orderCategoryProducts(visibleCategory) : undefined;
-const commerceProducts = new Map(productLinks.products.flatMap((product) => {
-  const commerce = commerceById.get(product.commerceItemId);
-  return commerce ? [[product.id, commerce] as const] : [];
-}));
-const hasPreviews = category?.items.some((item) => item.availabilitySource === "preview" && !commerceProducts.has(item.id)) ?? false;
-const managed = demonstrations?.managed;
-const unmanaged = demonstrations?.unmanaged;
+const entries = await getEmDashCollection<'products', Record<string, unknown>>('products', { status: 'published' });
+const categories = await getEmDashCollection<'categories', Record<string, unknown>>('categories', { status: 'published' });
+let unavailable = false;
+const products = await readCommerceCatalog({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => { unavailable = true; return []; });
+const { groups, paths } = shopCollections(await hydrateProductCollectionMembership(entries.entries), categories.entries, products);
+const category = groups.find(group => group.slug === Astro.params.slug);
+if (!category) Astro.response.status = 404;
+const checkoutAvailable = Boolean(await acquireGuestCheckoutAdmission({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => null));
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="description" content={category ? `Explore ${category.name} in the DinkusKit product catalog.` : "Category not found."} />
-    {category && <link rel="canonical" href={new URL(categoryPath(category.slug), Astro.site ?? Astro.url).href} />}
-    <title>{category ? `${category.name} | ${STORE_TITLE}` : `Category not found | ${STORE_TITLE}`}</title>
-  </head>
-  <body data-storefront-profile={profile}>
-    <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(checkoutAvailable)} role="status">{storeBannerText(checkoutAvailable)}</div>
-    <StoreHeader profile={profile} />
-    <main id="main-content" class="browse-page">
-      <nav class="browse-breadcrumb" aria-label="Breadcrumb"><a href="/">Catalog</a><span aria-hidden="true">/</span><span aria-current="page">{category?.name ?? "Not found"}</span></nav>
-      {category ? (
-        <>
-          <h1 class="browse-title">{category.name}</h1>
-          <p class="browse-intro">Explore the {category.name.toLowerCase()} category. {profile === "proof" ? "Connected availability is live; previews cannot be purchased." : hasPreviews ? "Editorial previews cannot be purchased." : ""}</p>
-          <MerchCatalog collections={[category]} managed={managed} unmanaged={unmanaged} commerceProducts={commerceProducts} collectionOnly />
-        </>
-      ) : <><h1>Category not found</h1><p>This category is not published or does not exist.</p><a href="/">Return to catalog</a></>}
-    </main>
-    <StoreFooter profile={profile} />
-  </body>
-</html>
+<BackroadPage title={category?.title ?? 'Collection not found'} description={category?.description || 'Everyday gear for a slow weekend away.'}>
+  <header class="brb-page collection-intro">
+    <nav aria-label="Breadcrumb"><a href="/shop">Shop</a><span aria-hidden="true">/</span><span aria-current="page">{category?.title ?? 'Not found'}</span></nav>
+    <h1>{category?.title ?? 'That collection isn’t here.'}</h1>
+    {category?.description && <p class="lead">{category.description}</p>}
+    {!category && <p>It may have moved or is no longer published. <a href="/shop">Browse all gear</a>.</p>}
+  </header>
+  {category && <>
+    <CollectionNav collections={groups} total={products.length} current={category.slug} unavailable={unavailable} />
+    <CommerceCatalog products={category.products} productPaths={paths} unavailable={unavailable} checkoutAvailable={checkoutAvailable} heading="In this collection" emptyMessage="No gear in this collection right now. Browse all gear above for something to take along." />
+  </>}
+</BackroadPage>
 <style>
-  .browse-page{width:min(70rem,calc(100% - 2rem));margin:0 auto;min-height:65vh}
-  .browse-breadcrumb{display:flex;flex-wrap:wrap;gap:.7rem;padding:2rem 0;color:var(--store-muted)}
-  .browse-breadcrumb a{color:inherit;text-underline-offset:.2em}
-  .browse-title{font-size:clamp(2.4rem,6vw,5rem);line-height:1;margin:.5rem 0}
-  .browse-intro{max-width:45rem;line-height:1.6;color:var(--store-muted)}
-  .browse-page :global(.merch-catalog){width:100%;margin:2rem 0}
+.collection-intro{margin-bottom:1.5rem;min-height:12rem}
+.collection-intro nav{display:flex;flex-wrap:wrap;gap:.75rem;color:var(--store-muted);margin-bottom:1.5rem}
+.collection-intro nav a{color:inherit;text-underline-offset:.2em}
+.collection-intro h1{margin-top:0}
 </style>

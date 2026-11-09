@@ -8,7 +8,7 @@ const links = [{url:'/shop',label:'Shop'},{url:'/field-notes',label:'Field notes
 <header class="store-header" data-store-header>
   <a class="store-header__mark" href="/" aria-label="Backroad Bum home">BACKROAD BUM</a>
   <nav class="brb-main-nav" aria-label="Main">
-    {links.map(link => <a href={link.url} aria-current={path === link.url ? 'page' : undefined}>{link.label}</a>)}
+    {links.map(link => <a href={link.url} aria-current={path === link.url ? 'page' : link.url === '/shop' && path.startsWith('/categories/') ? 'true' : undefined}>{link.label}</a>)}
   </nav>
   <nav class="store-header__nav" aria-label="Your shopping bag"><GuestCartNav /></nav>
 </header>

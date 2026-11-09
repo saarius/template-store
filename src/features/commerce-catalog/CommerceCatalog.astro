@@ -11,13 +11,16 @@ interface Props {
   productPaths?: ReadonlyMap<string, string>;
   /** Installed checkout admission; the footnote stays quiet when checkout works. */
   checkoutAvailable?: boolean;
+  heading?: string;
+  emptyMessage?: string;
 }
-const { products, unavailable = false, productPaths = new Map(), checkoutAvailable = false } = Astro.props;
+const { products, unavailable = false, productPaths = new Map(), checkoutAvailable = false,
+  heading = "Shop", emptyMessage = "No products are listed yet." } = Astro.props;
 const notice = catalogNoticeText({ unavailable, productCount: products.length, checkoutAvailable });
 ---
 <section class="shop-catalog" aria-labelledby="commerce-catalog" data-commerce-catalog>
-  <h2 id="commerce-catalog">Shop</h2>
-  {unavailable ? <p role="alert">The product catalog is temporarily unavailable.</p> : products.length === 0 ? <p data-commerce-empty>No products are listed yet.</p> : <div class="shop-grid">
+  <h2 id="commerce-catalog">{heading}</h2>
+  {unavailable ? <p role="alert">The product catalog is temporarily unavailable. Please try again shortly.</p> : products.length === 0 ? <p data-commerce-empty>{emptyMessage}</p> : <div class="shop-grid">
     {products.map(product => {
       const href = productPaths.get(product.id);
       const body = <>

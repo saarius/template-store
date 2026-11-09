@@ -20,7 +20,7 @@ All purchases are demonstrations: no real charges or physical shipments. Commerc
 Confirmed name: Backroad Bum. Owner delegates catalog, collections and editorial development. Provisional voice: plainspoken, observant, practical; no ruggedness theater, invented reviews or environmental/manufacturing claims. Initial content targets a slow weekend away, not extreme expeditions.
 
 ## Evidence on Hand
-Fresh deployment, November 9, 2026. No pre-existing store content, photography, customers or product claims were supplied. Source baseline: repos/template-store and exact dependency pins in its package.json. Any illustrative products are fictional demo merchandise. A private Payments transport created, retrieved and immediately expired an unpaid Stripe TEST session on November 9; no Commerce-backed paid order or shopper receipt has been verified, so checkout remains closed.
+Fresh deployment, November 9, 2026. No pre-existing store content, photography, customers or product claims were supplied. Source baseline: repos/template-store and exact dependency pins in its package.json. Any illustrative products are fictional demo merchandise. Road day and Slow camp are merchant-managed EmDash collections across the five products, not pre-priced bundles. A private Payments transport created, retrieved and immediately expired an unpaid Stripe TEST session on November 9; no Commerce-backed paid order or shopper receipt has been verified, so checkout remains closed.
 
 ## Product Principles
 - Make the next shopping action clear.

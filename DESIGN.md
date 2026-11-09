@@ -85,6 +85,9 @@ Image, name, authoritative price and availability, in that order. The whole list
 ### Navigation
 A compact uppercase wordmark and short plain-language links. The cart remains visible on phones. Current-page and hover states use underlines, not color alone.
 
+### Shopping collections
+The shop and collection pages share a wrapping row of ordinary links, not JavaScript tabs. All gear stays first; the current collection has a strong underline. Counts reflect only published, linked Commerce products; descriptions and membership come from EmDash. Empty collections remain addressable but stay out of navigation unless current. A catalog failure shows an error, never a false empty count.
+
 ### Reading and reporting
 Editorial pages have a single clear title and readable paragraph measure. Dashboard facts use aligned definition lists; tables have semantic headers and wrap rather than overflow.
 
