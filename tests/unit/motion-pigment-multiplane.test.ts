@@ -73,22 +73,15 @@ describe("A2 — Pigment Drift product illustrations & living hero/card ink-wash
     }
   });
 
-  it("wires the living Pigment Drift SVG wash in HomeOpener.astro and hover response in ProductMedia.astro", () => {
+  it("uses a photographic brand opener while retaining the starter's product and receipt primitives", () => {
     const homeOpener = readFileSync(
       resolve("src/features/store-shell/blocks/HomeOpener.astro"),
       "utf8",
     );
-    expect(homeOpener).toContain('class="home-opener__pigment-wash"');
-    expect(homeOpener).toContain('data-pigment-drift="hero"');
-    expect(homeOpener).toContain("<feTurbulence");
-    expect(homeOpener).toContain("<feDisplacementMap");
-    expect(homeOpener).toContain("var(--store-bg)");
-    expect(homeOpener).toContain("var(--store-surface-subtle)");
-    expect(homeOpener).toContain("var(--store-accent)");
-    expect(homeOpener).toContain("var(--store-ink)");
-    expect(homeOpener).toContain("prefers-reduced-motion: reduce");
-    // The ink wash is still artwork: nothing to pause for reduced motion.
-    expect(homeOpener).not.toContain("<animate");
+    expect(homeOpener).toContain('src="/backroad/forest.jpg"');
+    expect(homeOpener).toContain('fetchpriority="high"');
+    expect(homeOpener).toContain('sanitizeHref');
+    expect(homeOpener).not.toContain('<animate');
 
     const productMedia = readFileSync(
       resolve("src/features/commerce-catalog/ProductMedia.astro"),
@@ -117,10 +110,8 @@ describe("A2 — Pigment Drift product illustrations & living hero/card ink-wash
       resolve("src/features/store-shell/StoreFooter.astro"),
       "utf8",
     );
-    expect(storeFooter).toContain('data-pigment-drift="footer"');
-    expect(storeFooter).toContain("footer-chromatic-tide");
-    expect(storeFooter).toContain("var(--pigment-stop-1");
-    expect(storeFooter).toContain("var(--pigment-stop-4");
+    expect(storeFooter).toContain('var(--store-vault-bg)');
+    expect(storeFooter).toContain('BACKROAD BUM');
     expect(storeFooter).not.toContain("<animate");
 
     const productDetail = readFileSync(

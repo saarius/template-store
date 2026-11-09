@@ -121,7 +121,7 @@ describe("playground sandbox checkout gates", () => {
       // The cart derives its admission and banner from the same gate: checkout shows unavailable.
       const admission = playgroundCheckoutAdmission(true, playgroundCheckoutConfigured(env));
       expect(admission).toBeNull();
-      expect(storeBannerText(Boolean(admission))).toContain("checkout are unavailable");
+      expect(storeBannerText(Boolean(admission))).toContain("Checkout is not connected yet");
     }
     // Loopback http is accepted only for the local proof harness.
     expect(playgroundCheckoutConfigured({ ...payments, EMDASH_SITE_URL: "http://127.0.0.1:4397", DINKUS_LOCAL_PROOF: "1" })).toBe(true);

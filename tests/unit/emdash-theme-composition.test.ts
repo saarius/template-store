@@ -57,7 +57,8 @@ describe("Upstream EmDash theming (tokens.css + theme.css) & multi-preset suppor
     const themeCss = readFileSync(resolve("src/styles/theme.css"), "utf8");
     const uncommented = themeCss.replace(/\/\*[\s\S]*?\*\//gu, "");
     expect(uncommented).not.toContain("@layer");
-    expect(uncommented).toMatch(/:root\s*\{\s*\}/mu);
+    expect(uncommented).toContain('--store-bg:#f8fbfc');
+    expect(uncommented).toContain('--font-display:"Barlow Semi Condensed"');
 
     const globalCss = readFileSync(resolve("src/features/store-shell/global.css"), "utf8");
     const tokensImportIndex = globalCss.indexOf('@import "../../styles/tokens.css";');
@@ -88,22 +89,13 @@ describe("Shared StoreFooter.astro & public route mounting", () => {
     }
   });
 
-  it("wires getSiteSettingsWithCacheHint, footer menus, WidgetArea, and theme/preset switchers in StoreFooter.astro", () => {
+  it("keeps the adopted brand footer focused on shopping, guidance and the public experiment", () => {
     const footer = readFileSync(resolve("src/features/store-shell/StoreFooter.astro"), "utf8");
-    expect(footer).toContain("getSiteSettingsWithCacheHint");
-    expect(footer).toContain("Astro.cache.set(footerAreaResult.cacheHint)");
-    expect(footer).toContain('<WidgetArea name="footer" />');
-    expect(footer).toContain("data-footer-shop-nav");
-    expect(footer).toContain("data-footer-policies-nav");
-    expect(footer).toContain("data-nav-source=");
-    expect(footer).toContain("data-theme-switcher");
-    expect(footer).toContain("data-preset-switcher");
-    expect(footer).toContain("Transactional facts remain in Commerce");
-    // Preserve intentionally empty CMS menus without falling back to hardcoded categories:
-    expect(footer).toContain("const hasCmsShopMenu = shopMenuData !== null;");
-    expect(footer).toContain("const hasCmsPoliciesMenu = policiesMenuData !== null;");
-    expect(footer).not.toContain("shopMenuResult?.data?.items?.length");
-    expect(footer).not.toContain("policiesMenuResult?.data?.items?.length");
+    for (const path of ['/shop', '/field-notes', '/test-store', '/dashboard/', '/shipping', '/returns']) {
+      expect(footer).toContain(`href="${path}"`);
+    }
+    expect(footer).toContain('BACKROAD BUM');
+    expect(footer).not.toContain('data-theme-switcher');
 
     // Never hide merchant-configured footer menu widgets via CSS:
     const globalCss = readFileSync(resolve("src/features/store-shell/global.css"), "utf8");

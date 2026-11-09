@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh Backroad Bum telemetry every minute
+
+[Timer]
+OnBootSec=45
+OnUnitActiveSec=60
+Unit=backroadbum-telemetry.service
+
+[Install]
+WantedBy=timers.target

@@ -1,5 +1,7 @@
 # Agent Contract
 
+This `backroadbum/store` fork branch is a merchant-specific adoption, authorized by the owner instructions in `/etc/trialrun/AGENT.md`. Keep Backroad Bum branding and server operations out of any small upstream framework patch; `BACKROADBUM.md` records this deployment.
+
 This public repository owns the generic DinkusKit store starter for EmDash.
 Assume every committed byte is immediately public.
 
@@ -31,7 +33,7 @@ outputs must be original and public-safe.
 
 1. This file.
 2. The linked organization vision and planning boundaries for shared direction.
-3. `design.md` for this repository's visual contract.
+3. `DESIGN.md` for this merchant branch's visual contract. The original starter design is archived in `docs/template-design.md`.
 4. `FEATURE_MAP.md` for feature ownership and verification.
 5. `.grilltrack/ledger.json`, changed only through the GrillTrack CLI.
 6. Current source, tests, and committed proof for implemented behavior.

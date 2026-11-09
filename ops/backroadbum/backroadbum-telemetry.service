@@ -1,0 +1,12 @@
+[Unit]
+Description=Collect public-safe Backroad Bum telemetry
+After=backroadbum.service caddy.service
+
+[Service]
+Type=oneshot
+User=agent
+Group=agent
+ExecStart=/usr/bin/python3 /var/lib/trialrun/workspace/ops/collect-telemetry.py
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077

@@ -1,0 +1,20 @@
+---
+import BackroadPage from '../features/store-shell/BackroadPage.astro';
+import CommerceCatalog from '../features/commerce-catalog/CommerceCatalog.astro';
+import { readCommerceCatalog } from '../features/commerce-catalog/index.js';
+import { getEmDashCollection } from 'emdash';
+import { canonicalProductPath, commercePageLinks, hydrateProductCollectionMembership, readProductEntries } from '../features/store-shell/product-routes.js';
+import { acquireGuestCheckoutAdmission } from '../features/guest-cart/checkout-admission.js';
+let unavailable = false;
+const products = await readCommerceCatalog({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => { unavailable = true; return []; });
+const entries = await getEmDashCollection<'products', Record<string, unknown>>('products', { status: 'published' });
+const categories = await getEmDashCollection<'categories', Record<string, unknown>>('categories', { status: 'published' });
+const links = readProductEntries(await hydrateProductCollectionMembership(entries.entries), categories.entries, commercePageLinks(products));
+const paths = new Map(links.products.map(p => [p.commerceItemId, canonicalProductPath(p.slug)]));
+const checkoutAvailable = Boolean(await acquireGuestCheckoutAdmission({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => null));
+---
+<BackroadPage title="Shop all gear">
+  <header class="brb-page shop-intro"><h1>Pack a little possibility.</h1><p class="lead">The coffee stop. The last stretch of gravel. The evening you stay out for. A few everyday goods to take along.</p><p>Product images are illustrations of our demo designs.</p></header>
+  <CommerceCatalog products={products} productPaths={paths} unavailable={unavailable} checkoutAvailable={checkoutAvailable} />
+</BackroadPage>
+<style>.shop-intro{margin-bottom:1.5rem}.shop-intro>p:last-child{font-size:.85rem;color:var(--store-muted)}</style>

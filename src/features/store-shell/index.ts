@@ -1,6 +1,6 @@
-export const STORE_TITLE = "DinkusKit Store Starter";
+export const STORE_TITLE = "Backroad Bum";
 export const STORE_DESCRIPTION =
-  "A neutral storefront for EmDash and Commerce.";
+  "Everyday goods for the miles in between. Explore camp gear, roadwear and field notes from Backroad Bum.";
 export const PROOF_STORE_DESCRIPTION =
   "A neutral proof storefront for EmDash, Commerce, and Inventory.";
 export {

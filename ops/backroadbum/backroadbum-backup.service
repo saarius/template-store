@@ -1,0 +1,11 @@
+[Unit]
+Description=Back up Backroad Bum SQLite and uploads
+
+[Service]
+Type=oneshot
+User=agent
+Group=agent
+ExecStart=/usr/bin/python3 /var/lib/trialrun/workspace/ops/backup.py
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077

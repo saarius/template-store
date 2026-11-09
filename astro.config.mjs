@@ -12,6 +12,7 @@ import { selectedRegistryAccessOptions } from "./scripts/registry-access.mjs";
 import { registrySandboxRunner, selectedRegistrySandboxRunner } from "./scripts/registry-sandbox.mjs";
 import { pairedCommerceDescriptor, pairedCommercePin, pairedCommerceProfile, resolvePairedCommerceDir } from "./scripts/lib/paired-commerce.mjs";
 
+import { playgroundRegistryPlugins } from "./src/features/playground-plugins/registry-plugins.mjs";
 import { commerceProfile, commerceProfileDefine } from "./src/features/commerce-profile/profiles.mjs";
 
 const isCloudflare =
@@ -113,7 +114,7 @@ export default defineConfig({
       // On Cloudflare the Worker Loader runs the installed plugins; on Node the workerd runner does, and
       // astro dev hands them to Miniflare (EmDash's documented loop: build the plugin, run the site).
       ...(isCloudflare ? { sandboxRunner: cloudflareSandbox() } : pairedCommerce ? { sandboxRunner: "@emdash-cms/sandbox-workerd/sandbox" } : {}),
-      ...(pairedCommerce ? { sandboxed: [pairedCommerce] } : {}),
+      ...(pairedCommerce ? { sandboxed: [pairedCommerce, ...playgroundRegistryPlugins().filter(plugin => plugin.id !== pairedCommerce.id)] } : {}),
       plugins: [
         {
           id: "dinkus-template-product-urls",

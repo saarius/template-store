@@ -1,0 +1,26 @@
+[Unit]
+Description=Backroad Bum EmDash demo store
+After=network.target
+
+[Service]
+Type=simple
+User=agent
+Group=agent
+WorkingDirectory=/var/lib/trialrun/workspace/repos/template-store
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=4321
+Environment=EMDASH_SITE_URL=https://backroadbum.com
+Environment=DINKUS_TEMPLATE_DB_URL=file:/var/lib/backroadbum/content.db
+Environment=DINKUS_TEMPLATE_UPLOADS_DIR=/var/lib/backroadbum/uploads
+Environment=PATH=/opt/node/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/opt/node/bin/node /var/lib/backroadbum/current/server/entry.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

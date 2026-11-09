@@ -14,6 +14,9 @@ import { legacyPortableTextComponents } from "../features/store-shell/portable-t
 import { STORE_TITLE, readStorefrontProfile } from "../features/store-shell/index.js";
 import { canonicalUrl } from "../features/store-shell/structured-data.js";
 import "../features/store-shell/global.css";
+import { storeBannerText } from '../features/store-shell/checkout-copy.js';
+import { acquireGuestCheckoutAdmission } from '../features/guest-cart/checkout-admission.js';
+const checkoutAvailable = Boolean(await acquireGuestCheckoutAdmission({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => null));
 
 const slug = Astro.params.slug ?? "";
 // The home page lives at "/", never at "/home".
@@ -36,8 +39,9 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
     <title>{title} | {STORE_TITLE}</title>
   </head>
   <body data-storefront-profile={profile}>
+    <div class="store-demo-banner" role="status">{storeBannerText(checkoutAvailable)} <a href="/test-store">How to try it</a></div>
     <StoreHeader profile={profile} />
-    <main class="cms-page" data-cms-page={entry ? slug : undefined}>
+    <main id="main-content" class="cms-page" data-cms-page={entry ? slug : undefined}>
       {entry ? (
         <>
           {layout.length === 0 && <h1 class="cms-page__title">{title}</h1>}
@@ -65,7 +69,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
 <style>
   .cms-page{width:min(70rem,calc(100% - 2rem));margin:2.5rem auto 4rem;min-height:60vh;line-height:1.65}
   .cms-page .cms-composition{width:100%}
-  .cms-page__title{margin:0 0 1rem;font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.02;letter-spacing:-.045em}
+  .cms-page__title{margin:0 0 1rem;font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.02;letter-spacing:-.025em}
   .cms-page__body{max-width:44rem}
   .cms-page__body :global(h2){margin:1.5rem 0 .5rem;font-size:1.3rem;letter-spacing:-.02em}
   .cms-page__body :global(p){margin:0 0 1rem;color:var(--store-ink)}

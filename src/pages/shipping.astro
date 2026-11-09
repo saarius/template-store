@@ -26,7 +26,7 @@ const canonical = canonicalUrl("/shipping", Astro.site, Astro.url);
   <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><link rel="canonical" href={canonical} /><title>{entry?.data?.title ?? "Shipping"} | {STORE_TITLE}</title></head>
   <body data-storefront-profile={profile}>
     <StoreHeader profile={profile} />
-    <main class="policy-page">
+    <main id="main-content" class="policy-page">
       <div class="policy-shell">
         <aside class="policy-rail" aria-label="Customer care navigation and provenance">
           <a class="policy-rail__back" href="/">← Back to store</a>

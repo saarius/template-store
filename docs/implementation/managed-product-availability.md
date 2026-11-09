@@ -124,7 +124,7 @@ and current available quantity. The browser suite drives the proof-only
 adjustment endpoint, reloads the real page after each mutation, and retains
 initial, changed, and restored screenshots.
 
-The neutral scaffold is not a selected visual direction. `design.md` records
+The neutral scaffold is not a selected visual direction. `docs/template-design.md` records
 only confirmed functional and accessibility constraints.
 
 The Astro live-content registration is owned by `src/live.config.ts`. Browser

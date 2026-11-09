@@ -18,8 +18,8 @@ const STOREFRONT_PAGES = [
 
 describe("storefront checkout wording", () => {
   it("banner follows installed checkout admission", () => {
-    expect(storeBannerText(true)).toBe("Test checkout is available. No live purchases.");
-    expect(storeBannerText(false)).toBe("Demo / Test Store — Purchases and checkout are unavailable.");
+    expect(storeBannerText(true)).toBe("DEMO / TEST STORE — No real charges or shipments. Stripe test cards only.");
+    expect(storeBannerText(false)).toBe("DEMO / TEST STORE — No real charges or shipments. Checkout is not connected yet.");
   });
 
   it("every storefront page reads checkout admission for its banner", () => {

@@ -5,8 +5,8 @@
  */
 export function storeBannerText(checkoutAvailable: boolean): string {
   return checkoutAvailable
-    ? "Test checkout is available. No live purchases."
-    : "Demo / Test Store — Purchases and checkout are unavailable.";
+    ? "DEMO / TEST STORE — No real charges or shipments. Stripe test cards only."
+    : "DEMO / TEST STORE — No real charges or shipments. Checkout is not connected yet.";
 }
 
 export type CatalogGuidanceState = "unavailable" | "empty" | "ready";

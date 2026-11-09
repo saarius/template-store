@@ -67,7 +67,7 @@ const unmanaged = demonstrations?.unmanaged;
   <body data-storefront-profile={profile}>
     <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(checkoutAvailable)} role="status">{storeBannerText(checkoutAvailable)}</div>
     <StoreHeader profile={profile} />
-    <main class="browse-page">
+    <main id="main-content" class="browse-page">
       <nav class="browse-breadcrumb" aria-label="Breadcrumb"><a href="/">Catalog</a><span aria-hidden="true">/</span><span aria-current="page">{category?.name ?? "Not found"}</span></nav>
       {category ? (
         <>

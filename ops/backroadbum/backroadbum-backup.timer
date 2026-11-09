@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Backroad Bum recovery snapshot
+
+[Timer]
+OnCalendar=*-*-* 04:20:00 UTC
+Persistent=true
+Unit=backroadbum-backup.service
+
+[Install]
+WantedBy=timers.target

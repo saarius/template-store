@@ -119,7 +119,7 @@ describe("storefront profile", () => {
 
   it("isolates [data-integration-demos] and proof-only copy off / onto /proof", () => {
     expect(PROOF_DEMONSTRATIONS_PATH).toBe("/proof");
-    expect(STORE_DESCRIPTION).toBe("A neutral storefront for EmDash and Commerce.");
+    expect(STORE_DESCRIPTION).toBe("Everyday goods for the miles in between. Explore camp gear, roadwear and field notes from Backroad Bum.");
     expect(PROOF_STORE_DESCRIPTION).toBe(
       "A neutral proof storefront for EmDash, Commerce, and Inventory.",
     );

@@ -67,7 +67,7 @@ if (!composed && import.meta.env.DEV) {
   <body data-storefront-profile={profile}>
     <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(checkoutAvailable)} role="status">{storeBannerText(checkoutAvailable)}</div>
     <StoreHeader profile={profile} />
-    <main>
+    <main id="main-content">
       {
         layout?.length ? (
           <div class="cms-composition" data-cms-composition data-layout="blocks">
@@ -94,6 +94,10 @@ if (!composed && import.meta.env.DEV) {
         <p>{guidance.detail}</p>
       </section>
       <CommerceCatalog products={commerceProducts} unavailable={catalogUnavailable} productPaths={productPaths} checkoutAvailable={checkoutAvailable} />
+      <section class="brb-field-promo">
+        <div><h2>A little less itinerary.</h2><p>Notes on packing light, stopping often and leaving a place better than you found it.</p><a href="/field-notes">Read the field notes</a></div>
+        <p>Windows down.<br />Plans optional.<br />Leave no trace.</p>
+      </section>
       {productLinks.errors.length > 0 && (
         <aside data-product-url-errors hidden>{productLinks.errors.join(" | ")}</aside>
       )}
@@ -101,3 +105,9 @@ if (!composed && import.meta.env.DEV) {
     <StoreFooter profile={profile} />
   </body>
 </html>
+<style>
+.brb-field-promo{width:min(70rem,calc(100% - 2rem));margin:4rem auto;display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;background:var(--brb-blue);padding:2.5rem;border-radius:4px}
+.brb-field-promo h2{font-size:clamp(2.4rem,4vw,3.5rem);line-height:1.1;margin:0 0 1rem;letter-spacing:-.025em}
+.brb-field-promo p{max-width:43ch;margin:0 0 1.25rem}.brb-field-promo>p{font-family:var(--font-display);font-size:2rem;line-height:1.4;margin:auto 0 auto auto}.brb-field-promo a{color:inherit;font-weight:700}
+@media(max-width:40rem){.brb-field-promo{grid-template-columns:1fr;padding:1.5rem}.brb-field-promo>p{margin:0;font-size:1.6rem}}
+</style>

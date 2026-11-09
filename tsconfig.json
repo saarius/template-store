@@ -38,6 +38,9 @@
   ],
   "exclude": [
     "dist",
+    ".artifacts",
+    ".cursor",
+    ".pi",
     "node_modules",
     "test-results",
     "runs"

@@ -44,7 +44,7 @@ const sandboxCheckout = showsSandboxCheckoutNotice({ profile, isPlayground, isDe
   <body data-storefront-profile={profile}>
     <div class="store-demo-banner" data-store-demo-banner role="status">Demo checkout &mdash; No real payments or fulfillment.</div>
     <StoreHeader profile={profile} />
-    <main>
+    <main id="main-content">
       {sandboxCheckout && <p class="store-sandbox-notice" role="note" data-sandbox-checkout-return>Test mode checkout. {SANDBOX_SESSION_NOTICE}</p>}
       <GuestCheckoutReturn contactHref={contactHref} />
     </main>
