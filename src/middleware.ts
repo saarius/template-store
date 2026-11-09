@@ -11,7 +11,7 @@ import {
 } from "./features/security/public-boundary.js";
 import { acquireGuestCheckoutAdmission, canDispatchInstalledGuestCheckout } from "./features/guest-cart/checkout-admission.js";
 import { GUEST_CHECKOUT_STATUS_ENDPOINT } from "./features/guest-cart/checkout-protocol.js";
-import { merchantCheckoutClosed, merchantCheckoutPath, merchantOperator } from "./features/guest-cart/merchant-policy.js";
+import { merchantCheckoutClosed, merchantCheckoutPath } from "./features/guest-cart/merchant-policy.js";
 import {
    ensurePlaygroundDemoCatalog,
 } from "./features/playground/demo-commerce-seed.js";
@@ -97,22 +97,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
     applySecurityHeaders(response.headers);
     return response;
   }
-  const merchantClosed = merchantCheckoutClosed();
-  let operator = false;
-  if (merchantClosed && pathForms.some(merchantCheckoutPath)) {
-    try {
-      // EmDash auth can populate locals.user later on API requests. The Astro
-      // session is server-owned; re-read the current stored user before granting.
-      const runtime = context.locals.emdash as unknown as OnSaleRuntime | undefined;
-      const candidate = (context.locals as { user?: unknown }).user ??
-        (context.cookies.has('astro-session') ? await context.session?.get('user') : null);
-      operator = Boolean(runtime?.db) && merchantOperator(await storedUser(runtime!, candidate));
-    } catch { operator = false; }
-    if (!operator) {
-      const response = Response.json({ error: "Checkout is not available yet." }, { status: 503, headers: { "Cache-Control": "no-store" } });
-      applySecurityHeaders(response.headers);
-      return response;
-    }
+  if (merchantCheckoutClosed() && pathForms.some(merchantCheckoutPath)) {
+    const response = Response.json({ error: "Checkout is not available yet." }, { status: 503, headers: { "Cache-Control": "no-store" } });
+    applySecurityHeaders(response.headers);
+    return response;
   }
   if (context.url.pathname === "/cart/") {
     const response = new Response(null, {
@@ -181,7 +169,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   async function checkoutRouteAdmitted(): Promise<boolean> {
     const installed = { runtime: context.locals.emdash, request: context.request };
-    if (operator) return canDispatchInstalledGuestCheckout(installed);
     // Readiness is advisory for new checkout entry. An existing capability must
     // still reach Commerce's current start/status checks when the advisory is stale.
     return pathForms.some((path) => path.endsWith("/prepare"))
