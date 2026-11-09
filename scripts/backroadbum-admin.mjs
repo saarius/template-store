@@ -19,7 +19,7 @@ export async function openAdmin() {
     for (const credential of keys) await cdp.send('WebAuthn.addCredential', { authenticatorId, credential });
   }
   return { browser, context, page, async signIn() {
-    await page.goto('https://backroadbum.com/_emdash/admin');
+    await page.goto('https://backroadbum.com/_emdash/admin', { waitUntil: 'domcontentloaded' });
     await page.getByRole('button', { name: 'Sign in with Passkey', exact: true }).click();
     await page.waitForURL((url) => url.pathname === '/_emdash/admin' && !url.search);
     await page.waitForTimeout(2000);
