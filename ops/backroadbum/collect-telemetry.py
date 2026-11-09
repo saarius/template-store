@@ -29,8 +29,19 @@ try:
     with urllib.request.urlopen(req, timeout=10) as r: checkout = r.status
 except urllib.error.HTTPError as e: checkout = e.code
 except Exception: checkout = None
+# Loopback liveness is not proof that Commerce is connected or an order was paid.
+transport = None
+try:
+    with urllib.request.urlopen('http://127.0.0.1:8787/health', timeout=3) as response:
+        value = json.load(response)
+        if value.get('service') == 'backroadbum-payments':
+            transport = {'http': response.status, 'mode': value.get('mode') if value.get('mode') in ['test', 'live'] else None,
+                         'storefrontConnected': value.get('storefrontConnected') if isinstance(value.get('storefrontConnected'), bool) else None,
+                         'webhookConnected': value.get('webhookConnected') if isinstance(value.get('webhookConnected'), bool) else None}
+except Exception:
+    pass
 disk = shutil.disk_usage('/')
-result = {'collectedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(), 'services':{name:service(name) for name in ['backroadbum','caddy']}, 'http':health, 'host':{'cpuPercent':cpu(),**memory(),'diskUsedGiB':round(disk.used/2**30,1),'diskTotalGiB':round(disk.total/2**30,1)}, 'checkout':{'state':'not_connected','prepareHttp':checkout,'lastPaidTestAt':None}, 'usage':{'visitors':None,'orders':None,'tokens':None,'apiEquivalentUSD':None}, 'backupAt':None}
+result = {'collectedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(), 'services':{name:service(name) for name in ['backroadbum','caddy','backroadbum-payments']}, 'http':health, 'host':{'cpuPercent':cpu(),**memory(),'diskUsedGiB':round(disk.used/2**30,1),'diskTotalGiB':round(disk.total/2**30,1)}, 'checkout':{'state':'not_connected','prepareHttp':checkout,'lastPaidTestAt':None}, 'paymentsTransport':transport, 'usage':{'visitors':None,'orders':None,'tokens':None,'apiEquivalentUSD':None}, 'backupAt':None}
 backups = list((ROOT/'backups').glob('*.tar.gz'))
 if backups: result['backupAt'] = datetime.datetime.fromtimestamp(max(p.stat().st_mtime for p in backups),datetime.timezone.utc).isoformat()
 p = ROOT/'telemetry.json.tmp'; p.write_text(json.dumps(result)); p.replace(ROOT/'telemetry.json')

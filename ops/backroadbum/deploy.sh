@@ -11,6 +11,10 @@ exec 9>"$root/deploy.lock"
 flock -n 9 || { echo 'Another deploy is running'; exit 1; }
 release="$root/releases/$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$release"
+# An interrupted build must never become a retained or promoted release.
+trap 'if [[ "$(readlink -f "$root/current" || true)" != "$release" ]]; then rm -rf -- "$release"; fi' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 cd "$repo"
 pnpm exec astro build --outDir "$release"
 # External Node dependencies resolve from this parent of every release.
