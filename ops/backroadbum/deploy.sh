@@ -6,6 +6,7 @@ export EMDASH_SITE_URL=https://backroadbum.com
 export DINKUS_TEMPLATE_DB_URL=file:/var/lib/backroadbum/content.db
 export DINKUS_TEMPLATE_UPLOADS_DIR=/var/lib/backroadbum/uploads
 root=/var/lib/backroadbum
+[[ -r /etc/backroadbum/emdash.env ]] || { echo 'Private EmDash encryption configuration missing; deploy refused'; exit 1; }
 repo=/var/lib/trialrun/workspace/repos/template-store
 exec 9>"$root/deploy.lock"
 flock -n 9 || { echo 'Another deploy is running'; exit 1; }

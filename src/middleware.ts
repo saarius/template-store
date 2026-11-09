@@ -98,11 +98,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return response;
   }
   const merchantClosed = merchantCheckoutClosed();
-  const operator = merchantClosed && merchantOperator((context.locals as { user?: unknown }).user);
-  if (merchantClosed && pathForms.some(merchantCheckoutPath) && !operator) {
-    const response = Response.json({ error: "Checkout is not available yet." }, { status: 503, headers: { "Cache-Control": "no-store" } });
-    applySecurityHeaders(response.headers);
-    return response;
+  let operator = false;
+  if (merchantClosed && pathForms.some(merchantCheckoutPath)) {
+    try {
+      // EmDash auth can populate locals.user later on API requests. The Astro
+      // session is server-owned; re-read the current stored user before granting.
+      const runtime = context.locals.emdash as unknown as OnSaleRuntime | undefined;
+      const candidate = (context.locals as { user?: unknown }).user ??
+        (context.cookies.has('astro-session') ? await context.session?.get('user') : null);
+      operator = Boolean(runtime?.db) && merchantOperator(await storedUser(runtime!, candidate));
+    } catch { operator = false; }
+    if (!operator) {
+      const response = Response.json({ error: "Checkout is not available yet." }, { status: 503, headers: { "Cache-Control": "no-store" } });
+      applySecurityHeaders(response.headers);
+      return response;
+    }
   }
   if (context.url.pathname === "/cart/") {
     const response = new Response(null, {

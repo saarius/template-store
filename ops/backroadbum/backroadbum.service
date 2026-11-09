@@ -8,6 +8,7 @@ User=agent
 Group=agent
 WorkingDirectory=/var/lib/trialrun/workspace/repos/template-store
 Environment=NODE_ENV=production
+EnvironmentFile=/etc/backroadbum/emdash.env
 Environment=HOST=127.0.0.1
 Environment=PORT=4321
 Environment=EMDASH_SITE_URL=https://backroadbum.com
