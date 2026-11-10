@@ -72,6 +72,26 @@ def check_ship_binding(db, config):
     expected = ['https://backroadbum.com', 'backroadbum', 'backroadbum-ship', config['generation'], config['allowedOrderId'], 'practice']
     if not binding or json.loads(binding[0]) != expected:
         raise RuntimeError('Ship configuration and storage binding do not match')
+    # Older fixed-admission snapshots have no table; the new host migrates them once.
+    if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='merchant_admission'").fetchone():
+        return
+    rows = db.execute('SELECT id, revision, order_id, enabled, updated_at FROM merchant_admission').fetchall()
+    if len(rows) != 1:
+        raise RuntimeError('Invalid Ship admission state')
+    row_id, revision, order_id, enabled, updated_at = rows[0]
+    if (row_id != 1 or not isinstance(revision, int) or not 0 <= revision <= 9007199254740991 or
+            order_id is not None and (not isinstance(order_id, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,199}', order_id)) or
+            enabled not in (0, 1) or enabled == 1 and order_id is None or
+            (revision == 0) != (updated_at is None) or
+            config['allowedOrderId'] and (order_id != config['allowedOrderId'] or enabled != 1)):
+        raise RuntimeError('Invalid Ship admission state')
+    if updated_at is not None:
+        try:
+            datetime.datetime.fromisoformat(updated_at)
+        except (TypeError, ValueError):
+            raise RuntimeError('Invalid Ship admission timestamp') from None
+    if db.execute('SELECT COUNT(*) FROM orders WHERE order_id != ? OR ? IS NULL', (order_id, order_id)).fetchone()[0]:
+        raise RuntimeError('Ship admission does not match its orders')
 
 
 def snapshot(root=pathlib.Path('/var/lib/backroadbum'), ship_config=None):

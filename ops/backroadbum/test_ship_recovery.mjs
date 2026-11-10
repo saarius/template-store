@@ -17,12 +17,13 @@ async function store(host) {
   return ns.get(ns.idFromName('backroadbum'));
 }
 
-test('online archive restores synthetic practice label, PDF capability and unacknowledged event through restart', async () => {
+test('online archive restores disabled single-order admission, practice label, PDF and pending event through restart', async () => {
   const root = await mkdtemp(join(tmpdir(), 'brb-ship-recovery-test-'));
   let host;
   try {
     await build();
-    const config = { schema: 'backroadbum.ship-node/v1', generation: 'recovery-fixture', allowedOrderId: 'synthetic-recovery-order',
+    const orderId = 'synthetic-recovery-order';
+    const config = { schema: 'backroadbum.ship-node/v1', generation: 'recovery-fixture', allowedOrderId: '',
       sessionSecret: 'synthetic-recovery-secret-not-deployed-'.padEnd(48, 'x') };
     const configPath = join(root, 'private-ship.json');
     await writeFile(configPath, JSON.stringify(config), { mode: 0o600 });
@@ -30,14 +31,15 @@ test('online archive restores synthetic practice label, PDF capability and unack
     const jwk = { ...await exportJWK(keys.publicKey), kid: 'recovery-fixture', alg: 'ES256', use: 'sig' };
     host = await createPracticeHost({ config, stateDir: join(root, 'ship'), fetchJwks: async () => Response.json({ keys: [jwk] }) });
     const source = await store(host);
-    assert.equal((await source.receiveOrder({ schema: 'dinkuskit.commerce.ship-order/v1', orderId: config.allowedOrderId,
+    assert.equal((await source.changeMerchantAdmission({ revision: 0, orderId, enabled: true })).ok, true);
+    assert.equal((await source.receiveOrder({ schema: 'dinkuskit.commerce.ship-order/v1', orderId,
       number: 9999, version: 1, status: 'processing', test: true, completed: null,
       shipTo: { name: 'Fixture', line1: '1 Example Way', city: 'Example', region: 'CA', postalCode: '90000', country: 'US' },
       lines: [{ catalogItemId: 'fixture-item', name: 'Fixture mug', quantity: 1, weightOz: 8 }] })).ok, true);
     assert.equal((await source.saveShipFrom({ name: 'Fixture store', line1: '2 Example Way', city: 'Example', region: 'CA', postalCode: '90000' })).ok, true);
     assert.equal((await source.addBox({ name: 'Fixture box', lengthIn: '6', widthIn: '4', heightIn: '3', weightOz: '1' })).ok, true);
     const boxId = (await source.getSettings()).boxes[0].boxId;
-    const bought = await source.buyLabel({ orderId: config.allowedOrderId, fields: { kind: 'practice', version: 1, boxId, weightOz: 9, service: 'PM' }, uid: 'fixture' });
+    const bought = await source.buyLabel({ orderId, fields: { kind: 'practice', version: 1, boxId, weightOz: 9, service: 'PM' }, uid: 'fixture' });
     assert.equal(bought.status, 201);
     assert.equal(bought.body.practice, true);
     const events = await source.listLabels();
@@ -49,7 +51,10 @@ test('online archive restores synthetic practice label, PDF capability and unack
       method: 'POST', headers: { authorization: 'Bearer ' + pass, 'content-type': 'application/json' }, body: '{}' });
     assert.equal(print.status, 200);
     const printPath = new URL((await print.json()).url).pathname;
-    // Source host remains running: committed WAL state, never a raw copy of live files.
+    const disabled = await source.changeMerchantAdmission({ revision: 1, orderId, enabled: false });
+    assert.equal(disabled.ok, true);
+    assert.equal((await source.listLabels()).status, 403);
+    // Source host remains running and disabled: committed WAL state, not a raw copy of live files.
     const result = spawnSync('python3', ['-c', `
 import importlib.util, pathlib, sqlite3, sys
 root = pathlib.Path(sys.argv[2])
@@ -64,18 +69,26 @@ print(backup.snapshot(root, pathlib.Path(sys.argv[3])))
     assert.equal(result.status, 0, 'synthetic archive created');
     const proof = await withRestoredShip(result.stdout.trim(), async restored => {
       const target = await store(restored);
+      const state = await target.getMerchantAdmission();
+      assert.equal(state.orderId, orderId); assert.equal(state.enabled, false);
+      assert.equal((await target.listLabels()).status, 403);
+      // Only the disposable copy is briefly re-enabled to inspect the unacknowledged event.
+      assert.equal((await target.changeMerchantAdmission({ revision: state.revision, orderId, enabled: true })).ok, true);
       const restoredEvents = await target.listLabels();
       assert.equal(restoredEvents.body.length, 1);
       assert.equal(restoredEvents.body[0].eventId, events.body[0].eventId);
       assert.equal(restoredEvents.body[0].tracking, bought.body.tracking);
-      assert.equal((await target.getOrder(config.allowedOrderId)).test, true);
+      assert.equal((await target.getOrder(orderId)).test, true);
+      assert.equal((await target.changeMerchantAdmission({ revision: state.revision + 1, orderId, enabled: false })).ok, true);
       const pdf = await restored.fetch(printPath);
       assert.equal(pdf.status, 200);
       assert.match(await pdf.text(), /TEST - NOT POSTAGE/);
     });
     assert.equal(proof.restart, 'ok');
     assert.equal(proof.outboundRequests, 0);
-    assert.equal((await source.listLabels()).body[0].eventId, events.body[0].eventId, 'live fixture was not acknowledged or changed');
+    const sourceAfter = await source.getMerchantAdmission();
+    for (const key of ['revision', 'orderId', 'enabled', 'updatedAt']) assert.equal(sourceAfter[key], disabled.body[key], 'source fixture remains disabled and unchanged');
+    assert.equal((await source.listLabels()).status, 403);
   } finally {
     try { if (host) await host.dispose(); } finally { await rm(root, { recursive: true, force: true }); }
   }

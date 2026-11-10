@@ -106,6 +106,35 @@ class SnapshotTests(unittest.TestCase):
             self.assertEqual(db.execute('PRAGMA integrity_check').fetchone()[0], 'ok')
             self.assertEqual(db.execute('SELECT id FROM labels').fetchone()[0], 'synthetic-practice-label')
 
+    def test_dynamic_ship_admission_survives_archive_and_invalid_state_preserves_last_good(self):
+        self.ship_fixture()
+        with contextlib.closing(sqlite3.connect(self.object_path)) as db:
+            db.execute('CREATE TABLE orders (order_id TEXT)')
+            db.execute("INSERT INTO orders VALUES ('synthetic-selected')")
+            db.execute('CREATE TABLE merchant_admission (id INTEGER, revision INTEGER, order_id TEXT, enabled INTEGER, updated_at TEXT)')
+            db.execute("INSERT INTO merchant_admission VALUES (1, 2, 'synthetic-selected', 0, '2026-11-10T12:00:00.000Z')")
+            db.commit()
+        good = backup.snapshot(self.root, self.config_path)
+        extracted = self.root / 'admission-restored'
+        backup.restore_ship_copy(good, extracted)
+        with contextlib.closing(sqlite3.connect(extracted / self.object_path.relative_to(self.root))) as db:
+            self.assertEqual(db.execute('SELECT revision, order_id, enabled FROM merchant_admission').fetchone(), (2, 'synthetic-selected', 0))
+        for values in [(1, 2, None, 1, '2026-11-10T12:00:00Z'), (1, -1, 'synthetic-selected', 0, None),
+                       (1, 2, 'foreign', 0, '2026-11-10T12:00:00Z'), (1, 2, 'synthetic-selected', 0, 'invalid-time'),
+                       (1, 2, 'synthetic-selected', 0, None)]:
+            with contextlib.closing(sqlite3.connect(self.object_path)) as db:
+                db.execute('DELETE FROM merchant_admission')
+                db.execute('INSERT INTO merchant_admission VALUES (?, ?, ?, ?, ?)', values)
+                db.commit()
+            with self.assertRaises(RuntimeError):
+                backup.snapshot(self.root, self.config_path)
+        with contextlib.closing(sqlite3.connect(self.object_path)) as db:
+            db.execute('DELETE FROM merchant_admission')
+            db.commit()
+        with self.assertRaises(RuntimeError):
+            backup.snapshot(self.root, self.config_path)
+        self.assertEqual(list((self.root / 'backups').glob('*.tar.gz')), [good])
+
     def test_ship_missing_config_wrong_mode_or_binding_keeps_last_good_archive(self):
         self.ship_fixture()
         good = backup.snapshot(self.root, self.config_path)

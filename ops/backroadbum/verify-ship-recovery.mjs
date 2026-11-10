@@ -26,7 +26,10 @@ backup.restore_ship_copy(sys.argv[2], pathlib.Path(sys.argv[3]))
     host = await createPracticeHost(options);
     const health = await (await host.fetch('/health')).json();
     assert.equal(health.mode, 'test'); assert.equal(health.provider, 'practice'); assert.equal(health.commerceConnected, false);
-    assert.equal(health.admission, config.allowedOrderId ? 'selected-order' : 'closed');
+    const namespace = await host.mf.getDurableObjectNamespace('SHIP_STORES');
+    const admission = await namespace.get(namespace.idFromName('backroadbum')).getMerchantAdmission();
+    assert.equal(health.admission, admission.enabled ? 'selected-order' : 'closed');
+    if (config.allowedOrderId) assert.equal(admission.orderId, config.allowedOrderId);
     assert.equal((await host.fetch('/v1/admin/orders')).status, 401);
     await inspect(host);
     assert.deepEqual(host.network(), { allowedFetches: 0, refusedFetches: 0 });
