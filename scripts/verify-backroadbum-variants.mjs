@@ -27,20 +27,39 @@ try {
     expect(members).toHaveLength(3);
     expect(new Set(members.map(item => item.id)).size).toBe(3);
     for (const size of ['M', 'L', 'XL']) expect(member(size)).toBeTruthy();
+    const publicItem = await page.request.get(base + '/_emdash/api/plugins/r_gshdrqaldna3r7sn/catalog/public/item?itemId=' + encodeURIComponent(await page.locator('[data-commerce-item]').getAttribute('data-commerce-item')));
+    expect(publicItem.ok()).toBe(true);
+    const projected = (await publicItem.json()).data.variants.members;
+    const metadataAtSelection = async size => {
+      const raw = projected.find(value => value.catalogItemId === member(size).id);
+      expect(raw).toBeTruthy();
+      const metadata = JSON.parse(await page.locator('[data-product-jsonld]').textContent());
+      expect(metadata).toMatchObject({ '@type': 'Product', url: base + '/products/wrong-turn-tee' });
+      if (raw.sku) {
+        expect(metadata.sku).toBe(raw.sku);
+        expect(metadata.offers).toMatchObject({ price: '34.00', availability: 'https://schema.org/' + (size === 'XL' ? 'OutOfStock' : 'InStock') });
+      } else {
+        expect(metadata).not.toHaveProperty('sku');
+        expect(metadata).not.toHaveProperty('offers');
+      }
+    };
     const add = page.locator('[data-add-to-cart]');
     await expect(page.getByRole('radio', { name: 'M', exact: true })).toBeChecked();
     await expect(add).toHaveAttribute('data-add-to-cart', member('M').id);
+    await metadataAtSelection('M');
     await add.click();
     await expect(page.locator('[data-add-to-cart-view]')).toBeVisible();
     await page.getByRole('radio', { name: 'L', exact: true }).check();
     await expect(page.locator('[data-add-to-cart-view]')).toBeHidden();
     await expect(add).toHaveAttribute('data-add-to-cart', member('L').id);
     await expect(page.locator('[data-variant-price]')).toHaveText(member('L').price);
+    await metadataAtSelection('L');
     await page.locator('[data-add-to-cart-qty]').fill('2'); await add.click();
     await expect(page.locator('[data-add-to-cart-status]')).toHaveText('Added to cart.');
     await page.getByRole('radio', { name: 'XL (sold out)', exact: true }).check();
     await expect(add).toBeDisabled();
     await expect(add).toHaveText('Sold out');
+    await metadataAtSelection('XL');
     await expect(page.locator('[data-product-status]')).toHaveText('Out of stock');
     await expect(page.locator('[data-add-to-cart-view]')).toBeHidden();
     await page.evaluate(() => document.fonts.ready); await fits();
@@ -65,13 +84,21 @@ try {
     await expect(lines).toHaveCount(1);
     await expect(m).toBeVisible();
     await expect(page.locator('[data-guest-cart-subtotal-amount]')).toHaveText('$34.00');
+    await page.goto(base + '/products/creekside-camp-mug');
+    const mugMetadata = JSON.parse(await page.locator('[data-product-jsonld]').textContent());
+    expect(mugMetadata.sku).toBe(await page.locator('[data-product-sku]').getAttribute('data-product-sku'));
+    expect(mugMetadata.offers).toMatchObject({ price: '18.00', availability: 'https://schema.org/InStock' });
+    await page.goto(base + '/dashboard/');
+    await expect(page.getByRole('heading', { name: 'November 10, 2026 · No borrowed identity' })).toBeVisible();
+    await fits();
+    await page.screenshot({ path: new URL(`metadata-dashboard-${width}.png`, output).pathname, fullPage: false });
     expect(errors).toEqual([]); expect(checkout).toEqual([]);
     results.push({ width, groupedShopFamilies: 5, distinctMemberIds: true, selectedTarget: true, savedFeedbackReset: true,
       soldOutRefused: true, independentCartQuantities: true, refreshedSubtotal: '102.00',
-      removedOnlyChosenMember: true, noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout.length });
+      removedOnlyChosenMember: true, selectedMetadataMatchesPublicProjection: true, simpleSaleMetadataPreserved: true, noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout.length });
     await context.close();
   }
 } finally { await browser.close(); }
-const evidence = { checkedAt: new Date().toISOString(), base, scope: 'Variant selection and cart only; not SKU/JSON-LD qualification or a paid checkout.', results };
+const evidence = { checkedAt: new Date().toISOString(), base, scope: 'Selected metadata against the actual signed public projection, simple-sale metadata, variant/cart behavior and dashboard. No checkout or merchant writes.', results };
 await writeFile(new URL('verification.json', output), JSON.stringify(evidence, null, 2));
 console.log(JSON.stringify(evidence, null, 2));
