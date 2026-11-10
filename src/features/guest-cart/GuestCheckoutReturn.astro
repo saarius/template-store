@@ -34,6 +34,12 @@ const { contactHref } = Astro.props;
         </div>
       </div>
     </section>
+    <section class="guest-checkout-fulfillment" data-guest-checkout-fulfillment aria-labelledby="guest-checkout-fulfillment-title" hidden>
+      <h3 id="guest-checkout-fulfillment-title">Fulfillment</h3>
+      <p class="guest-checkout-fulfillment-status" data-guest-checkout-fulfillment-status></p>
+      <p data-guest-checkout-fulfillment-note></p>
+      <dl data-guest-checkout-fulfillment-details></dl>
+    </section>
     <h3>Keep your receipt</h3>
     <p>Return to this page in the same browser to check your saved checkout. Keep this browser’s site data: the page address alone cannot recover an order.</p>
     {contactHref && <p data-guest-checkout-contact>Questions? <a href={contactHref}>Contact the store</a>.</p>}

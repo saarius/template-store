@@ -1070,6 +1070,22 @@
   background: var(--store-surface);
 }
 .guest-checkout-order-heading h2 { overflow-wrap: anywhere; }
+.guest-checkout-fulfillment {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--store-line);
+}
+.guest-checkout-fulfillment h3 { margin: 0 0 .75rem; }
+.guest-checkout-fulfillment-status { font-weight: 700; margin-bottom: .25rem; }
+.guest-checkout-fulfillment dl { margin: 1rem 0 0; }
+.guest-checkout-fulfillment dl div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: .25rem 1rem;
+  padding: .4rem 0;
+}
+.guest-checkout-fulfillment dt { color: var(--store-muted); }
+.guest-checkout-fulfillment dd { margin: 0; overflow-wrap: anywhere; }
 
 /* RoughNotation Double-Pass SVG Ink Callout & Product Stage Tilt */
 .rough-ink-callout {

@@ -1,0 +1,35 @@
+import { describe, expect, it } from "vitest";
+import { guestCheckoutWire, parseGuestCheckoutWireResult, parseGuestOrderFulfillment } from "../../src/features/guest-cart/checkout-protocol.js";
+const completed = { status: "completed", completedAt: "2026-11-10T01:00:00.000Z", carrier: "Demo carrier", tracking: "TEST-NOT-A-SHIPMENT" };
+function wire(fulfillment: unknown) {
+  return { ok: true, capabilityId: "fixture-capability", checkout: {
+    schema: "dinkuskit.commerce.guest-checkout-projection/v1", state: "paid", attemptId: "fixture-attempt", redirectUrl: null,
+    order: { orderId: "order:fixture", receiptId: "receipt:fixture", test: true, fulfillment,
+      lines: [{ catalogItemId: "mug", quantity: 1 }], total: { currency: "USD", minor: "2200" } }, retryAfter: null,
+  } };
+}
+describe("guest receipt fulfillment", () => {
+  it("preserves current completion through the server status relay and browser parser", () => {
+    const parsed = parseGuestCheckoutWireResult(wire(completed));
+    expect(parsed?.ok).toBe(true);
+    if (!parsed?.ok) throw Error("fixture must parse");
+    expect(parsed.checkout.order?.fulfillment).toEqual(completed);
+    const relayed = parseGuestCheckoutWireResult({ ...parsed, checkout: guestCheckoutWire(parsed.checkout) });
+    expect(relayed?.ok && relayed.checkout.order?.fulfillment).toEqual(completed);
+    expect(relayed?.ok && relayed.checkout.order?.test).toBe(true);
+  });
+  it("clears stale completed fields for Processing", () => {
+    expect(parseGuestOrderFulfillment({ ...completed, status: "processing" })).toEqual({ status: "processing" });
+  });
+  it.each([undefined, null, [], {}, { status: "delivered" }, { ...completed, completedAt: "bad date" }])(
+    "does not invent a state from malformed optional data (%j)", value => {
+      expect(parseGuestOrderFulfillment(value)).toBeUndefined();
+      const parsed = parseGuestCheckoutWireResult(wire(value));
+      expect(parsed?.ok && parsed.checkout.order?.fulfillment).toBeUndefined();
+    },
+  );
+  it("keeps text as text, excludes private fields and rejects oversized or control-bearing notes", () => {
+    expect(parseGuestOrderFulfillment({ ...completed, carrier: '<b>not HTML</b>', email: 'private@example.test' })).toEqual({ ...completed, carrier: '<b>not HTML</b>' });
+    expect(parseGuestOrderFulfillment({ ...completed, carrier: 'x'.repeat(65), tracking: 'bad\ntracking' })).toEqual({ status: 'completed', completedAt: completed.completedAt });
+  });
+});

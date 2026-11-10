@@ -1125,6 +1125,32 @@ export function confirmedOrderMarkup(
   if (testBadge instanceof HTMLElement) {
     testBadge.hidden = order.test !== true;
   }
+  const fulfillmentSection = root.querySelector("[data-guest-checkout-fulfillment]");
+  if (fulfillmentSection instanceof HTMLElement) {
+    const fulfillment = order.fulfillment;
+    fulfillmentSection.hidden = !fulfillment;
+    const label = fulfillmentSection.querySelector("[data-guest-checkout-fulfillment-status]");
+    const note = fulfillmentSection.querySelector("[data-guest-checkout-fulfillment-note]");
+    const details = fulfillmentSection.querySelector("[data-guest-checkout-fulfillment-details]");
+    const completed = fulfillment?.status === "completed";
+    if (label) label.textContent = fulfillment ? completed ? order.test ? "Demo fulfillment complete" : "Shipped" : "Processing" : "";
+    if (note) note.textContent = !fulfillment ? "" : completed
+      ? order.test ? "The store marked this test order complete. No parcel was sent." : "Marked shipped by the store. This is not delivery confirmation."
+      : "The store has not marked this order complete.";
+    const rows: Array<[string, string | undefined]> = completed ? [
+      ["Marked complete", new Date(fulfillment.completedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })],
+      [order.test ? "Carrier (demo)" : "Carrier", fulfillment.carrier],
+      [order.test ? "Tracking reference (demo)" : "Tracking number", fulfillment.tracking],
+    ] : [];
+    details?.replaceChildren(...rows.flatMap(([name, value]) => {
+      if (!value) return [];
+      const row = document.createElement("div"), term = document.createElement("dt"), description = document.createElement("dd");
+      term.textContent = name;
+      description.textContent = value;
+      row.append(term, description);
+      return [row];
+    }));
+  }
   const items = root.querySelector("[data-guest-checkout-order-items]");
   if (items instanceof HTMLElement) {
     items.replaceChildren(...order.lines.map((line) => {

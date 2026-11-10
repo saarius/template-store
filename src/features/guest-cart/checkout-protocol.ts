@@ -52,6 +52,24 @@ export type GuestCheckoutContact = Readonly<{
   billing?: GuestCheckoutDelivery;
 }>;
 
+export type GuestOrderFulfillment = Readonly<
+  { status: "processing" } |
+  { status: "completed"; completedAt: string; carrier?: string; tracking?: string }
+>;
+
+/** Optional later-state data is independent of the immutable paid receipt. */
+export function parseGuestOrderFulfillment(value: unknown): GuestOrderFulfillment | undefined {
+  if (!isObject(value)) return undefined;
+  if (value.status === "processing") return { status: "processing" };
+  if (value.status !== "completed" || typeof value.completedAt !== "string" ||
+      value.completedAt.length > 64 || !Number.isFinite(Date.parse(value.completedAt))) return undefined;
+  const note = (v: unknown) => typeof v === "string" && v.length <= 64 &&
+    !/[\p{Cc}\p{Zl}\p{Zp}]/u.test(v) ? v.trim() || undefined : undefined;
+  const carrier = note(value.carrier), tracking = note(value.tracking);
+  return { status: "completed", completedAt: value.completedAt,
+    ...(carrier ? { carrier } : {}), ...(tracking ? { tracking } : {}) };
+}
+
 export type GuestCheckoutProjection = Readonly<{
   schema: typeof GUEST_CHECKOUT_PROJECTION_SCHEMA;
   state: "pending" | "paid" | "recoverable-failure" | "released-retry";
@@ -66,6 +84,7 @@ export type GuestCheckoutProjection = Readonly<{
     contact?: GuestCheckoutContact;
     delivery?: GuestCheckoutDelivery;
     shippingMethod?: string;
+    fulfillment?: GuestOrderFulfillment;
   }> | null;
   contact?: GuestCheckoutContact;
   delivery?: GuestCheckoutDelivery;
@@ -320,7 +339,9 @@ function projectCheckout(value: unknown): GuestCheckoutProjection | null {
       (typeof rawOrder.email === "string" ? parseContact({ email: rawOrder.email }, orderDelivery) : undefined) ??
       topContact;
     const orderShippingMethod = boundedText(rawOrder.shippingMethod, 160) ?? topShippingMethod;
+    const fulfillment = parseGuestOrderFulfillment(rawOrder.fulfillment);
     order = {
+      ...(fulfillment ? { fulfillment } : {}),
       orderId: value.order.orderId,
       receiptId: value.order.receiptId,
       lines,
@@ -392,6 +413,7 @@ export function guestCheckoutWire(checkout: GuestCheckoutProjection) {
       ...(order.contact ? { contact: order.contact } : {}),
       ...(order.delivery ? { delivery: order.delivery } : {}),
       ...(order.shippingMethod ? { shippingMethod: order.shippingMethod } : {}),
+      ...(order.fulfillment ? { fulfillment: order.fulfillment } : {}),
     },
     ...(checkout.contact ? { contact: checkout.contact } : {}),
     ...(checkout.delivery ? { delivery: checkout.delivery } : {}),

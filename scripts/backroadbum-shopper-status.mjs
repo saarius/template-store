@@ -8,6 +8,8 @@ if (!process.argv.includes('--check')) {
   process.exit(0);
 }
 const capture = process.argv.includes('--capture');
+const fulfillment = process.argv.find(value => value.startsWith('--fulfillment='))?.slice('--fulfillment='.length);
+if (fulfillment && !['processing', 'completed'].includes(fulfillment)) throw Error('Unknown fulfillment expectation');
 const statePath = process.argv.find(value => value.startsWith('--state-file='))?.slice('--state-file='.length);
 const captureDir = 'runs/backroadbum/shopper-status';
 if (capture) mkdirSync(captureDir, { recursive: true });
@@ -27,10 +29,22 @@ try {
       assert.match(await page.locator('[data-guest-checkout-order-items]').innerText(), /Creekside Camp Mug × 1/);
       assert.match(await page.locator('[data-guest-checkout-order-totals]').innerText(), /\$22\.00/);
       assert.doesNotMatch(await page.locator('main').innerText(), /email is coming|shipping email/);
+      if (fulfillment) {
+        assert.equal(await page.locator('[data-guest-checkout-fulfillment]').isVisible(), true);
+        assert.equal(await page.locator('[data-guest-checkout-fulfillment-status]').innerText(),
+          fulfillment === 'completed' ? 'Demo fulfillment complete' : 'Processing');
+        if (fulfillment === 'completed') {
+          assert.match(await page.locator('[data-guest-checkout-fulfillment-note]').innerText(), /No parcel was sent/);
+          assert.match(await page.locator('[data-guest-checkout-fulfillment-details]').innerText(), /BRB-TEST-1003-NOT-SHIPPED/);
+        } else assert.equal(await page.locator('[data-guest-checkout-fulfillment-details]').innerText(), '');
+        assert.equal(await page.locator('[data-guest-checkout-fulfillment] a').count(), 0);
+      }
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       await page.reload({ waitUntil: 'domcontentloaded' });
       await page.locator('[data-guest-checkout-order]').waitFor({ state: 'visible' });
       assert.equal(await page.locator('[data-guest-checkout-order-number]').innerText(), stableOrder);
+      if (fulfillment) assert.equal(await page.locator('[data-guest-checkout-fulfillment-status]').innerText(),
+        fulfillment === 'completed' ? 'Demo fulfillment complete' : 'Processing');
       if (capture) {
         await page.evaluate(() => document.fonts.ready);
         await page.locator('img').evaluateAll(images => Promise.all(images.map(image => image.decode().catch(() => {}))));
@@ -38,7 +52,8 @@ try {
       }
       await page.goto('https://backroadbum.com/cart', { waitUntil: 'domcontentloaded' });
       await page.locator('[data-guest-cart-empty]').waitFor({ state: 'visible' });
-      report.viewportChecks.push({ width, paidReceipt: true, testLabel: true, reloadStable: true, purchasedCartSettled: true, noOverflow: true });
+      report.viewportChecks.push({ width, paidReceipt: true, testLabel: true, reloadStable: true, purchasedCartSettled: true, noOverflow: true,
+        ...(fulfillment ? { fulfillment, syntheticTrackingOnly: fulfillment === 'completed' } : {}) });
     } finally { await shopper.browser.close(); }
   }
   const stranger = await openShopperPreview();
