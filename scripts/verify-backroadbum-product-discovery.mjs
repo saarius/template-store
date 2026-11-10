@@ -53,6 +53,7 @@ try {
         for (const [name, slug] of [['Road day', 'road-day'], ['Slow camp', 'slow-camp']]) {
           await expect(collections.getByRole('link', { name, exact: true })).toHaveAttribute('href', '/categories/' + slug);
         }
+        await page.keyboard.press('Tab'); // Establish keyboard modality after pointer-operated details.
         await cards.first().focus();
         expect(await cards.first().evaluate(card => getComputedStyle(card).outlineStyle)).not.toBe('none');
         const destination = await cards.first().getAttribute('href');

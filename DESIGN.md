@@ -92,6 +92,9 @@ Primary links have a sun field, dark ink, a 48px minimum height and a small corn
 ### Product listings
 Image, name, authoritative price and availability, in that order. The whole listing links to its product page. Illustrations have cool flat grounds; prices must never be baked into artwork or copied into editorial content.
 
+### Product inspection
+Keep the primary product illustration, CMS summary, price, availability and yellow cart action together; use a direct Shop breadcrumb rather than a home-bound catalog label. Product prices are plain facts, without an animated underline. Below the native Design & care disclosure, ordinary collection links lead to up to three existing catalog cards from shared published collections. Reuse the catalog’s responsive grid inside the page container without adding gutters, a carousel or another enclosing panel; a secondary catalog failure gets a short browse/refresh message rather than a false empty list.
+
 ### Navigation
 A compact uppercase wordmark and short plain-language links. The cart remains visible on phones. Current-page and hover states use underlines, not color alone.
 
