@@ -65,5 +65,8 @@ Operational counters live in `/var/lib/backroadbum/admission.db`0600. `/etc/back
 - `node scripts/backroadbum-checkout-status.mjs --check` reads operator #1001, never creates payment/order.
 - Payments `ops/backroadbum/replay-webhook.mjs --check|--resend` inspects or asks Stripe to redeliver the retained real event; optional --state-file selects a shopper proof. Load private Stripe environment without echo; no fabricated local signature/new payment. Own-account provenance is independently retrieved; wakes only prompt Commerce provider lookup. See Payments' operator README.
 
+## Upstream reports
+[template-store #211](https://github.com/dinkuskit/template-store/issues/211) reports the invalid displayed quantity that previously left checkout enabled with the saved subtotal. The merchant fix is deployed. Current upstream `4a421e5` reproduces the mismatch in an isolated browser-client/synthetic-transport fixture at1440/390; that is not a generic EmDash/Registry/payment integration pass. No generic patch or full owning-suite qualification has been submitted. Keep the branding/layout work separate from any future minimal framework repair.
+
 ## Next
 Connect TEST-only Ship automation without changing shared services and verify email/account recovery. Receipt TEST labeling is intentionally local: upstream’s verified `commerce-payment-mode-001` decision says the shopper view does not carry mode. Other receipt extensions need contract review before being treated as upstream bug fixes. Visitor/order aggregates, cycle/token accounting and off-host recovery remain unfinished. Evidence narratives live in workspace `evidence/`; no screenshots, databases, traces or private browser state belong in git.
