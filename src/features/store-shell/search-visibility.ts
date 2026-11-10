@@ -140,21 +140,27 @@ export function filterStorefrontSearchHits<
 export async function loadVisibleStorefrontProductSlugs(
   context: InstalledCatalogContext,
   env: NodeJS.ProcessEnv = process.env,
+  options: { throwOnUnavailable?: boolean } = {},
 ): Promise<Set<string>> {
+  const contentUnavailable = (error: unknown) => {
+    if (options.throwOnUnavailable) throw error;
+    return { entries: [] };
+  };
   const [productCollection, categoryCollection, demonstrations] = await Promise.all([
     getEmDashCollection<"products", Record<string, unknown>>("products", {
       status: "published",
-    }).catch(() => ({ entries: [] })),
+    }).catch(contentUnavailable),
     getEmDashCollection<"categories", Record<string, unknown>>("categories", {
       status: "published",
-    }).catch(() => ({ entries: [] })),
+    }).catch(contentUnavailable),
     readProofDemonstrations(env).catch(() => null),
   ]);
 
   const profile = readStorefrontProfile(env);
 
   let catalogAvailable = true;
-  const commerceProducts = await readCommerceCatalog(context).catch(() => {
+  const commerceProducts = await readCommerceCatalog(context).catch((error: unknown) => {
+    if (options.throwOnUnavailable) throw error;
     catalogAvailable = false;
     return [];
   });
