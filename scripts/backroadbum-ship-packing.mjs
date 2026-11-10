@@ -48,7 +48,8 @@ try {
     await save(group('Add box size'), 'Add box size', 'Packing not saved');
     await expect(group('Add box size').getByLabel('Box name', { exact: true })).toHaveValue('Temporary packing check');
     await expect(group('Add box size').getByLabel('Length (inches)', { exact: true })).toHaveValue('0');
-    await page.screenshot({ path: directory + '/invalid-1440.png', fullPage: true });
+    await page.getByText('Packing not saved', { exact: true }).scrollIntoViewIfNeeded();
+    await page.screenshot({ path: directory + '/invalid-1440.png' });
     await group('Add box size').getByLabel('Length (inches)', { exact: true }).fill('6');
     await save(group('Add box size'), 'Add box size', 'Box size added');
     const row = page.getByRole('row').filter({ hasText: 'Temporary packing check' });
@@ -66,7 +67,11 @@ try {
     const text = await page.locator('main').innerText();
     check(!/dk_store_|eyJ[A-Za-z0-9_-]{20}|PRIVATE KEY|Buy label|Connect Ship|DinkusKit\.com/.test(text), 'unexpected_private_or_unsupported_view');
     check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'horizontal_overflow');
-    await page.screenshot({ path: directory + '/packing-' + width + '.png', fullPage: true }); viewports.push({ width, noOverflow: true });
+    // EmDash scrolls inside main, not the document; capture both task regions explicitly.
+    await page.getByText('Practice packing', { exact: true }).scrollIntoViewIfNeeded();
+    await page.screenshot({ path: directory + '/packing-top-' + width + '.png' });
+    await page.getByText('Saved boxes', { exact: true }).scrollIntoViewIfNeeded();
+    await page.screenshot({ path: directory + '/packing-boxes-' + width + '.png' }); viewports.push({ width, noOverflow: true });
   }
   await page.getByRole('button', { name: 'Back to Shipments', exact: true }).click();
   await page.getByText('No orders admitted', { exact: true }).waitFor(); await expect(page.getByText('Closed', { exact: true })).toBeVisible();
