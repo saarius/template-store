@@ -3,7 +3,8 @@ import { readFileSync, lstatSync, mkdirSync } from 'node:fs';
 import { openAdmin } from './backroadbum-admin.mjs';
 const ID = 'r_ehdlg5cxkb3ffqvr', ORIGIN = 'https://backroadbum.com';
 let admin;
-const require = (condition, code) => { if (!condition) throw Error(code); };
+class CheckFailure extends Error {}
+const require = (condition, code) => { if (!condition) throw new CheckFailure(code); };
 try {
   admin = await openAdmin();
   await admin.signIn();
@@ -48,6 +49,7 @@ try {
     facts.viewports.push({ width, overflow });
   }
   console.log(JSON.stringify(facts));
-} catch {
-  console.error('Merchant Ship admin check failed; no private response, browser state or credentials emitted.'); process.exitCode = 1;
+} catch (error) {
+  const reason = error instanceof CheckFailure ? ` (${error.message})` : '';
+  console.error('Merchant Ship admin check failed' + reason + '; no private response, browser state or credentials emitted.'); process.exitCode = 1;
 } finally { await admin?.browser.close(); }
