@@ -29,6 +29,8 @@ import {
 
 const PUBLIC_STOREFRONT_PAGES = [
   "src/pages/index.astro",
+  "src/pages/field-notes.astro",
+  "src/pages/[slug].astro",
   "src/pages/categories/[slug].astro",
   "src/pages/products/[id].astro",
   "src/pages/cart.astro",
@@ -84,8 +86,15 @@ describe("Shared StoreFooter.astro & public route mounting", () => {
   it("mounts StoreFooter across every public storefront route", () => {
     for (const pagePath of PUBLIC_STOREFRONT_PAGES) {
       const source = readFileSync(resolve(pagePath), "utf8");
-      expect(source, pagePath).toContain("StoreFooter.astro");
-      expect(source, pagePath).toContain("<StoreFooter profile={profile} />");
+      if (source.includes('BackroadPage.astro')) {
+        expect(source, pagePath).toContain('<BackroadPage');
+        const shell = readFileSync(resolve('src/features/store-shell/BackroadPage.astro'), 'utf8');
+        expect(shell).toContain('StoreFooter.astro');
+        expect(shell).toContain('<StoreFooter profile={profile} />');
+      } else {
+        expect(source, pagePath).toContain("StoreFooter.astro");
+        expect(source, pagePath).toContain("<StoreFooter profile={profile} />");
+      }
     }
   });
 

@@ -29,7 +29,12 @@ describe('Backroad Bum initial merchant content', () => {
   });
   it('keeps field notes editable in EmDash Pages', () => {
     const notes = pages.filter((p: any) => p.slug.startsWith('field-note-'));
-    expect(notes).toHaveLength(2);
+    expect(notes).toHaveLength(3);
+    expect(new Set(notes.map((p: any) => p.slug)).size).toBe(notes.length);
     expect(notes.every((p: any) => p.sections.some(([style]: string[]) => style === 'h2'))).toBe(true);
+    const reset = notes.find((p: any) => p.slug === 'field-note-wet-gear-reset');
+    expect(JSON.stringify(reset.sections)).toContain('care instructions');
+    expect(JSON.stringify(reset.sections)).toContain('fully dry');
+    expect(JSON.stringify(reset.sections)).not.toMatch(/\$\d|waterproof|guaranteed/i);
   });
 });

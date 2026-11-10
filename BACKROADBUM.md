@@ -25,6 +25,7 @@ Operational counters live in `/var/lib/backroadbum/admission.db`0600. `/etc/back
 - Caddy requires a random credential on private EmDash/operator paths; EmDash additionally requires a passkey. Credentials and browser proofs stay only in `/etc/backroadbum/`0600. No production dev-bypass.
 - `/etc/backroadbum/emdash.env` contains the stable plugin-settings encryption key. **Never regenerate it over encrypted settings.** Stripe env is operator-owned and unchanged; never log/source it with shell tracing. Reject non-sk_test_ secret keys; no live postage.
 - `scripts/backroadbum-admin.mjs`: always saveKey and browser.close in finally; never run operator browsers concurrently.
+- `backroadbum-publish-field-note.mjs field-note-SLUG --publish` creates one new source-authored field note from `seed/backroadbum-pages.json`. Without --publish it does nothing; existing CMS pages are never overwritten or republished. Edit subsequent revisions in EmDash. Published note titles/prose supply the index and related-reading links.
 - `backroadbum-seed.mjs` creates missing/adopts untouched starter content without resetting merchant prices. `backroadbum-publish-guides.mjs --publish` deliberately publishes only the three source-owned operational guides (test-store, shipping, returns), leaving catalog and field notes alone.
 - `/api/operator/checkout` is separately HTTP/passkey Administrator protected. It calls canonical installed Commerce guest routes, not a second payment/order implementation.
 
