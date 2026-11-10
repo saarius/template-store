@@ -1,0 +1,37 @@
+---
+import CommerceCatalog from '../commerce-catalog/CommerceCatalog.astro';
+import { readCommerceCatalog } from '../commerce-catalog/index.js';
+import { readRelatedShopProducts } from './backroad-collections.js';
+import { categoryPath } from './merch-catalog.js';
+
+interface Props {
+  productId: string;
+  entries: readonly { id: string; data: Record<string, unknown> }[];
+  categories: readonly { id: string; data: Record<string, unknown> }[];
+  checkoutAvailable: boolean;
+}
+const { productId, entries, categories, checkoutAvailable } = Astro.props;
+// This secondary lookup cannot change the primary product's status or cart admission.
+const related = await readRelatedShopProducts(productId, entries, categories,
+  () => readCommerceCatalog({ runtime: Astro.locals.emdash, request: Astro.request }));
+---
+{!related.available ? <section class="related-unavailable" aria-label="Related gear" data-related-unavailable>
+  <p>Related gear is temporarily unavailable. <a href="/shop">Browse all gear</a> or refresh to try again.</p>
+</section> : related.collections.length > 0 && <div class="related-gear" data-related-gear>
+  <nav aria-label="This product’s collections">
+    <span>Browse {related.collections.length === 1 ? 'the collection' : 'its collections'}</span>
+    {related.collections.map(group => <a href={categoryPath(group.slug)}>{group.title}</a>)}
+    <a href="/shop">All gear</a>
+  </nav>
+  {related.products.length > 0 && <CommerceCatalog products={related.products} productPaths={related.paths}
+    checkoutAvailable={checkoutAvailable} heading="In the same collections" contained />}
+</div>}
+<style>
+.related-gear{border-top:1px solid var(--store-line);padding-top:1.5rem;margin:0 0 4rem}
+.related-gear nav{display:flex;flex-wrap:wrap;align-items:baseline;gap:.75rem 1.5rem;line-height:1.6}
+.related-gear nav span{color:var(--store-muted)}
+a{color:inherit;text-underline-offset:.2em}
+.related-gear nav a{display:inline-flex;align-items:center;min-height:44px;font-weight:600}
+a:focus-visible{outline:3px solid var(--store-focus-ring);outline-offset:3px}
+.related-unavailable{margin:0 0 4rem;max-width:70ch;line-height:1.6;color:var(--store-muted)}
+</style>

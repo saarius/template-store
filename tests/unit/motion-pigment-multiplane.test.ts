@@ -119,14 +119,16 @@ describe("A2 — Pigment Drift product illustrations & living hero/card ink-wash
       "utf8",
     );
     expect(productDetail).toContain("data-product-stage-visual");
-    expect(productDetail).toContain("rough-ink-callout");
+    // Prices are ordinary Commerce facts, not an animated decorative callout.
+    expect(productDetail).not.toContain("rough-ink-callout");
+    expect(productDetail).not.toContain("product-detail__eyebrow");
 
     const checkoutReturn = readFileSync(
       resolve("src/features/guest-cart/GuestCheckoutReturn.astro"),
       "utf8",
     );
-    expect(checkoutReturn).toContain("data-ephemera-receipt");
-    expect(checkoutReturn).toContain("data-ephemera-stamp");
-    expect(checkoutReturn).toContain("data-ephemera-barcode");
+    expect(checkoutReturn).toContain("data-guest-checkout-order");
+    expect(checkoutReturn).not.toContain("data-ephemera-stamp");
+    expect(checkoutReturn).not.toContain("data-ephemera-barcode");
   });
 });

@@ -9,6 +9,29 @@ export type ShopCollection = {
   products: PublicCommerceProduct[];
 };
 
+/** Onward discovery is shared published membership, not a second recommendation catalog. */
+export function relatedShopProducts(currentId: string, groups: readonly ShopCollection[]) {
+  const collections = groups.filter(group => group.products.some(product => product.id === currentId));
+  const seen = new Set([currentId]);
+  const products = collections.flatMap(group => group.products).filter(product => {
+    if (seen.has(product.id)) return false;
+    seen.add(product.id);
+    return true;
+  }).slice(0, 3);
+  return { collections, products };
+}
+
+/** A secondary catalog failure is not a successful empty related-products list. */
+export async function readRelatedShopProducts(currentId: string, entries: readonly Entry[], categories: readonly Entry[],
+  readCatalog: () => Promise<PublicCommerceProduct[]>) {
+  try {
+    const { groups, paths } = shopCollections(entries, categories, await readCatalog());
+    return { available: true as const, ...relatedShopProducts(currentId, groups), paths };
+  } catch {
+    return { available: false as const };
+  }
+}
+
 /** Published CMS membership selects products; Commerce alone supplies sale facts. */
 export function shopCollections(entries: readonly Entry[], categories: readonly Entry[], catalog: PublicCommerceProduct[]) {
   const links = readProductEntries(entries, categories, commercePageLinks(catalog));
