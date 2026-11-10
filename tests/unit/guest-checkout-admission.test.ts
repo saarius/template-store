@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+afterEach(() => vi.unstubAllEnvs());
 
 import {
   COMMERCE_REGISTRY_RUNTIME_ID,
@@ -20,6 +21,14 @@ function runtime() {
 }
 
 describe("guest checkout installed admission", () => {
+  it("requires the installed manifest on the hosted merchant, even with valid route metadata", () => {
+    vi.stubEnv('BACKROADBUM_MERCHANT_PROFILE', '1');
+    vi.stubEnv('BACKROADBUM_HOSTED_REGISTRY', '1');
+    const catalog = { pluginId: COMMERCE_REGISTRY_RUNTIME_ID, sameCatalogNamespace: true as const, checkoutConfiguration: 'supported' as const };
+    expect(resolveGuestCheckoutAdmission({ runtime: { ...runtime(), getRuntimePluginSettingsSchema: () => null }, catalog })).toBeNull();
+    expect(resolveGuestCheckoutAdmission({ runtime: runtime(), catalog })).not.toBeNull();
+  });
+
   it("stays closed without Core same-catalog/config authority", () => {
     expect(resolveGuestCheckoutAdmission({ runtime: runtime(), catalog: null })).toBeNull();
   });

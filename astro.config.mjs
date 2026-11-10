@@ -53,7 +53,10 @@ if (process.env.DINKUS_CATALOG_PROFILE === "native-development") {
 // The Commerce this store mounts the way a Registry store installs it: the pin's Registry build, or the
 // checkout a developer is building (scripts/lib/paired-commerce.mjs). A Registry store build mounts none;
 // its owner installs Commerce from the Registry.
-const pairedCommerceDir = resolvePairedCommerceDir(process.env);
+// Hosted merchant installs the real signed Registry packages through EmDash admin.
+// Never shadow those IDs with build-time/local issuer overlays.
+const hostedRegistry = process.env.BACKROADBUM_HOSTED_REGISTRY === '1';
+const pairedCommerceDir = hostedRegistry ? null : resolvePairedCommerceDir(process.env);
 // The build's package names the runtime id: a pre-release pin is the beta package, a release the stable one.
 if (pairedCommerceDir && !process.env.DINKUS_COMMERCE_PROFILE) {
   process.env.DINKUS_COMMERCE_PROFILE = pairedCommerceProfile(pairedCommercePin());
@@ -62,7 +65,7 @@ const pairedCommerce = pairedCommerceDir
   ? await pairedCommerceDescriptor(pairedCommerceDir, commerceProfile(process.env.DINKUS_COMMERCE_PROFILE).runtimeId)
   : undefined;
 const accessOptions = selectedRegistryAccessOptions(process.env);
-const merchantShip = merchantShipDescriptor(process.env);
+const merchantShip = hostedRegistry ? undefined : merchantShipDescriptor(process.env);
 
 // The store has no default Wrangler file: the demo Worker's wrangler.jsonc was retired with the hosted demo
 // (hosted-demo-retired-20261031). A Cloudflare build names its config, which pnpm run build:registry writes;
@@ -115,7 +118,7 @@ export default defineConfig({
       ...(accessOptions ? { auth: access(accessOptions) } : {}),
       // On Cloudflare the Worker Loader runs the installed plugins; on Node the workerd runner does, and
       // astro dev hands them to Miniflare (EmDash's documented loop: build the plugin, run the site).
-      ...(isCloudflare ? { sandboxRunner: cloudflareSandbox() } : pairedCommerce ? { sandboxRunner: "@emdash-cms/sandbox-workerd/sandbox" } : {}),
+      ...(isCloudflare ? { sandboxRunner: cloudflareSandbox() } : (hostedRegistry || pairedCommerce) ? { sandboxRunner: "@emdash-cms/sandbox-workerd/sandbox" } : {}),
       ...(pairedCommerce ? { sandboxed: [pairedCommerce, ...playgroundRegistryPlugins().filter(plugin => plugin.id !== pairedCommerce.id)
         .map(plugin => merchantShip && plugin.id === merchantShip.id ? merchantShip : plugin)] } : {}),
       plugins: [

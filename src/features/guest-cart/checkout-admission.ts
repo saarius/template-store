@@ -169,6 +169,7 @@ function hasInstalledGuestCheckoutRoutes(runtime: RuntimeGuestCheckoutMetadata, 
   // Keep the generic manifest check, and require full route metadata before the
   // explicit merchant build can use this exception (never a native fallback).
   const merchantBuildTime = process.env.BACKROADBUM_MERCHANT_PROFILE === "1" &&
+    process.env.BACKROADBUM_HOSTED_REGISTRY !== "1" &&
     typeof runtime.getPluginRouteMeta === "function";
   if (
     !inStore && !merchantBuildTime &&

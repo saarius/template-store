@@ -17,9 +17,11 @@ trap 'if [[ "$(readlink -f "$root/current" || true)" != "$release" ]]; then rm -
 trap 'exit 130' INT
 trap 'exit 143' TERM
 cd "$repo"
-export DINKUS_PAIRED_COMMERCE_DIR="$(node scripts/backroadbum-commerce.mjs)"
+# Owner Steer1: real Registry installs and hosted DinkusKit, never local service overlays.
+export DINKUS_PAIRED_COMMERCE_DIR=""
+export BACKROADBUM_HOSTED_REGISTRY=1
 export BACKROADBUM_MERCHANT_PROFILE=1
-export BACKROADBUM_SHIP_DIR="$(node scripts/backroadbum-ship.mjs)"
+unset BACKROADBUM_SHIP_DIR
 export BACKROADBUM_CHECKOUT_ENABLED=1
 pnpm exec astro build --outDir "$release"
 # External Node dependencies resolve from this parent of every release.

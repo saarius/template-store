@@ -1,6 +1,6 @@
 // Local operator helper. Secrets and WebAuthn state stay outside the repository.
 import { chromium } from '@playwright/test';
-import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, renameSync, existsSync, chmodSync } from 'node:fs';
 
 export async function persistAdminKey(cdp, authenticatorId, keyPath) {
   const { credentials: keys } = await cdp.send('WebAuthn.getCredentials', { authenticatorId });
@@ -9,10 +9,13 @@ export async function persistAdminKey(cdp, authenticatorId, keyPath) {
   renameSync(keyPath + '.next', keyPath);
 }
 
-export async function openAdmin() {
+export async function openAdmin({ hostedState = false } = {}) {
   const credentials = JSON.parse(readFileSync('/etc/backroadbum/admin.json', 'utf8'));
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({ httpCredentials: credentials });
+  const context = await browser.newContext({
+    httpCredentials: { ...credentials, origin: 'https://backroadbum.com' },
+    ...(hostedState ? { storageState: '/etc/backroadbum/dinkuskit-session.json' } : {}),
+  });
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   await cdp.send('WebAuthn.enable');
@@ -28,6 +31,8 @@ export async function openAdmin() {
   return { browser, context, page, async signIn() {
     await page.goto('https://backroadbum.com/_emdash/admin', { waitUntil: 'domcontentloaded' });
     try {
+      const current = new URL(page.url());
+      if (current.pathname === '/_emdash/admin' && !current.search) return;
       await page.getByRole('button', { name: 'Sign in with Passkey', exact: true }).click();
       await page.waitForURL((url) => url.pathname === '/_emdash/admin' && !url.search);
       await page.waitForTimeout(2000);
@@ -37,5 +42,10 @@ export async function openAdmin() {
       // Every caller must retain it, not just scripts that remember an explicit saveKey().
       await persistAdminKey(cdp, authenticatorId, keyPath);
     }
-  }, async saveKey() { await persistAdminKey(cdp, authenticatorId, keyPath); } };
+  }, async saveKey() { await persistAdminKey(cdp, authenticatorId, keyPath); },
+  async saveHosted() {
+    if (!hostedState) return;
+    const path = '/etc/backroadbum/dinkuskit-session.json';
+    await context.storageState({ path }); chmodSync(path, 0o600);
+  } };
 }
