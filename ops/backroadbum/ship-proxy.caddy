@@ -31,7 +31,7 @@ handle @merchant_ship_label {
  reverse_proxy 127.0.0.1:8788
 }
 @merchant_ship_print {
- path_regexp merchant_print ^/api/ship/print/[A-Za-z0-9_.-]{1,2048}$
+ path_regexp merchant_print ^/api/ship/print/[A-Za-z0-9_.-]{1,1000}$
  method GET
 }
 handle @merchant_ship_print {
