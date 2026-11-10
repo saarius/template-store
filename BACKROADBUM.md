@@ -3,7 +3,7 @@
 Merchant branch: `backroadbum/store`, serving https://backroadbum.com. This is an explicit merchant composition, not a generic self-hosting release or upstream proposal. `PRODUCT.md` and `DESIGN.md` record the provisional brand; the original starter design is at `docs/template-design.md`.
 
 ## Current state
-Five EmDash products, two collections, cart and field notes use Commerce-owned prices and availability. Public Stripe TEST checkout, same-browser paid receipts, manual demo fulfillment and webhook-driven background reconciliation are verified. Commerce runs the merchant TEST profile based on v0.8.0; Payments and Ship Registry bundles are mounted, but Ship automation and email/account recovery remain unconnected or unverified. A separate private Ship practice host now runs on loopback8788 with intake closed; temporary synthetic tests are not live-store fulfillment proof. Its source and activation/backup prerequisites are in `../ship/ops/backroadbum/README.md`; no Commerce setting, Ship Registry artifact or public proxy points to it yet.
+Five EmDash products, two collections, cart and field notes use Commerce-owned prices and availability. Public Stripe TEST checkout, same-browser paid receipts, manual demo fulfillment and webhook-driven background reconciliation are verified. Commerce runs the merchant TEST profile based on v0.8.0; Payments and Ship Registry bundles are mounted, but Ship automation and email/account recovery remain unconnected or unverified. A separate private Ship practice host now runs on loopback8788 with intake closed; temporary synthetic tests are not live-store fulfillment proof. Its source and activation prerequisites are in `../ship/ops/backroadbum/README.md`; no Commerce setting, Ship Registry artifact or public proxy points to it yet. Local recovery now includes its online SQLite copies and private configuration, with an isolated workerd restore drill.
 
 ## Deploy and recover
 - Node24.22.2/pnpm11.9.0. On this2GB host use `NODE_OPTIONS=--max-old-space-size=1200 pnpm exec astro check`.
@@ -11,8 +11,22 @@ Five EmDash products, two collections, cart and field notes use Commerce-owned p
 - First build Commerce with `node ops/backroadbum/build.mjs` in its fork. Store deploy stages its content-hashed Registry artifact, builds a release and atomically switches `/var/lib/backroadbum/current`. Run workspace `ops/deploy.sh` as agent in a unique persistent systemd-run oneshot; failed builds are never promoted, failed health rolls back. Two releases and at most three backups are retained.
 - Runtime requires `BACKROADBUM_MERCHANT_PROFILE=1`. Public checkout now deliberately uses `BACKROADBUM_CHECKOUT_ENABLED=1`; the code still defaults closed for the merchant profile. `bash ops/backroadbum/checkout-gate.sh close|open` writes a dedicated store-service drop-in and restarts it. A close persists across deploys until explicitly reopened. This never changes Stripe mode or admin authentication.
 - `/api/checkout/health` is a non-creating GET advisory. HTTP200 requires installed supported TEST readiness; closed/unavailable gives503. It never prepares a capability/cart/payment/order and is not evidence of a paid purchase.
-- Data: `/var/lib/backroadbum/content.db`, `uploads/`, `payments/attempts.db`. `backup.py` makes individually consistent SQLite copies plus uploads, not a cross-service atomic snapshot; provider reconciliation is required after restoration. Backups remain local; off-host and key recovery are unfinished.
+- Data: `/var/lib/backroadbum/content.db`, `uploads/`, `payments/attempts.db`, Ship Durable Object SQLite and namespace metadata. `backup.py` makes individually consistent online SQLite copies plus uploads, not a cross-service atomic snapshot; provider reconciliation is required after restoration. Backups remain local. The narrowly scoped Ship print secret/configuration is included privately; off-host recovery and recovery of other service keys remain unfinished.
 - Independent telemetry and backup timers run without agent cycles. Missing usage/order/token/cost aggregates stay unavailable, not zero.
+
+## Ship recovery (local only)
+The daily timer and every deploy call `ops/backroadbum/backup.py`. If the Ship directory exists, missing metadata, unreadable/corrupt SQLite, a linked input, non-0600 configuration or a configuration/storage-binding mismatch refuses the entire new archive and preserves older recovery points. Ship SQLite is copied through the online backup API, including committed WAL state; caches, raw WAL/SHM files and arbitrary service files are excluded. Archives stay0600 under the0700 backups directory, with at most three retained. **These archives now contain a private Ship print secret: never upload them to public artifacts or git.** Stripe, EmDash, Payments and browser credentials are not swept into the archive.
+
+```sh
+python3 -m unittest discover -s ops/backroadbum -p test_backup.py -v
+node --test ops/backroadbum/test_ship_recovery.mjs
+# Build the peer Ship worker first if its ignored bundle is missing; see its README.
+node ops/backroadbum/verify-ship-recovery.mjs /var/lib/backroadbum/backups/PRIVATE_ARCHIVE.tar.gz
+```
+
+The drill extracts only allowlisted regular Ship files into a new0700 temporary directory, checks integrity/binding, starts the peer merchant host without provider/issuer network and checks restart plus anonymous-admin denial. It removes that copy in `finally`, never replaces production files, and is not proof of a real shipment. The reusable synthetic integration test separately proves an online copy of a practice label, its still-valid PDF capability and pending event; no fixture order goes into production.
+
+For an actual incident, stop Ship first and keep intake disabled. Run the isolated drill before restoring; replace the complete persistence namespace and matching configuration together under0700/0600 permissions, not individual database rows or generations. Do not restore stale WAL/SHM or merge another generation. Start Ship only after checking the binding and closed admission, then reconcile with canonical Commerce state before any subsequent admission. This is a narrow Ship runbook, not a verified full-store or off-host recovery procedure.
 
 ## Public request admission
 Caddy must overwrite `X-Backroadbum-Client-IP` with `{remote_host}` in its store `reverse_proxy 127.0.0.1:4321` block. The listener is loopback-only; never trust browser-provided forwarding headers or expose it directly. Private Caddy credentials/configuration are deliberately not committed.
