@@ -69,7 +69,7 @@ try {
       await page.goto(base + '/' + kind);
       await page.getByRole('link', { name: 'Back to shop', exact: true }).click();
       await expect(page).toHaveURL(base + '/shop');
-      await expect(page.locator('[data-commerce-product]')).toHaveCount(5);
+      await expect(page.locator('[data-commerce-product]')).toHaveCount(6);
       policies.push({ kind, sha256, publishedTextAndJsonLdUnchanged: baseline ? true : null });
     }
     expect(errors).toEqual([]);

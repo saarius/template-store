@@ -26,20 +26,20 @@ try {
       href: node.getAttribute('href'),
     }])));
     await visit('/shop');
-    assert.equal(await page.locator('[data-commerce-product]').count(), 5);
+    assert.equal(await page.locator('[data-commerce-product]').count(), 6);
     const all = await listings();
     const nav = page.getByRole('navigation', { name: 'Shop collections' });
     assert.equal(await nav.getByRole('link').count(), 3);
-    assert.equal(await nav.locator('[aria-current="page"]').textContent().then(text => text.trim()), 'All gear (5)');
+    assert.equal(await nav.locator('[aria-current="page"]').textContent().then(text => text.trim()), 'All gear (6)');
     if (captures) await page.screenshot({ path: `${captures}/shop-${width}.png`, fullPage: true });
     for (const [slug, title, names] of [
-      ['road-day', 'Road day', ['Wrong Turn Tee', 'Long Way Cap', 'Glovebox Field Tote']],
-      ['slow-camp', 'Slow camp', ['Creekside Camp Mug', 'Last Light Fleece', 'Glovebox Field Tote']],
+      ['road-day', 'Road day', ['Wrong Turn Tee', 'Long Way Cap', 'Glovebox Field Tote', 'Switchback Bandana']],
+      ['slow-camp', 'Slow camp', ['Creekside Camp Mug', 'Last Light Fleece', 'Glovebox Field Tote', 'Switchback Bandana']],
     ]) {
-      await page.getByRole('navigation', { name: 'Shop collections' }).getByRole('link', { name: `${title} (3)`, exact: true }).click();
+      await page.getByRole('navigation', { name: 'Shop collections' }).getByRole('link', { name: `${title} (4)`, exact: true }).click();
       await page.waitForURL(origin + '/categories/' + slug);
       assert.equal(await page.locator('h1').textContent(), title);
-      assert.equal(await page.locator('[data-commerce-product]').count(), 3);
+      assert.equal(await page.locator('[data-commerce-product]').count(), 4);
       const selected = await listings();
       assert.deepEqual(Object.values(selected).map(item => item.name).sort(), names.sort());
       for (const [id, item] of Object.entries(selected)) assert.deepEqual(item, all[id], 'Commerce facts differ from shop');
@@ -62,7 +62,7 @@ try {
     await visit('/categories/not-a-real-collection', 404);
     assert.equal(await page.getByRole('link', { name: 'Browse all gear', exact: true }).getAttribute('href'), '/shop');
     assert.deepEqual(errors, []);
-    result.viewports.push({ width, products: 5, collections: 2, collectionCounts: [3, 3], cartPersists: true, emptyAndMissing: true, pageErrors: 0, overflow: false });
+    result.viewports.push({ width, products: 6, collections: 2, collectionCounts: [4, 4], cartPersists: true, emptyAndMissing: true, pageErrors: 0, overflow: false });
     await page.close();
   }
   console.log(JSON.stringify(result, null, 2));

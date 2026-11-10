@@ -15,7 +15,7 @@ try {
     page.on('request', request => { if (/\/api\/checkout\//.test(request.url())) checkout.push(new URL(request.url()).pathname); });
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await page.goto(base + '/shop')).status()).toBe(200);
-    await expect(page.locator('[data-commerce-product][data-product-link]')).toHaveCount(5);
+    await expect(page.locator('[data-commerce-product][data-product-link]')).toHaveCount(6);
     const tee = page.locator('[data-product-link][href="/products/wrong-turn-tee"]');
     await expect(tee).toHaveCount(1);
     await tee.click();
@@ -93,7 +93,7 @@ try {
     await fits();
     await page.screenshot({ path: new URL(`metadata-dashboard-${width}.png`, output).pathname, fullPage: false });
     expect(errors).toEqual([]); expect(checkout).toEqual([]);
-    results.push({ width, groupedShopFamilies: 5, distinctMemberIds: true, selectedTarget: true, savedFeedbackReset: true,
+    results.push({ width, groupedShopFamilies: 6, distinctMemberIds: true, selectedTarget: true, savedFeedbackReset: true,
       soldOutRefused: true, independentCartQuantities: true, refreshedSubtotal: '102.00',
       removedOnlyChosenMember: true, selectedMetadataMatchesPublicProjection: true, simpleSaleMetadataPreserved: true, noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout.length });
     await context.close();
