@@ -2,6 +2,7 @@
 """Public-safe metrics only. Never serialize environment variables or logs."""
 import datetime, json, pathlib, shutil, subprocess, time, urllib.request
 from payments_metrics import payments_metrics
+from checkout_metrics import checkout_metrics
 ROOT = pathlib.Path('/var/lib/backroadbum')
 def service(name):
     p = subprocess.run(['systemctl', 'is-active', name], capture_output=True, text=True)
@@ -24,12 +25,18 @@ for route in ['/', '/shop', '/cart', '/test-store', '/_emdash/admin']:
         with urllib.request.urlopen(req, timeout=10) as r: health[route] = r.status
     except urllib.error.HTTPError as e: health[route] = e.code
     except Exception: health[route] = None
-# The public gate is separate from private payment proof. A refusal is not a payment result.
+# GET advisory only: never mint a capability or create a cart/payment during health checks.
+checkout = checkout_metrics(None, None)
 try:
-    req = urllib.request.Request('https://backroadbum.com/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/prepare',data=b'{}',headers={'Content-Type':'application/json','User-Agent':'BackroadBum-SelfCheck/1.0'})
-    with urllib.request.urlopen(req, timeout=10) as r: checkout = r.status
-except urllib.error.HTTPError as e: checkout = e.code
-except Exception: checkout = None
+    req = urllib.request.Request('https://backroadbum.com/api/checkout/health', headers={'User-Agent':'BackroadBum-SelfCheck/1.0'})
+    try:
+        response = urllib.request.urlopen(req, timeout=10)
+    except urllib.error.HTTPError as error:
+        response = error
+    with response as r:
+        checkout = checkout_metrics(json.load(r), r.status)
+except Exception:
+    pass
 # Loopback liveness is not proof that Commerce is connected or an order was paid.
 transport = None
 try:
@@ -38,7 +45,7 @@ try:
 except Exception:
     pass
 disk = shutil.disk_usage('/')
-result = {'collectedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(), 'services':{name:service(name) for name in ['backroadbum','caddy','backroadbum-payments']}, 'http':health, 'host':{'cpuPercent':cpu(),**memory(),'diskUsedGiB':round(disk.used/2**30,1),'diskTotalGiB':round(disk.total/2**30,1)}, 'checkout':{'state':'refused' if checkout in (401,403,503) else 'unverified','prepareHttp':checkout,'lastPaidTestAt':None}, 'paymentsTransport':transport, 'usage':{'visitors':None,'orders':None,'tokens':None,'apiEquivalentUSD':None}, 'backupAt':None}
+result = {'collectedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(), 'services':{name:service(name) for name in ['backroadbum','caddy','backroadbum-payments']}, 'http':health, 'host':{'cpuPercent':cpu(),**memory(),'diskUsedGiB':round(disk.used/2**30,1),'diskTotalGiB':round(disk.total/2**30,1)}, 'checkout':checkout, 'paymentsTransport':transport, 'usage':{'visitors':None,'orders':None,'tokens':None,'apiEquivalentUSD':None}, 'backupAt':None}
 backups = list((ROOT/'backups').glob('*.tar.gz'))
 if backups: result['backupAt'] = datetime.datetime.fromtimestamp(max(p.stat().st_mtime for p in backups),datetime.timezone.utc).isoformat()
 p = ROOT/'telemetry.json.tmp'; p.write_text(json.dumps(result)); p.replace(ROOT/'telemetry.json')

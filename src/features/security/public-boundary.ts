@@ -21,6 +21,7 @@ const EXACT_ALLOWED_PATHS = new Set([
   "/agents.md",
   "/api/guest-cart/snapshot",
   "/api/checkout/status",
+  "/api/checkout/health",
   "/shipping",
   "/returns",
   "/search",

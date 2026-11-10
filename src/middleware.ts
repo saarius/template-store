@@ -102,6 +102,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     applySecurityHeaders(response.headers);
     return response;
   }
+  if (process.env.BACKROADBUM_MERCHANT_PROFILE === '1') {
+    const checkoutPath = pathForms.find(merchantCheckoutPath);
+    if (checkoutPath) {
+      const { admitMerchantCheckout } = await import('./features/guest-cart/merchant-admission.js');
+      const refused = await admitMerchantCheckout(context.request, checkoutPath);
+      if (refused) { applySecurityHeaders(refused.headers); return refused; }
+    }
+  }
   if (context.url.pathname === "/cart/") {
     const response = new Response(null, {
       status: 302,

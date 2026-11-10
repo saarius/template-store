@@ -4,20 +4,21 @@ import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 import { openShopperPreview } from './lib/backroadbum-shopper-preview.mjs';
 if (!process.argv.includes('--check')) {
-  console.log('No action. Start the private checkout preview, then --check verifies the retained shopper receipt.');
+  console.log('No action. --check reads a retained receipt in private preview; --public uses the real public store.');
   process.exit(0);
 }
 const capture = process.argv.includes('--capture');
+const publicStore = process.argv.includes('--public');
 const fulfillment = process.argv.find(value => value.startsWith('--fulfillment='))?.slice('--fulfillment='.length);
 if (fulfillment && !['processing', 'completed'].includes(fulfillment)) throw Error('Unknown fulfillment expectation');
 const statePath = process.argv.find(value => value.startsWith('--state-file='))?.slice('--state-file='.length);
 const captureDir = 'runs/backroadbum/shopper-status';
 if (capture) mkdirSync(captureDir, { recursive: true });
-const report = { checkedAt: new Date().toISOString(), publicRollout: 'closed', viewportChecks: [] };
+const report = { checkedAt: new Date().toISOString(), surface: publicStore ? 'public-store' : 'private-preview', viewportChecks: [] };
 try {
   let stableOrder;
   for (const width of [1440, 390]) {
-    const shopper = await openShopperPreview({ saved: true, width, statePath });
+    const shopper = await openShopperPreview({ saved: true, width, statePath, publicStore });
     try {
       const { page } = shopper;
       await page.goto('https://backroadbum.com/checkout/success', { waitUntil: 'domcontentloaded' });
@@ -56,7 +57,7 @@ try {
         ...(fulfillment ? { fulfillment, syntheticTrackingOnly: fulfillment === 'completed' } : {}) });
     } finally { await shopper.browser.close(); }
   }
-  const stranger = await openShopperPreview();
+  const stranger = await openShopperPreview({ publicStore });
   try {
     await stranger.page.goto('https://backroadbum.com/checkout/success?session_id=cs_test_not_authority', { waitUntil: 'domcontentloaded' });
     await stranger.page.waitForFunction(() => !document.querySelector('[data-guest-checkout-return-status]')?.textContent?.includes('Checking'));
