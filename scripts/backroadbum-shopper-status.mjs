@@ -30,7 +30,11 @@ try {
       await page.reload({ waitUntil: 'domcontentloaded' });
       await page.locator('[data-guest-checkout-order]').waitFor({ state: 'visible' });
       assert.equal(await page.locator('[data-guest-checkout-order-number]').innerText(), stableOrder);
-      if (capture) await page.screenshot({ path: `${captureDir}/receipt-${width}.png`, fullPage: true });
+      if (capture) {
+        await page.evaluate(() => document.fonts.ready);
+        await page.locator('img').evaluateAll(images => Promise.all(images.map(image => image.decode().catch(() => {}))));
+        await page.screenshot({ path: `${captureDir}/receipt-${width}.png`, fullPage: true });
+      }
       await page.goto('https://backroadbum.com/cart', { waitUntil: 'domcontentloaded' });
       await page.locator('[data-guest-cart-empty]').waitFor({ state: 'visible' });
       report.viewportChecks.push({ width, paidReceipt: true, testLabel: true, reloadStable: true, purchasedCartSettled: true, noOverflow: true });
