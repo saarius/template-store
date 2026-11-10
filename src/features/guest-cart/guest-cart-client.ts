@@ -284,7 +284,11 @@ function lineThumbnailMarkup(line: GuestCartView["lines"][number]): string {
 }
 
 function lineCopyMarkup(line: GuestCartView["lines"][number]): string {
-  return `<h2>${escapeText(line.name)}</h2>
+  const name = escapeText(line.name);
+  const title = line.productPath
+    ? `<a data-guest-cart-product-link href="${escapeText(line.productPath)}">${name}</a>`
+    : name;
+  return `<h2>${title}</h2>
   ${line.sku ? `<p data-guest-cart-sku>SKU: ${escapeText(line.sku)}</p>` : ""}
   ${priceMarkup(line)}
   ${line.lineTotalText ? `<p data-guest-cart-line-total${invalidQuantities.has(line.id) ? " hidden" : ""}>Line total <strong>${escapeText(line.lineTotalText)}</strong></p>` : ""}

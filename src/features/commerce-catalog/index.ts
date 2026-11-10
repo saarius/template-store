@@ -29,6 +29,8 @@ export type CommerceCatalogSnapshot =
       found: true;
       name: string;
       sku: string;
+      /** Commerce's public link to the product's EmDash entry, shared by members. */
+      page?: string;
       fulfillment: "physical" | "digital";
       thumbnail?: GuestCartPublicThumbnail | null;
       price: PublicPriceView;

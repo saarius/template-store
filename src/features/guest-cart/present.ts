@@ -1,4 +1,5 @@
 import { formatUsdMinor } from "../store-shell/price.js";
+import { safeCartProductPath } from "./product-links.js";
 import { isSafeGuestCartProductId, type GuestCartIntent, type GuestCartReadNotice } from "./intent.js";
 
 const availabilityLabels: Record<string, string> = {
@@ -35,6 +36,7 @@ export type GuestCartCatalogSnapshot =
       found: true;
       name: string;
       sku: string;
+      productPath?: string | null;
       fulfillment?: "physical" | "digital";
       thumbnail?: GuestCartPublicThumbnail | null;
       price: GuestCartPublicPrice;
@@ -79,6 +81,7 @@ export type GuestCartLineView = Readonly<{
   quantity: number;
   name: string;
   sku: string | null;
+  productPath?: string | null;
   fulfillment?: "physical" | "digital";
   /** Real product media, or null for the neutral placeholder. */
   thumbnail: GuestCartPublicThumbnail | null;
@@ -273,6 +276,7 @@ export function presentGuestCart(options: {
       quantity: line.quantity,
       name,
       sku,
+      productPath: snapshot?.found && listable ? safeCartProductPath(snapshot.productPath) : null,
       fulfillment: snapshot?.found ? snapshot.fulfillment ?? "physical" : "physical",
       thumbnail,
       regularText: snapshot?.found ? snapshot.price.regularText : null,
@@ -494,6 +498,7 @@ export function projectGuestCartCatalogSnapshot(value: unknown): GuestCartCatalo
     found: true,
     name: publicName,
     sku: publicSku,
+    productPath: listable ? safeCartProductPath(value.productPath) : null,
     fulfillment: value.fulfillment === "digital" ? "digital" : "physical",
     thumbnail,
     price,
