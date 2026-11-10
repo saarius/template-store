@@ -5,7 +5,7 @@ export PATH=/opt/node/bin:/usr/local/bin:/usr/bin:/bin
 repo=/var/lib/trialrun/workspace/repos/template-store
 unit=backroadbum-checkout-preview
 case "${1:-}" in
-  stop) sudo systemctl stop "$unit"; exit ;;
+  stop) sudo systemctl stop "$unit"; sudo systemctl reset-failed "$unit" 2>/dev/null || true; exit ;;
   start) ;;
   *) echo 'Usage: checkout-preview.sh start|stop'; exit 2 ;;
 esac
@@ -31,7 +31,7 @@ writeFileSync('/var/lib/backroadbum/checkout-preview/runner.mjs', source.replace
 console.log(path);
 JS
 )
-sudo systemd-run --unit="$unit" --uid=agent --gid=agent \
+sudo systemd-run --collect --unit="$unit" --uid=agent --gid=agent \
   --property=WorkingDirectory="$repo" \
   --property=EnvironmentFile=/etc/backroadbum/emdash.env \
   --property=BindReadOnlyPaths=/var/lib/backroadbum/checkout-preview/runner.mjs:"$runner" \
@@ -43,7 +43,7 @@ sudo systemd-run --unit="$unit" --uid=agent --gid=agent \
   --setenv=DINKUS_TEMPLATE_UPLOADS_DIR=/var/lib/backroadbum/uploads \
   /opt/node/bin/node /var/lib/backroadbum/current/server/entry.mjs
 for _ in {1..15}; do
-  if curl -fsS --max-time 4 -H 'Host: backroadbum.com' -H 'X-Forwarded-Proto: https' http://127.0.0.1:4322/cart -o /dev/null; then
+  if curl -fsS --max-time 4 -H 'Host: backroadbum.com' -H 'X-Forwarded-Proto: https' http://127.0.0.1:4322/cart -o /dev/null 2>/dev/null; then
     echo 'Private preview on 127.0.0.1:4322; public checkout unchanged. Stop after verification.'; exit
   fi
   sleep 1
