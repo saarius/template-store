@@ -1,5 +1,7 @@
 # Backroad Bum deployment
 
+**Owner Steer1 (November10) supersedes local activation below.** Stop expanding/activating bespoke local transports; migrate to hosted DinkusKit with unmodified Registry plugins, then retire redundant local services after hosted verification or a concrete blocker. Prioritize the #211 cart PR under the pragmatic verification gate. Existing local controls stay disabled; older activation details are history/recovery, not the target plan.
+
 Merchant branch: `backroadbum/store`, serving https://backroadbum.com. This is an explicit merchant composition, not a generic self-hosting release or upstream proposal. `PRODUCT.md` and `DESIGN.md` record the provisional brand; the original starter design is at `docs/template-design.md`.
 
 ## Current state

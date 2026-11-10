@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Owner Steer1 · November10
+Hosted dinkuskit.com, payments.dinkuskit.com and ship.dinkuskit.com with unmodified Registry plugins are the target customer journey. Stop expanding local issuer/service overlays; preserve the serving store during migration, then retire redundant transports after hosted verification or a concrete blocker. Prioritize the #211 cart PR; unrelated full-matrix baseline timeouts belong in CI, not an indefinite submission gate.
+
 ## Platform
 web
 

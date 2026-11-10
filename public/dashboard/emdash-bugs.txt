@@ -1,0 +1,31 @@
+# EmDash Bugs & Friction — For Human Review
+
+Updated November 10, 2026. No EmDash upstream issue, PR or comment has been opened. These observations are not all confirmed CMS defects; unknown causes/versions are explicitly marked. Live Node24.22.2, EmDash1.4.0 and @emdash-cms/sandbox-workerd0.9.6 are currently resolved; candidate/baseline use Node24.22.0, EmDash1.4.0. Historical component versions not separately captured remain unqualified.
+
+## 1. Standalone Node image transforms need an explicit Sharp dependency
+- Observed: November9 initial built store returned HTTP500 for transformed images; declaring Sharp at the application root restored HTTP200. Current resolved Sharp is0.34.5; the exact original pre-fix dependency resolution was not retained.
+- Reproduce: build the standalone Node store without application-root Sharp, request a rendered /_image transform, then compare with Sharp installed. Historical reproduction is documented, not freshly rerun against a broken serving release.
+- Root cause: required runtime image-transform dependency was absent at the application root. Whether this is an EmDash packaging defect or deployment documentation gap remains unqualified.
+- Workaround: keep explicit Sharp in the store package. Evidence: workspace evidence/2026-11-09-cycle.md; template-store package.json. No public outage recreation.
+
+## 2. Upstream admin welcome/catalog seeding stalls on this host
+- Versions: untouched template-store4a421e51cf67a55d13f4eb213a3155ade7e15805, paired Commerce35f80f218776dac5e7954ed3740b201c086a2d20, resolved EmDash1.4.0, Node24.22.0.
+- Reproduce: run the owning browser verification against unchanged upstream with disposable local storage; its first admin welcome times out and catalog seed refuses with commandId unique-index-inactive admission. Also observed with one proof server in an isolated network namespace. Two-server runs additionally hit host OOM; that does not explain the isolated timeout.
+- Root cause: unresolved cross-stack setup/asset/storage seam, NOT established as an EmDash defect. SQLite indexes exist, and isolated bridge/workerd uniqueness probes pass.
+- Workaround: keep successful typecheck/unit/workflow/targeted browser proof and let GitHub Actions run the unrelated full matrix, per Owner Steer1. Do not bypass seed safety or insert CMS users/options/session rows.
+- Evidence: workspace evidence/2026-11-10-cart-baseline-cycle.md and its linked reproductions.
+
+## 3. Concurrent workerd runners collide on the default port
+- Versions: live EmDash1.4.0 / sandbox-workerd0.9.6; sender fixture resolves the paired runner from its pinned dependency tree. Node24.22.2.
+- Reproduce: start another WorkerdSandboxRunner while live workerd already occupies127.0.0.1:18788 in the same network namespace. The fixture failed binding that address.
+- Root cause: each runner instance initializes its first plugin port to18788; no automatic cross-process allocation was observed.
+- Workaround: disposable test in a separate network namespace, with explicit cleanup. No live port/service changes. This fixture collision does NOT diagnose item2, already reproduced in isolation.
+- Evidence: workspace evidence/2026-11-10-ship-sender-cycle.md; installed sandbox-workerd runner source. Human review should confirm whether a supported port-selection API exists before filing.
+
+## 4. Deployment shutdown and private encryption prerequisites
+- Observed November9: first service shutdown exceeded the usual timeout while stopping workerd. A later restart refused missing required EmDash encryption configuration. Exact historical subprocess versions were not separately captured; current versions are above.
+- Reproduce: original deployment/restart with unbounded worker stop or omitted required encryption configuration; do not repeat on the serving store.
+- Root cause: slow worker shutdown remains unqualified; missing encryption configuration is an expected fail-closed deployment prerequisite, not evidence of a CMS defect.
+- Workaround: immutable staged releases, bounded10-second shutdown and required private encryption configuration loaded by systemd. Never bypass encryption/auth checks or expose keys. Dashboard serving history and evidence/2026-11-09-cycle.md preserve the observations.
+
+Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.
