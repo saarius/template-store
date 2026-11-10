@@ -13,7 +13,10 @@ try {
     const page = await context.newPage();
     const errors = [], checkout = [];
     page.on('pageerror', error => errors.push(error.message));
-    page.on('request', request => { if (/\/api\/checkout\//.test(request.url())) checkout.push(new URL(request.url()).pathname); });
+    page.on('request', request => {
+      const path = new URL(request.url()).pathname;
+      if (path.startsWith('/api/checkout/') || /\/_emdash\/api\/plugins\/[^/]+\/checkout\/guest\//.test(path)) checkout.push(path);
+    });
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const capture = async name => { await page.evaluate(() => document.fonts.ready); await fits(); await page.screenshot({ path: new URL(`${name}-${width}.png`, output).pathname, fullPage: true }); };
     await page.goto(base + '/cart');
@@ -114,14 +117,17 @@ try {
     await page.getByRole('link', { name: 'Continue shopping', exact: true }).focus();
     expect(await page.getByRole('link', { name: 'Continue shopping', exact: true }).evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
     expect(errors).toEqual([]);
+    expect(checkout.filter(path => /\/prepare$/.test(path)).length).toBeGreaterThan(0);
     expect(checkout.filter(path => /\/start$/.test(path))).toEqual([]);
-    results.push({ width, currentPricesMatched: true, invalidInputs: 7, invalidDraftSurvivesRefresh: true, multiRowErrors: true, typingAndKeyboardFocus: true, checkoutGateAndTotals: true, emptyBrowseAction: true, noOverflow: true, browserErrors: errors.length, checkoutPrepareRequests: checkout.filter(path => /\/prepare$/.test(path)).length, checkoutStartRequests: 0 });
+    results.push({ width, currentPricesMatched: true, invalidInputs: 7, invalidDraftSurvivesRefresh: true, multiRowErrors: true, typingAndKeyboardFocus: true, checkoutGateAndTotals: true, emptyBrowseAction: true, noOverflow: true, browserErrors: errors.length, checkoutPrepareRequests: checkout.filter(path => /\/prepare$/.test(path)).length, checkoutStatusRequests: checkout.filter(path => /\/status$/.test(path)).length, checkoutStartRequests: 0 });
     await context.close();
   }
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 1000 }, userAgent: 'BackroadBum-SelfCheck/1.0' });
   const page = await context.newPage(); await page.goto(base + '/cart');
-  await expect(page.getByText('Your cart needs JavaScript', { exact: false })).toBeVisible();
-  await page.getByRole('link', { name: 'browse the gear', exact: true }).click();
+  // Playwright's text/role engines exclude noscript even when scripting is off.
+  await expect(page.locator('noscript p')).toBeVisible();
+  await expect(page.locator('noscript p')).toContainText('Your cart needs JavaScript');
+  await page.locator('noscript a[href="/shop"]').click();
   await expect(page).toHaveURL(base + '/shop'); await context.close();
 } finally { await browser.close(); }
 const proof = { checkedAt: new Date().toISOString(), results, additionalReflowWidths: [768, 320], noJavaScriptBrowsePath: true, noPaymentOrOrderCreated: true };

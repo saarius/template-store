@@ -162,6 +162,21 @@ describe("guest cart untrusted cache", () => {
 });
 
 describe("guest cart quantity mutation", () => {
+  it.each(["0", "-1", "1.5", "100", "08", "abc", ""])("rejects quantity draft %j without changing saved intent", (draft) => {
+    const store = memoryStorage();
+    const original = { version: 1 as const, lines: [{ id: "hat-1", quantity: 2 }] };
+    saveGuestCartIntent(GUEST_CART_STORAGE_KEY, original, store);
+    expect(parseGuestCartQuantityInput(draft)).toBeNull();
+    expect(loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent).toEqual(original);
+    // Coercion is not a recovery path: the mutation boundary also refuses
+    // numeric drafts outside 1..99 without altering its input.
+    if (draft !== "" && draft !== "08" && draft !== "abc") {
+      const result = setGuestCartLineQuantity(original, "hat-1", Number(draft));
+      expect(result.accepted).toBe(false);
+      expect(result.intent).toEqual(original);
+    }
+  });
+
   it("adds, replaces, and removes only safe positive integers", () => {
     const first = addGuestCartLine(emptyGuestCartIntent(), "hat-1", 1);
     expect(first.accepted).toBe(true);
