@@ -85,7 +85,7 @@ test("real Wrangler unknown-token return handles the expected 503", async ({ bro
         }));
       });
       await page.goto("/checkout/success?session_id=unknown");
-      await expect(page.getByText("We couldn't confirm your order just now. Check your email.")).toBeVisible();
+      await expect(page.getByText("We couldn't confirm your saved checkout. Try again in the browser used for checkout.")).toBeVisible();
       expect(pageErrors).toEqual([]);
       expect(consoleErrors.some((message) => /Failed to load resource/u.test(message))).toBe(true);
     } finally {

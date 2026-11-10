@@ -36,7 +36,7 @@ try {
     await expect(page.locator('[data-guest-cart-subtotal]')).toHaveText('Subtotal $72.00');
     await page.reload();
     await expect(qty).toHaveValue('3');
-    await expect(page.locator('[data-guest-cart-checkout]')).toBeDisabled();
+    await expect(page.locator('[data-guest-cart-checkout]')).toBeEnabled();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: new URL(`cart-${name}.png`, output).pathname, fullPage: true });
     await page.locator('[data-guest-cart-remove]').click();
@@ -45,7 +45,7 @@ try {
     await expect(page.locator('.brb-story-link')).toHaveCount(2);
     await page.goto(base + '/test-store');
     await expect(page.locator('main')).toContainText('4242 4242 4242 4242');
-    await expect(page.locator('main')).toContainText('Checkout is not connected yet');
+    await expect(page.locator('main')).toContainText('Try a test purchase');
     await page.goto(base + '/dashboard/');
     await expect(page.locator('main')).toContainText('A store, built in the open.');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -53,9 +53,10 @@ try {
     for (const path of ['/_emdash/admin', '/_emdash/api/setup/dev-bypass', '/_emdash/api/auth/dev-bypass']) {
       expect((await page.request.get(base + path)).status()).toBe(401);
     }
-    const checkout = await page.request.post(base + '/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/prepare', { data: {} });
-    expect(checkout.status()).toBe(503);
-    results.push({ viewport: name, width, productCount: 5, cartPersistence: true, quantitySubtotal: '72.00', checkoutRefused: true, adminProtected: true, imagesLoaded: true, browserErrors: 0 });
+    const checkout = await page.request.get(base + '/api/checkout/health');
+    expect(checkout.status()).toBe(200);
+    expect(await checkout.json()).toMatchObject({ admission: 'open', readiness: 'supported', mode: 'test' });
+    results.push({ viewport: name, width, productCount: 5, cartPersistence: true, quantitySubtotal: '72.00', checkoutReadyAdvisory: true, adminProtected: true, imagesLoaded: true, browserErrors: 0 });
     await context.close();
   }
 } finally { await browser.close(); }

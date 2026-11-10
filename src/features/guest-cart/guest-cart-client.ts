@@ -1281,8 +1281,8 @@ export function hydrateGuestCheckoutReturn(): void {
     }
   })();
   const failureMessage = root.querySelector("[data-guest-checkout-contact]")
-    ? "We couldn't confirm your order just now. Check your email, or contact us."
-    : "We couldn't confirm your order just now. Check your email.";
+    ? "We couldn't confirm your saved checkout. Try again in the browser used for checkout, or contact the store."
+    : "We couldn't confirm your saved checkout. Try again in the browser used for checkout.";
   const setFailureState = () => {
     const title = root.querySelector("#guest-checkout-return-title");
     if (title instanceof HTMLElement) title.textContent = "We couldn't confirm your order";
@@ -1406,7 +1406,7 @@ export function hydrateGuestCheckoutReturn(): void {
     if (exhausted && result.ok && result.checkout.state === "pending") {
       setFailureState();
       setMessage(
-        "Status checks are temporarily limited. Check your confirmation email or refresh later.",
+        "Status checks are temporarily limited. Keep this browser’s site data and refresh later.",
         true,
       );
       if (statusRetry instanceof HTMLButtonElement) statusRetry.hidden = false;

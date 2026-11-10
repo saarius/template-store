@@ -62,6 +62,7 @@ try {
     await stranger.page.goto('https://backroadbum.com/checkout/success?session_id=cs_test_not_authority', { waitUntil: 'domcontentloaded' });
     await stranger.page.waitForFunction(() => !document.querySelector('[data-guest-checkout-return-status]')?.textContent?.includes('Checking'));
     assert.equal(await stranger.page.locator('[data-guest-checkout-order]').isVisible(), false);
+    assert.doesNotMatch(await stranger.page.locator('[data-guest-checkout-return-status]').innerText(), /Check your email|confirmation email/);
     report.urlWithoutCapabilityDenied = true;
   } finally { await stranger.browser.close(); }
   console.log(JSON.stringify(report, null, 2));

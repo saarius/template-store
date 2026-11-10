@@ -44,7 +44,7 @@ test("guest checkout stays closed and return pages never trust browser claims", 
   await installOfflineCheckoutHarness(page, { baseURL: testInfo.project.use.baseURL as string, synthetic: false });
   await page.goto("/checkout/success");
   await expect(page.getByRole("heading", { name: "We couldn't confirm your order" })).toBeVisible();
-  await expect(page.getByText("We couldn't confirm your order just now. Check your email.")).toBeVisible();
+  await expect(page.getByText("We couldn't confirm your saved checkout. Try again in the browser used for checkout.")).toBeVisible();
   await page.screenshot({
     path: resolve("runs/checkout-success-commerce", `${testInfo.project.name}-no-token.png`),
     fullPage: true,
@@ -298,7 +298,7 @@ test("unknown checkout token gives a safe status-failure message", async ({ brow
       }));
     });
     await page.goto("/checkout/success?session_id=well-formed-but-unknown");
-    await expect(page.getByText("We couldn't confirm your order just now. Check your email.")).toBeVisible();
+    await expect(page.getByText("We couldn't confirm your saved checkout. Try again in the browser used for checkout.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Check status again" })).toBeHidden();
     expect(consoleErrors).toEqual([]);
     await page.screenshot({
@@ -329,7 +329,7 @@ test("corrupt stored checkout data does not imply a completed order", async ({ b
     });
     await page.goto("/checkout/success");
     await expect(page.getByRole("heading", { name: "We couldn't confirm your order" })).toBeVisible();
-    await expect(page.getByText("We couldn't confirm your order just now. Check your email.")).toBeVisible();
+    await expect(page.getByText("We couldn't confirm your saved checkout. Try again in the browser used for checkout.")).toBeVisible();
     expect(harness.counts().statusCalls).toBe(0);
   } finally {
     await context.close();

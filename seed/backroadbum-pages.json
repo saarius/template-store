@@ -28,23 +28,28 @@
   ["normal","Backroad Bum is a demo commerce store. No real charges are made and nothing is physically shipped. The products and their illustrations are fictional designs made for this experiment."],
   ["h2","What works today"],
   ["normal","Browse five products, inspect their design notes and prices, and add them to your guest cart. You can change quantities, remove items and return later in the same browser. Prices and availability are read from the installed DinkusKit Commerce plugin, not saved as checkout authority in your browser."],
-  ["h2","Checkout is not connected yet"],
-  ["normal","Stripe test credentials are configured on the server, but the Payments service and Commerce connection still need to be wired and verified. The checkout stays closed until that integration is ready. A cart is not an order, and no receipt or shipment is claimed at this stage."],
-  ["h2","When test checkout opens"],
-  ["normal","Use Stripe’s test card 4242 4242 4242 4242 with any future expiry date and any three-digit CVC. Use only fictional contact and address details. Never enter a real card here. An order confirmation will appear only after the server has verified a successful test payment."],
+  ["h2","Try a test purchase"],
+  ["normal","Add an item to your cart and choose Checkout. Enter a fictional email, name and U.S. delivery address, then continue to Stripe. Do not enter personal contact details or a home address in this demo."],
+  ["normal","On Stripe’s test checkout, use card 4242 4242 4242 4242 with any future expiry date and any three-digit CVC. Never enter a real card. Return to the store after payment; the receipt appears only when Commerce has verified the payment with the provider."],
+  ["h2","Keep your receipt"],
+  ["normal","Use the same browser and keep its site data. Return to Order confirmation to read the saved checkout; the page address alone cannot recover an order. If payment is pending, check its status before starting again. Email and account-based recovery are not verified yet."],
+  ["h2","If checkout is busy"],
+  ["normal","This small demo allows up to three payment-start requests per network address in each ten-minute window, with a separate budget for receipt checks. If you reach a limit, keep your cart and try again in a few minutes. A request limit is not a payment failure."],
+  ["h2","After payment"],
+  ["normal","New orders begin in Processing. The merchant can mark an order complete manually with an explicitly synthetic tracking reference; the receipt then shows Demo fulfillment complete. That is not a carrier scan or delivery. Ship label automation is not connected."],
   ["h2","Privacy"],
-  ["normal","Your guest cart is stored in your browser. Administration requires separate authentication. The public experiment dashboard shows aggregate operational data, never credentials, customer addresses or raw session logs."]
+  ["normal","The guest cart and receipt capability stay in your browser; fictional checkout contact details are kept with the test order. Request limiting stores keyed network counters, not raw IP addresses. Administration requires separate authentication. The public dashboard never shows credentials, customer addresses or raw session logs."]
  ]},
  {"slug":"shipping","title":"Shipping","replaceStarter":true,"sections":[
   ["normal","There are no physical shipments from this store. Shipping is a sandbox workflow for testing order handling; it is not a delivery promise."],
   ["h2","What to expect"],
-  ["normal","The shipping integration is not connected yet. When enabled, test orders will show clearly labeled sandbox fulfillment and tracking states. We will not buy live postage or send parcels."],
+  ["normal","New paid test orders show Processing. Manual completion in Commerce can add an explicitly synthetic tracking reference, shown on the guest receipt as Demo fulfillment complete. A completed demo order is not a carrier scan or delivery. Ship’s label automation is not connected; no live postage is bought."],
   ["h2","Address details"],
   ["normal","Use fictional U.S. address details when trying checkout. Do not submit a home address or any information you would not want stored in a demo order."]
  ]},
  {"slug":"returns","title":"Returns","replaceStarter":true,"sections":[
   ["normal","Because this store does not sell or ship physical goods, there is nothing to send back. Please do not mail items or submit personal information for a return."],
   ["h2","Test orders and recovery"],
-  ["normal","Checkout is not connected yet. Once payment testing is available, the order-confirmation page will explain the state of your test order. Demo recovery and refund workflows will be documented here as they are verified."]
+  ["normal","After a test payment, use Order confirmation in the same browser to read its saved receipt. Keep that browser’s site data; the address of the page alone is not access to an order. Email recovery and refund workflows are not verified yet, and no real refund or return is promised."]
  ]}
 ]

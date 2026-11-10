@@ -19,7 +19,7 @@ trap 'exit 143' TERM
 cd "$repo"
 export DINKUS_PAIRED_COMMERCE_DIR="$(node scripts/backroadbum-commerce.mjs)"
 export BACKROADBUM_MERCHANT_PROFILE=1
-export BACKROADBUM_CHECKOUT_ENABLED=0
+export BACKROADBUM_CHECKOUT_ENABLED=1
 pnpm exec astro build --outDir "$release"
 # External Node dependencies resolve from this parent of every release.
 ln -sfn "$repo/node_modules" "$root/node_modules"
