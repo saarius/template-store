@@ -13,7 +13,6 @@ const STOREFRONT_PAGES = [
   "src/pages/cart.astro",
   "src/pages/checkout/index.astro",
   "src/pages/products/[id].astro",
-  "src/pages/categories/[slug].astro",
 ] as const;
 
 describe("storefront checkout wording", () => {
@@ -116,14 +115,35 @@ describe("category pages on a shipping store", () => {
     expect(catalog).toContain("{commerce ? <ProductMedia image={commerce.image} productId={commerce.id} fallbackSrc={demoPlaceholderImage(commerce.sku, item.id)}");
     expect(catalog).not.toContain("fallbackSrc={`/merch/");
     const page = readFileSync("src/pages/categories/[slug].astro", "utf8");
-    expect(page).toContain('profile === "shipping" && listedCategory');
-    expect(page).toContain("commerceProducts={commerceProducts}");
+    expect(page).toContain('readCommerceCatalog({ runtime: Astro.locals.emdash, request: Astro.request })');
+    expect(page).toContain('products={category.products}');
+    expect(page).toContain('checkoutAvailable={checkoutAvailable}');
   });
 
-  it("only mention editorial previews when the category has one", () => {
+  it("uses the shared admission-aware banner and distinguishes unavailable from empty", () => {
     const page = readFileSync("src/pages/categories/[slug].astro", "utf8");
-    expect(page).toContain('hasPreviews ? "Editorial previews cannot be purchased." : ""');
-    expect(page).toContain('item.availabilitySource === "preview" && !commerceProducts.has(item.id)');
+    expect(page).toContain('<BackroadPage');
+    expect(page).toContain('unavailable={unavailable}');
+    expect(page).not.toContain('Editorial previews');
+    const shell = readFileSync("src/features/store-shell/BackroadPage.astro", "utf8");
+    expect(shell).toContain('acquireGuestCheckoutAdmission({ runtime: Astro.locals.emdash, request: Astro.request })');
+    expect(shell).toContain('{storeBannerText(available)}');
+  });
+});
+
+describe("saved checkout rediscovery", () => {
+  it("provides credential-free recovery links in the footer and cart", () => {
+    for (const path of [
+      "src/features/store-shell/StoreFooter.astro",
+      "src/features/guest-cart/GuestCart.astro",
+    ]) {
+      const markup = readFileSync(path, "utf8");
+      expect(markup).toMatch(/href="\/checkout\/success" data-last-checkout-link/);
+    }
+    const receipt = readFileSync("src/features/guest-cart/GuestCheckoutReturn.astro", "utf8");
+    expect(receipt).toContain("Your last checkout");
+    expect(receipt).toContain("only its latest checkout");
+    expect(receipt).toContain("page address alone cannot recover an order");
   });
 });
 

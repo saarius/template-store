@@ -21,6 +21,7 @@ const { checkoutAdmission = null } = Astro.props;
     <a data-guest-cart-resume hidden rel="noopener noreferrer">Return to secure checkout</a>
     <button type="button" data-guest-cart-recover hidden>Check checkout status</button>
   </div>
+  <p class="guest-cart-last-checkout">Already checked out? <a href="/checkout/success" data-last-checkout-link>View your last checkout</a> in the browser you used to pay.</p>
 </section>
 <style>
   .guest-cart{width:min(70rem,calc(100% - 2rem));margin:3rem auto;min-height:65vh;overflow-wrap:anywhere}
@@ -33,6 +34,8 @@ const { checkoutAdmission = null } = Astro.props;
   .guest-cart-subtotal strong{font-family:var(--font-mono);font-variant-numeric:tabular-nums;transition:color .22s ease,transform .22s cubic-bezier(.22,1,.36,1);display:inline-block}
   .guest-cart-subtotal strong[data-number-flow-ticking="true"]{color:var(--store-accent);transform:translateY(-1px)}
   .guest-cart-checkout{margin-top:2rem}
+  .guest-cart-last-checkout{max-width:65ch;margin-top:2rem;color:var(--store-muted);line-height:1.6}
+  .guest-cart-last-checkout a{color:var(--store-ink);text-underline-offset:.2em}
   .guest-cart-checkout button{margin:.4rem .6rem .4rem 0;padding:.75rem 1.1rem;border:1.5px solid var(--store-ink-border);border-radius:.4rem;background:var(--store-surface);color:inherit;font:inherit;font-weight:800;box-shadow:3px 3px 0 var(--store-shadow);cursor:pointer}
   .guest-cart-checkout [data-guest-cart-checkout]:not(:disabled){background:var(--dinkus-action-background);color:var(--dinkus-action-color);border-color:var(--dinkus-action-background)}
   .guest-cart-checkout [data-guest-cart-resume]{display:inline-block;margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1.5px solid var(--store-ink-border);border-radius:.4rem;background:var(--store-surface);color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:.2em}

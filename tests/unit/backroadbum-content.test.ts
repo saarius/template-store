@@ -14,10 +14,14 @@ describe('Backroad Bum initial merchant content', () => {
       expect(readFileSync(`public/backroad/${p.art}.svg`, 'utf8')).toContain('<svg');
     }
   });
-  it('states the current checkout limit separately from future test instructions', () => {
+  it('explains current test checkout and browser-bound recovery without publishing credentials', () => {
     const guide = pages.find((p: any) => p.slug === 'test-store');
     const content = JSON.stringify(guide.sections);
-    expect(content).toContain('Checkout is not connected yet');
+    expect(content).toContain('Try a test purchase');
+    expect(content).toContain('Your last checkout in the footer');
+    expect(content).toContain('Only this browser’s latest checkout');
+    expect(content).toContain('Email and account-based recovery are not verified');
+    expect(content).not.toContain('Checkout is not connected yet');
     expect(content).toContain('4242 4242 4242 4242');
     expect(content).toContain('No real charges');
     expect(content).toContain('Never enter a real card');

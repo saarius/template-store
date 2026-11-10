@@ -1296,7 +1296,9 @@ export function hydrateGuestCheckoutReturn(): void {
     status.setAttribute("role", error ? "alert" : "status");
   };
   if (!retention && storedCheckoutData === null) {
-    setFailureState();
+    const title = root.querySelector("#guest-checkout-return-title");
+    if (title instanceof HTMLElement) title.textContent = "No saved checkout in this browser";
+    setMessage("If you already checked out, open Your last checkout in the browser you used to pay. Clearing site data or using private browsing can remove access to a saved checkout.");
     return;
   }
   if (!retention) {

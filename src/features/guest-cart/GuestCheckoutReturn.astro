@@ -41,7 +41,7 @@ const { contactHref } = Astro.props;
       <dl data-guest-checkout-fulfillment-details></dl>
     </section>
     <h3>Keep your receipt</h3>
-    <p>Return to this page in the same browser to check your saved checkout. Keep this browser’s site data: the page address alone cannot recover an order.</p>
+    <p>Choose “Your last checkout” in the footer or cart to return here. This browser keeps only its latest checkout; keep its site data to reopen the receipt. The page address alone cannot recover an order.</p>
     {contactHref && <p data-guest-checkout-contact>Questions? <a href={contactHref}>Contact the store</a>.</p>}
   </div>
   <a data-guest-checkout-retry hidden rel="noopener noreferrer">Continue to secure checkout</a>

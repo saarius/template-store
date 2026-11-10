@@ -32,7 +32,7 @@
   ["normal","Add an item to your cart and choose Checkout. Enter a fictional email, name and U.S. delivery address, then continue to Stripe. Do not enter personal contact details or a home address in this demo."],
   ["normal","On Stripe’s test checkout, use card 4242 4242 4242 4242 with any future expiry date and any three-digit CVC. Never enter a real card. Return to the store after payment; the receipt appears only when Commerce has verified the payment with the provider."],
   ["h2","Keep your receipt"],
-  ["normal","Use the same browser and keep its site data. Return to Order confirmation to read the saved checkout; the page address alone cannot recover an order. If payment is pending, check its status before starting again. Email and account-based recovery are not verified yet."],
+  ["normal","Choose Your last checkout in the footer, or View your last checkout in the cart, using the browser you paid with. Only this browser’s latest checkout is kept; preserve its site data. The page address alone cannot recover an order. If payment is pending, check its status before starting again. Email and account-based recovery are not verified yet."],
   ["h2","If checkout is busy"],
   ["normal","This small demo allows up to three payment-start requests per network address in each ten-minute window, with a separate budget for receipt checks. If you reach a limit, keep your cart and try again in a few minutes. A request limit is not a payment failure."],
   ["h2","After payment"],
@@ -50,6 +50,6 @@
  {"slug":"returns","title":"Returns","replaceStarter":true,"sections":[
   ["normal","Because this store does not sell or ship physical goods, there is nothing to send back. Please do not mail items or submit personal information for a return."],
   ["h2","Test orders and recovery"],
-  ["normal","After a test payment, use Order confirmation in the same browser to read its saved receipt. Keep that browser’s site data; the address of the page alone is not access to an order. Email recovery and refund workflows are not verified yet, and no real refund or return is promised."]
+  ["normal","After a test payment, choose Your last checkout in the footer of the same browser to read its latest saved checkout. Keep that browser’s site data; the address of the page alone is not access to an order. Email recovery and refund workflows are not verified yet, and no real refund or return is promised."]
  ]}
 ]

@@ -21,7 +21,9 @@ try {
     const shopper = await openShopperPreview({ saved: true, width, statePath, publicStore });
     try {
       const { page } = shopper;
-      await page.goto('https://backroadbum.com/checkout/success', { waitUntil: 'domcontentloaded' });
+      await page.goto('https://backroadbum.com/', { waitUntil: 'domcontentloaded' });
+      await page.locator('[data-store-footer] [data-last-checkout-link]').click();
+      assert.equal(page.url(), 'https://backroadbum.com/checkout/success');
       await page.locator('[data-guest-checkout-order]').waitFor({ state: 'visible' });
       assert.equal(await page.locator('[data-guest-checkout-test]').isVisible(), true);
       const order = await page.locator('[data-guest-checkout-order-number]').innerText();
@@ -53,18 +55,41 @@ try {
       }
       await page.goto('https://backroadbum.com/cart', { waitUntil: 'domcontentloaded' });
       await page.locator('[data-guest-cart-empty]').waitFor({ state: 'visible' });
-      report.viewportChecks.push({ width, paidReceipt: true, testLabel: true, reloadStable: true, purchasedCartSettled: true, noOverflow: true,
+      await page.locator('[data-guest-cart] [data-last-checkout-link]').click();
+      await page.locator('[data-guest-checkout-order]').waitFor({ state: 'visible' });
+      assert.equal(await page.locator('[data-guest-checkout-order-number]').innerText(), stableOrder);
+      assert.equal(page.url(), 'https://backroadbum.com/checkout/success');
+      report.viewportChecks.push({ width, paidReceipt: true, footerRecovery: true, cartRecovery: true, credentialFreeUrl: true, testLabel: true, reloadStable: true, purchasedCartSettled: true, noOverflow: true,
         ...(fulfillment ? { fulfillment, syntheticTrackingOnly: fulfillment === 'completed' } : {}) });
     } finally { await shopper.browser.close(); }
   }
-  const stranger = await openShopperPreview({ publicStore });
-  try {
-    await stranger.page.goto('https://backroadbum.com/checkout/success?session_id=cs_test_not_authority', { waitUntil: 'domcontentloaded' });
-    await stranger.page.waitForFunction(() => !document.querySelector('[data-guest-checkout-return-status]')?.textContent?.includes('Checking'));
-    assert.equal(await stranger.page.locator('[data-guest-checkout-order]').isVisible(), false);
-    assert.doesNotMatch(await stranger.page.locator('[data-guest-checkout-return-status]').innerText(), /Check your email|confirmation email/);
-    report.urlWithoutCapabilityDenied = true;
-  } finally { await stranger.browser.close(); }
+  report.missingAccessChecks = [];
+  for (const storage of ['empty', 'corrupt', 'unavailable']) {
+    const stranger = await openShopperPreview({ publicStore, width: 390 });
+    try {
+      let checkoutRequests = 0;
+      stranger.page.on('request', request => {
+        if (/\/(?:checkout\/guest\/(?:prepare|start|status)|api\/checkout\/status)(?:\?|$)/u.test(new URL(request.url()).pathname)) checkoutRequests++;
+      });
+      if (storage === 'corrupt') await stranger.context.addInitScript(() => {
+        localStorage.setItem('dinkus.guest-checkout.v1', '{corrupt');
+      });
+      if (storage === 'unavailable') await stranger.context.addInitScript(() => {
+        Object.defineProperty(window, 'localStorage', { get() { throw new DOMException('Storage unavailable', 'SecurityError'); } });
+      });
+      await stranger.page.goto('https://backroadbum.com/checkout/success?session_id=cs_test_not_authority', { waitUntil: 'domcontentloaded' });
+      await stranger.page.waitForFunction(() => !document.querySelector('[data-guest-checkout-return-status]')?.textContent?.includes('Checking'));
+      assert.equal(await stranger.page.locator('[data-guest-checkout-order]').isVisible(), false);
+      const title = await stranger.page.locator('#guest-checkout-return-title').innerText();
+      assert.equal(title, storage === 'empty' ? 'No saved checkout in this browser' : "We couldn't confirm your order");
+      assert.doesNotMatch(await stranger.page.locator('[data-guest-checkout-return-status]').innerText(), /Check your email|confirmation email/);
+      assert.equal(checkoutRequests, 0);
+      assert.equal(await stranger.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+      if (capture) await stranger.page.screenshot({ path: `${captureDir}/receipt-${storage}-390.png`, fullPage: true });
+      report.missingAccessChecks.push({ storage, receiptDenied: true, noCheckoutRequests: true, noOverflow: true });
+    } finally { await stranger.browser.close(); }
+  }
+  report.urlWithoutCapabilityDenied = true;
   console.log(JSON.stringify(report, null, 2));
 } catch {
   console.error('Shopper receipt verification failed; no response body, URL or browser state emitted.');

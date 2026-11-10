@@ -43,8 +43,8 @@ test("guest checkout stays closed and return pages never trust browser claims", 
   await mkdir(resolve("runs/checkout-success-commerce"), { recursive: true });
   await installOfflineCheckoutHarness(page, { baseURL: testInfo.project.use.baseURL as string, synthetic: false });
   await page.goto("/checkout/success");
-  await expect(page.getByRole("heading", { name: "We couldn't confirm your order" })).toBeVisible();
-  await expect(page.getByText("We couldn't confirm your saved checkout. Try again in the browser used for checkout.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No saved checkout in this browser" })).toBeVisible();
+  await expect(page.locator("[data-guest-checkout-return-status]")).toContainText("open Your last checkout in the browser you used to pay");
   await page.screenshot({
     path: resolve("runs/checkout-success-commerce", `${testInfo.project.name}-no-token.png`),
     fullPage: true,
