@@ -1,0 +1,68 @@
+/* Only the receipt route opts in. Native browser printing never sends data to
+   another service or puts the retained checkout capability into a document. */
+@media print {
+  @page { margin: 16mm; }
+
+  body[data-receipt-page] {
+    --store-line: #888;
+    --store-muted: black;
+    --store-ink: black;
+    background: white;
+    color: black;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+  [data-receipt-page] :is(.skip-link, [data-store-header], [data-store-footer], .store-demo-banner, .store-sandbox-notice) {
+    display: none !important;
+  }
+  [data-receipt-page] .receipt-print-only { display: block; }
+  [data-receipt-page] .receipt-print-header {
+    border-bottom: 1px solid black;
+    padding-bottom: 4mm;
+  }
+  [data-receipt-page] .receipt-print-header p { margin: 0 0 2mm; }
+  [data-receipt-page] .receipt-print-header p:first-child { font-weight: 700; }
+  [data-receipt-page] .guest-checkout-return {
+    width: 100%;
+    margin: 6mm 0 0;
+    min-height: 0;
+  }
+  [data-receipt-page] .guest-checkout-return h1 { font-size: 22pt; margin-bottom: 4mm; }
+  [data-receipt-page] .guest-checkout-return h2 { font-size: 17pt; margin: 0; }
+  [data-receipt-page] .guest-checkout-return h3 { break-after: avoid; }
+  [data-receipt-page] .guest-checkout-receipt {
+    border: 0;
+    border-radius: 0;
+    background: white;
+    padding: 0;
+    margin-top: 5mm;
+  }
+  [data-receipt-page] .guest-checkout-return :is(p, dt, dd, small) { color: black !important; }
+  [data-receipt-page] .guest-checkout-test-badge {
+    color: black;
+    background: white;
+    border: 1px solid black;
+  }
+  [data-receipt-page] :is(.guest-checkout-actions, [data-receipt-screen-only], [data-guest-checkout-contact], [data-guest-checkout-retry], [data-guest-checkout-status-retry]) {
+    display: none !important;
+  }
+  [data-receipt-page] :is([data-guest-checkout-order-items] li, [data-guest-checkout-order-totals], .guest-checkout-destination__item, .guest-checkout-fulfillment) {
+    break-inside: avoid;
+  }
+  /* Keep long receipts paginatable. Do not hold the entire order on one page. */
+  [data-receipt-page] .guest-checkout-return [data-guest-checkout-order-items] li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 3mm 0;
+  }
+  [data-receipt-page] .guest-checkout-item-thumb { display: none; }
+  [data-receipt-page] .guest-checkout-destination__grid { grid-template-columns: 1fr 1fr; }
+  [data-receipt-page] :is(.guest-checkout-destination, .guest-checkout-fulfillment) {
+    margin-top: 6mm;
+    padding-top: 4mm;
+  }
+  [data-receipt-page] .guest-checkout-receipt > .receipt-print-only {
+    margin-top: 6mm;
+    padding-top: 3mm;
+    border-top: 1px solid black;
+  }
+}

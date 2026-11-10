@@ -40,8 +40,13 @@ const { contactHref } = Astro.props;
       <p data-guest-checkout-fulfillment-note></p>
       <dl data-guest-checkout-fulfillment-details></dl>
     </section>
-    <h3>Keep your receipt</h3>
-    <p>Choose “Your last checkout” in the footer or cart to return here. This browser keeps only its latest checkout; keep its site data to reopen the receipt. The page address alone cannot recover an order.</p>
+    <section class="guest-checkout-keep" data-receipt-screen-only aria-labelledby="guest-checkout-keep-title">
+      <h3 id="guest-checkout-keep-title">Keep your receipt</h3>
+      <p>Choose “Your last checkout” in the footer or cart to return here. This browser keeps only its latest checkout; keep its site data to reopen the receipt. The page address alone cannot recover an order.</p>
+      <button type="button" data-guest-checkout-print aria-describedby="guest-checkout-print-hint" hidden>Print or save receipt</button>
+      <p id="guest-checkout-print-hint">Use your browser’s print options to print a copy or save a PDF. A saved copy won’t update or restore online access.</p>
+    </section>
+    <p class="receipt-print-only">Receipt copy. Fulfillment reflects the last status check, not a live update. This copy does not restore online order access.</p>
     {contactHref && <p data-guest-checkout-contact>Questions? <a href={contactHref}>Contact the store</a>.</p>}
   </div>
   <a data-guest-checkout-retry hidden rel="noopener noreferrer">Continue to secure checkout</a>

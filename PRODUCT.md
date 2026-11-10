@@ -30,5 +30,6 @@ Fresh deployment, November 9, 2026. No pre-existing store content, photography, 
 - Keep test instructions findable and separate from editorial storytelling.
 - Give field notes a complete reading path: practical EmDash-authored advice, another note and an unobtrusive way back to the gear. Never imply the fictional merchandise has been field-tested.
 - Keep cart edits honest: an invalid quantity is an unsaved draft, not permission to purchase the previous quantity. Explain the correction beside its field, suppress stale totals and block checkout until every draft is corrected or removed.
+- Let shoppers print or save the authorized paid receipt without creating another checkout or exporting its browser capability. A saved copy is a static record, not online recovery or a live fulfillment view.
 - Treat failure and recovery as part of the product.
 - Keep operational evidence public-safe and truthful.

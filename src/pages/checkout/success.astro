@@ -7,6 +7,7 @@ import { STORE_TITLE, readStorefrontProfile } from "../../features/store-shell/i
 import { isCheckoutEnabled, SANDBOX_SESSION_NOTICE, showsSandboxCheckoutNotice } from "../../features/playground-checkout/index.js";
 import { isDemoCatalogProfile } from "../../features/playground/demo-products.js";
 import "../../features/store-shell/global.css";
+import "../../features/guest-cart/receipt-print.css";
 
 const profile = readStorefrontProfile();
 const settings = await getSiteSettings().catch(() => ({}));
@@ -41,10 +42,14 @@ const sandboxCheckout = showsSandboxCheckoutNotice({ profile, isPlayground, isDe
     <meta name="robots" content="noindex, nofollow" />
     <title>Order confirmation | {STORE_TITLE}</title>
   </head>
-  <body data-storefront-profile={profile}>
+  <body data-storefront-profile={profile} data-receipt-page>
     <div class="store-demo-banner" data-store-demo-banner role="status">Demo checkout &mdash; No real payments or fulfillment.</div>
     <StoreHeader profile={profile} />
     <main id="main-content">
+      <div class="receipt-print-only receipt-print-header">
+        <p>{STORE_TITLE} · backroadbum.com</p>
+        <p>Demo / test store — no real charges or physical shipments.</p>
+      </div>
       {sandboxCheckout && <p class="store-sandbox-notice" role="note" data-sandbox-checkout-return>Test mode checkout. {SANDBOX_SESSION_NOTICE}</p>}
       <GuestCheckoutReturn contactHref={contactHref} />
     </main>

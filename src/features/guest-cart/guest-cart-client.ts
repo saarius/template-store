@@ -1301,6 +1301,12 @@ export function hydrateGuestCheckoutReturn(): void {
   if (!(root instanceof HTMLElement)) return;
   const status = root.querySelector("[data-guest-checkout-return-status]");
   const order = root.querySelector("[data-guest-checkout-order]");
+  const printReceipt = root.querySelector("[data-guest-checkout-print]");
+  printReceipt?.addEventListener("click", () => {
+    // Print the already-authorized view. Never create, refresh or recover an
+    // order as a side effect of saving a copy, even if printing is cancelled.
+    if (order instanceof HTMLElement && !order.hidden) window.print();
+  });
   const initialContact = root.querySelector("[data-guest-checkout-contact]");
   const retry = root.querySelector("[data-guest-checkout-retry]");
   const statusRetry = root.querySelector("[data-guest-checkout-status-retry]");
@@ -1386,6 +1392,7 @@ export function hydrateGuestCheckoutReturn(): void {
         order.hidden = false;
         const currentRetention = readGuestCheckoutRetention(checkoutStorage()) ?? retention;
         confirmedOrderMarkup(root, result, currentRetention);
+        if (printReceipt instanceof HTMLButtonElement) printReceipt.hidden = false;
         const missingMediaIds = result.checkout.order
           ? [...new Set(
               result.checkout.order.lines

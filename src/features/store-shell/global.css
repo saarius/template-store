@@ -1042,8 +1042,9 @@
   color: inherit;
   text-decoration: none;
 }
-.guest-checkout-return > button {
-  min-height: 44px;
+.guest-checkout-return > button,
+.guest-checkout-keep button {
+  min-height: 48px;
   padding: 0.7rem 1rem;
   border: 1.5px solid var(--store-ink-border);
   border-radius: 0.4rem;
@@ -1070,6 +1071,11 @@
   background: var(--store-surface);
 }
 .guest-checkout-order-heading h2 { overflow-wrap: anywhere; }
+.receipt-print-only { display: none; }
+.guest-checkout-keep { margin-top: 2rem; }
+.guest-checkout-keep h3 { margin: 0 0 .7rem; font-size: 1.05rem; }
+.guest-checkout-keep p { max-width: 68ch; color: var(--store-muted); }
+.guest-checkout-keep button:hover { background: var(--brb-blue); }
 .guest-checkout-fulfillment {
   margin-top: 2rem;
   padding-top: 1.5rem;
