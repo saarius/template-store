@@ -1,0 +1,70 @@
+---
+import type { PortableTextBlock } from "emdash";
+import { PortableText } from "emdash/ui";
+import { POLICY_SUPPORT_SECTION_SLUG } from "./index.js";
+import { legacyPortableTextComponents } from "./portable-text/index.js";
+
+interface Props {
+  kind: "shipping" | "returns";
+  title: string;
+  intro?: string;
+  content: PortableTextBlock[];
+  supportContent?: PortableTextBlock[];
+}
+const { kind, title, intro, content, supportContent = [] } = Astro.props;
+const headingId = kind === "shipping" ? "shipping-policy-heading" : "return-policy-heading";
+---
+<main id="main-content" class="policy-page">
+  <a class="policy-page__back" href="/shop">Back to shop</a>
+  <h1 id={headingId}>{title}</h1>
+  <nav class="policy-page__nav" aria-label="Store policies">
+    <a href="/shipping" aria-current={kind === "shipping" ? "page" : undefined}>Shipping</a>
+    <a href="/returns" aria-current={kind === "returns" ? "page" : undefined}>Returns</a>
+  </nav>
+  <section class="policy-page__reading" aria-labelledby={headingId}>
+    {intro && <p class="policy-page__intro">{intro}</p>}
+    {content.length > 0 ? (
+      <div class="policy-page__body prose" data-policy-body data-shipping-policy-body={kind === "shipping" ? "" : undefined} data-return-policy-body={kind === "returns" ? "" : undefined}>
+        <PortableText value={content} components={legacyPortableTextComponents} />
+      </div>
+    ) : (
+      <p role="status" data-shipping-policy-unset={kind === "shipping" ? "" : undefined} data-return-policy-unset={kind === "returns" ? "" : undefined}>
+        This store has not published its {kind} policy yet.
+      </p>
+    )}
+  </section>
+  <section class="policy-recovery" aria-labelledby="policy-recovery-heading" data-policy-recovery>
+    <h2 id="policy-recovery-heading">Looking for your order?</h2>
+    <p>Use the browser you checked out with. Only its latest checkout is saved; the page address alone cannot recover an order.</p>
+    <a href="/checkout/success" data-last-checkout-link>View your last checkout</a>
+  </section>
+  <div class="policy-support" data-policy-support-section={POLICY_SUPPORT_SECTION_SLUG} data-section-source={supportContent.length ? "cms" : "fallback"}>
+    {supportContent.length ? <PortableText value={supportContent} /> : (
+      <p>For test-card details and checkout steps, read the <a href="/test-store">Test-store guide</a>.</p>
+    )}
+  </div>
+</main>
+<style>
+  .policy-page{width:min(52rem,calc(100% - 2rem));margin:2.5rem auto 4rem;min-height:60vh;line-height:1.65;overflow-wrap:anywhere}
+  .policy-page a{color:var(--store-ink);text-underline-offset:.2em}
+  .policy-page__back{display:inline-flex;align-items:center;min-height:3rem;margin-bottom:1rem}
+  h1{margin:0;font-size:clamp(2.8rem,5.7vw,5rem);line-height:1;letter-spacing:-.025em;text-wrap:balance}
+  .policy-page__nav{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;margin:1rem 0 2rem;border-bottom:1px solid var(--store-line)}
+  .policy-page__nav a{display:inline-flex;align-items:center;min-height:3rem;text-decoration:none}
+  .policy-page__nav a:hover,.policy-page__nav a[aria-current="page"]{text-decoration:underline;text-decoration-thickness:2px}
+  .policy-page__nav a[aria-current="page"]{font-weight:600}
+  .policy-page__reading{max-width:68ch;font-size:1.0625rem}
+  .policy-page__intro{font-size:1.15rem;color:var(--store-muted);margin:0 0 2rem}
+  .policy-page__body :global(p){margin:0 0 1rem}
+  .policy-page__body :global(>p:first-child){font-size:1.15rem;color:var(--store-muted);margin-bottom:2rem}
+  .policy-page__body :global(h2){font-size:1.65rem;line-height:1.2;margin:2.25rem 0 .65rem;letter-spacing:-.02em}
+  .policy-page__body :global(h2:first-child){margin-top:0}
+  .policy-recovery{margin-top:2.5rem;padding:1.5rem;background:var(--store-surface-subtle);border-radius:var(--store-radius-card)}
+  .policy-recovery h2{font-size:1.65rem;line-height:1.2;margin:0 0 .65rem}
+  .policy-recovery p{max-width:65ch;margin:0 0 .5rem;color:var(--store-muted)}
+  .policy-recovery a{display:inline-flex;align-items:center;min-height:3rem;font-weight:600}
+  .policy-support{max-width:68ch;margin-top:1.5rem;color:var(--store-muted)}
+  .policy-support :global(p){margin:0 0 1rem}
+  .policy-support :global(h3){font-size:1.5rem;color:var(--store-ink);margin:1.5rem 0 .5rem}
+  .policy-support :global(a){color:var(--store-ink);text-underline-offset:.2em}
+</style>

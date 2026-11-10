@@ -27,6 +27,15 @@ describe('Backroad Bum initial merchant content', () => {
     expect(content).toContain('Never enter a real card');
     expect(content).not.toContain('sk_test_');
   });
+  it('links policy support to the test guide without inventing shipping terms', () => {
+    const support = JSON.parse(readFileSync('seed/backroadbum-policy-support.json', 'utf8'));
+    expect(support.slug).toBe('policy-support-note');
+    const paragraph = support.content.find((block: any) => block.style === 'normal');
+    expect(paragraph.children.map((span: any) => span.text).join('')).toBe('For test-card details and checkout steps, read the Test-store guide.');
+    expect(paragraph.markDefs).toEqual([{ _type: 'link', _key: 'guide', href: '/test-store', blank: false }]);
+    expect(paragraph.children.find((span: any) => span.text === 'Test-store guide').marks).toEqual(['guide']);
+    expect(JSON.stringify(support)).not.toMatch(/shipping charge|sk_test_|guaranteed/i);
+  });
   it('keeps field notes editable in EmDash Pages', () => {
     const notes = pages.filter((p: any) => p.slug.startsWith('field-note-'));
     expect(notes).toHaveLength(3);

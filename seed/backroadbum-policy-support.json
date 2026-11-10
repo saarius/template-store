@@ -1,0 +1,23 @@
+{
+  "slug": "policy-support-note",
+  "content": [
+    {
+      "_type": "block",
+      "_key": "policy-support-heading",
+      "style": "h3",
+      "markDefs": [],
+      "children": [{ "_type": "span", "_key": "heading", "text": "About these policies", "marks": [] }]
+    },
+    {
+      "_type": "block",
+      "_key": "policy-support-guide",
+      "style": "normal",
+      "markDefs": [{ "_type": "link", "_key": "guide", "href": "/test-store", "blank": false }],
+      "children": [
+        { "_type": "span", "_key": "intro", "text": "For test-card details and checkout steps, read the ", "marks": [] },
+        { "_type": "span", "_key": "guide-text", "text": "Test-store guide", "marks": ["guide"] },
+        { "_type": "span", "_key": "end", "text": ".", "marks": [] }
+      ]
+    }
+  ]
+}

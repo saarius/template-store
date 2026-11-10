@@ -1,93 +1,35 @@
 ---
 import { getEmDashEntry, getSection, type PortableTextBlock } from "emdash";
-import { PortableText } from "emdash/ui";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
+import PolicyContent from "../features/store-shell/PolicyContent.astro";
 import {
   POLICY_SUPPORT_SECTION_SLUG,
   STORE_TITLE,
   readStorefrontProfile,
 } from "../features/store-shell/index.js";
-import { legacyPortableTextComponents } from "../features/store-shell/portable-text/index.js";
 import { canonicalUrl, jsonLdScript, storeReturnPolicyJsonLd } from "../features/store-shell/structured-data.js";
 import "../features/store-shell/global.css";
 
-// The returns policy is this EmDash page, written by the merchant; it always shows its own text
-// (GrillTrack policy-pages-content-20261031).
+// Published EmDash prose owns the policy; no structured return terms are invented.
 const { entry, isPreview } = await getEmDashEntry("pages", "returns");
 const supportSection = await getSection(POLICY_SUPPORT_SECTION_SLUG).catch(() => null);
 const profile = readStorefrontProfile();
+const title = entry?.data?.title ?? "Returns";
 const content = Array.isArray(entry?.data?.content) ? (entry.data.content as PortableTextBlock[]) : [];
 const intro = (entry?.data as { intro?: string } | undefined)?.intro;
 const canonical = canonicalUrl("/returns", Astro.site, Astro.url);
-// A published returns page names itself as the store's return policy, by link only.
+// A published returns page names itself as the policy, by link only.
 const returnPolicyJsonLd = content.length > 0 && !isPreview
   ? storeReturnPolicyJsonLd({ storeName: STORE_TITLE, storeUrl: canonicalUrl("/", Astro.site, Astro.url), returnsUrl: canonical })
   : null;
 ---
 <!doctype html>
 <html lang="en">
-  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><link rel="canonical" href={canonical} /><title>{entry?.data?.title ?? "Returns"} | {STORE_TITLE}</title>{returnPolicyJsonLd && <script type="application/ld+json" set:html={jsonLdScript(returnPolicyJsonLd)} />}</head>
+  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><link rel="canonical" href={canonical} /><title>{title} | {STORE_TITLE}</title>{returnPolicyJsonLd && <script type="application/ld+json" set:html={jsonLdScript(returnPolicyJsonLd)} />}</head>
   <body data-storefront-profile={profile}>
     <StoreHeader profile={profile} />
-    <main id="main-content" class="policy-page">
-      <div class="policy-shell">
-        <aside class="policy-rail" aria-label="Customer care navigation and provenance">
-          <a class="policy-rail__back" href="/">← Back to store</a>
-          <nav class="policy-rail__nav" aria-label="Store policies">
-            <a href="/shipping">Shipping policy</a>
-            <a href="/returns" aria-current="page">Returns policy</a>
-          </nav>
-          <div
-            class="policy-support-section"
-            data-policy-support-section={POLICY_SUPPORT_SECTION_SLUG}
-            data-section-source={supportSection?.content?.length ? "cms" : "fallback"}
-          >
-            {supportSection?.content?.length ? (
-              <PortableText value={supportSection.content} />
-            ) : (
-              <>
-                <h3>About these policies</h3>
-                <p>This store writes its shipping and returns policies on these pages. The shipping charge for an order is shown at checkout.</p>
-              </>
-            )}
-          </div>
-        </aside>
-
-        <section class="policy-card" aria-labelledby="return-policy-heading">
-          <p class="policy-card__kicker">Store policy</p>
-          <h1 id="return-policy-heading">{entry?.data?.title ?? "Returns"}</h1>
-          {intro && <p class="policy-card__intro">{intro}</p>}
-          {content.length > 0 ? (
-            <div class="policy-page__body prose" data-policy-body data-return-policy-body>
-              <PortableText value={content} components={legacyPortableTextComponents} />
-            </div>
-          ) : <p class="policy-card__unset" role="status" data-return-policy-unset>This store has not published its returns policy yet.</p>}
-        </section>
-      </div>
-    </main>
+    <PolicyContent kind="returns" title={title} intro={intro} content={content} supportContent={supportSection?.content} />
     <StoreFooter profile={profile} />
   </body>
 </html>
-<style>
-  .policy-page{width:min(70rem,calc(100% - 2rem));margin:2.5rem auto 4rem;min-height:60vh;line-height:1.6}
-  .policy-shell{display:grid;grid-template-columns:minmax(16rem,4fr) minmax(0,8fr);gap:1.5rem;align-items:start}
-  .policy-rail{padding:1.4rem;border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:var(--store-vault-bg);color:var(--store-vault-ink);box-shadow:4px 4px 0 var(--store-shadow)}
-  .policy-rail a{color:var(--store-vault-ink);text-decoration:none;font-weight:700}
-  .policy-rail a:hover,.policy-rail a[aria-current="page"]{text-decoration:underline;text-decoration-color:var(--store-accent);text-underline-offset:.22em}
-  .policy-rail__back{display:inline-block;margin-bottom:1rem;font-family:var(--font-mono);font-size:.82rem}
-  .policy-rail__nav{display:grid;gap:.45rem;padding:1rem 0;border-top:1px solid var(--store-vault-line);border-bottom:1px solid var(--store-vault-line)}
-  .policy-support-section{margin-top:1rem;font-size:.9rem;color:var(--store-vault-muted)}
-  .policy-support-section :global(h3){margin:0 0 .5rem;color:var(--store-vault-ink);font-size:1.05rem}
-  .policy-support-section :global(p){margin:.5rem 0 0;line-height:1.55}
-  .policy-card{padding:clamp(1.35rem,3vw,2.25rem);border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:var(--store-surface);box-shadow:4px 4px 0 var(--store-shadow)}
-  .policy-card__kicker{margin:0 0 .35rem;color:var(--store-accent);font-family:var(--font-mono);font-size:.75rem;font-weight:800;letter-spacing:.12em}
-  .policy-card h1{margin:0 0 .75rem;font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.02;letter-spacing:-.045em}
-  .policy-card__intro{margin:0 0 1.5rem;color:var(--store-muted)}
-  .policy-page__body{margin-top:1.75rem;padding-top:1.25rem;border-top:1px solid var(--store-line);line-height:1.65}
-  .policy-page__body :global(h2){margin:1.5rem 0 .5rem;font-size:1.3rem;letter-spacing:-.02em}
-  .policy-page__body :global(h2:first-child){margin-top:0}
-  .policy-page__body :global(p){margin:0 0 1rem;color:var(--store-ink)}
-  .policy-card__unset{margin:0;padding:.9rem 1rem;border:1px dashed var(--store-line);border-radius:var(--store-radius-pill);color:var(--store-muted)}
-  @media(max-width:52rem){.policy-shell{grid-template-columns:1fr}}
-</style>
