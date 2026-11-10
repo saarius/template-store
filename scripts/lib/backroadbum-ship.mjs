@@ -7,7 +7,7 @@ export function checkedShipArtifact(source) {
   const backend = readFileSync(resolve(source, 'dist/plugin.mjs'));
   const manifestBytes = readFileSync(resolve(source, 'dist/manifest.json'));
   const manifest = JSON.parse(manifestBytes.toString('utf8'));
-  if (profile.profile !== 'backroadbum/ship-readonly-v1' || profile.origin !== 'https://backroadbum.com' || profile.mode !== 'test' ||
+  if (profile.profile !== 'backroadbum/ship-packing-v1' || profile.origin !== 'https://backroadbum.com' || profile.mode !== 'test' ||
       profile.commerceConnected !== false || profile.published !== false || !/^[a-f0-9]{64}$/.test(profile.sha256) ||
       createHash('sha256').update(backend).digest('hex') !== profile.sha256 || profile.bytes !== backend.length || backend.length >= 131072 ||
       createHash('sha256').update(backend).update(manifestBytes).digest('hex') !== profile.artifactSha256 ||

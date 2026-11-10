@@ -1,5 +1,5 @@
 # Imported inside backroadbum.com's site block, before the storefront catch-all.
-# These are bearer-authenticated reads, not a public Ship mutation/print gateway.
+# Exact bearer-authenticated reads and practice packing setup only; no order/label/print gateway.
 # The issuer exposes only its existing public verification key, never private signing material.
 @merchant_issuer_jwks path /.well-known/jwks.json
 handle @merchant_issuer_jwks {
@@ -10,6 +10,14 @@ handle @merchant_issuer_jwks {
  method GET
 }
 handle @merchant_ship_read {
+ uri strip_prefix /api/ship
+ reverse_proxy 127.0.0.1:8788
+}
+@merchant_ship_packing {
+ path /api/ship/v1/admin/practice-settings
+ method GET POST
+}
+handle @merchant_ship_packing {
  uri strip_prefix /api/ship
  reverse_proxy 127.0.0.1:8788
 }

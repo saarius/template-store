@@ -34,7 +34,7 @@ try {
   let refreshes = 0;
   if (!process.argv.includes('--expect-unavailable')) {
     await admin.page.getByRole('button', { name: 'Refresh connection', exact: true }).click();
-    await admin.page.getByText('Verified · read-only', { exact: true }).waitFor(); refreshes++;
+    await admin.page.getByText('Verified · admin', { exact: true }).waitFor(); refreshes++;
   }
   const facts = { provisioned, view: expected, refreshes, viewports: [] };
   const directory = 'runs/backroadbum/ship-admin'; mkdirSync(directory, { recursive: true });
