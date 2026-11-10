@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PublicCommerceProduct } from '../../src/features/commerce-catalog/index.js';
-import { shopCollections } from '../../src/features/store-shell/backroad-collections.js';
+import { relatedShopProducts, shopCollections } from '../../src/features/store-shell/backroad-collections.js';
 
 const categories = [
   { id: 'road-day', data: { title: 'Road day', description: 'Room for the unplanned stop.' } },
@@ -25,10 +25,19 @@ describe('Backroad Bum collection projection', () => {
     expect(groups.find(group => group.slug === 'road-day')?.description).toBe('Room for the unplanned stop.');
     expect(paths.get(cap.id)).toBe('/products/cap');
   });
-  it('does not resurrect products removed from Commerce or unlinked editorial pages', () => {
-    const { groups, paths } = shopCollections([page('archived'), page('live')], categories, [item('live'), item('no-page')]);
-    expect(groups.find(group => group.slug === 'road-day')?.products.map(product => product.id)).toEqual(['item-live']);
-    expect(paths.has('item-archived')).toBe(false);
+  it('does not resurrect removed products in any collection, related gear or product path', () => {
+    const live = item('live');
+    const { groups, paths } = shopCollections([
+      page('archived', ['road-day', 'slow-camp']),
+      page('live', ['road-day', 'slow-camp']),
+      // An old CMS link is not permission to restore a missing Commerce item.
+      { ...page('stale'), data: { ...page('stale').data, commerce_item_id: 'item-archived' } },
+    ], categories, [live, item('no-page')]);
+    for (const slug of ['road-day', 'slow-camp']) {
+      expect(groups.find(group => group.slug === slug)?.products).toEqual([live]);
+    }
+    expect(relatedShopProducts(live.id, groups).products).toEqual([]);
+    expect([...paths.entries()]).toEqual([['item-live', '/products/live']]);
   });
   it('keeps a published empty collection addressable without inventing products', () => {
     const { groups } = shopCollections([], categories, []);

@@ -146,20 +146,26 @@ describe("#35 Commerce structured data contract", () => {
     }
   });
 
-  it("exposes /shipping and /returns under Policies & Care in StoreFooter, each always showing its EmDash text", () => {
+  it("links both policies in the footer and delegates each page's EmDash prose to the shared policy renderer", () => {
     const footer = readFileSync(new URL("../../src/features/store-shell/StoreFooter.astro", import.meta.url), "utf8");
     expect(footer).toContain('aria-label="Policies & Care"');
     expect(footer).toContain('href="/shipping"');
     expect(footer).toContain('href="/returns"');
 
+    const renderer = readFileSync(new URL("../../src/features/store-shell/PolicyContent.astro", import.meta.url), "utf8");
+    expect(renderer).toContain("<PortableText value={content}");
+    expect(renderer).toContain("content.length > 0");
     for (const [name, kind] of [["shipping", "shipping"], ["returns", "return"]] as const) {
       const page = readFileSync(new URL(`../../src/pages/${name}.astro`, import.meta.url), "utf8");
-      expect(page).toContain(`data-${kind}-policy-body`);
-      expect(page).toContain(`data-${kind}-policy-unset`);
-      expect(page).toContain("<PortableText value={content}");
+      expect(page).toContain(`getEmDashEntry("pages", "${name}")`);
+      expect(page).toContain(`kind="${name}"`);
+      expect(page).toContain("<PolicyContent");
+      expect(page).toContain("content={content}");
       expect(page).toContain("<StoreFooter profile={profile} />");
-      // No Commerce facts box: the page reads no policy records.
-      expect(page).not.toMatch(/readInstalledCommercePolicies|policies\/public|<dl\b/u);
+      expect(renderer).toContain(`data-${kind}-policy-body`);
+      expect(renderer).toContain(`data-${kind}-policy-unset`);
+      // Neither the page nor its renderer may replace CMS prose with Commerce records.
+      for (const source of [page, renderer]) expect(source).not.toMatch(/readInstalledCommercePolicies|policies\/public|<dl\b/u);
     }
     const returnsPage = readFileSync(new URL("../../src/pages/returns.astro", import.meta.url), "utf8");
     expect(returnsPage).toContain("storeReturnPolicyJsonLd(");

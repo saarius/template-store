@@ -26,10 +26,16 @@ describe("products whose Commerce product left the catalog", () => {
     expect(shown.find((group) => group.slug === "hats")?.items.map((item) => item.id)).toEqual(["canvas-cap"]);
   });
 
-  it("drop out of category pages only when the catalog was read, while proof-only MerchCatalog groups live on /proof", () => {
+  it("uses the merchant's Commerce-filtered collection projection and distinguishes a catalog failure from an empty collection", () => {
     const category = readFileSync("src/pages/categories/[slug].astro", "utf8");
-    expect(category).toContain('const removedEntryIds = new Set(profile === "shipping" && catalogRead');
-    expect(category).toContain("withoutRemovedProducts([listedCategory], removedEntryIds)[0]");
+    expect(category).toContain('getEmDashCollection<\'products\', Record<string, unknown>>(\'products\', { status: \'published\' })');
+    expect(category).toContain("shopCollections(await hydrateProductCollectionMembership(entries.entries), categories.entries, products)");
+    expect(category).toContain("unavailable = true");
+    expect(category).toContain("products={category.products}");
+    expect(category.match(/unavailable=\{unavailable\}/gu)).toHaveLength(2);
+  });
+
+  it("keeps proof-only MerchCatalog groups on /proof rather than the merchant homepage", () => {
     const home = readFileSync("src/pages/index.astro", "utf8");
     expect(home).not.toContain("<MerchCatalog");
     expect(home).not.toContain("data-integration-demos");
