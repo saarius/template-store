@@ -12,6 +12,14 @@ try {
     const context = await browser.newContext({ viewport: { width, height: 1000 }, reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
     const page = await context.newPage();
     const errors = [], writes = [];
+    const capture = async name => {
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+        // Full-page capture alone can race lazy artwork; eager loading is test-only.
+        await Promise.all([...document.images].map(image => { image.loading = 'eager'; return image.decode(); }));
+      });
+      await page.screenshot({ path: new URL(`${name}-${width}.png`, out).pathname, fullPage: true });
+    };
     page.on('pageerror', error => errors.push(error.message));
     page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/api/checkout/') && request.method() !== 'GET') writes.push(request.method()); });
     await page.goto(base + '/products/wrong-turn-tee');
@@ -62,13 +70,13 @@ try {
     await expect(page.locator('[data-guest-cart-subtotal-amount]')).toHaveText('$100.00');
     await expect(lines.nth(2).locator('[data-guest-cart-qty]')).toBeFocused();
     await expect(links).toHaveCount(3);
-    await page.screenshot({ path: new URL(`cart-${width}.png`, out).pathname, fullPage: true });
+    await capture('cart');
     const edited = await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'));
     await page.goto(base + '/checkout');
     await expect(links).toHaveCount(3);
     expect(await links.first().evaluate(link => getComputedStyle(link).color)).toBe('rgb(24, 63, 82)');
     await expect(page.locator('[data-guest-cart-checkout]')).toBeDisabled();
-    await page.screenshot({ path: new URL(`checkout-${width}.png`, out).pathname, fullPage: true });
+    await capture('checkout');
     expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'))).toBe(edited);
     // The browser also rejects a forged destination; this does not alter server data.
     await page.route('**/api/guest-cart/snapshot?**', async route => {
@@ -95,8 +103,7 @@ try {
       const metadata = JSON.parse(await page.locator('[data-product-jsonld]').textContent());
       expect(metadata.offers).toBeUndefined(); expect(metadata.sku).toBeUndefined();
     }
-    await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: new URL(`stale-selection-${width}.png`, out).pathname, fullPage: true });
+    await capture('stale-selection');
     await page.getByRole('radio', { name: 'L', exact: true }).focus();
     await page.keyboard.press('Space');
     await expect(page.getByRole('radio', { name: 'L', exact: true })).toBeFocused();
@@ -105,8 +112,7 @@ try {
     await expect(page.locator('[data-add-to-cart]')).toBeEnabled();
     await expect(page.locator('[data-add-to-cart]')).toHaveAttribute('data-add-to-cart', ids[1]);
     await expect(page).toHaveURL(base + teePath(1));
-    await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: new URL(`restored-selection-${width}.png`, out).pathname, fullPage: true });
+    await capture('restored-selection');
     expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'))).toBe(edited);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(errors).toEqual([]); expect(writes).toEqual([]);
