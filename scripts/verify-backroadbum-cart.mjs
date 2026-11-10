@@ -39,8 +39,18 @@ try {
     const money = value => '$' + value.toFixed(2);
     await expect(lines).toHaveCount(2);
     await expect(button).toBeEnabled();
+    await expect(page.locator('[data-guest-cart-resume]')).toBeHidden();
+    await expect(page.locator('[data-guest-cart-recover]')).toBeHidden();
     await expect(subtotal).toHaveText('Subtotal ' + money(products[0].price + products[1].price));
     await capture('filled');
+    if (width === 1440) {
+      for (const reflow of [768, 320]) {
+        await page.setViewportSize({ width: reflow, height: 1000 });
+        await fits();
+        await page.screenshot({ path: new URL(`filled-${reflow}.png`, output).pathname, fullPage: true });
+      }
+      await page.setViewportSize({ width, height: 1000 });
+    }
     const before = await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'));
     for (const value of ['0', '-1', '1.5', '100', '08', 'abc', '']) {
       await qty.fill(value);
@@ -100,6 +110,7 @@ try {
     await expect(page.locator('[data-guest-cart-empty]')).toBeFocused();
     await expect(page.locator('[data-guest-cart-summary]')).toBeHidden();
     await capture('empty');
+    await page.keyboard.press('Tab'); // Establish keyboard modality after pointer removal.
     await page.getByRole('link', { name: 'Continue shopping', exact: true }).focus();
     expect(await page.getByRole('link', { name: 'Continue shopping', exact: true }).evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
     expect(errors).toEqual([]);
@@ -113,6 +124,6 @@ try {
   await page.getByRole('link', { name: 'browse the gear', exact: true }).click();
   await expect(page).toHaveURL(base + '/shop'); await context.close();
 } finally { await browser.close(); }
-const proof = { checkedAt: new Date().toISOString(), results, noJavaScriptBrowsePath: true, noPaymentOrOrderCreated: true };
+const proof = { checkedAt: new Date().toISOString(), results, additionalReflowWidths: [768, 320], noJavaScriptBrowsePath: true, noPaymentOrOrderCreated: true };
 await writeFile(new URL('verification.json', output), JSON.stringify(proof, null, 2));
 console.log(JSON.stringify(proof, null, 2));

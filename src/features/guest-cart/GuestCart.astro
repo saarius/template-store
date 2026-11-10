@@ -23,7 +23,7 @@ const { checkoutAdmission = null } = Astro.props;
   <div class="guest-cart-layout">
     <div data-guest-cart-lines></div>
     <div class="guest-cart-summary" data-guest-cart-summary hidden>
-      <h2>Before you go</h2>
+      <h2>Cart summary</h2>
       <p class="guest-cart-subtotal" data-guest-cart-subtotal hidden>Subtotal <strong data-guest-cart-subtotal-amount></strong></p>
       <div class="guest-cart-checkout">
         <button type="button" data-guest-cart-checkout data-guest-cart-proceed disabled>{checkoutAdmission ? GUEST_CHECKOUT_READY_LABEL : GUEST_CHECKOUT_LABEL}</button>
@@ -61,6 +61,7 @@ const { checkoutAdmission = null } = Astro.props;
   .guest-cart-checkout [data-guest-cart-checkout]:not(:disabled):hover,.guest-cart-shop:hover{background:var(--dinkus-action-hover-background,#eac04b)}
   .guest-cart-checkout [data-guest-cart-checkout]:disabled{color:var(--store-muted);cursor:not-allowed}
   .guest-cart-checkout [data-guest-cart-resume]{display:inline-block;margin-top:1rem;line-height:1.6}
+  .guest-cart-checkout [data-guest-cart-resume][hidden]{display:none}
   .guest-cart-checkout [data-guest-cart-recover]{margin-top:1rem}
   .guest-cart-retry{margin-top:1rem}
   .guest-cart :global([data-guest-cart-line]){display:grid;grid-template-columns:7rem minmax(0,1fr) auto;gap:.75rem 1.25rem;align-items:start;padding:1.5rem 0;border-top:1px solid var(--store-line);min-width:0;overflow-wrap:anywhere}
