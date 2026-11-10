@@ -8,13 +8,14 @@ if (!process.argv.includes('--check')) {
   process.exit(0);
 }
 const capture = process.argv.includes('--capture');
+const statePath = process.argv.find(value => value.startsWith('--state-file='))?.slice('--state-file='.length);
 const captureDir = 'runs/backroadbum/shopper-status';
 if (capture) mkdirSync(captureDir, { recursive: true });
 const report = { checkedAt: new Date().toISOString(), publicRollout: 'closed', viewportChecks: [] };
 try {
   let stableOrder;
   for (const width of [1440, 390]) {
-    const shopper = await openShopperPreview({ saved: true, width });
+    const shopper = await openShopperPreview({ saved: true, width, statePath });
     try {
       const { page } = shopper;
       await page.goto('https://backroadbum.com/checkout/success', { waitUntil: 'domcontentloaded' });

@@ -92,7 +92,7 @@ The shop and collection pages share a wrapping row of ordinary links, not JavaSc
 Checkout is an Operate surface: daylight fields, blue text, ordinary address controls and a yellow payment action. Keep Stripe test-card instructions beside contact entry. The paid receipt uses a plain white panel, canonical TEST labeling and readable order identifiers; no decorative stamps or imitation barcodes. Explain browser-bound receipt recovery, and do not promise unconnected email or fulfillment services.
 
 ### Reading and reporting
-Editorial pages have a single clear title and readable paragraph measure. Dashboard facts use aligned definition lists; tables have semantic headers and wrap rather than overflow.
+Editorial pages have a single clear title and readable paragraph measure. Dashboard facts use aligned definition lists; tables have semantic headers and wrap rather than overflow. Distinguish configured webhook transport from verified delivery, and label wake counts separately from orders; missing metrics stay unavailable.
 
 ## Do's and Don'ts
 - **Do** use real product imagery or explicitly labeled illustrative designs.

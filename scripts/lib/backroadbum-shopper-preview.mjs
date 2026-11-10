@@ -4,10 +4,10 @@ import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 export const shopperStatePath = '/etc/backroadbum/shopper-browser.json';
-export async function openShopperPreview({ saved = false, width = 1440 } = {}) {
+export async function openShopperPreview({ saved = false, width = 1440, statePath = shopperStatePath } = {}) {
   const publicGate = await fetch('https://backroadbum.com/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/prepare', { method: 'POST' });
   assert.equal(publicGate.status, 503, 'Public checkout must stay closed during preview');
-  const state = saved ? JSON.parse(readFileSync(shopperStatePath, 'utf8')) : null;
+  const state = saved ? JSON.parse(readFileSync(statePath, 'utf8')) : null;
   const origins = state?.origins?.filter(entry => entry.origin === 'https://backroadbum.com') ?? [];
   const browser = await chromium.launch({ headless: true });
   try {
