@@ -1,6 +1,7 @@
 // Local operator helper. Secrets and WebAuthn state stay outside the repository.
 import { chromium } from '@playwright/test';
-import { readFileSync, writeFileSync, renameSync, existsSync, chmodSync } from 'node:fs';
+import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
+import { writeHostedStorageState } from './lib/hosted-browser-state.mjs';
 
 export async function persistAdminKey(cdp, authenticatorId, keyPath) {
   const { credentials: keys } = await cdp.send('WebAuthn.getCredentials', { authenticatorId });
@@ -46,6 +47,7 @@ export async function openAdmin({ hostedState = false } = {}) {
   async saveHosted() {
     if (!hostedState) return;
     const path = '/etc/backroadbum/dinkuskit-session.json';
-    await context.storageState({ path }); chmodSync(path, 0o600);
+    try { writeHostedStorageState(await context.storageState(), path); }
+    catch (error) { await browser.close(); throw error; }
   } };
 }

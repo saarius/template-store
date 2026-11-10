@@ -4,6 +4,9 @@
 ## Owner Steer1 · November10
 Hosted dinkuskit.com, payments.dinkuskit.com and ship.dinkuskit.com with unmodified Registry plugins are the target customer journey. Stop expanding local issuer/service overlays; preserve the serving store during migration, then retire redundant transports after hosted verification or a concrete blocker. Prioritize the #211 cart PR; unrelated full-matrix baseline timeouts belong in CI, not an indefinite submission gate.
 
+## Current hosted state · November 10
+Signed Registry Commerce 0.8.0, Payments 0.5.0 and Ship 0.3.1 replace build-time merchant mounts. Commerce and Payments completed hosted consent; Stripe confirms a TEST connected account but onboarding is incomplete, and Ship is not connected. Checkout is intentionally closed. A local browser-context mistake lost the provisioned operator login copy; restore it before continuing hosted setup. No hosted paid-order or label proof is claimed.
+
 ## Platform
 web
 

@@ -1,6 +1,8 @@
 ---
 name: Backroad Bum
 description: Daylight, enamel blue and a slower weekend.
+# Dashboard Read surface: distinguish signed installation, hosted connection and paid-order proof.
+# November 10: report the operator login-state failure plainly; paused checkout is not readiness.
 colors:
   ink: "#183f52"
   lagoon: "#c9e0eb"
