@@ -13,7 +13,8 @@ Updated November 10, 2026. No EmDash upstream issue, PR or comment has been open
 - Reproduce: run the owning browser verification against unchanged upstream with disposable local storage; its first admin welcome times out and catalog seed refuses with commandId unique-index-inactive admission. Also observed with one proof server in an isolated network namespace. Two-server runs additionally hit host OOM; that does not explain the isolated timeout.
 - Root cause: unresolved cross-stack setup/asset/storage seam, NOT established as an EmDash defect. SQLite indexes exist, and isolated bridge/workerd uniqueness probes pass.
 - Workaround: keep successful typecheck/unit/workflow/targeted browser proof and let GitHub Actions run the unrelated full matrix, per Owner Steer1. Do not bypass seed safety or insert CMS users/options/session rows.
-- Evidence: workspace evidence/2026-11-10-cart-baseline-cycle.md and its linked reproductions.
+- Additional observation November10: the selected-metadata candidate's longer `structured-data-policy-feed.spec.ts` crashes Chromium during the product reload after `setStockStatus`, before the changed metadata assertions, on Node24.22.0 / EmDash1.4.0. A single-proof-server rerun also exceeded240seconds. This exact scenario has not been baseline-compared; it is NOT established as the same cause as the welcome timeout or as a CMS defect. The corrected candidate f4c6174 passes this scenario and the full desktop/phone matrix in GitHub Actions. Focused product-page checks pass locally on both payload generations.
+- Evidence: workspace evidence/2026-11-10-cart-baseline-cycle.md and its linked reproductions; 2026-11-10-variant-jsonld-browser-policy{,-single}.txt and recovery-pr214.json.
 
 ## 3. Concurrent workerd runners collide on the default port
 - Versions: live EmDash1.4.0 / sandbox-workerd0.9.6; sender fixture resolves the paired runner from its pinned dependency tree. Node24.22.2.
