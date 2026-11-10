@@ -18,7 +18,9 @@ const STOREFRONT_PAGES = [
 describe("storefront checkout wording", () => {
   it("banner follows installed checkout admission", () => {
     expect(storeBannerText(true)).toBe("DEMO / TEST STORE — No real charges or shipments. Stripe test cards only.");
-    expect(storeBannerText(false)).toBe("DEMO / TEST STORE — No real charges or shipments. Checkout is not connected yet.");
+    expect(storeBannerText(false)).toBe("DEMO / TEST STORE — No real charges or shipments. Checkout is unavailable right now.");
+    // A closed admission can be a pause or outage, not an absent connection.
+    expect(storeBannerText(false)).not.toMatch(/not connected|yet/i);
   });
 
   it("every storefront page reads checkout admission for its banner", () => {
@@ -50,7 +52,7 @@ describe("storefront checkout wording", () => {
     expect(catalogNoticeText({ unavailable: false, productCount: 3, checkoutAvailable: true })).toBeNull();
     expect(catalogNoticeText({ unavailable: true, productCount: 0, checkoutAvailable: true })).toBeNull();
     expect(catalogNoticeText({ unavailable: false, productCount: 3, checkoutAvailable: false })).toBe(
-      "Product browsing is available. Checkout is not available yet.",
+      "Product browsing is available. Checkout is unavailable right now.",
     );
     expect(catalogNoticeText({ unavailable: false, productCount: 0, checkoutAvailable: false })).toBe(
       "Checkout is unavailable.",

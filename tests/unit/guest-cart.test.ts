@@ -398,6 +398,32 @@ describe("guest cart quantity mutation", () => {
 });
 
 describe("guest cart snapshot presentation", () => {
+  it("refreshes an existing cart to Commerce's current price and refuses an out-of-stock line even when checkout is admitted", () => {
+    const intent = addGuestCartLine(emptyGuestCartIntent(), "demo-mug", 1).intent;
+    // Commerce's public projection supplies customerPays, not a reconstructed
+    // Regular/Sale pair. This mirrors the signed Registry merchant workflow.
+    const current = {
+      id: "demo-mug", found: true as const, name: "Demo mug", sku: "DEMO-MUG",
+      price: { listable: true, regularText: "$18.00", saleText: null, unitMinor: "1800" },
+      availability: { status: "in-stock" as const, sellable: true, listable: true },
+    };
+    const before = presentGuestCart({ intent, checkoutAdmitted: true, snapshots: [
+      { ...current, price: { ...current.price, regularText: "$22.00", unitMinor: "2200" } },
+    ] });
+    expect(before.subtotalText).toBe("$22.00");
+    const after = presentGuestCart({ intent, checkoutAdmitted: true, snapshots: [current] });
+    expect(after.subtotalText).toBe("$18.00");
+    expect(after.checkoutEnabled).toBe(true);
+    const blocked = presentGuestCart({ intent, checkoutAdmitted: true, snapshots: [
+      { ...current, availability: { ...current.availability, status: "out-of-stock", sellable: false } },
+    ] });
+    expect(blocked.checkoutEnabled).toBe(false);
+    expect(blocked.lines[0]?.reason).toBe("Out of stock and cannot be checked out.");
+    // A confirmed current price may remain visible for an unavailable item.
+    expect(blocked.subtotalText).toBe("$18.00");
+    expect(intent.lines).toEqual([{ id: "demo-mug", quantity: 1 }]);
+  });
+
   it("keeps intent when the catalog snapshot fails and never enables checkout", () => {
     const intent = addGuestCartLine(emptyGuestCartIntent(), "hat-1", 2).intent;
     const failed = presentGuestCart({
@@ -445,7 +471,7 @@ describe("guest cart snapshot presentation", () => {
     expect(guestReturnQueryIsPresent("?success=1")).toBe(true);
     expect(parseGuestCartSnapshotIds("../etc/passwd")).toBeNull();
     expect(parseGuestCartSnapshotIds("hat-1,hat-2")).toEqual(["hat-1", "hat-2"]);
-    expect(GUEST_CHECKOUT_REASON).toBe("Checkout is not available yet.");
+    expect(GUEST_CHECKOUT_REASON).toBe("Checkout is unavailable right now.");
     expect(GUEST_CHECKOUT_REASON).not.toMatch(/registry|source|artifact|stripe|provider/i);
     expect(parseGuestCartSnapshotResponse({ products: [null] })).toBeNull();
     expect(parseGuestCartSnapshotResponse({ products: [{ id: "hat-1" }] })).toBeNull();

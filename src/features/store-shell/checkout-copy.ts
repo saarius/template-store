@@ -6,7 +6,7 @@
 export function storeBannerText(checkoutAvailable: boolean): string {
   return checkoutAvailable
     ? "DEMO / TEST STORE — No real charges or shipments. Stripe test cards only."
-    : "DEMO / TEST STORE — No real charges or shipments. Checkout is not connected yet.";
+    : "DEMO / TEST STORE — No real charges or shipments. Checkout is unavailable right now.";
 }
 
 export type CatalogGuidanceState = "unavailable" | "empty" | "ready";
@@ -44,7 +44,7 @@ export function catalogNoticeText(input: {
   if (input.checkoutAvailable) return null;
   return input.unavailable || input.productCount === 0
     ? "Checkout is unavailable."
-    : "Product browsing is available. Checkout is not available yet.";
+    : "Product browsing is available. Checkout is unavailable right now.";
 }
 
 /**

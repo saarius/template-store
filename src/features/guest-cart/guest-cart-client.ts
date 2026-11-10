@@ -527,7 +527,7 @@ function checkoutFailureText(failure: string | null): string {
   if (failure === "association" || failure === "attempt-active") {
     return "This checkout is still tied to the original attempt. Check status before retrying.";
   }
-  return "Checkout is not available yet. Try again when Commerce is available.";
+  return "Checkout is unavailable right now. Please try again later.";
 }
 
 function checkoutStatusFailureText(code?: string): string {

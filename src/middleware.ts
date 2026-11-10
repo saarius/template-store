@@ -98,7 +98,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return response;
   }
   if (merchantCheckoutClosed() && pathForms.some(merchantCheckoutPath)) {
-    const response = Response.json({ error: "Checkout is not available yet." }, { status: 503, headers: { "Cache-Control": "no-store" } });
+    const response = Response.json({ error: "Checkout is unavailable right now." }, { status: 503, headers: { "Cache-Control": "no-store" } });
     applySecurityHeaders(response.headers);
     return response;
   }
@@ -365,7 +365,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const admission = await checkoutRouteAdmitted();
       if (!admission) {
         const response = new Response(
-          JSON.stringify({ error: "Checkout is not available yet." }),
+          JSON.stringify({ error: "Checkout is unavailable right now." }),
           {
             status: 503,
             headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
@@ -392,7 +392,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const admission = await checkoutRouteAdmitted();
     if (!admission) {
       const response = new Response(
-        JSON.stringify({ error: "Checkout is not available yet." }),
+        JSON.stringify({ error: "Checkout is unavailable right now." }),
         {
           status: 503,
           headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },

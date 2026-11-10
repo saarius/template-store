@@ -11,7 +11,7 @@ Signed Registry Commerce 0.8.0, Payments 0.5.0 and Ship 0.3.1 replace build-time
 web
 
 ## Stack
-Owner-required EmDash + DinkusKit template-store, Commerce, Payments and Ship; Node 24. SQLite and local uploads on this server, with systemd and Caddy HTTPS. Registry sandbox bundles only for commerce plugins. Commerce's Backroad Bum TEST profile isolates the merchant issuer and exact-host grant from generic DinkusKit Connect; public rollout remains independently gated.
+Owner-required EmDash + DinkusKit template-store, Commerce, Payments and Ship; Node 24. SQLite and local uploads on this server, with systemd and Caddy HTTPS. Commerce, Payments and Ship use signed Registry sandbox bundles and hosted DinkusKit bindings; shopper checkout remains independently gated.
 
 ## Users
 Inferred from the owner brief: people planning short backroad trips, looking for practical camp and travel gear. A second audience is merchants and developers exercising the demo checkout and following the public experiment.
@@ -31,7 +31,7 @@ Fresh deployment, November 9, 2026. No pre-existing store content, photography, 
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
 - Let shoppers search gear, collections and reading from one labeled form. Search destinations use published EmDash content and Commerce product visibility, never indexed prices as shopping authority; unavailable search is not a zero-result claim.
-- Show authoritative commerce facts, including Orders-assigned receipt numbers, never a second price list or a locally invented order label.
+- Show authoritative commerce facts, including Orders-assigned receipt numbers, never a second price list or a locally invented order label. The signed Commerce public projection supplies the current customerPays price; do not reconstruct Regular/Sale comparisons from CMS or old cart data.
 - After a product is saved to the cart, offer a keyboard-reachable View cart link beside the confirmation. Invalid quantities and failed saves must not show that saved-cart invitation; do not move focus or navigate automatically.
 - Keep product inspection connected to onward browsing: use published EmDash collection membership for related gear, not invented bundles or purchase-history claims. Exclude the current item and duplicates; Commerce still owns every displayed product fact.
 - Keep test instructions findable and separate from editorial storytelling. Shipping and Returns keep their EmDash-authored policy text, with direct links to the test guide and browser-bound last checkout; do not make shoppers hunt for a receipt in the footer.

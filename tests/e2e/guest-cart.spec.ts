@@ -133,7 +133,7 @@ test("guest cart persists shopper intent and stays honest when checkout is unava
   await expect(subtotal).toHaveText("Subtotal $24.00");
   await expect(shopper.locator("[data-guest-cart-checkout]")).toBeDisabled();
   await expect(shopper.locator("[data-guest-cart-checkout]")).toHaveText("Checkout unavailable");
-  await expect(shopper.locator("[data-guest-cart-checkout-reason]")).toHaveText("Checkout is not available yet.");
+  await expect(shopper.locator("[data-guest-cart-checkout-reason]")).toHaveText("Checkout is unavailable right now.");
   await expect(shopper.locator("[data-guest-cart-checkout-reason]")).not.toContainText(/registry|source|artifact/i);
 
   await qty.click();
@@ -745,7 +745,7 @@ test("guest cart persists shopper intent and stays honest when checkout is unava
         editMode: false,
         shippingDb: ".artifacts/e2e/content.db",
         storedShape: "version-id-quantity",
-        checkoutReason: "Checkout is not available yet.",
+        checkoutReason: "Checkout is unavailable right now.",
         lineBackground: lineStyles.backgroundColor,
         linePaddingTop: lineStyles.paddingTop,
         quantityFontSize: qtyStyles.fontSize,

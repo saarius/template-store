@@ -42,7 +42,7 @@ export type GuestCartCatalogSnapshot =
     }>;
 
 export const GUEST_CHECKOUT_LABEL = "Checkout unavailable";
-export const GUEST_CHECKOUT_REASON = "Checkout is not available yet.";
+export const GUEST_CHECKOUT_REASON = "Checkout is unavailable right now.";
 /** Shown when checkout is admitted but there is nothing to buy yet. */
 export const GUEST_CHECKOUT_READY_LABEL = "Checkout";
 export const GUEST_CHECKOUT_EMPTY_REASON = "Add products to your cart to check out.";
