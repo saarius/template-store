@@ -70,6 +70,7 @@ try {
       assert.equal(await button.isVisible(), true);
       assert.deepEqual(errors, []);
       if (width === 1440) {
+        await page.emulateMedia({ media: 'print' });
         // Browser-only pagination fixture, not another Commerce order or proof.
         await page.locator('[data-guest-checkout-order-items]').evaluate(list => {
           const template = list.firstElementChild;
@@ -87,6 +88,7 @@ try {
         assert.ok(pages.length > 1 && pages.length < 5);
         assert.ok(pages.every(value => value.trim().length > 20));
         report.syntheticLongReceiptPdf = { browserOnlyFixture: true, addedRows: 35, allRowsPresent: true, pages: pages.length, noBlankPages: true };
+        await page.emulateMedia({ media: 'screen' });
       }
       report.checks.push({ width, keyboardPrint: true, repeatedInvocation: true, printDialog: 'stubbed; PDF rendered separately', canonicalNumberAndTotals: true, testLabel: true, onePagePdf: true, paper: width === 1440 ? 'Letter' : 'A4', noCheckoutWrites: true, printCausedNoReads: true, storageUnchanged: true, noCapabilitiesInPdf: true, noOverflow: true, pageErrors: 0 });
     } finally { await shopper.browser.close(); }

@@ -30,6 +30,9 @@
   [data-receipt-page] .guest-checkout-return h1 { font-size: 22pt; margin-bottom: 4mm; }
   [data-receipt-page] .guest-checkout-return h2 { font-size: 17pt; margin: 0; }
   [data-receipt-page] .guest-checkout-return h3 { break-after: avoid; }
+  [data-receipt-page] .guest-checkout-return [data-guest-checkout-order] > h3 { margin: 4mm 0 2mm; }
+  [data-receipt-page] .guest-checkout-return p { line-height: 1.4; }
+  [data-receipt-page] .guest-checkout-fulfillment dl { margin: 2mm 0 0; }
   [data-receipt-page] .guest-checkout-receipt {
     border: 0;
     border-radius: 0;
@@ -61,7 +64,7 @@
     padding-top: 4mm;
   }
   [data-receipt-page] .guest-checkout-receipt > .receipt-print-only {
-    margin-top: 6mm;
+    margin-top: 4mm;
     padding-top: 3mm;
     border-top: 1px solid black;
   }
