@@ -41,4 +41,4 @@ Fresh deployment, November 9, 2026. No pre-existing store content, photography, 
 - Keep cart edits honest: an invalid quantity is an unsaved draft, not permission to purchase the previous quantity. Explain the correction beside its field, suppress stale totals and block checkout until every draft is corrected or removed.
 - Let shoppers print or save the authorized paid receipt without creating another checkout or exporting its browser capability. A saved copy is a static record, not online recovery or a live fulfillment view.
 - Treat failure and recovery as part of the product.
-- Keep operational evidence public-safe and truthful.
+- Keep operational evidence public-safe and truthful. Activity reads only allowlisted metadata from retained session records and controller state; distinguish observed prompt-to-final windows from controller outcomes, cached token processing from unique text, and API-equivalent estimates from actual billed costs. Missing accounting stays unavailable; transcripts and credentials never become dashboard data.
