@@ -103,6 +103,8 @@ Primary links have a sun field, dark ink, a 48px minimum height and a small corn
 Image, name, authoritative price and availability, in that order. The whole listing links to its product page. Illustrations have cool flat grounds; prices must never be baked into artwork or copied into editorial content.
 
 ### Product inspection
+A saved addition reveals an ordinary underlined View cart link beside its live confirmation, immediately after Add to cart in keyboard order. Keep it secondary to the yellow action, with a 48px minimum target and wrapping feedback on phones. Leave focus in place; do not open a drawer or redirect. Hide the invitation on invalid quantities, failed storage writes and when a variant change clears the success confirmation.
+
 Keep the primary product illustration, CMS summary, price, availability and yellow cart action together; use a direct Shop breadcrumb rather than a home-bound catalog label. Product prices are plain facts, without an animated underline. Below the native Design & care disclosure, ordinary collection links lead to up to three existing catalog cards from shared published collections. Reuse the catalog’s responsive grid inside the page container without adding gutters, a carousel or another enclosing panel; a secondary catalog failure gets a short browse/refresh message rather than a false empty list.
 
 ### Navigation

@@ -51,7 +51,10 @@ const qtyInputId = `guest-cart-add-qty-${product.id}`;
         disabled={!singleSellable}
       >{singleSellable ? "Add to cart" : "Sold out"}</button>
     </div>
-    <p data-add-to-cart-status hidden role="status"></p>
+    <div class="guest-cart-add__feedback">
+      <p data-add-to-cart-status hidden role="status"></p>
+      <a href="/cart" data-add-to-cart-view hidden>View cart</a>
+    </div>
   </div>
 ) : null}
 <style>
@@ -65,7 +68,10 @@ const qtyInputId = `guest-cart-add-qty-${product.id}`;
   .guest-cart-add button{padding:.7rem 1rem;border:0;border-radius:.4rem;background:var(--dinkus-action-background);color:var(--dinkus-action-color);font:inherit;font-weight:800;cursor:pointer}
   .guest-cart-add button.guest-cart-add__step{padding:.45rem .65rem;border-radius:0;background:transparent;color:inherit;font-weight:800;line-height:1}
   .guest-cart-add button:disabled,.guest-cart-add input:disabled{opacity:.5;cursor:not-allowed}
-  .guest-cart-add p{margin:.2rem 0 0;color:var(--store-muted)}
+  .guest-cart-add__feedback{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 1rem}
+  .guest-cart-add__feedback:has([data-add-to-cart-status][hidden]){display:none}
+  .guest-cart-add p{margin:0;color:var(--store-muted)}
+  .guest-cart-add__feedback a{display:inline-flex;align-items:center;min-height:48px;color:var(--store-ink);font-weight:600;text-underline-offset:.2em}
 </style>
 <script>
   import { hydrateGuestCartControls } from "./guest-cart-client.ts";

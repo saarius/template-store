@@ -302,6 +302,8 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
     if (addStatus?.getAttribute("role") === "status") {
       addStatus.hidden = true;
       addStatus.textContent = "";
+      const viewCart = document.querySelector<HTMLElement>("[data-add-to-cart-view]");
+      if (viewCart) viewCart.hidden = true;
     }
   }
   for (const input of choices) input.addEventListener("change", update);

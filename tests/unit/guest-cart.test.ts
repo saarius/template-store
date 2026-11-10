@@ -281,6 +281,8 @@ describe("guest cart quantity mutation", () => {
     addButton.setAttribute("data-add-to-cart-sellable", "true");
     const status = new MockElement();
     status.hidden = true;
+    const viewCart = new MockElement();
+    viewCart.hidden = true;
     const navBadge = new MockElement();
     const navLink = new MockElement();
     navLink.querySelector = (sel: string) => (sel === "[data-guest-cart-count]" ? navBadge : null);
@@ -297,6 +299,7 @@ describe("guest cart quantity mutation", () => {
     container.querySelector = (selector: string) => {
       if (selector === "[data-add-to-cart-qty]") return qtyInput;
       if (selector === "[data-add-to-cart-status]") return status;
+      if (selector === "[data-add-to-cart-view]") return viewCart;
       return null;
     };
 
@@ -319,12 +322,15 @@ describe("guest cart quantity mutation", () => {
 
     try {
       hydrateGuestCartControls();
+      expect(viewCart.hidden).toBe(true);
       // Step single quantity to 3 and click Add to cart
       stepUp.click();
       stepUp.click();
       expect(qtyInput.value).toBe("3");
       addButton.click();
       expect(status.textContent).toBe("Added to cart.");
+      expect(status.getAttribute("role")).toBe("status");
+      expect(viewCart.hidden).toBe(false);
       expect(loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent.lines).toEqual([
         { id: "hoodie-small-indigo", quantity: 3 },
       ]);
@@ -334,6 +340,7 @@ describe("guest cart quantity mutation", () => {
       addButton.click();
       expect(status.textContent).toBe("Quantity must be a whole number from 1 to 99.");
       expect(status.getAttribute("role")).toBe("alert");
+      expect(viewCart.hidden).toBe(true);
       qtyInput.value = "1";
 
       // Picking another variant points the one Add to cart at it
@@ -341,6 +348,7 @@ describe("guest cart quantity mutation", () => {
       qtyInput.value = "3";
       addButton.click();
       expect(status.textContent).toBe("Added to cart.");
+      expect(viewCart.hidden).toBe(false);
       expect(loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent.lines).toEqual([
         { id: "hoodie-small-indigo", quantity: 3 },
         { id: "hoodie-xl-vermilion", quantity: 3 },
@@ -368,6 +376,21 @@ describe("guest cart quantity mutation", () => {
       ]);
 
       expect(navBadge.textContent).toBe("6");
+
+      // A later failed save must retract the saved-cart handoff.
+      addButton.setAttribute("data-add-to-cart-sellable", "true");
+      qtyInput.value = "1";
+      const saved = loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent;
+      const write = vi.spyOn(store, "setItem").mockImplementation(() => { throw new Error("blocked"); });
+      try {
+        addButton.click();
+        expect(status.getAttribute("role")).toBe("alert");
+        expect(status.textContent).not.toBe("Added to cart.");
+        expect(viewCart.hidden).toBe(true);
+        expect(loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent).toEqual(saved);
+      } finally {
+        write.mockRestore();
+      }
     } finally {
       vi.unstubAllGlobals();
     }

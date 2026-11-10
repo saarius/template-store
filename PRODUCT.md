@@ -26,6 +26,7 @@ Fresh deployment, November 9, 2026. No pre-existing store content, photography, 
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
 - Let shoppers search gear, collections and reading from one labeled form. Search destinations use published EmDash content and Commerce product visibility, never indexed prices as shopping authority; unavailable search is not a zero-result claim.
 - Show authoritative commerce facts, including Orders-assigned receipt numbers, never a second price list or a locally invented order label.
+- After a product is saved to the cart, offer a keyboard-reachable View cart link beside the confirmation. Invalid quantities and failed saves must not show that saved-cart invitation; do not move focus or navigate automatically.
 - Keep product inspection connected to onward browsing: use published EmDash collection membership for related gear, not invented bundles or purchase-history claims. Exclude the current item and duplicates; Commerce still owns every displayed product fact.
 - Keep test instructions findable and separate from editorial storytelling.
 - Give field notes a complete reading path: practical EmDash-authored advice, another note and an unobtrusive way back to the gear. Never imply the fictional merchandise has been field-tested.

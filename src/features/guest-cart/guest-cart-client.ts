@@ -730,6 +730,9 @@ function persistFailed(): boolean {
 }
 
 function setAddToCartStatus(container: Element | null | undefined, message: string, isError: boolean): void {
+  // Only offer the onward path after a saved addition, never an unsaved cart.
+  const viewCart = container?.querySelector("[data-add-to-cart-view]");
+  if (viewCart instanceof HTMLElement) viewCart.hidden = isError;
   const status = container?.querySelector("[data-add-to-cart-status]");
   if (!(status instanceof HTMLElement)) return;
   status.hidden = false;
