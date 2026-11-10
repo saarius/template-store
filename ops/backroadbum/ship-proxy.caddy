@@ -6,6 +6,14 @@
 handle @merchant_issuer_jwks {
  reverse_proxy 127.0.0.1:8787
 }
+# Read-only current Commerce admission, with its existing commerce:settings pass.
+@merchant_commerce_ship {
+ path /api/commerce-ship
+ method GET
+}
+handle @merchant_commerce_ship {
+ reverse_proxy 127.0.0.1:8787
+}
 @merchant_ship_read {
  path /api/ship/v1/admin/status /api/ship/v1/admin/orders /api/ship/v1/admin/practice-order
  method GET

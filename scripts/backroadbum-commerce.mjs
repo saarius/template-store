@@ -6,7 +6,7 @@ const root = resolve(import.meta.dirname, '..');
 const source = resolve(root, '../commerce/dist/backroadbum');
 const profile = JSON.parse(readFileSync(resolve(source, 'profile.json'), 'utf8'));
 const digest = path => createHash('sha256').update(readFileSync(path)).digest('hex');
-if (profile.profile !== 'backroadbum/merchant-test-v1' || profile.mode !== 'test' || profile.origin !== 'https://backroadbum.com' ||
+if (profile.profile !== 'backroadbum/merchant-test-v2' || profile.mode !== 'test' || profile.origin !== 'https://backroadbum.com' ||
     JSON.stringify(profile.allowedHosts) !== '["backroadbum.com"]' || !/^[a-f0-9]{64}$/.test(profile.sha256) ||
     digest(resolve(source, 'dist/sandbox/plugin.mjs')) !== profile.sha256) throw Error('merchant_artifact_refused');
 const manifest = JSON.parse(readFileSync(resolve(source, 'dist/sandbox/manifest.json'), 'utf8'));
