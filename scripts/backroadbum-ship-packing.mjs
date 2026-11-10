@@ -48,8 +48,13 @@ try {
     await save(group('Add box size'), 'Add box size', 'Packing not saved');
     await expect(group('Add box size').getByLabel('Box name', { exact: true })).toHaveValue('Temporary packing check');
     await expect(group('Add box size').getByLabel('Length (inches)', { exact: true })).toHaveValue('0');
-    await page.getByText('Packing not saved', { exact: true }).scrollIntoViewIfNeeded();
-    await page.screenshot({ path: directory + '/invalid-1440.png' });
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.getByText('Packing not saved', { exact: true }).scrollIntoViewIfNeeded();
+      if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)) throw Error('Invalid packing view overflows');
+      await page.screenshot({ path: directory + '/invalid-' + width + '.png' });
+    }
+    await page.setViewportSize({ width: 1440, height: 900 });
     await group('Add box size').getByLabel('Length (inches)', { exact: true }).fill('6');
     await save(group('Add box size'), 'Add box size', 'Box size added');
     const row = page.getByRole('row').filter({ hasText: 'Temporary packing check' });
@@ -70,7 +75,7 @@ try {
     // EmDash scrolls inside main, not the document; capture both task regions explicitly.
     await page.getByText('Practice packing', { exact: true }).scrollIntoViewIfNeeded();
     await page.screenshot({ path: directory + '/packing-top-' + width + '.png' });
-    await page.getByText('Saved boxes', { exact: true }).scrollIntoViewIfNeeded();
+    await page.getByText('Saved boxes', { exact: true }).evaluate(element => element.scrollIntoView({ block: 'start' }));
     await page.screenshot({ path: directory + '/packing-boxes-' + width + '.png' }); viewports.push({ width, noOverflow: true });
   }
   await page.getByRole('button', { name: 'Back to Shipments', exact: true }).click();

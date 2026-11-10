@@ -29,9 +29,10 @@ The daily timer and every deploy call `ops/backroadbum/backup.py`. If the Ship d
 
 ```sh
 python3 -m unittest discover -s ops/backroadbum -p test_backup.py -v
-node --test ops/backroadbum/test_ship_recovery.mjs
+# Ship’s workerd module paths require the peer repository as working directory.
+(cd ../ship && node --test ../template-store/ops/backroadbum/test_ship_recovery.mjs)
 # Build the peer Ship worker first if its ignored bundle is missing; see its README.
-node ops/backroadbum/verify-ship-recovery.mjs /var/lib/backroadbum/backups/PRIVATE_ARCHIVE.tar.gz
+(cd ../ship && node ../template-store/ops/backroadbum/verify-ship-recovery.mjs /var/lib/backroadbum/backups/PRIVATE_ARCHIVE.tar.gz)
 ```
 
 The drill extracts only allowlisted regular Ship files into a new0700 temporary directory, checks integrity/binding, starts the peer merchant host without provider/issuer network and checks restart plus anonymous-admin denial. It removes that copy in `finally`, never replaces production files, and is not proof of a real shipment. The reusable synthetic integration test separately proves an online copy of a practice label, its still-valid PDF capability and pending event; no fixture order goes into production.
