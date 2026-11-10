@@ -3,7 +3,7 @@
 Merchant branch: `backroadbum/store`, serving https://backroadbum.com. This is an explicit merchant composition, not a generic self-hosting release or upstream proposal. `PRODUCT.md` and `DESIGN.md` record the provisional brand; the original starter design is at `docs/template-design.md`.
 
 ## Current state
-Five EmDash products, two collections, cart and field notes use Commerce-owned prices and availability. Public Stripe TEST checkout, same-browser paid receipts, manual demo fulfillment and webhook-driven background reconciliation are verified. Commerce runs the merchant TEST profile based on v0.8.0; Payments and Ship Registry bundles are mounted, but Ship automation and email/account recovery remain unconnected or unverified.
+Five EmDash products, two collections, cart and field notes use Commerce-owned prices and availability. Public Stripe TEST checkout, same-browser paid receipts, manual demo fulfillment and webhook-driven background reconciliation are verified. Commerce runs the merchant TEST profile based on v0.8.0; Payments and Ship Registry bundles are mounted, but Ship automation and email/account recovery remain unconnected or unverified. A separate private Ship practice host now runs on loopback8788 with intake closed; temporary synthetic tests are not live-store fulfillment proof. Its source and activation/backup prerequisites are in `../ship/ops/backroadbum/README.md`; no Commerce setting, Ship Registry artifact or public proxy points to it yet.
 
 ## Deploy and recover
 - Node24.22.2/pnpm11.9.0. On this2GB host use `NODE_OPTIONS=--max-old-space-size=1200 pnpm exec astro check`.
