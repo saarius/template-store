@@ -68,6 +68,10 @@ let checkoutRecovery = false;
 let checkoutController: ReturnType<typeof createGuestCheckoutController> | null = null;
 let checkoutAdmitted = false;
 let mutationNotice: string | null = null;
+// Invalid edits are drafts, never cart intent. Keep them visible across catalog
+// refreshes until corrected or removed, rather than silently buying the old qty.
+const invalidQuantities = new Map<string, { value: string; message: string }>();
+const QUANTITY_ERROR = "Enter a whole number from 1 to 99, or remove this item.";
 let checkoutMessage: string | null = null;
 let checkoutMessageError = false;
 let checkoutProbePending = false;
@@ -283,7 +287,7 @@ function lineCopyMarkup(line: GuestCartView["lines"][number]): string {
   return `<h2>${escapeText(line.name)}</h2>
   ${line.sku ? `<p data-guest-cart-sku>SKU: ${escapeText(line.sku)}</p>` : ""}
   ${priceMarkup(line)}
-  ${line.lineTotalText ? `<p data-guest-cart-line-total>Line total <strong>${escapeText(line.lineTotalText)}</strong></p>` : ""}
+  ${line.lineTotalText ? `<p data-guest-cart-line-total${invalidQuantities.has(line.id) ? " hidden" : ""}>Line total <strong>${escapeText(line.lineTotalText)}</strong></p>` : ""}
   ${line.availabilityLabel ? `<p data-commerce-availability>${escapeText(line.availabilityLabel)}</p>` : ""}
   ${line.reason ? `<p data-guest-cart-line-reason="${escapeText(line.reasonCode ?? "")}">${escapeText(line.reason)}</p>` : ""}`;
 }
@@ -295,9 +299,10 @@ function lineMarkup(line: GuestCartView["lines"][number], current: GuestCartView
   <div data-guest-cart-line-copy>${lineCopyMarkup(line)}</div>
   <div class="guest-cart-qty">
     <label for="guest-cart-qty-${escapeText(line.id)}">Quantity</label>
-    <input id="guest-cart-qty-${escapeText(line.id)}" data-guest-cart-qty="${escapeText(line.id)}" type="text" inputmode="numeric" value="${line.quantity}" />
+    <input id="guest-cart-qty-${escapeText(line.id)}" data-guest-cart-qty="${escapeText(line.id)}" aria-label="Quantity for ${escapeText(line.name)}" aria-describedby="guest-cart-qty-error-${escapeText(line.id)}" type="text" inputmode="numeric" value="${line.quantity}" />
+    <p id="guest-cart-qty-error-${escapeText(line.id)}" data-guest-cart-qty-error role="alert" hidden></p>
   </div>
-  <button type="button" data-guest-cart-remove="${escapeText(line.id)}">Remove</button>
+  <button type="button" data-guest-cart-remove="${escapeText(line.id)}" aria-label="Remove ${escapeText(line.name)}">Remove</button>
 </article>`;
 }
 
@@ -323,9 +328,18 @@ function patchLine(article: HTMLElement, line: GuestCartView["lines"][number], c
   const copy = article.querySelector("[data-guest-cart-line-copy]");
   if (copy instanceof HTMLElement) copy.innerHTML = lineCopyMarkup(line);
   const input = article.querySelector("[data-guest-cart-qty]");
-  if (input instanceof HTMLInputElement && document.activeElement !== input) {
-    input.value = String(line.quantity);
+  const invalid = invalidQuantities.get(line.id);
+  if (input instanceof HTMLInputElement) {
+    input.setAttribute("aria-label", `Quantity for ${line.name}`);
+    input.setAttribute("aria-invalid", String(Boolean(invalid)));
+    if (document.activeElement !== input) input.value = invalid?.value ?? String(line.quantity);
   }
+  const error = article.querySelector("[data-guest-cart-qty-error]");
+  if (error instanceof HTMLElement) {
+    error.hidden = !invalid;
+    error.textContent = invalid?.message ?? "";
+  }
+  article.querySelector("[data-guest-cart-remove]")?.setAttribute("aria-label", `Remove ${line.name}`);
 }
 
 function reconcileLines(container: HTMLElement, current: GuestCartView): void {
@@ -335,14 +349,17 @@ function reconcileLines(container: HTMLElement, current: GuestCartView): void {
     const id = child.getAttribute("data-guest-cart-line");
     if (!id || !keep.has(id)) child.remove();
   }
-  for (const line of current.lines) {
-    const existing = container.querySelector(lineSelector(line.id));
-    if (existing instanceof HTMLElement) {
-      patchLine(existing, line, current);
-      container.append(existing);
-      continue;
+  for (const [index, line] of current.lines.entries()) {
+    let article = container.querySelector(lineSelector(line.id));
+    if (!(article instanceof HTMLElement)) {
+      container.insertAdjacentHTML("beforeend", lineMarkup(line, current));
+      article = container.querySelector(lineSelector(line.id));
     }
-    container.insertAdjacentHTML("beforeend", lineMarkup(line, current));
+    if (article instanceof HTMLElement) {
+      patchLine(article, line, current);
+      // Moving an already correctly placed row drops focus while typing.
+      if (container.children[index] !== article) container.insertBefore(article, container.children[index] ?? null);
+    }
   }
 }
 
@@ -378,6 +395,10 @@ export function renderBilling(root: Element, needsDelivery: boolean): void {
 
 function renderCart(root: Element): void {
   const current = view();
+  for (const id of invalidQuantities.keys()) {
+    if (!current.lines.some(line => line.id === id)) invalidQuantities.delete(id);
+  }
+  const hasInvalidQuantity = invalidQuantities.size > 0;
   const isCheckoutPage = root.hasAttribute("data-guest-checkout-page");
   const empty = root.querySelector("[data-guest-cart-empty]");
   const lines = root.querySelector("[data-guest-cart-lines]");
@@ -399,15 +420,17 @@ function renderCart(root: Element): void {
   }
   const subtotal = root.querySelector("[data-guest-cart-subtotal]");
   if (subtotal instanceof HTMLElement) {
-    subtotal.hidden = current.empty || !current.subtotalText;
+    subtotal.hidden = current.empty || hasInvalidQuantity || !current.subtotalText;
     const amount = subtotal.querySelector("[data-guest-cart-subtotal-amount]");
     if (amount instanceof HTMLElement) amount.textContent = current.subtotalText ?? "";
   }
+  const summary = root.querySelector("[data-guest-cart-summary]");
+  if (summary instanceof HTMLElement) summary.hidden = current.empty && !checkoutRecovery && !checkoutResumeUrl;
   if (manifest instanceof HTMLElement) {
     manifest.hidden = current.empty;
   }
   if (breakdown instanceof HTMLElement) {
-    breakdown.hidden = current.empty;
+    breakdown.hidden = current.empty || hasInvalidQuantity;
     const shippingMode = root.getAttribute("data-checkout-shipping-mode");
     const shippingMinor = root.getAttribute("data-checkout-shipping-minor");
     const shippingPolicy: GuestCheckoutShippingPolicyInput | null =
@@ -452,7 +475,7 @@ function renderCart(root: Element): void {
     }
   }
   if (checkout instanceof HTMLButtonElement) {
-    checkout.disabled = !current.checkoutEnabled || checkoutLocked();
+    checkout.disabled = !current.checkoutEnabled || checkoutLocked() || hasInvalidQuantity;
     checkout.textContent = !isCheckoutPage && current.checkoutEnabled
       ? GUEST_CART_PROCEED_LABEL
       : current.checkoutLabel;
@@ -461,7 +484,7 @@ function renderCart(root: Element): void {
     contact.disabled = !(checkoutAdmitted || checkoutController?.canStart()) || checkoutLocked();
   }
   if (reason instanceof HTMLElement) {
-    reason.textContent = current.checkoutReason;
+    reason.textContent = hasInvalidQuantity ? "Correct the marked quantities or remove those items to continue." : current.checkoutReason;
   }
   if (delivery instanceof HTMLElement) {
     delivery.hidden = !current.needsDelivery;
@@ -871,7 +894,7 @@ export function hydrateGuestCartPage(): void {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
     if (target.closest("[data-guest-cart-checkout]")) {
-      if (!checkoutController || checkoutLocked() || !view().checkoutEnabled) return;
+      if (!checkoutController || checkoutLocked() || invalidQuantities.size > 0 || !view().checkoutEnabled) return;
       if (!root.hasAttribute("data-guest-checkout-page")) {
         window.location.assign("/checkout");
         return;
@@ -947,6 +970,30 @@ export function hydrateGuestCartPage(): void {
     focusAfterRemove(root, removeId);
     void refreshSnapshot(root);
   });
+  const updateQuantity = (target: HTMLInputElement) => {
+    if (checkoutLocked()) return;
+    const id = target.getAttribute("data-guest-cart-qty");
+    if (!id) return;
+    const quantity = parseGuestCartQuantityInput(target.value);
+    if (quantity === null) {
+      invalidQuantities.set(id, { value: target.value, message: QUANTITY_ERROR });
+      renderCart(root);
+      return;
+    }
+    if (!persistFailed()) session = loadSession();
+    const result = setGuestCartLineQuantity(session.intent, id, quantity);
+    if (!result.accepted) {
+      invalidQuantities.set(id, { value: target.value, message: result.reason ?? QUANTITY_ERROR });
+      renderCart(root);
+      return;
+    }
+    invalidQuantities.delete(id);
+    mutationNotice = null;
+    applyIntent(result.intent, session.notice, root);
+  };
+  root.addEventListener("input", (event) => {
+    if (event.target instanceof HTMLInputElement) updateQuantity(event.target);
+  });
   root.addEventListener("change", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLInputElement)) return;
@@ -954,26 +1001,7 @@ export function hydrateGuestCartPage(): void {
       renderBilling(root, view().needsDelivery);
       return;
     }
-    if (checkoutLocked()) return;
-    const id = target.getAttribute("data-guest-cart-qty");
-    if (!id) return;
-    const quantity = parseGuestCartQuantityInput(target.value);
-    if (quantity === null) {
-      mutationNotice = "Quantity must be a whole number from 1 to 99.";
-      setStatus(root, mutationNotice, true);
-      return;
-    }
-    if (!persistFailed()) {
-      session = loadSession();
-    }
-    const result = setGuestCartLineQuantity(session.intent, id, quantity);
-    if (!result.accepted) {
-      mutationNotice = result.reason;
-      setStatus(root, mutationNotice, true);
-      return;
-    }
-    mutationNotice = null;
-    applyIntent(result.intent, session.notice, root);
+    updateQuantity(target);
   });
   document.addEventListener("guest-cart-updated", () => {
     session = loadSession();

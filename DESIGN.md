@@ -34,6 +34,16 @@ typography:
     fontSize: "1.15rem"
     fontWeight: 400
     lineHeight: 1.65
+  summary-value:
+    fontFamily: "Segoe UI, system-ui, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 600
+    lineHeight: 1.6
+  compact-product-title:
+    fontFamily: "Barlow Semi Condensed, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 600
+    lineHeight: 1.15
   product-title:
     fontFamily: "Barlow Semi Condensed, sans-serif"
     fontSize: "1.65rem"
@@ -103,6 +113,9 @@ The shop and collection pages share a wrapping row of ordinary links, not JavaSc
 
 ### Search
 Use one plainly labeled field and a yellow Search action, followed by ordinary underlined links grouped by destination. Search shares the daylight surface and blue ink rather than introducing a dark developer panel. Stack the action below the field when needed on phones. Keep a retained query and useful browse links in both empty and unavailable states; do not present an unavailable index as zero results. Native GET submission must work without JavaScript.
+
+### Cart
+Use flat item rows rather than full-width enclosing cards. Keep artwork beside product facts and quantity controls; place a quieter blue summary alongside on desktop and below on phones. The empty state offers Browse the gear, and Continue shopping stays visible above the list. Quantity and Remove controls name their product for assistive technology. Invalid quantity drafts keep their typed text through catalog refresh, show a nearby correction and suppress stale line/subtotals; every draft must be corrected or removed before checkout. Valid typing updates totals without dropping focus. A no-JavaScript explanation retains a browse path rather than showing an inert checkout.
 
 ### Checkout and receipts
 Checkout is an Operate surface: daylight fields, blue text, ordinary address controls and a yellow payment action. Keep Stripe test-card instructions beside contact entry. The paid receipt uses a plain white panel, canonical TEST labeling and the canonical short Orders number when available (for example, Order #1004); keep the full order ID as a fallback rather than deriving a short label from it; no decorative stamps or imitation barcodes. Explain browser-bound receipt recovery, and do not promise unconnected email or fulfillment services. A separate, quiet Fulfillment section shows only Commerce’s latest state; omit it when unavailable. TEST completion says no parcel was sent and labels tracking as a demo reference, rendered as text rather than a carrier link. Completion must never read as Delivered. Request-limit errors preserve the cart and name a retry action. Failed recovery directs people to the browser used for checkout, never to an unverified confirmation email. A permanent “Your last checkout” footer link and a quieter cart link reopen the capability-scoped return page without URL credentials. Explain the latest-checkout-only limit. An empty browser gets a neutral empty state, not a claim that payment failed; corrupt or blocked storage still fails closed.

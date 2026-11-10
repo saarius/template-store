@@ -29,5 +29,6 @@ Fresh deployment, November 9, 2026. No pre-existing store content, photography, 
 - Keep product inspection connected to onward browsing: use published EmDash collection membership for related gear, not invented bundles or purchase-history claims. Exclude the current item and duplicates; Commerce still owns every displayed product fact.
 - Keep test instructions findable and separate from editorial storytelling.
 - Give field notes a complete reading path: practical EmDash-authored advice, another note and an unobtrusive way back to the gear. Never imply the fictional merchandise has been field-tested.
+- Keep cart edits honest: an invalid quantity is an unsaved draft, not permission to purchase the previous quantity. Explain the correction beside its field, suppress stale totals and block checkout until every draft is corrected or removed.
 - Treat failure and recovery as part of the product.
 - Keep operational evidence public-safe and truthful.

@@ -144,6 +144,17 @@ test("guest cart persists shopper intent and stays honest when checkout is unava
   await expect(qty).toHaveValue("3");
   await expect(lineTotal).toHaveText("Line total $72.00");
   await expect(subtotal).toHaveText("Subtotal $72.00");
+  await qty.fill("0");
+  await expect(qty).toBeFocused();
+  await expect(qty).toHaveAttribute("aria-invalid", "true");
+  await expect(lineArticle.locator("[data-guest-cart-qty-error]")).toContainText("1 to 99");
+  await expect(lineTotal).toBeHidden();
+  await expect(subtotal).toBeHidden();
+  expect(readStoredIntent(await shopper.evaluate((key) => localStorage.getItem(key), GUEST_CART_STORAGE_KEY)).lines).toEqual([{ id, quantity: 3 }]);
+  await qty.fill("3");
+  await expect(qty).toHaveAttribute("aria-invalid", "false");
+  await expect(lineArticle.locator("[data-guest-cart-qty-error]")).toBeHidden();
+  await expect(subtotal).toHaveText("Subtotal $72.00");
   const lineStyles = await shopper.locator(`[data-guest-cart-line="${id}"]`).evaluate((element) => {
     const style = getComputedStyle(element);
     return {
@@ -161,9 +172,9 @@ test("guest cart persists shopper intent and stays honest when checkout is unava
       borderTopWidth: style.borderTopWidth,
     };
   });
-  expect(lineStyles.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  // Flat rows, not an enclosing card around each item.
   expect(Number.parseFloat(lineStyles.paddingTop)).toBeGreaterThanOrEqual(16);
-  expect(Number.parseFloat(lineStyles.borderRadius)).toBeGreaterThanOrEqual(8);
+  expect(Number.parseFloat(lineStyles.borderRadius)).toBe(0);
   expect(Number.parseFloat(lineStyles.borderTopWidth)).toBeGreaterThanOrEqual(1);
   expect(Number.parseFloat(qtyStyles.fontSize)).toBeGreaterThanOrEqual(14);
   expect(Number.parseFloat(qtyStyles.paddingTop)).toBeGreaterThanOrEqual(4);

@@ -9,56 +9,81 @@ interface Props {
 const { checkoutAdmission = null } = Astro.props;
 ---
 <section class="guest-cart" aria-labelledby="guest-cart-title" data-guest-cart data-guest-cart-page="cart" data-guest-checkout-admitted={checkoutAdmission ? "true" : "false"}>
-  <h1 id="guest-cart-title">Cart</h1>
-  <p data-guest-cart-status role="status" hidden></p>
-  <p data-guest-cart-empty hidden tabindex="-1">Your cart is empty. Listed shop products can be added when they are currently priced and sellable.</p>
-  <div data-guest-cart-lines></div>
-  <p class="guest-cart-subtotal" data-guest-cart-subtotal hidden>Subtotal <strong data-guest-cart-subtotal-amount></strong></p>
-  <div class="guest-cart-checkout">
-    <button type="button" data-guest-cart-checkout data-guest-cart-proceed disabled>{checkoutAdmission ? GUEST_CHECKOUT_READY_LABEL : GUEST_CHECKOUT_LABEL}</button>
-    <p data-guest-cart-checkout-reason>{checkoutAdmission ? "" : GUEST_CHECKOUT_REASON}</p>
-    <button type="button" data-guest-cart-retry hidden>Try again</button>
-    <a data-guest-cart-resume hidden rel="noopener noreferrer">Return to secure checkout</a>
-    <button type="button" data-guest-cart-recover hidden>Check checkout status</button>
+  <div class="guest-cart-header">
+    <h1 id="guest-cart-title">Cart</h1>
+    <a href="/shop">Continue shopping</a>
   </div>
+  <noscript><p>Your cart needs JavaScript to read saved items and check current prices. You can still <a href="/shop">browse the gear</a>.</p></noscript>
+  <p data-guest-cart-status role="status" hidden></p>
+  <div class="guest-cart-empty" data-guest-cart-empty hidden tabindex="-1">
+    <h2>Your cart is empty.</h2>
+    <p>Pick a little gear for the miles in between.</p>
+    <a class="guest-cart-shop" href="/shop">Browse the gear</a>
+  </div>
+  <div class="guest-cart-layout">
+    <div data-guest-cart-lines></div>
+    <div class="guest-cart-summary" data-guest-cart-summary hidden>
+      <h2>Before you go</h2>
+      <p class="guest-cart-subtotal" data-guest-cart-subtotal hidden>Subtotal <strong data-guest-cart-subtotal-amount></strong></p>
+      <div class="guest-cart-checkout">
+        <button type="button" data-guest-cart-checkout data-guest-cart-proceed disabled>{checkoutAdmission ? GUEST_CHECKOUT_READY_LABEL : GUEST_CHECKOUT_LABEL}</button>
+        <p data-guest-cart-checkout-reason>{checkoutAdmission ? "" : GUEST_CHECKOUT_REASON}</p>
+        <a data-guest-cart-resume hidden rel="noopener noreferrer">Return to secure checkout</a>
+        <button type="button" data-guest-cart-recover hidden>Check checkout status</button>
+      </div>
+    </div>
+  </div>
+  <button class="guest-cart-retry" type="button" data-guest-cart-retry hidden>Try again</button>
   <p class="guest-cart-last-checkout">Already checked out? <a href="/checkout/success" data-last-checkout-link>View your last checkout</a> in the browser you used to pay.</p>
 </section>
 <style>
-  .guest-cart{width:min(70rem,calc(100% - 2rem));margin:3rem auto;min-height:65vh;overflow-wrap:anywhere}
-  h1{font-size:clamp(2.5rem,6vw,5rem);letter-spacing:-.05em;margin:0 0 1.5rem}
-  [data-guest-cart-status],[data-guest-cart-empty],[data-guest-cart-checkout-reason]{color:var(--store-muted);line-height:1.5}
-  [data-guest-cart-status][role="alert"]{color:var(--store-alert-ink);background:var(--store-alert);padding:.8rem 1rem;border-radius:.6rem}
-  [data-guest-cart-lines]{display:grid;gap:1rem;margin:1.5rem 0}
-  .guest-cart-subtotal[hidden]{display:none}
-  .guest-cart-subtotal{display:flex;justify-content:space-between;gap:1rem;max-width:32rem;margin:1rem 0 0;padding-top:1rem;border-top:1px solid var(--store-line);font-size:1.25rem;font-variant-numeric:tabular-nums}
-  .guest-cart-subtotal strong{font-family:var(--font-mono);font-variant-numeric:tabular-nums;transition:color .22s ease,transform .22s cubic-bezier(.22,1,.36,1);display:inline-block}
-  .guest-cart-subtotal strong[data-number-flow-ticking="true"]{color:var(--store-accent);transform:translateY(-1px)}
-  .guest-cart-checkout{margin-top:2rem}
-  .guest-cart-last-checkout{max-width:65ch;margin-top:2rem;color:var(--store-muted);line-height:1.6}
-  .guest-cart-last-checkout a{color:var(--store-ink);text-underline-offset:.2em}
-  .guest-cart-checkout button{margin:.4rem .6rem .4rem 0;padding:.75rem 1.1rem;border:1.5px solid var(--store-ink-border);border-radius:.4rem;background:var(--store-surface);color:inherit;font:inherit;font-weight:800;box-shadow:3px 3px 0 var(--store-shadow);cursor:pointer}
-  .guest-cart-checkout [data-guest-cart-checkout]:not(:disabled){background:var(--dinkus-action-background);color:var(--dinkus-action-color);border-color:var(--dinkus-action-background)}
-  .guest-cart-checkout [data-guest-cart-resume]{display:inline-block;margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1.5px solid var(--store-ink-border);border-radius:.4rem;background:var(--store-surface);color:inherit;font-weight:800;text-decoration:underline;text-underline-offset:.2em}
-  .guest-cart-checkout [data-guest-cart-resume][hidden]{display:none}
-  [data-guest-cart-checkout]:disabled{color:var(--store-muted);box-shadow:none;cursor:not-allowed}
-  .guest-cart :global([data-guest-cart-line]){display:grid;grid-template-columns:auto minmax(0,1fr);gap:1rem 1.25rem;align-items:start;padding:1.5rem;border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:var(--store-surface);box-shadow:4px 4px 0 var(--store-shadow);min-width:0;overflow-wrap:anywhere}
-  .guest-cart :global(.guest-cart-line-media){width:clamp(5.5rem,18vw,8.5rem);aspect-ratio:4/3;box-sizing:border-box;padding:.35rem;border:1.5px solid var(--store-ink-border);border-radius:.65rem;background:#f7f4ec;box-shadow:inset 0 0 0 1px rgba(25,25,22,.06);overflow:hidden}
-  .guest-cart :global(.guest-cart-line-media img){display:block;width:100%;height:100%;object-fit:cover;border-radius:.4rem;background:#e9e8df}
-  .guest-cart :global([data-guest-cart-thumbnail-placeholder]){display:grid;place-items:center;height:100%;margin:0;border-radius:.4rem;background:#e9e8df;color:var(--store-muted);font-size:.85rem;font-weight:700;text-align:center}
-  .guest-cart :global([data-guest-cart-line-copy]){min-width:0}
-  .guest-cart :global([data-guest-cart-line] h2){font-size:1.5rem;margin:0 0 1rem}
-  .guest-cart :global(.price){display:flex;gap:.65rem;flex-wrap:wrap;font-size:1.4rem}
-  .guest-cart :global(s){color:var(--store-muted)}
-  .guest-cart :global([data-guest-cart-line-reason]){color:var(--store-muted);line-height:1.5}
-  .guest-cart :global(.guest-cart-qty){grid-column:1/-1;display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin:.25rem 0 0;min-width:0}
-  .guest-cart :global([data-guest-cart-qty]){width:4.5rem;max-width:100%;padding:.45rem .55rem;border:1px solid var(--store-line);border-radius:.4rem;font:inherit;background:var(--store-surface)}
-  .guest-cart :global([data-guest-cart-remove]){grid-column:1/-1;justify-self:start;padding:.7rem 1rem;border:1px solid var(--store-line);border-radius:.4rem;background:var(--store-surface);font:inherit;font-weight:800;cursor:pointer}
-  .guest-cart :global([data-guest-cart-qty]:focus-visible),
-  .guest-cart :global([data-guest-cart-remove]:focus-visible),
-  .guest-cart :global([data-guest-cart-retry]:focus-visible),
-  .guest-cart :global([data-guest-cart-resume]:focus-visible),
-  .guest-cart :global([data-guest-cart-empty]:focus-visible){outline:3px solid #215cc8;outline-offset:3px}
-  @media(max-width:45rem){.guest-cart :global([data-guest-cart-line]),.guest-cart :global(.guest-cart-qty){min-width:0}}
+  .guest-cart{width:min(70rem,calc(100% - 2rem));margin:3rem auto;min-height:60vh;overflow-wrap:anywhere}
+  .guest-cart [hidden]{display:none}
+  .guest-cart a{color:var(--store-ink);text-underline-offset:.2em}
+  .guest-cart-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
+  h1{font-size:clamp(2.8rem,5.7vw,5rem);letter-spacing:-.025em;line-height:1;margin:0}
+  h2{font-size:1.65rem;line-height:1.15;margin:0 0 1rem}
+  [data-guest-cart-status]{color:var(--store-muted);line-height:1.6}
+  [data-guest-cart-status][role="alert"]{color:var(--store-alert-ink);background:var(--store-alert);padding:1rem;border-radius:var(--store-radius-card)}
+  .guest-cart-empty{padding:2rem 0 3rem;max-width:65ch}
+  .guest-cart-empty p{color:var(--store-muted);line-height:1.6;margin:0 0 1.5rem}
+  .guest-cart-layout{display:grid;grid-template-columns:minmax(0,1fr) 20rem;gap:3rem;align-items:start}
+  [data-guest-cart-lines]{display:grid;min-width:0}
+  .guest-cart-summary{padding:1.5rem;background:var(--store-surface-subtle);border-radius:var(--store-radius-card)}
+  .guest-cart-subtotal{display:flex;justify-content:space-between;gap:1rem;font-size:1.25rem;font-variant-numeric:tabular-nums;margin:1.5rem 0}
+  .guest-cart-subtotal strong{font-family:var(--font-sans);font-variant-numeric:tabular-nums}
+  .guest-cart-checkout p{color:var(--store-muted);line-height:1.6;margin:1rem 0 0}
+  .guest-cart-last-checkout{max-width:65ch;margin:2.5rem 0 0;color:var(--store-muted);line-height:1.6}
+  .guest-cart-checkout button,.guest-cart-retry,.guest-cart-shop{display:inline-flex;align-items:center;justify-content:center;min-height:3rem;padding:.7rem 1rem;border:1px solid var(--store-line);border-radius:var(--store-radius-card);background:var(--store-surface);color:var(--store-ink);font:inherit;font-weight:600;cursor:pointer}
+  .guest-cart-checkout [data-guest-cart-checkout]{width:100%}
+  .guest-cart-checkout [data-guest-cart-checkout]:not(:disabled),.guest-cart-shop{background:var(--dinkus-action-background);color:var(--dinkus-action-color);border-color:var(--dinkus-action-background)}
+  .guest-cart-shop{text-decoration:none}
+  .guest-cart-checkout [data-guest-cart-checkout]:not(:disabled):hover,.guest-cart-shop:hover{background:var(--dinkus-action-hover-background,#eac04b)}
+  .guest-cart-checkout [data-guest-cart-checkout]:disabled{color:var(--store-muted);cursor:not-allowed}
+  .guest-cart-checkout [data-guest-cart-resume]{display:inline-block;margin-top:1rem;line-height:1.6}
+  .guest-cart-checkout [data-guest-cart-recover]{margin-top:1rem}
+  .guest-cart-retry{margin-top:1rem}
+  .guest-cart :global([data-guest-cart-line]){display:grid;grid-template-columns:7rem minmax(0,1fr) auto;gap:.75rem 1.25rem;align-items:start;padding:1.5rem 0;border-top:1px solid var(--store-line);min-width:0;overflow-wrap:anywhere}
+  .guest-cart :global([data-guest-cart-line]:last-child){border-bottom:1px solid var(--store-line)}
+  .guest-cart :global(.guest-cart-line-media){grid-row:1/3;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:var(--store-radius-card);background:var(--store-surface-subtle)}
+  .guest-cart :global(.guest-cart-line-media img){display:block;width:100%;height:100%;object-fit:cover}
+  .guest-cart :global([data-guest-cart-thumbnail-placeholder]){display:grid;place-items:center;height:100%;margin:0;color:var(--store-muted);text-align:center}
+  .guest-cart :global([data-guest-cart-line-copy]){grid-column:2/-1;min-width:0}
+  .guest-cart :global([data-guest-cart-line] h2){font-size:1.65rem;line-height:1.15;margin:0 0 .75rem}
+  .guest-cart :global([data-guest-cart-line] p){margin:.4rem 0;line-height:1.5}
+  .guest-cart :global(.price){display:flex;gap:.65rem;flex-wrap:wrap;font-size:1.15rem}
+  .guest-cart :global([data-regular-price]),.guest-cart :global([data-sale-price]){font-family:var(--font-sans)}
+  .guest-cart :global(s),.guest-cart :global([data-guest-cart-sku]),.guest-cart :global([data-commerce-availability]),.guest-cart :global([data-guest-cart-line-reason]){color:var(--store-muted)}
+  .guest-cart :global(.guest-cart-qty){grid-column:2;display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center;min-width:0}
+  .guest-cart :global([data-guest-cart-qty]){width:4.5rem;max-width:100%;min-height:3rem;padding:.5rem;border:1px solid var(--store-line);border-radius:var(--store-radius-card);font:inherit;background:var(--store-surface);color:var(--store-ink);caret-color:var(--store-ink)}
+  .guest-cart :global([data-guest-cart-qty][aria-invalid="true"]){border-color:var(--store-alert-ink)}
+  .guest-cart :global([data-guest-cart-qty-error]){flex-basis:100%;color:var(--store-alert-ink)}
+  .guest-cart :global([data-guest-cart-line] [hidden]){display:none}
+  .guest-cart :global([data-guest-cart-remove]){grid-column:3;min-height:3rem;padding:.5rem 0;border:0;background:none;color:var(--store-ink);font:inherit;text-decoration:underline;text-underline-offset:.2em;cursor:pointer}
+  .guest-cart :global([data-guest-cart-remove]:hover){text-decoration-thickness:2px}
+  .guest-cart :global([data-guest-cart-qty]:disabled),.guest-cart :global([data-guest-cart-remove]:disabled){color:var(--store-muted);cursor:not-allowed}
+  @media(max-width:60rem){.guest-cart-layout{grid-template-columns:1fr;gap:2rem}.guest-cart-summary{max-width:32rem;width:100%}}
+  @media(max-width:34rem){.guest-cart :global([data-guest-cart-line]){grid-template-columns:5rem minmax(0,1fr);gap:1rem}.guest-cart :global(.guest-cart-line-media){grid-row:1}.guest-cart :global([data-guest-cart-line-copy]){grid-column:2}.guest-cart :global(.guest-cart-qty){grid-column:1/-1}.guest-cart :global([data-guest-cart-remove]){grid-column:1/-1;justify-self:start}.guest-cart :global([data-guest-cart-line] h2){font-size:1.5rem}}
 </style>
 <script>
   import { hydrateGuestCartPage } from "./guest-cart-client.ts";

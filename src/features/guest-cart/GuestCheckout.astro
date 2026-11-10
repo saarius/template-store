@@ -197,6 +197,9 @@ const BILLING_COUNTRIES = Array.from({ length: 26 * 26 }, (_, i) => String.fromC
   .guest-checkout :global([data-guest-cart-line-reason]){color:var(--store-muted);line-height:1.45}
   .guest-checkout :global(.guest-cart-qty){grid-column:1/-1;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.65rem 0;min-width:0}
   .guest-checkout :global([data-guest-cart-qty]){width:4rem;max-width:100%;padding:.35rem .5rem;border:1px solid var(--store-line);border-radius:.35rem;font:inherit;background:var(--store-surface)}
+  .guest-checkout :global([data-guest-cart-qty][aria-invalid="true"]){border-color:var(--store-alert-ink)}
+  .guest-checkout :global([data-guest-cart-qty-error]){flex-basis:100%;color:var(--store-alert-ink)}
+  .guest-checkout :global([data-guest-cart-line] [hidden]){display:none}
   .guest-checkout :global([data-guest-cart-remove]){grid-column:1/-1;justify-self:start;padding:.45rem .75rem;border:1px solid var(--store-line);border-radius:.35rem;background:var(--store-surface);font:inherit;font-size:.88rem;font-weight:700;cursor:pointer}
   .guest-checkout-breakdown{margin:0;padding-top:.85rem;border-top:1px solid var(--store-line);display:grid;gap:.45rem}
   .guest-checkout-breakdown[hidden]{display:none}
