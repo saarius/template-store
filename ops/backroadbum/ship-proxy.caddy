@@ -1,0 +1,14 @@
+# Imported inside backroadbum.com's site block, before the storefront catch-all.
+# These are bearer-authenticated reads, not a public Ship mutation/print gateway.
+@merchant_ship_read {
+ path /api/ship/v1/admin/status /api/ship/v1/admin/orders
+ method GET
+}
+handle @merchant_ship_read {
+ uri strip_prefix /api/ship
+ reverse_proxy 127.0.0.1:8788
+}
+@merchant_ship_other path /api/ship /api/ship/*
+handle @merchant_ship_other {
+ respond "" 404
+}

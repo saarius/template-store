@@ -11,6 +11,7 @@ import { unstable_readConfig } from "wrangler";
 import { selectedRegistryAccessOptions } from "./scripts/registry-access.mjs";
 import { registrySandboxRunner, selectedRegistrySandboxRunner } from "./scripts/registry-sandbox.mjs";
 import { pairedCommerceDescriptor, pairedCommercePin, pairedCommerceProfile, resolvePairedCommerceDir } from "./scripts/lib/paired-commerce.mjs";
+import { merchantShipDescriptor } from "./scripts/lib/backroadbum-ship.mjs";
 
 import { playgroundRegistryPlugins } from "./src/features/playground-plugins/registry-plugins.mjs";
 import { commerceProfile, commerceProfileDefine } from "./src/features/commerce-profile/profiles.mjs";
@@ -61,6 +62,7 @@ const pairedCommerce = pairedCommerceDir
   ? await pairedCommerceDescriptor(pairedCommerceDir, commerceProfile(process.env.DINKUS_COMMERCE_PROFILE).runtimeId)
   : undefined;
 const accessOptions = selectedRegistryAccessOptions(process.env);
+const merchantShip = merchantShipDescriptor(process.env);
 
 // The store has no default Wrangler file: the demo Worker's wrangler.jsonc was retired with the hosted demo
 // (hosted-demo-retired-20261031). A Cloudflare build names its config, which pnpm run build:registry writes;
@@ -114,7 +116,8 @@ export default defineConfig({
       // On Cloudflare the Worker Loader runs the installed plugins; on Node the workerd runner does, and
       // astro dev hands them to Miniflare (EmDash's documented loop: build the plugin, run the site).
       ...(isCloudflare ? { sandboxRunner: cloudflareSandbox() } : pairedCommerce ? { sandboxRunner: "@emdash-cms/sandbox-workerd/sandbox" } : {}),
-      ...(pairedCommerce ? { sandboxed: [pairedCommerce, ...playgroundRegistryPlugins().filter(plugin => plugin.id !== pairedCommerce.id)] } : {}),
+      ...(pairedCommerce ? { sandboxed: [pairedCommerce, ...playgroundRegistryPlugins().filter(plugin => plugin.id !== pairedCommerce.id)
+        .map(plugin => merchantShip && plugin.id === merchantShip.id ? merchantShip : plugin)] } : {}),
       plugins: [
         {
           id: "dinkus-template-product-urls",
