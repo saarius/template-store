@@ -42,7 +42,7 @@ try {
     await page.locator('[data-guest-cart-remove]').click();
     await expect(page.locator('[data-guest-cart-line]')).toHaveCount(0);
     await page.goto(base + '/field-notes');
-    await expect(page.locator('.brb-story-link')).toHaveCount(2);
+    await expect(page.locator('.brb-story-link')).toHaveCount(3);
     await page.goto(base + '/test-store');
     await expect(page.locator('main')).toContainText('4242 4242 4242 4242');
     await expect(page.locator('main')).toContainText('Try a test purchase');
