@@ -13,7 +13,13 @@ try {
     const writes = [];
     page.on('request', request => { if (request.method() !== 'GET') writes.push(request.method()); });
     expect((await page.goto(base + '/dashboard/')).status()).toBe(200);
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      document.documentElement.style.scrollBehavior = 'auto';
+    });
     await page.getByRole('navigation', { name: 'Dashboard sections' }).getByRole('link', { name: 'Activity & costs', exact: true }).click();
+    await page.waitForURL(url => /^\/dashboard\/?$/.test(url.pathname) && url.hash === '#costs');
+    await page.waitForLoadState('networkidle');
     const section = page.locator('#costs');
     const metrics = section.locator('[data-activity-metrics]');
     await expect(metrics.locator('dt')).toHaveCount(15);
@@ -30,7 +36,13 @@ try {
       await expect(section).not.toContainText(privateText);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await section.screenshot({ path: new URL(`activity-${width}.png`, output).pathname });
+    // Instant positioning avoids capturing an in-flight inherited smooth scroll.
+    await page.evaluate(() => document.querySelector('#costs').scrollIntoView({ behavior: 'instant' }));
+    await expect(section.locator('h2')).toBeInViewport();
+    await page.screenshot({ path: new URL(`activity-${width}.png`, output).pathname });
+    await page.evaluate(() => document.querySelector('[data-api-equivalent]').scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await expect(section.locator('[data-api-equivalent]')).toBeInViewport();
+    await page.screenshot({ path: new URL(`costs-${width}.png`, output).pathname });
     expect(writes).toEqual([]);
     results.push({ width, javaScriptEnabled: false, status: 200, semanticFacts: 15, recordedMetricsVisible: true, billingAndCoverageLabels: true, noPrivateFields: true, noOverflow: true, writes: 0 });
     await context.close();
