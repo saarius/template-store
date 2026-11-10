@@ -162,10 +162,16 @@ export function resolveGuestCheckoutAdmission(input: {
 }
 
 function hasInstalledGuestCheckoutRoutes(runtime: RuntimeGuestCheckoutMetadata, inStore: boolean): boolean {
-  // A Registry install has a Registry manifest; the playground installs Commerce's Registry build in the
-  // visitor's store under the same id (template-one-build-registry-20261031), without one.
+  // Runtime Registry installs have a cached manifest. The playground and the
+  // Backroad Bum merchant profile mount Registry-format sandbox builds at build
+  // time instead. EmDash's full API runtime reports no *runtime-installed*
+  // settings schema for those; its public route metadata remains authoritative.
+  // Keep the generic manifest check, and require full route metadata before the
+  // explicit merchant build can use this exception (never a native fallback).
+  const merchantBuildTime = process.env.BACKROADBUM_MERCHANT_PROFILE === "1" &&
+    typeof runtime.getPluginRouteMeta === "function";
   if (
-    !inStore &&
+    !inStore && !merchantBuildTime &&
     typeof runtime.getRuntimePluginSettingsSchema === "function" &&
     runtime.getRuntimePluginSettingsSchema(COMMERCE_REGISTRY_RUNTIME_ID) === null
   ) {

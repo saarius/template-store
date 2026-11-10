@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { merchantCheckoutClosed, merchantCheckoutPath, merchantOperator } from '../../src/features/guest-cart/merchant-policy.js';
-import { acquireGuestCheckoutAdmission } from '../../src/features/guest-cart/checkout-admission.js';
+import { acquireGuestCheckoutAdmission, canDispatchInstalledGuestCheckout, CHECKOUT_READINESS_SCHEMA } from '../../src/features/guest-cart/checkout-admission.js';
 afterEach(() => vi.unstubAllEnvs());
 describe('private merchant checkout rollout', () => {
   it('defaults closed for this profile, without changing generic stores', () => {
@@ -16,6 +16,30 @@ describe('private merchant checkout rollout', () => {
     for (const action of ['prepare', 'start', 'status', 'readiness']) expect(merchantCheckoutPath('/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/' + action)).toBe(true);
     expect(merchantCheckoutPath('/api/checkout/status')).toBe(true);
     for (const path of ['/cart', '/api/guest-cart/snapshot', '/shop']) expect(merchantCheckoutPath(path)).toBe(false);
+  });
+  it('admits the merchant build-time sandbox on API requests, not only anonymous pages', async () => {
+    vi.stubEnv('BACKROADBUM_MERCHANT_PROFILE', '1');
+    vi.stubEnv('BACKROADBUM_CHECKOUT_ENABLED', '1');
+    const runtime = {
+      getRuntimePluginSettingsSchema: () => null,
+      getPluginRouteMeta: (_id: string, path: string) => ({ public: true, methods: [path.endsWith('readiness') ? 'GET' : 'POST'] }),
+      handlePublicPluginApiRoute: vi.fn(async () => ({ success: true, data: { schema: CHECKOUT_READINESS_SCHEMA, status: 'supported', mode: 'test' } })),
+    };
+    const request = new Request('https://backroadbum.com/cart');
+    expect(await acquireGuestCheckoutAdmission({ runtime, request })).not.toBeNull();
+    expect(canDispatchInstalledGuestCheckout({ runtime, request })).toBe(true);
+    // No runtime manifest is still an error for ordinary installations.
+    vi.stubEnv('BACKROADBUM_MERCHANT_PROFILE', '0');
+    expect(await acquireGuestCheckoutAdmission({ runtime, request })).toBeNull();
+    expect(canDispatchInstalledGuestCheckout({ runtime, request })).toBe(false);
+  });
+  it('never substitutes the merchant flag for public POST metadata', () => {
+    vi.stubEnv('BACKROADBUM_MERCHANT_PROFILE', '1');
+    const dispatch = async () => ({ success: true });
+    for (const meta of [null, { public: false, methods: ['POST'] }, { public: true, methods: ['GET'] }]) {
+      expect(canDispatchInstalledGuestCheckout({ runtime: { getRuntimePluginSettingsSchema: () => null, getPluginRouteMeta: () => meta, handlePublicPluginApiRoute: dispatch } })).toBe(false);
+    }
+    expect(canDispatchInstalledGuestCheckout({ runtime: { getRuntimePluginSettingsSchema: () => null, handlePublicPluginApiRoute: dispatch } })).toBe(false);
   });
   it('does not advertise checkout or spend readiness calls before the operator opens it', async () => {
     vi.stubEnv('BACKROADBUM_MERCHANT_PROFILE', '1');
