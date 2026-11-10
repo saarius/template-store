@@ -24,7 +24,7 @@ Fresh deployment, November 9, 2026. No pre-existing store content, photography, 
 
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
-- Show authoritative commerce facts, never a second price list.
+- Show authoritative commerce facts, including Orders-assigned receipt numbers, never a second price list or a locally invented order label.
 - Keep test instructions findable and separate from editorial storytelling.
 - Treat failure and recovery as part of the product.
 - Keep operational evidence public-safe and truthful.

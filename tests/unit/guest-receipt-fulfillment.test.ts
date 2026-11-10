@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { confirmedOrderHeading } from "../../src/features/guest-cart/guest-cart-client.js";
 import { guestCheckoutWire, parseGuestCheckoutWireResult, parseGuestOrderFulfillment } from "../../src/features/guest-cart/checkout-protocol.js";
 const completed = { status: "completed", completedAt: "2026-11-10T01:00:00.000Z", carrier: "Demo carrier", tracking: "TEST-NOT-A-SHIPMENT" };
 function wire(fulfillment: unknown) {
@@ -8,6 +9,26 @@ function wire(fulfillment: unknown) {
       lines: [{ catalogItemId: "mug", quantity: 1 }], total: { currency: "USD", minor: "2200" } }, retryAfter: null,
   } };
 }
+describe("canonical receipt number", () => {
+  it("keeps the Orders number through parsing, relay and display without deriving it from an ID", () => {
+    const value = wire(completed);
+    const parsed = parseGuestCheckoutWireResult({ ...value, checkout: { ...value.checkout, order: { ...value.checkout.order, number: 1004 } } });
+    if (!parsed?.ok) throw Error("fixture must parse");
+    expect(parsed.checkout.order?.number).toBe(1004);
+    const relayed = parseGuestCheckoutWireResult({ ...parsed, checkout: guestCheckoutWire(parsed.checkout) });
+    if (!relayed?.ok || !relayed.checkout.order) throw Error("relay must parse");
+    expect(confirmedOrderHeading(relayed.checkout.order)).toBe("Order #1004");
+    expect(relayed.checkout.order.orderId).toBe("order:fixture");
+  });
+  it.each([undefined, null, "1004", 0, -1, 1004.5, Number.MAX_SAFE_INTEGER + 1])("omits invalid optional number %j and keeps the canonical ID fallback", number => {
+    const value = wire(completed);
+    const parsed = parseGuestCheckoutWireResult({ ...value, checkout: { ...value.checkout, order: { ...value.checkout.order, number } } });
+    if (!parsed?.ok || !parsed.checkout.order) throw Error("paid receipt remains valid");
+    expect(parsed.checkout.order.number).toBeUndefined();
+    expect(confirmedOrderHeading(parsed.checkout.order)).toBe("Order fixture");
+  });
+});
+
 describe("guest receipt fulfillment", () => {
   it("preserves current completion through the server status relay and browser parser", () => {
     const parsed = parseGuestCheckoutWireResult(wire(completed));

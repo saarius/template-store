@@ -1109,6 +1109,12 @@ export function resolveConfirmedOrderDestination(
   };
 }
 
+export function confirmedOrderHeading(order: { orderId: string; number?: number }): string {
+  return Number.isSafeInteger(order.number) && order.number! > 0
+    ? `Order #${order.number}`
+    : `Order ${order.orderId.replace(/^order:/u, "")}`;
+}
+
 export function confirmedOrderMarkup(
   root: HTMLElement,
   result: GuestCheckoutWireResult,
@@ -1119,7 +1125,7 @@ export function confirmedOrderMarkup(
   const order = result.checkout.order!;
   const orderNumber = root.querySelector("[data-guest-checkout-order-number]");
   if (orderNumber instanceof HTMLElement) {
-    orderNumber.textContent = `Order ${order.orderId.replace(/^order:/u, "")}`;
+    orderNumber.textContent = confirmedOrderHeading(order);
   }
   const testBadge = root.querySelector("[data-guest-checkout-test]");
   if (testBadge instanceof HTMLElement) {

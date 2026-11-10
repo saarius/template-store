@@ -78,6 +78,7 @@ export type GuestCheckoutProjection = Readonly<{
   order: Readonly<{
     orderId: string;
     receiptId: string;
+    number?: number;
     lines: readonly GuestCheckoutOrderLine[];
     total?: GuestCheckoutMoney;
     test?: boolean;
@@ -344,6 +345,7 @@ function projectCheckout(value: unknown): GuestCheckoutProjection | null {
       ...(fulfillment ? { fulfillment } : {}),
       orderId: value.order.orderId,
       receiptId: value.order.receiptId,
+      ...(Number.isSafeInteger(rawOrder.number) && (rawOrder.number as number) > 0 ? { number: rawOrder.number as number } : {}),
       lines,
       ...(total ? { total } : {}),
       ...(typeof rawOrder.test === "boolean" ? { test: rawOrder.test } : {}),
@@ -399,6 +401,7 @@ export function guestCheckoutWire(checkout: GuestCheckoutProjection) {
     order: order && {
       orderId: order.orderId,
       receiptId: order.receiptId,
+      ...(order.number === undefined ? {} : { number: order.number }),
       lines: order.lines.map(({ id, quantity, name, variant, imageUrl, imageAlt, sku, unitPrice }) => ({
         catalogItemId: id, quantity,
         ...(name ? { name } : {}),

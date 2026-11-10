@@ -12,6 +12,8 @@ const publicStore = process.argv.includes('--public');
 const fulfillment = process.argv.find(value => value.startsWith('--fulfillment='))?.slice('--fulfillment='.length);
 if (fulfillment && !['processing', 'completed'].includes(fulfillment)) throw Error('Unknown fulfillment expectation');
 const statePath = process.argv.find(value => value.startsWith('--state-file='))?.slice('--state-file='.length);
+const expectedNumber = process.argv.find(value => value.startsWith('--order-number='))?.slice('--order-number='.length);
+if (expectedNumber && !/^[1-9]\d*$/u.test(expectedNumber)) throw Error('Invalid order number expectation');
 const captureDir = 'runs/backroadbum/shopper-status';
 if (capture) mkdirSync(captureDir, { recursive: true });
 const report = { checkedAt: new Date().toISOString(), surface: publicStore ? 'public-store' : 'private-preview', viewportChecks: [] };
@@ -27,6 +29,7 @@ try {
       await page.locator('[data-guest-checkout-order]').waitFor({ state: 'visible' });
       assert.equal(await page.locator('[data-guest-checkout-test]').isVisible(), true);
       const order = await page.locator('[data-guest-checkout-order-number]').innerText();
+      if (expectedNumber) assert.equal(order, `Order #${expectedNumber}`);
       stableOrder ??= order;
       assert.equal(order, stableOrder);
       assert.match(await page.locator('[data-guest-checkout-order-items]').innerText(), /Creekside Camp Mug × 1/);
@@ -59,7 +62,7 @@ try {
       await page.locator('[data-guest-checkout-order]').waitFor({ state: 'visible' });
       assert.equal(await page.locator('[data-guest-checkout-order-number]').innerText(), stableOrder);
       assert.equal(page.url(), 'https://backroadbum.com/checkout/success');
-      report.viewportChecks.push({ width, paidReceipt: true, footerRecovery: true, cartRecovery: true, credentialFreeUrl: true, testLabel: true, reloadStable: true, purchasedCartSettled: true, noOverflow: true,
+      report.viewportChecks.push({ width, paidReceipt: true, canonicalShortNumber: /^Order #\d+$/u.test(order), footerRecovery: true, cartRecovery: true, credentialFreeUrl: true, testLabel: true, reloadStable: true, purchasedCartSettled: true, noOverflow: true,
         ...(fulfillment ? { fulfillment, syntheticTrackingOnly: fulfillment === 'completed' } : {}) });
     } finally { await shopper.browser.close(); }
   }
