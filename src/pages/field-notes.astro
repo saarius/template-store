@@ -12,9 +12,9 @@ try {
 <BackroadPage title="Field notes" description="Practical notes for unhurried weekends: packing, planning and taking care of the places you visit.">
   <section class="brb-page"><h1>Leave a little room<br />for the long way.</h1><p class="lead">Practical notes for unhurried weekends. Less conquering the outdoors. More paying attention to it.</p>
     <img class="brb-photo" src="/backroad/forest.jpg" alt="A still lake reflecting the surrounding forest and mountains" width="1600" height="1067" />
-    <div class="field-index" aria-label="Published field notes">
+    <section class="field-index" aria-label="Published field notes">
       {unavailable ? <div role="status"><h2>The notes couldn’t load.</h2><p>Try reloading this page in a moment. You can still <a href="/shop">browse the gear</a>.</p></div> : notes.length > 0 ? notes.map(note => <a class="brb-story-link" href={`/${note.slug}`}><h2>{note.title}</h2>{note.excerpt && <p>{note.excerpt}</p>}<span>Read the note &rarr;</span></a>) : <p>No field notes are published yet. <a href="/shop">Take a look at the gear</a> while we get the next one ready.</p>}
-    </div>
+    </section>
     <p class="photo-credit">Forest photograph via <a href="https://images.unsplash.com/photo-1473448912268-2022ce9509d8" rel="noopener">Unsplash</a>. Product designs and field notes by Backroad Bum.</p>
   </section>
 </BackroadPage>
