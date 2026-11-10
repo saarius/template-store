@@ -1,0 +1,7 @@
+# Imported inside the site before the storefront catch-all.
+# Owner Steer 1: signed Registry plugins use hosted DinkusKit services.
+# Keep former local issuer/payment/practice-shipping routes explicitly closed.
+@retired_merchant_routes path /.well-known/jwks.json /api/store-passes /api/commerce-settings /api/commerce-ship /v1/checkout-binding /v1/existing-binding /v1/checkout/session /v1/checkout/lookup /v1/checkout/wakes /v1/checkout/wakes/ack /v1/webhooks/stripe /api/ship /api/ship/*
+handle @retired_merchant_routes {
+ respond "" 404
+}
