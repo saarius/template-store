@@ -91,6 +91,7 @@ try {
       await expect(page.locator('[data-product-selection-notice]')).toBeVisible();
       await expect(page.locator('[data-product-price]')).toBeHidden();
       await expect(page.locator('[data-add-to-cart]')).toBeDisabled();
+      await expect(page.locator('[data-add-to-cart]')).toHaveText('Choose an option');
       const metadata = JSON.parse(await page.locator('[data-product-jsonld]').textContent());
       expect(metadata.offers).toBeUndefined(); expect(metadata.sku).toBeUndefined();
     }
@@ -125,6 +126,7 @@ try {
     await expect(page.locator('[data-product-price]')).toBeHidden();
     await expect(page.locator('[data-add-to-cart]')).toBeDisabled();
     await expect(page.locator('[data-product-selection-notice]')).toBeVisible();
+    await expect(page.locator('[data-add-to-cart]')).toHaveText('Choose an option');
     results.push({ noJavaScriptServerSelection: true, staleServerSelectionClosed: true });
   } finally { await context.close(); }
   await writeFile(new URL('verification.json', out), JSON.stringify(results, null, 2));

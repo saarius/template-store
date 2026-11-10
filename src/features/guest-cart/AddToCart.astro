@@ -5,11 +5,12 @@ import type { PublicCommerceProduct, PublicCommerceVariant } from "../commerce-c
 interface Props {
   product: PublicCommerceProduct;
   variants?: readonly PublicCommerceVariant[];
+  selectionRequired?: boolean;
 }
 
-const { product, variants = [] } = Astro.props;
+const { product, variants = [], selectionRequired = false } = Astro.props;
 const sellableVariants = variants.filter((member) => member.availability.sellable);
-const singleSellable = canAddCommerceProductToCart(product);
+const singleSellable = !selectionRequired && canAddCommerceProductToCart(product);
 const allowed = singleSellable || sellableVariants.length > 0;
 const qtyInputId = `guest-cart-add-qty-${product.id}`;
 ---
@@ -49,7 +50,7 @@ const qtyInputId = `guest-cart-add-qty-${product.id}`;
         data-add-to-cart={product.id}
         data-add-to-cart-sellable={String(singleSellable)}
         disabled={!singleSellable}
-      >{singleSellable ? "Add to cart" : variants.length && !variants.some(member => member.id === product.id) ? "Choose an option" : "Sold out"}</button>
+      >{singleSellable ? "Add to cart" : selectionRequired ? "Choose an option" : "Sold out"}</button>
     </div>
     <div class="guest-cart-add__feedback">
       <p data-add-to-cart-status hidden role="status"></p>
