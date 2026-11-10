@@ -13,7 +13,7 @@ function artifact() {
   const manifest = { version: '0.3.1', capabilities: ['network:request'], allowedHosts: ['backroadbum.com'], storage: {}, hooks: [],
     routes: [{ name: 'admin', methods: ['POST'], public: false, permission: 'plugins:manage' }],
     admin: { settingsSchema: { connection: { type: 'secret' } }, pages: [{ path: '/shipping', label: 'Shipments' }] } };
-  const profile = { profile: 'backroadbum/ship-packing-v1', origin: 'https://backroadbum.com', mode: 'test', commerceConnected: false,
+  const profile = { profile: 'backroadbum/ship-practice-v2', origin: 'https://backroadbum.com', mode: 'test', commerceConnected: false,
     published: false, bytes: Buffer.byteLength(backend), sha256: hash(backend), artifactSha256: hash(backend, JSON.stringify(manifest)), allowedHosts: ['backroadbum.com'] };
   const save = () => { writeFileSync(join(dir, 'dist/plugin.mjs'), backend); writeFileSync(join(dir, 'dist/manifest.json'), JSON.stringify(manifest)); writeFileSync(join(dir, 'profile.json'), JSON.stringify(profile)); };
   save(); return { dir, backend, profile, manifest, save };
@@ -37,6 +37,7 @@ describe('merchant Ship composition', () => {
   });
   it('refuses live, shared-host, public/wider-route and plaintext-secret profiles even with matching hashes', () => {
     const mutations = [
+      (a: ReturnType<typeof artifact>) => { a.profile.profile = 'backroadbum/ship-packing-v1'; },
       (a: ReturnType<typeof artifact>) => { a.profile.mode = 'live'; },
       (a: ReturnType<typeof artifact>) => { a.profile.published = true; },
       (a: ReturnType<typeof artifact>) => { a.profile.commerceConnected = true; },

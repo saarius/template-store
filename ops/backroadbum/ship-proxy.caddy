@@ -1,12 +1,13 @@
 # Imported inside backroadbum.com's site block, before the storefront catch-all.
-# Exact bearer-authenticated reads and practice packing setup only; no order/label/print gateway.
+# Exact bearer-authenticated admin/packing/practice actions. No order-intake gateway.
+# PDF reads use the existing five-minute, site+label-scoped capability, not an owner session.
 # The issuer exposes only its existing public verification key, never private signing material.
 @merchant_issuer_jwks path /.well-known/jwks.json
 handle @merchant_issuer_jwks {
  reverse_proxy 127.0.0.1:8787
 }
 @merchant_ship_read {
- path /api/ship/v1/admin/status /api/ship/v1/admin/orders
+ path /api/ship/v1/admin/status /api/ship/v1/admin/orders /api/ship/v1/admin/practice-order
  method GET
 }
 handle @merchant_ship_read {
@@ -18,6 +19,22 @@ handle @merchant_ship_read {
  method GET POST
 }
 handle @merchant_ship_packing {
+ uri strip_prefix /api/ship
+ reverse_proxy 127.0.0.1:8788
+}
+@merchant_ship_label {
+ path /api/ship/v1/admin/practice-label
+ method POST
+}
+handle @merchant_ship_label {
+ uri strip_prefix /api/ship
+ reverse_proxy 127.0.0.1:8788
+}
+@merchant_ship_print {
+ path_regexp merchant_print ^/api/ship/print/[A-Za-z0-9_.-]{1,2048}$
+ method GET
+}
+handle @merchant_ship_print {
  uri strip_prefix /api/ship
  reverse_proxy 127.0.0.1:8788
 }
