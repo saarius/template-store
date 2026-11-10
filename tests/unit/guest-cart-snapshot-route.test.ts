@@ -32,7 +32,7 @@ describe("guest cart snapshot route", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Cache-Control")).toBe("no-store");
     expect(collection).toHaveBeenCalledWith("products", { status: "published" });
-    expect((await response.json()).products[0]).toMatchObject({ id: "bandana", sku: "BRB-BANDANA", productPath: "/products/switchback-bandana", price: product.price });
+    expect((await response.json()).products[0]).toMatchObject({ id: "bandana", sku: "BRB-BANDANA", productPath: "/products/switchback-bandana?item=bandana", price: product.price });
   });
   it("keeps prices and plain names when the CMS lookup fails or has no published match", async () => {
     for (const failure of [true, false]) {

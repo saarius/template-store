@@ -1,9 +1,11 @@
 import type { CommerceCatalogSnapshot } from "../commerce-catalog/index.js";
+import { isSafeGuestCartProductId } from "./intent.js";
 
-/** Only canonical, same-origin product paths may reach browser markup. */
+/** Only same-origin product paths and one explicit cart item may reach markup. */
 export function safeCartProductPath(value: unknown): string | null {
-  return typeof value === "string" && value === value.trim() && /^\/products\/[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(value)
-    ? value : null;
+  if (typeof value !== "string" || value !== value.trim()) return null;
+  const match = /^(\/products\/[a-z0-9]+(?:-[a-z0-9]+)*)(?:\?item=([A-Za-z0-9._-]+))?$/u.exec(value);
+  return match && (match[2] === undefined || isSafeGuestCartProductId(match[2])) ? value : null;
 }
 
 /** Entries must come from EmDash's published collection, never a draft query. */
@@ -19,10 +21,14 @@ export function attachCartProductPaths(
     // An ambiguous CMS link is not a destination we can promise.
     paths.set(pageId, paths.has(pageId) ? null : path);
   }
-  return snapshots.map(snapshot => ({
-    ...snapshot,
-    productPath: snapshot.found && snapshot.page &&
+  return snapshots.map(snapshot => {
+    const path = snapshot.found && snapshot.page &&
       (snapshot.price.listable || snapshot.availability.listable)
-      ? paths.get(snapshot.page) ?? null : null,
-  }));
+      ? paths.get(snapshot.page) ?? null : null;
+    return {
+      ...snapshot,
+      // The item is public Commerce identity, never a label or saved price.
+      productPath: path && isSafeGuestCartProductId(snapshot.id) ? `${path}?item=${snapshot.id}` : null,
+    };
+  });
 }

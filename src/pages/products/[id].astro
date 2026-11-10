@@ -19,6 +19,7 @@ import { allowsProductJsonLd, canonicalUrl, jsonLdScript } from "../../features/
 import { availabilityLabels } from "../../features/commerce-catalog/index.js";
 import { demoPlaceholderImage } from "../../features/playground/demo-products.js";
 import { variantPickerView, NO_OFFER_JSON_LD_KEY, type VariantPickerMember } from "../../features/store-shell/variant-picker.js";
+import { productSelection } from "../../features/store-shell/product-selection.js";
 import { STORE_TITLE, categoryPath, loadStorefrontRouteContext, productPath } from "../../features/store-shell/index.js";
 import { hydrateProductCollectionMembership, productPageOffersCart, readProductEntries } from "../../features/store-shell/product-routes.js";
 import { leftCommerceCatalog } from "../../features/store-shell/merch-catalog.js";
@@ -103,7 +104,8 @@ const checkoutEnabled = playgroundCheckoutConfigured(playgroundEnvOf(Astro.local
 const offersCart = productPageOffersCart({ profile, isPlayground, isDemo, checkoutEnabled });
 const sandboxCheckout = showsSandboxCheckoutNotice({ profile, isPlayground, isDemo, checkoutEnabled });
 const variants = linkedProduct?.variants ?? [];
-const selectedVariant = variants.find((member) => member.availability.sellable) ?? variants[0] ?? null;
+const selection = productSelection(variants, Astro.url.searchParams);
+const selectedVariant = selection.member;
 // One picker per option (Color, then Size), like Shopify or WooCommerce
 // product pages. The browser matches the picked values to one member.
 const variantOptions = [...new Set(variants.flatMap((member) => member.selections.map(([option]) => option)))]
@@ -121,8 +123,9 @@ const variantMembers: VariantPickerMember[] = variants.map((member) => ({
   sellable: member.availability.sellable,
 }));
 const initialPicker = variantPickerView(variantMembers, Object.fromEntries(selectedVariant?.selections ?? []));
-const cartProduct = linkedProduct && selectedVariant
-  ? { ...linkedProduct, id: selectedVariant.id, availability: { ...selectedVariant.availability, listable: true } }
+const cartProduct = linkedProduct && variants.length
+  ? { ...linkedProduct, id: selectedVariant?.id ?? linkedProduct.id,
+    availability: selectedVariant ? { ...selectedVariant.availability, listable: true } : { ...linkedProduct.availability, sellable: false } }
   : linkedProduct;
 const linkedStatus = selectedVariant?.availability.status ?? linkedProduct?.availability.status;
 // A configured playground admits its sandbox checkout, as the cart page does.
@@ -144,7 +147,7 @@ const purchasable = Boolean(cartProduct) && linkedProductPurchasable({
 const productName = linkedProduct?.name.trim() || item?.title;
 const managed = item?.availabilitySource === "managed" ? demonstrations?.managed ?? null : null;
 const unmanaged = item?.availabilitySource === "unmanaged" ? demonstrations?.unmanaged ?? null : null;
-const status = linkedStatus ? availabilityLabels[linkedStatus] ?? "Availability unavailable" : managed ? `${managed.inventory.available} available` : unmanaged ? ({
+const status = selection.stale ? "Choose an option" : linkedStatus ? availabilityLabels[linkedStatus] ?? "Availability unavailable" : managed ? `${managed.inventory.available} available` : unmanaged ? ({
   "in-stock": "In stock", "out-of-stock": "Out of stock", "available-on-backorder": "Available on backorder",
   "availability-unavailable": "Availability unavailable", "low-stock": "Low stock",
 } as Record<string, string>)[unmanaged.storefront.status] ?? "Availability unavailable" : "Preview only · not purchasable";
@@ -155,6 +158,10 @@ const productCanonical = item
 // The browser only selects a prepared block; it never recalculates an Offer.
 const selectedProductJsonLd = (variant: (typeof variants)[number] | null) => {
   if (!linkedProduct || !item || !productName) return null;
+  if (variants.length && !variant) return buildProductPreviewJsonLd({
+    url: productCanonical, name: productName,
+    ...(item.description ? { description: item.description } : {}),
+  });
   return linkedProductJsonLd(linkedProduct, {
     url: productCanonical,
     name: productName,
@@ -216,7 +223,8 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
             {linkedProduct?.gtin && <p class="product-detail__identifier" data-product-gtin={linkedProduct.gtin}>GTIN {linkedProduct.gtin}</p>}
             {linkedProduct?.mpn && <p class="product-detail__identifier" data-product-mpn={linkedProduct.mpn}>MPN {linkedProduct.mpn}</p>}
             {linkedProduct?.brand && <p class="product-detail__identifier" data-product-brand={linkedProduct.brand}>Brand {linkedProduct.brand}</p>}
-            {linkedProduct && <p class="product-detail__price" data-product-price>{linkedProduct.price.saleText ? <><s data-regular-price>{linkedProduct.price.regularText}</s> <strong data-sale-price>{linkedProduct.price.saleText}</strong></> : <strong data-regular-price data-variant-price>{selectedVariant?.priceText ?? linkedProduct.price.regularText}</strong>}</p>}
+            {linkedProduct && <p class="product-detail__price" data-product-price hidden={selection.stale}>{linkedProduct.price.saleText ? <><s data-regular-price>{linkedProduct.price.regularText}</s> <strong data-sale-price>{linkedProduct.price.saleText}</strong></> : <strong data-regular-price data-variant-price>{selectedVariant?.priceText ?? linkedProduct.price.regularText}</strong>}</p>}
+            {selection.stale && <p class="product-detail__notice" data-product-selection-notice role="status">That saved option is no longer available. Choose from the options below before adding to your cart.</p>}
             {variantOptions.map((option, index) => <fieldset class="product-variants" data-product-variants data-variant-option={option.label}>
               <legend>{option.label}</legend>
               {option.values.map((value) => <label class="product-variant">
@@ -246,6 +254,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
   // Variant pickers: match the picked values to one Commerce member, then show
   // its price and availability and point the single Add to cart at it.
   import { variantPickerView, NO_OFFER_JSON_LD_KEY, type VariantPickerMember } from "../../features/store-shell/variant-picker.ts";
+  import { productSelectionUrl } from "../../features/store-shell/product-selection.ts";
   const productJsonLd = document.querySelector<HTMLScriptElement>("[data-product-jsonld]");
   const variantJsonLdData = document.querySelector<HTMLScriptElement>("[data-variant-product-jsonld]");
   const variantJsonLd = JSON.parse(variantJsonLdData?.textContent ?? "{}") as Record<string, unknown>;
@@ -258,6 +267,10 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
     for (const input of choices) {
       input.dataset.variantSoldOut = String(view.soldOut[input.dataset.variantOption ?? ""]?.[input.value] ?? true);
     }
+    // Copy/reload keeps this selection; no navigation, history entry or cart mutation.
+    try { history.replaceState(history.state, "", productSelectionUrl(location.href, view.member?.id ?? null)); } catch {}
+    const selectionNotice = document.querySelector<HTMLElement>("[data-product-selection-notice]");
+    if (selectionNotice) selectionNotice.hidden = true;
     const priceRow = document.querySelector<HTMLElement>("[data-product-price]");
     const price = document.querySelector("[data-variant-price]");
     if (priceRow) priceRow.hidden = view.price === null;

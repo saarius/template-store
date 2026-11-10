@@ -2,7 +2,7 @@
 version: 1
 slug: "repos-template-store-src-pages-products-id-astro"
 primary_target: "src/pages/products/[id].astro"
-related_targets: ["src/features/store-shell/RelatedGear.astro"]
+related_targets: ["src/features/store-shell/RelatedGear.astro", "src/features/guest-cart/product-links.ts", "src/features/store-shell/product-selection.ts"]
 ---
 
 # Product inspection & onward discovery
@@ -22,5 +22,8 @@ FORM: Local extension of the established product page; no identity or compositio
 
 FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
 
+## Cart selection continuity · November 10
+Observed a saved L cart line reopening with M selected. Restore a current Commerce member through `?item=` in server HTML; preserve sold-out selections, keep the canonical parent URL and never mutate the cart on inspection. Picker changes replace the current URL rather than adding history entries. Stale/foreign/duplicate requests start with no choice or price/Offer and a short sentence before the native option controls; choosing a current option clears it without moving focus. No new visual world, claims or imagery.
+
 ## Verification
-Inspect desktop1440 and phone390. Check shared memberships, duplicate removal, self exclusion, bounds, no resurrection of unlinked/removed products, preserved sale/availability references, and unavailable/empty outcomes. Browser proof follows related gear to a product and back to its collection; an optional cart check adds/removes one item but never starts checkout. No new raster assets.
+Check cart → L, reload, copied URLs, sold-out XL, empty/removed/duplicate selection recovery, canonical metadata, preserved cart state and no-JavaScript initial HTML. Inspect desktop1440 and phone390. Check shared memberships, duplicate removal, self exclusion, bounds, no resurrection of unlinked/removed products, preserved sale/availability references, and unavailable/empty outcomes. Browser proof follows related gear to a product and back to its collection; an optional cart check adds/removes one item but never starts checkout. No new raster assets.
