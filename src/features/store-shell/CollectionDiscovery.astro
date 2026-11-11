@@ -1,0 +1,23 @@
+---
+import { collectionIntroductions, type ShopCollection } from './backroad-collections.js';
+import { canonicalCategoryPath } from './product-routes.js';
+interface Props { collections: readonly ShopCollection[]; unavailable?: boolean }
+const { collections, unavailable = false } = Astro.props;
+const introductions = collectionIntroductions(collections, unavailable);
+---
+{introductions.length > 0 && <section class="collection-discovery" aria-label="Shop by collection" data-collection-discovery>
+  {introductions.map(collection => <article>
+    <h2><a href={canonicalCategoryPath(collection.slug)}>{collection.title}</a></h2>
+    {collection.description && <p>{collection.description}</p>}
+  </article>)}
+</section>}
+<style>
+.collection-discovery{width:min(70rem,calc(100% - 2rem));margin:3rem auto 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2.5rem}
+.collection-discovery article{min-width:0;padding:1.25rem 0 0;border-top:1px solid var(--store-line)}
+.collection-discovery h2{margin:0;font-size:clamp(1.65rem,3vw,2.4rem);line-height:1.15;letter-spacing:-.025em}
+.collection-discovery a{display:inline-flex;align-items:center;min-height:48px;color:inherit;text-decoration-thickness:1px;text-underline-offset:.2em}
+.collection-discovery a:hover{text-decoration-thickness:2px}
+.collection-discovery a:focus-visible{outline:3px solid var(--store-focus-ring);outline-offset:4px}
+.collection-discovery p{max-width:48ch;margin:.5rem 0 0;color:var(--store-muted);line-height:1.6;overflow-wrap:anywhere}
+@media(max-width:40rem){.collection-discovery{grid-template-columns:1fr;gap:1.5rem;margin-top:2rem}}
+</style>

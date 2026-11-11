@@ -2,13 +2,13 @@
   {
     "slug": "road-day",
     "title": "Road day",
-    "description": "An everyday tee, a canvas cap and a tote for the unplanned stop. Leave a little room for what you find along the way.",
+    "description": "A quick coffee, a promising turnoff, one more stop before home. Everyday pieces for the hours between here and there.",
     "products": ["wrong-turn-tee", "long-way-cap", "glovebox-field-tote"]
   },
   {
     "slug": "slow-camp",
     "title": "Slow camp",
-    "description": "Coffee in the open air. One more evening outside. A mug, a comfort layer and a tote to carry the small things home.",
+    "description": "Coffee while the morning warms up. A layer for the last light. Small comforts for an evening with nowhere else to be.",
     "products": ["creekside-camp-mug", "last-light-fleece", "glovebox-field-tote"]
   }
 ]

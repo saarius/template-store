@@ -8,6 +8,8 @@ import { legacyPortableTextComponents } from "../features/store-shell/portable-t
 import UnknownBlock from "../features/store-shell/blocks/UnknownBlock.astro";
 
 import CommerceCatalog from "../features/commerce-catalog/CommerceCatalog.astro";
+import CollectionDiscovery from "../features/store-shell/CollectionDiscovery.astro";
+import { shopCollections } from "../features/store-shell/backroad-collections.js";
 import { readCommerceCatalog } from "../features/commerce-catalog/index.js";
 import { acquireGuestCheckoutAdmission } from "../features/guest-cart/checkout-admission.js";
 import { playgroundCheckoutAdmission, playgroundCheckoutConfigured, playgroundEnvOf } from "../features/playground-checkout/index.js";
@@ -36,6 +38,7 @@ if (productLinks.errors.length > 0) {
   console.error(`[product-url] excluded published product entries: ${productLinks.errors.join("; ")}`);
 }
 const productPaths = new Map(productLinks.products.map((product) => [product.commerceItemId, canonicalProductPath(product.slug)]));
+const { groups: collections } = shopCollections(products.entries, categoryEntries.entries, commerceProducts);
 const isPlayground = Boolean((Astro.locals as { __playgroundDb?: unknown }).__playgroundDb);
 // A configured playground admits its sandbox checkout, as the cart page does.
 const checkoutAvailable = Boolean(playgroundCheckoutAdmission(isPlayground, playgroundCheckoutConfigured(playgroundEnvOf(Astro.locals)))) ||
@@ -89,6 +92,7 @@ if (!composed && import.meta.env.DEV) {
           </section>
         )
       }
+      <CollectionDiscovery collections={collections} unavailable={catalogUnavailable} />
       <section class="catalog-guidance" data-catalog-guidance data-catalog-guidance-state={guidanceState} aria-label="How to use this store">
         <strong>{guidance.heading}</strong>
         <p>{guidance.detail}</p>

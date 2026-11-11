@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { PublicCommerceProduct } from '../../src/features/commerce-catalog/index.js';
-import { relatedShopProducts, shopCollections } from '../../src/features/store-shell/backroad-collections.js';
+import { collectionIntroductions, relatedShopProducts, shopCollections } from '../../src/features/store-shell/backroad-collections.js';
 
 const categories = [
   { id: 'road-day', data: { title: 'Road day', description: 'Room for the unplanned stop.' } },
@@ -15,6 +15,31 @@ const item = (slug: string) => ({
 }) as PublicCommerceProduct;
 
 describe('Backroad Bum collection projection', () => {
+  it('introduces only nonempty current collections using CMS copy, without sale facts', () => {
+    const { groups } = shopCollections([page('tote', ['road-day', 'slow-camp'])], categories, [item('tote')]);
+    expect(collectionIntroductions(groups)).toEqual([
+      { slug: 'road-day', title: 'Road day', description: 'Room for the unplanned stop.' },
+      { slug: 'slow-camp', title: 'Slow camp', description: 'One more evening outside.' },
+    ]);
+    expect(groups.find(group => group.slug === 'empty')).toBeDefined();
+  });
+  it('omits secondary discovery on catalog failure, leaving the main catalog to report the error', () => {
+    const { groups } = shopCollections([page('cap')], categories, [item('cap')]);
+    const before = structuredClone(groups);
+    expect(collectionIntroductions(groups, true)).toEqual([]);
+    expect(groups).toEqual(before);
+    expect(collectionIntroductions([], false)).toEqual([]);
+  });
+  it('does not treat out-of-stock as an empty collection or invent absent editorial copy', () => {
+    const product = { ...item('cap'), availability: { status: 'out-of-stock' } } as PublicCommerceProduct;
+    const { groups } = shopCollections([page('cap')], [{ id: 'road-day', data: { title: 'Road day' } }], [product]);
+    expect(collectionIntroductions(groups)).toEqual([{ slug: 'road-day', title: 'Road day', description: '' }]);
+    expect(groups[0].products[0]).toBe(product);
+  });
+  it('does not introduce a collection whose only member lost its published Commerce page', () => {
+    const { groups } = shopCollections([page('archived')], categories, [item('not-linked')]);
+    expect(collectionIntroductions(groups)).toEqual([]);
+  });
   it('selects published memberships and preserves authoritative Commerce price and availability objects', () => {
     const tote = item('tote');
     const cap = item('cap');

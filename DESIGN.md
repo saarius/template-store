@@ -41,6 +41,12 @@ typography:
     fontSize: "1.25rem"
     fontWeight: 600
     lineHeight: 1.6
+  collection-title:
+    fontFamily: "Barlow Semi Condensed, sans-serif"
+    fontSize: "clamp(1.65rem, 3vw, 2.4rem)"
+    fontWeight: 600
+    lineHeight: 1.15
+    letterSpacing: "-0.025em"
   compact-product-title:
     fontFamily: "Barlow Semi Condensed, sans-serif"
     fontSize: "1.5rem"
@@ -117,6 +123,8 @@ Keep the primary product illustration, CMS summary, price, availability and yell
 A compact uppercase wordmark and short plain-language links. The cart remains visible on phones. Current-page and hover states use underlines, not color alone.
 
 ### Shopping collections
+Homepage discovery puts the current nonempty published collections between the hero and full catalog: two plain, ruled columns on desktop, stacked on phones. The collection name is an underlined heading link with a 48px target and visible keyboard focus; its EmDash description follows without added counts, copied prices, cards or illustration. Catalog failure omits this secondary surface while the main catalog reports the error. Keep empty collections off this shortlist without treating a sold-out product as absent.
+
 The shop and collection pages share a wrapping row of ordinary links, not JavaScript tabs. All gear stays first; the current collection has a strong underline. Counts reflect only published, linked Commerce products; descriptions and membership come from EmDash. Empty collections remain addressable but stay out of navigation unless current. A catalog failure shows an error, never a false empty count.
 
 ### Search

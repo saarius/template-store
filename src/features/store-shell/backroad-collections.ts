@@ -9,6 +9,16 @@ export type ShopCollection = {
   products: PublicCommerceProduct[];
 };
 
+/** Homepage introductions use published CMS copy and only nonempty current collections.
+ * Catalog failure is not evidence of an empty collection; the main catalog owns its error.
+ */
+export function collectionIntroductions(groups: readonly ShopCollection[], unavailable = false) {
+  if (unavailable) return [];
+  return groups.filter(group => group.products.length > 0).map(group => ({
+    slug: group.slug, title: group.title, description: group.description,
+  }));
+}
+
 /** Onward discovery is shared published membership, not a second recommendation catalog. */
 export function relatedShopProducts(currentId: string, groups: readonly ShopCollection[]) {
   const collections = groups.filter(group => group.products.some(product => product.id === currentId));
