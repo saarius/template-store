@@ -7,7 +7,7 @@ await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const results = [];
 try {
-  for (const width of [1440, 390]) {
+  for (const width of [1440, 768, 390, 320]) {
     const context = await browser.newContext({ viewport: { width, height: 1000 }, reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
     const page = await context.newPage();
     const errors = [], checkout = [];
@@ -19,7 +19,29 @@ try {
     const view = page.locator('[data-add-to-cart-view]');
     const status = page.locator('[data-add-to-cart-status]');
     await expect(view).toBeHidden();
-    await page.getByRole('button', { name: 'Increase quantity', exact: true }).click();
+    const quantity = page.locator('[data-add-to-cart-qty]');
+    const decrease = page.getByRole('button', { name: 'Decrease quantity', exact: true });
+    const increase = page.getByRole('button', { name: 'Increase quantity', exact: true });
+    const stepper = page.locator('.guest-cart-add__stepper');
+    for (const control of [decrease, quantity, increase]) {
+      const bounds = await control.boundingBox();
+      expect(bounds.width).toBeGreaterThanOrEqual(48);
+      expect(bounds.height).toBeGreaterThanOrEqual(48);
+    }
+    await decrease.focus(); await page.keyboard.press('Enter');
+    await expect(quantity).toHaveValue('1'); // Existing lower clamp, no cart mutation.
+    for (const [name, control] of [['quantity', quantity], ['increase', increase], ['add', add]]) {
+      await page.keyboard.press('Tab'); await expect(control).toBeFocused();
+      if (name === 'add') continue;
+      expect(await control.evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
+      expect(await stepper.evaluate(el => getComputedStyle(el).overflow)).toBe('visible');
+      if (process.argv.includes('--capture')) {
+        await page.locator('.guest-cart-add').screenshot({ path: new URL(`${name}-focus-${width}.png`, output).pathname });
+      }
+    }
+    await quantity.fill('99'); await increase.click(); await expect(quantity).toHaveValue('99');
+    await quantity.fill('1');
+    await increase.click();
     await expect(page.locator('[data-add-to-cart-qty]')).toHaveValue('2');
     await add.click();
     await expect(status).toHaveText('Added to cart.');
@@ -63,6 +85,7 @@ try {
     expect(errors).toEqual([]); expect(checkout).toEqual([]);
     results.push({ width, savedAddition: true, keyboardCartHandoff: true, cartQuantity: 2, removed: true,
       invalidQuantityHasNoHandoff: true, correctedQuantityHasHandoff: true, failedSaveRetractsHandoff: true,
+      quantityTargetsAtLeast48px: true, keyboardQuantityOrder: true, unclippedQuantityFocus: true, boundsUnchanged: true,
       noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout.length });
     await context.close();
   }
