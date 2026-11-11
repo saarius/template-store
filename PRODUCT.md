@@ -10,6 +10,9 @@ Signed Registry Commerce0.8.0, Payments0.5.0 and Ship0.3.1 are unchanged and all
 ## Hosted basket review · November 11
 A read-only hosted settings visit confirms TEST/flat$5/free from$75. Public baskets on either side of the threshold produced matching Commerce/Stripe Test totals: $74+$5 and $76+$0. These were unpaid checkout sessions, not new orders or fulfillment. A separate M-and-L tee basket retained both selections in Commerce but showed identical name/quantity lines without sizes in Stripe; Commerce issue262 records the shopper-clarity gap. The existing variant contract kept PaymentRequest unchanged; no protocol change, fix or release is decided. Three guarded attempts are retained privately and must not be restarted to repeat this proof.
 
+## Native merchant pricing · November 11
+The bandana now has Regular $16 / Sale $14 in signed Commerce, saved through the native product panel. Public shop, collections, product/JSON-LD and previously open cart/checkout views use $14; the existing paid order1007 still shows its frozen $16 line and $21 total. No shopper-facing comparison or countdown is invented from the effective-price-only payload. A hosted Ship quote for the existing unlabelled order at3oz returned three sandbox rates without creating a label; order revision3 is unchanged.
+
 ## Shopper accounts · November 11
 The five public Commerce account routes now bypass Caddy's merchant Basic Auth, while Commerce's shopper capabilities still protect orders and profile writes. Real dogfooding reached `EMAIL_UNAVAILABLE`, so the merchant sign-in form stays paused until delivery is configured and verified; `/account` offers the browser-bound last checkout instead of collecting an unusable email. A separate read-only minute probe checks anonymous capability denial, not mail readiness. Existing sessions remain supported; no email-based recovery or new shopper session is claimed.
 
