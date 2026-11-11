@@ -1,4 +1,5 @@
-// Public smoke test during hosted migration (checkout deliberately closed). No admin sessions or orders.
+// Public smoke test with no admin session, checkout creation or payment.
+// Default requires open TEST checkout; --expect-closed verifies a deliberate pause.
 import { chromium, expect } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 const base = 'https://backroadbum.com';
@@ -6,6 +7,7 @@ const output = new URL('../runs/backroadbum/', import.meta.url);
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const results = [];
+const checkoutOpen = !process.argv.includes('--expect-closed');
 try {
   for (const [name, width] of [['desktop', 1440], ['mobile', 390]]) {
     const context = await browser.newContext({ viewport: { width, height: 1000 }, reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
@@ -36,7 +38,8 @@ try {
     await expect(page.locator('[data-guest-cart-subtotal]')).toHaveText('Subtotal $72.00');
     await page.reload();
     await expect(qty).toHaveValue('3');
-    await expect(page.locator('[data-guest-cart-checkout]')).toBeDisabled();
+    if (checkoutOpen) await expect(page.locator('[data-guest-cart-checkout]')).toBeEnabled();
+    else await expect(page.locator('[data-guest-cart-checkout]')).toBeDisabled();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: new URL(`cart-${name}.png`, output).pathname, fullPage: true });
     await page.locator('[data-guest-cart-remove]').click();
@@ -54,9 +57,11 @@ try {
       expect((await page.request.get(base + path)).status()).toBe(401);
     }
     const checkout = await page.request.get(base + '/api/checkout/health');
-    expect(checkout.status()).toBe(503);
-    expect(await checkout.json()).toMatchObject({ admission: 'closed', readiness: 'unavailable', mode: null });
-    results.push({ viewport: name, width, productCount: 6, cartPersistence: true, quantitySubtotal: '72.00', checkoutClosedAdvisory: true, adminProtected: true, imagesLoaded: true, browserErrors: 0 });
+    expect(checkout.status()).toBe(checkoutOpen ? 200 : 503);
+    expect(await checkout.json()).toMatchObject(checkoutOpen
+      ? { admission: 'open', readiness: 'supported', mode: 'test' }
+      : { admission: 'closed', readiness: 'unavailable', mode: null });
+    results.push({ viewport: name, width, productCount: 6, cartPersistence: true, quantitySubtotal: '72.00', checkoutAdmission: checkoutOpen ? 'open TEST' : 'closed', nonCreatingProbe: true, adminProtected: true, imagesLoaded: true, browserErrors: 0 });
     await context.close();
   }
 } finally { await browser.close(); }

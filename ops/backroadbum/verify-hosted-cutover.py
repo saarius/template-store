@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only checks for retired local transports and the paused hosted store."""
+"""Read-only boundaries for the hosted store; --checkout-open requires TEST readiness."""
 import argparse
 import datetime
 import hashlib
@@ -68,7 +68,13 @@ def data_digests(db):
     return result
 
 
-def verify(before=None):
+def verify_checkout_health(code, health, checkout_open=False):
+    require(isinstance(health, dict) and health.get('schema') == 'backroadbum.checkout-health/v1', 'checkout_gate_changed')
+    expected = (200, 'open', 'supported', 'test') if checkout_open else (503, 'closed', 'unavailable', None)
+    require((code, health.get('admission'), health.get('readiness'), health.get('mode')) == expected, 'checkout_gate_changed')
+
+
+def verify(before=None, checkout_open=False):
     result = {'checkedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'legacyServices': {}}
     for service, port in [('backroadbum-payments', 8787), ('backroadbum-ship', 8788)]:
         active = subprocess.run(['systemctl', 'is-active', service], capture_output=True, text=True).stdout.strip()
@@ -107,7 +113,7 @@ def verify(before=None):
         require(code == 401 and challenge, 'private_commerce_route_exposed')
     result['privateCommerceProtected'] = True
     code, _, health = request('/api/checkout/health')
-    require(code == 503 and health.get('admission') == 'closed' and health.get('mode') is None, 'checkout_gate_changed')
+    verify_checkout_health(code, health, checkout_open)
     result['checkout'] = health
     with sqlite3.connect('file:/var/lib/backroadbum/content.db?mode=ro', uri=True) as db:
         for plugin, version in PLUGINS.items():
@@ -124,8 +130,9 @@ def verify(before=None):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--before-state', type=pathlib.Path)
+    parser.add_argument('--checkout-open', action='store_true', help='Require open TEST checkout, never live mode.')
     args = parser.parse_args()
     try:
-        print(json.dumps(verify(args.before_state), indent=2))
+        print(json.dumps(verify(args.before_state, args.checkout_open), indent=2))
     except Exception:
         raise SystemExit('Hosted cutover verification failed; no private response or configuration emitted.') from None

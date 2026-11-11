@@ -60,6 +60,24 @@ class HostedCutoverTests(unittest.TestCase):
             db.execute("UPDATE _plugin_storage SET data='changed' WHERE id='a'")
             self.assertNotEqual(first['orders']['sha256'], cutover.data_digests(db)['orders']['sha256'])
 
+    def test_checkout_health_requires_the_selected_admission_and_never_live_mode(self):
+        schema = {'schema': 'backroadbum.checkout-health/v1'}
+        closed = {**schema, 'admission': 'closed', 'readiness': 'unavailable', 'mode': None}
+        opened = {**schema, 'admission': 'open', 'readiness': 'supported', 'mode': 'test'}
+        cutover.verify_checkout_health(503, closed)
+        cutover.verify_checkout_health(200, opened, checkout_open=True)
+        for code, health, checkout_open in [
+            (200, opened, False), (503, closed, True),
+            (200, {**opened, 'mode': 'live'}, True),
+            (200, {**opened, 'mode': None}, True),
+            (200, {**opened, 'readiness': 'unavailable'}, True),
+            (200, {**opened, 'schema': 'unknown'}, True),
+            (503, {**closed, 'mode': 'test'}, False), (200, None, True),
+        ]:
+            with self.subTest(code=code, checkout_open=checkout_open, health=health):
+                with self.assertRaisesRegex(RuntimeError, '^checkout_gate_changed$'):
+                    cutover.verify_checkout_health(code, health, checkout_open)
+
     def test_failures_use_only_the_callers_fixed_code(self):
         cutover.require(True, 'unused')
         with self.assertRaisesRegex(RuntimeError, '^closed_boundary_required$'):
