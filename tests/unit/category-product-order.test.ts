@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { orderCategoryProducts } from "../../src/features/store-shell/category-product-order.js";
 import { buildMerchCollections, type MerchCollection } from "../../src/features/store-shell/merch-catalog.js";
+import { orderShopCollection, type ShopCollection } from "../../src/features/store-shell/backroad-collections.js";
+import type { PublicCommerceProduct } from "../../src/features/commerce-catalog/index.js";
 
 const { readReferences } = vi.hoisted(() => ({ readReferences: vi.fn() }));
 vi.mock("emdash", () => ({ getEmDashReferences: readReferences }));
@@ -18,6 +20,41 @@ const hats = () => categories()[0]!;
 const ids = (category: MerchCollection) => category.items.map((item) => item.id);
 
 beforeEach(() => { readReferences.mockReset(); });
+
+describe("merchant Commerce collection order", () => {
+  const product = (id: string): PublicCommerceProduct => ({ id, name: id, sku: id, image: null, gallery: [],
+    price: { listable: true, regularText: '$14.00', saleText: null, unitMinor: '1400' },
+    availability: { status: 'available-on-backorder', sellable: true, listable: true } });
+  const fixture = () => ({ slug: 'road-day', title: 'Road day', description: 'Room for a stop.',
+    products: [product('commerce-tote'), product('commerce-bandana'), product('commerce-cap')] }) satisfies ShopCollection;
+  const paths = new Map([
+    ['commerce-tote', '/products/glovebox-field-tote'],
+    ['commerce-bandana', '/products/switchback-bandana'],
+    ['commerce-cap', '/products/long-way-cap'],
+  ]);
+  it('maps native CMS slugs to current Commerce identities without altering any product facts', async () => {
+    const category = fixture(), before = structuredClone(category);
+    readReferences.mockResolvedValue(page(['foreign-draft', 'switchback-bandana', 'long-way-cap', 'glovebox-field-tote']));
+    const result = await orderShopCollection(category, paths);
+    expect(result.products.map(product => product.id)).toEqual(['commerce-bandana', 'commerce-cap', 'commerce-tote']);
+    expect(category).toEqual(before);
+    expect(result.title).toBe(category.title);
+    expect(result.description).toBe(category.description);
+    for (const product of result.products) expect(product).toBe(category.products.find(candidate => candidate.id === product.id));
+    expect(readReferences).toHaveBeenCalledWith('categories', 'road-day', 'products', { limit: 100 });
+  });
+  it('keeps unmatched products stable and never adds an absent native reference', async () => {
+    const category = fixture();
+    readReferences.mockResolvedValue(page(['switchback-bandana', 'removed-product', 'switchback-bandana']));
+    expect((await orderShopCollection(category, paths)).products.map(product => product.id))
+      .toEqual(['commerce-bandana', 'commerce-tote', 'commerce-cap']);
+  });
+  it('keeps current Commerce discovery available when the ordering read fails', async () => {
+    const category = fixture();
+    readReferences.mockRejectedValue(new Error('CMS unavailable'));
+    expect(await orderShopCollection(category, paths)).toBe(category);
+  });
+});
 
 describe("published category product order", () => {
   it("does not read references when there is nothing to reorder", async () => {

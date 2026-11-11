@@ -5,6 +5,8 @@ import { mkdirSync } from 'node:fs';
 import { chromium } from '@playwright/test';
 const origin = process.env.BACKROADBUM_ORIGIN || 'https://backroadbum.com';
 const captures = process.env.CAPTURE_DIR;
+// Optional native-publication proof; comma-separated current product slugs, not a second catalog.
+const expectedRoadDay = process.argv.find(arg => arg.startsWith('--road-day-order='))?.split('=')[1].split(',');
 if (captures) mkdirSync(captures, { recursive: true });
 const browser = await chromium.launch();
 const report = { checkedAt: new Date().toISOString(), viewports: [] };
@@ -56,6 +58,10 @@ try {
       assert.equal(await page.locator('.collection-intro .lead').textContent(), intro.description);
       const selected = await listings();
       assert(Object.keys(selected).length > 0);
+      if (expectedRoadDay && intro.href === '/categories/road-day') {
+        assert.deepEqual(Object.values(selected).map(product => product.href), expectedRoadDay.map(slug => `/products/${slug}`),
+          'Road day must follow its published native reference order');
+      }
       for (const [id, product] of Object.entries(selected)) assert.deepEqual(product, all[id], 'Commerce facts changed between home and collection');
       assert.equal(await page.getByRole('navigation', { name: 'Shop collections' }).locator('[aria-current="page"]').getAttribute('href'), intro.href);
       await fit();
@@ -64,7 +70,8 @@ try {
     assert.deepEqual(writes, []);
     assert.deepEqual(errors, []);
     report.viewports.push({ width, javaScript: false, collections: introductions.length,
-      cmsCopyMatches: true, keyboardNavigation: true, visibleFocus: true, commerceFactsMatch: true, writes: 0, noOverflow: true });
+      cmsCopyMatches: true, keyboardNavigation: true, visibleFocus: true, commerceFactsMatch: true,
+      nativeOrderChecked: Boolean(expectedRoadDay), writes: 0, noOverflow: true });
     await context.close();
   }
   console.log(JSON.stringify(report, null, 2));

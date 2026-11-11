@@ -7,14 +7,15 @@ import { getEmDashCollection } from 'emdash';
 import { readCommerceCatalog } from '../../features/commerce-catalog/index.js';
 import { acquireGuestCheckoutAdmission } from '../../features/guest-cart/checkout-admission.js';
 import { hydrateProductCollectionMembership } from '../../features/store-shell/product-routes.js';
-import { shopCollections } from '../../features/store-shell/backroad-collections.js';
+import { orderShopCollection, shopCollections } from '../../features/store-shell/backroad-collections.js';
 
 const entries = await getEmDashCollection<'products', Record<string, unknown>>('products', { status: 'published' });
 const categories = await getEmDashCollection<'categories', Record<string, unknown>>('categories', { status: 'published' });
 let unavailable = false;
 const products = await readCommerceCatalog({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => { unavailable = true; return []; });
 const { groups, paths } = shopCollections(await hydrateProductCollectionMembership(entries.entries), categories.entries, products);
-const category = groups.find(group => group.slug === Astro.params.slug);
+const matched = groups.find(group => group.slug === Astro.params.slug);
+const category = matched ? await orderShopCollection(matched, paths) : undefined;
 if (!category) Astro.response.status = 404;
 const checkoutAvailable = Boolean(await acquireGuestCheckoutAdmission({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => null));
 ---

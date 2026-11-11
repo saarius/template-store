@@ -127,6 +127,8 @@ A compact uppercase wordmark and short plain-language links. The cart remains vi
 ### Shopping collections
 Homepage discovery puts the current nonempty published collections between the hero and full catalog: two plain, ruled columns on desktop, stacked on phones. The collection name is an underlined heading link with a 48px target and visible keyboard focus; its EmDash description follows without added counts, copied prices, cards or illustration. Catalog failure omits this secondary surface while the main catalog reports the error. Keep empty collections off this shortlist without treating a sold-out product as absent.
 
+Within a collection, card order follows the native category’s published product references rather than global catalog iteration. Road day currently puts the bandana first and backordered tote last; this is CMS merchandising, not a new badge, stock permission or price list. Saved drafts remain invisible until native publication. Reuse the existing reference-pagination/failure fallback, retain unmatched current members stably at the end and never admit stale references; the full catalog and related-gear order remain outside this change.
+
 The shop and collection pages share a wrapping row of ordinary links, not JavaScript tabs. All gear stays first; the current collection has a strong underline. Counts reflect only published, linked Commerce products; descriptions and membership come from EmDash. Empty collections remain addressable but stay out of navigation unless current. A catalog failure shows an error, never a false empty count.
 
 ### Missing pages
