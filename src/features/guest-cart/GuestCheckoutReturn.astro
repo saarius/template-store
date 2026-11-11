@@ -4,6 +4,12 @@ const { contactHref } = Astro.props;
 <section class="guest-checkout-return" data-guest-checkout-return aria-labelledby="guest-checkout-return-title">
   <h1 id="guest-checkout-return-title">Order confirmation</h1>
   <p data-guest-checkout-return-status role="status">Checking the saved checkout status.</p>
+  <section class="guest-checkout-pending-review" data-guest-checkout-pending-review aria-labelledby="guest-checkout-pending-title" hidden>
+    <h2 id="guest-checkout-pending-title">Original checkout</h2>
+    <dl><div><dt>Amount sent to checkout</dt><dd data-guest-checkout-pending-amount></dd></div></dl>
+    <p>This is not a paid receipt. Your cart may now show different prices; this amount belongs to the original checkout.</p>
+    <a href="/cart">View current cart</a>
+  </section>
   {contactHref && <p data-guest-checkout-contact>Need help? <a href={contactHref}>Contact the store</a>.</p>}
   <div class="guest-checkout-receipt" data-guest-checkout-order hidden>
     <div class="guest-checkout-order-heading">

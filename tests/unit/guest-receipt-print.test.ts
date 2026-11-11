@@ -23,6 +23,11 @@ function setup(saved: string | null, response: unknown) {
   root.children.set("[data-guest-checkout-order]", order);
   root.children.set("[data-guest-checkout-print]", print);
   root.children.set("[data-guest-checkout-return-status]", status);
+  const review = new Element(), amount = new Element(), title = new Element(), statusRetry = new Button();
+  root.children.set("[data-guest-checkout-pending-review]", review);
+  root.children.set("[data-guest-checkout-pending-amount]", amount);
+  root.children.set("#guest-checkout-return-title", title);
+  root.children.set("[data-guest-checkout-status-retry]", statusRetry);
   vi.stubGlobal("HTMLElement", Element);
   vi.stubGlobal("HTMLButtonElement", Button);
   vi.stubGlobal("HTMLAnchorElement", Anchor);
@@ -32,7 +37,7 @@ function setup(saved: string | null, response: unknown) {
   const fetchCall = vi.fn(async () => Response.json(response));
   vi.stubGlobal("window", { print: printCall });
   vi.stubGlobal("fetch", fetchCall);
-  return { order, print, printCall, fetchCall, values };
+  return { order, print, printCall, fetchCall, values, review, amount, title, statusRetry };
 }
 const retention = JSON.stringify({ capabilityId: "cap-1", capability: "cap-1.secret", attemptId: "attempt-1" });
 function wire(state: string, overrides = {}) {
@@ -44,6 +49,33 @@ function wire(state: string, overrides = {}) {
 }
 afterEach(() => vi.unstubAllGlobals());
 describe("receipt printing", () => {
+  it("keeps a pending amount separate from a later paid receipt", async () => {
+    const pending = wire("pending", { pricing: { finalTotal: { currency: "USD", minor: "7900" } } });
+    const fixture = setup(retention, pending);
+    fixture.fetchCall.mockResolvedValueOnce(Response.json(pending)).mockResolvedValueOnce(Response.json(wire("paid")));
+    hydrateGuestCheckoutReturn();
+    await vi.waitFor(() => expect(fixture.review.hidden).toBe(false));
+    expect(fixture.amount.textContent).toBe("$79.00");
+    expect(fixture.title.textContent).toBe("Checkout status");
+    expect(fixture.order.hidden).toBe(true);
+    expect(fixture.print.hidden).toBe(true);
+    fixture.statusRetry.listeners.get("click")!();
+    await vi.waitFor(() => expect(fixture.order.hidden).toBe(false));
+    expect(fixture.review.hidden).toBe(true);
+    expect(fixture.title.textContent).toBe("Order confirmation");
+    expect(fixture.print.hidden).toBe(false);
+  });
+  it("hides an earlier pending amount when a later status check fails", async () => {
+    const pending = wire("pending", { pricing: { finalTotal: { currency: "USD", minor: "7900" } } });
+    const fixture = setup(retention, pending);
+    fixture.fetchCall.mockResolvedValueOnce(Response.json(pending)).mockResolvedValueOnce(Response.json({ ok: false, error: { code: "UNAVAILABLE", message: "Unavailable" } }));
+    hydrateGuestCheckoutReturn();
+    await vi.waitFor(() => expect(fixture.review.hidden).toBe(false));
+    fixture.statusRetry.listeners.get("click")!();
+    await vi.waitFor(() => expect(fixture.title.textContent).toBe("We couldn't confirm your order"));
+    expect(fixture.review.hidden).toBe(true);
+    expect(fixture.print.hidden).toBe(true);
+  });
   it("prints only the confirmed view, without further network or storage changes, including a second click after cancellation", async () => {
     const fixture = setup(retention, wire("paid"));
     hydrateGuestCheckoutReturn();

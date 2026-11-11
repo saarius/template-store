@@ -905,6 +905,27 @@
 .guest-checkout-return [hidden] {
   display: none !important;
 }
+.guest-checkout-pending-review {
+  border-block: 1px solid var(--store-line);
+  margin-block: 2rem;
+  padding-block: 1.5rem;
+}
+.guest-checkout-pending-review h2 { margin: 0 0 1rem; }
+.guest-checkout-pending-review dl { margin: 0; }
+.guest-checkout-pending-review dl > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+}
+.guest-checkout-pending-review dd {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.guest-checkout-pending-review p { max-width: 68ch; color: var(--store-muted); }
 .guest-checkout-order-heading {
   display: flex;
   align-items: center;

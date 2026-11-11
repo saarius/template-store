@@ -41,6 +41,7 @@ import {
   type GuestCheckoutTransport,
   type GuestCheckoutWireResult,
 } from "./index.js";
+import { pendingCheckoutAmount } from "./pending-review.js";
 import {
   SHOPPER_ORDERS_ENDPOINT,
   SHOPPER_SESSION_HEADER,
@@ -1314,6 +1315,8 @@ export function hydrateGuestCheckoutReturn(): void {
   if (!(root instanceof HTMLElement)) return;
   const status = root.querySelector("[data-guest-checkout-return-status]");
   const order = root.querySelector("[data-guest-checkout-order]");
+  const pendingReview = root.querySelector("[data-guest-checkout-pending-review]");
+  const pendingAmount = root.querySelector("[data-guest-checkout-pending-amount]");
   const printReceipt = root.querySelector("[data-guest-checkout-print]");
   printReceipt?.addEventListener("click", () => {
     // Print the already-authorized view. Never create, refresh or recover an
@@ -1337,6 +1340,7 @@ export function hydrateGuestCheckoutReturn(): void {
     ? "We couldn't confirm your saved checkout. Try again in the browser used for checkout, or contact the store."
     : "We couldn't confirm your saved checkout. Try again in the browser used for checkout.";
   const setFailureState = () => {
+    if (pendingReview instanceof HTMLElement) pendingReview.hidden = true;
     const title = root.querySelector("#guest-checkout-return-title");
     if (title instanceof HTMLElement) title.textContent = "We couldn't confirm your order";
     setMessage(failureMessage, false);
@@ -1386,6 +1390,7 @@ export function hydrateGuestCheckoutReturn(): void {
     checking = true;
     if (statusRetry instanceof HTMLButtonElement) statusRetry.disabled = true;
     if (retry instanceof HTMLAnchorElement) retry.hidden = true;
+    if (pendingReview instanceof HTMLElement) pendingReview.hidden = true;
     setMessage("Checking the saved checkout status.");
     statusChecks += 1;
     const { result, failure } = await controller.status();
@@ -1401,6 +1406,8 @@ export function hydrateGuestCheckoutReturn(): void {
       return;
     }
     if (result.ok && checkoutCanConfirm(result)) {
+      const title = root.querySelector("#guest-checkout-return-title");
+      if (title instanceof HTMLElement) title.textContent = "Order confirmation";
       if (order instanceof HTMLElement) {
         order.hidden = false;
         const currentRetention = readGuestCheckoutRetention(checkoutStorage()) ?? retention;
@@ -1444,6 +1451,13 @@ export function hydrateGuestCheckoutReturn(): void {
           : "Order confirmed. Your cart could not be updated. Check status again.", !settled);
       finishCheck();
       return;
+    }
+    const savedAmount = pendingCheckoutAmount(result);
+    if (savedAmount && pendingReview instanceof HTMLElement && pendingAmount instanceof HTMLElement) {
+      pendingAmount.textContent = savedAmount;
+      pendingReview.hidden = false;
+      const title = root.querySelector("#guest-checkout-return-title");
+      if (title instanceof HTMLElement) title.textContent = "Checkout status";
     }
     const redirect = guestCheckoutRetryUrl(result);
     if (redirect && retry instanceof HTMLAnchorElement) {
