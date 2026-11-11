@@ -1,0 +1,47 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Page not found',
+  description = 'There is no page at this address. It may have moved or is no longer published.',
+} = Astro.props;
+---
+<section class="missing-page" data-page-not-found>
+  <h1>{title}</h1>
+  <p class="missing-page__intro">{description}</p>
+  <form method="get" action="/search" role="search" aria-label="Find another page">
+    <label for="missing-page-search">Search the store</label>
+    <div class="missing-page__search">
+      <input id="missing-page-search" type="search" name="q" minlength="2" maxlength="120" required aria-describedby="missing-page-help" placeholder="Try mug or bandana" />
+      <button type="submit">Search</button>
+    </div>
+    <p id="missing-page-help">Use at least two characters to find gear, collections and field notes.</p>
+  </form>
+  <nav class="missing-page__browse" aria-label="Keep exploring">
+    <a href="/shop">Browse all gear</a>
+    <a href="/field-notes">Read field notes</a>
+  </nav>
+  <div class="missing-page__checkout">
+    <a href="/checkout/success">Open your last checkout</a>
+    <p>Use the browser you checked out with. Only its latest checkout can be reopened; the status page checks whether a receipt is available.</p>
+  </div>
+</section>
+<style>
+  .missing-page{max-width:52rem;padding-block:2.5rem 4rem;min-height:55vh;color:var(--store-ink)}
+  .missing-page h1{font-size:clamp(2.8rem,5.7vw,5rem);line-height:1.05;letter-spacing:-.025em;margin:0 0 1.5rem}
+  .missing-page__intro{max-width:65ch;font-size:1.15rem;margin:0 0 2rem}
+  form{max-width:44rem}
+  label{display:block;font-weight:600;margin-bottom:.5rem}
+  .missing-page__search{display:flex;gap:.75rem;align-items:stretch}
+  input{min-width:0;flex:1;padding:.75rem 1rem;min-height:48px;border:1px solid var(--store-muted);border-radius:var(--store-radius-card);background:var(--store-surface);color:inherit;font:inherit}
+  button{padding:.7rem 1.25rem;min-height:48px;border:0;border-radius:var(--store-radius-card);background:var(--brb-yellow);color:inherit;font:inherit;font-weight:600;cursor:pointer}
+  button:hover{background:#eac04b}
+  #missing-page-help{margin:.75rem 0 0;color:var(--store-muted)}
+  .missing-page__browse{display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;margin-top:1.5rem}
+  .missing-page a{display:inline-flex;align-items:center;min-height:48px;color:inherit;text-underline-offset:.22em}
+  .missing-page__checkout{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--store-line)}
+  .missing-page__checkout p{margin:.25rem 0 0;max-width:65ch;color:var(--store-muted)}
+  @media(max-width:30rem){.missing-page__search{flex-direction:column}.missing-page__search button{align-self:flex-start}}
+</style>

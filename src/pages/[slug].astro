@@ -6,6 +6,7 @@
  */
 import { getEmDashEntry, getEmDashCollection, type PortableTextBlock } from "emdash";
 import FieldNoteFooter from "../features/store-shell/FieldNoteFooter.astro";
+import MissingPageContent from "../features/store-shell/MissingPageContent.astro";
 import TestStoreActions from "../features/store-shell/TestStoreActions.astro";
 import { fieldNote, fieldNotes } from "../features/store-shell/field-notes.js";
 import { Blocks, PortableText, type BlockValue } from "emdash/ui";
@@ -69,11 +70,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
           {testGuide && <TestStoreActions />}
         </>
       ) : (
-        <section class="cms-page__missing" data-page-not-found>
-          <h1 class="cms-page__title">Page not found</h1>
-          <p>There is no page at this address.</p>
-          <a href="/">Back to the store</a>
-        </section>
+        <MissingPageContent />
       )}
     </main>
     <StoreFooter profile={profile} />
@@ -86,7 +83,6 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
   .cms-page__body{max-width:44rem}
   .cms-page__body :global(h2){margin:1.5rem 0 .5rem;font-size:1.3rem;letter-spacing:-.02em}
   .cms-page__body :global(p){margin:0 0 1rem;color:var(--store-ink)}
-  .cms-page__missing a{font-weight:700;color:var(--store-ink)}
   .cms-reading{max-width:52rem}
   .field-note__back{display:inline-block;margin-bottom:1.5rem;padding:.5rem 0;color:var(--store-ink);text-underline-offset:.2em}
   .cms-reading .cms-page__title{max-width:20ch;text-wrap:balance}

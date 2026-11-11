@@ -9,6 +9,7 @@ import { linkedProductPurchasable, storeBannerText } from "../../features/store-
 import { AddToCart } from "../../features/guest-cart/ui.ts";
 import ProductGallery from "../../features/commerce-catalog/ProductGallery.astro";
 import RelatedGear from "../../features/store-shell/RelatedGear.astro";
+import MissingPageContent from "../../features/store-shell/MissingPageContent.astro";
 import { productDetailComponents } from "../../features/store-shell/blocks/index.js";
 import UnknownBlock from "../../features/store-shell/blocks/UnknownBlock.astro";
 import { legacyPortableTextComponents } from "../../features/store-shell/portable-text/index.js";
@@ -199,7 +200,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={noLongerAvailable ? "This product is no longer available." : item?.description ?? "Product not found."} />
-    {item && <link rel="canonical" href={productCanonical} />}
+    {Astro.response.status === 404 ? <meta name="robots" content="noindex, follow" /> : item && <link rel="canonical" href={productCanonical} />}
     <title>{noLongerAvailable ? `No longer available | ${STORE_TITLE}` : item ? `${productName} | ${STORE_TITLE}` : `Product not found | ${STORE_TITLE}`}</title>
     {productJsonLd && <script type="application/ld+json" data-product-jsonld set:html={jsonLdScript(productJsonLd)} />}
     {variantJsonLd && <script type="application/json" data-variant-product-jsonld set:html={jsonLdScript(variantJsonLd)} />}
@@ -245,7 +246,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
         {details && <section class="product-details" data-product-details aria-label="Product details"><Blocks value={details} components={productDetailComponents} fallback={UnknownBlock} /></section>}
         {linkedProduct && !lookupUnavailable && Astro.response.status === 200 && <RelatedGear productId={linkedProduct.id}
           entries={products.entries} categories={categoryEntries.entries} checkoutAvailable={checkoutAvailable} />}
-      </>) : <><h1>Product not found</h1><p>This product is not published or does not exist.</p><a href="/">Return to catalog</a></>}
+      </>) : <MissingPageContent title="Product not found" description="This product is not published or does not exist. Search the store or browse the current gear below." />}
     </main>
     <StoreFooter profile={profile} />
   </body>

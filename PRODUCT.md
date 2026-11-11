@@ -44,6 +44,7 @@ Fresh deployment, November 9, 2026. No pre-existing store content, photography, 
 
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
+- Missing storefront addresses keep HTTP404 and provide native search, current gear and field-note links within the store shell. Offer last-checkout recovery with its same-browser/latest-checkout limits, never a payment conclusion; do not echo missing addresses or query strings. API/security refusals and temporary service failures retain their own semantics.
 - Offer the current published, nonempty EmDash collections on the homepage before the full catalog. Their names and descriptions are editorial guidance, not bundles, prices or availability promises; sold-out products still belong to their collections. Native category drafts remain private until publication, then supply the same copy on home and collection pages.
 - Let shoppers search gear, collections and reading from one labeled form. Search destinations use published EmDash content and Commerce product visibility, never indexed prices as shopping authority; unavailable search is not a zero-result claim.
 - Variant catalog cards say Check options, not the default member's stock state: a sold-out M does not mean L is sold out. This is navigation guidance, never reconstructed family inventory; simple-product cards keep their authoritative stock labels.

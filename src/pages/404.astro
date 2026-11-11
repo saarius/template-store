@@ -1,0 +1,12 @@
+---
+import BackroadPage from '../features/store-shell/BackroadPage.astro';
+import MissingPageContent from '../features/store-shell/MissingPageContent.astro';
+Astro.response.status = 404;
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+<BackroadPage title="Page not found" noindex>
+  <div class="missing-page-container"><MissingPageContent /></div>
+</BackroadPage>
+<style>
+  .missing-page-container{width:min(70rem,calc(100% - 2rem));margin-inline:auto}
+</style>

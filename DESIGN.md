@@ -127,6 +127,9 @@ Homepage discovery puts the current nonempty published collections between the h
 
 The shop and collection pages share a wrapping row of ordinary links, not JavaScript tabs. All gear stays first; the current collection has a strong underline. Counts reflect only published, linked Commerce products; descriptions and membership come from EmDash. Empty collections remain addressable but stay out of navigation unless current. A catalog failure shows an error, never a false empty count.
 
+### Missing pages
+Missing generic, CMS, product and collection pages use the store’s daylight shell rather than framework branding or an automatic redirect. Keep one left-aligned heading, a short explanation, a labeled native GET search with the yellow action, then ordinary gear and field-note links. A quiet ruled paragraph offers the last checkout and its browser/latest-checkout limits without asserting payment state. All recovery controls have 48px minimum targets; search stacks on narrow phones, no address/query is reflected, and missing pages retain HTTP404/noindex without a false canonical or Product claim. Existing product-removal and temporary availability states stay distinct.
+
 ### Search
 Use one plainly labeled field and a yellow Search action, followed by ordinary underlined links grouped by destination. Search shares the daylight surface and blue ink rather than introducing a dark developer panel. Stack the action below the field when needed on phones. Keep a retained query and useful browse links in both empty and unavailable states; do not present an unavailable index as zero results. Native GET submission must work without JavaScript.
 
