@@ -11,7 +11,7 @@ import {
 } from "./features/security/public-boundary.js";
 import { acquireGuestCheckoutAdmission, canDispatchInstalledGuestCheckout } from "./features/guest-cart/checkout-admission.js";
 import { GUEST_CHECKOUT_STATUS_ENDPOINT } from "./features/guest-cart/checkout-protocol.js";
-import { merchantCheckoutClosed, merchantCheckoutPath } from "./features/guest-cart/merchant-policy.js";
+import { merchantCheckoutClosed, merchantCheckoutPath, merchantCheckoutStatusPath } from "./features/guest-cart/merchant-policy.js";
 import {
    ensurePlaygroundDemoCatalog,
 } from "./features/playground/demo-commerce-seed.js";
@@ -97,7 +97,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
     applySecurityHeaders(response.headers);
     return response;
   }
-  if (merchantCheckoutClosed() && pathForms.some(merchantCheckoutPath)) {
+  // Keep receipt recovery behind normal request/capability checks even while
+  // the independent merchant gate refuses all new checkout entry.
+  if (merchantCheckoutClosed() && pathForms.some(path => merchantCheckoutPath(path) && !merchantCheckoutStatusPath(path))) {
     const response = Response.json({ error: "Checkout is unavailable right now." }, { status: 503, headers: { "Cache-Control": "no-store" } });
     applySecurityHeaders(response.headers);
     return response;
