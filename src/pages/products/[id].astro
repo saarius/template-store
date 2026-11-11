@@ -235,7 +235,20 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
                 <span>{value}</span><span class="product-variant__sold-out"> (sold out)</span>
               </label>)}
             </fieldset>)}
-            {variantMembers.length > 0 && <script type="application/json" data-variant-members set:html={jsonLdScript(variantMembers)} />}
+            {variantMembers.length > 0 && <>
+              <script type="application/json" data-variant-members set:html={jsonLdScript(variantMembers)} />
+              <noscript>
+                <form method="get" action={productCanonical} class="product-options-fallback" data-product-options-fallback>
+                  <label for="product-option">View a product option</label>
+                  <p>Load an option to see its current price and availability. Saving items to your cart needs JavaScript.</p>
+                  <select id="product-option" name="item" required>
+                    <option value="" disabled selected={!selectedVariant}>Choose an option</option>
+                    {variantMembers.map(member => <option value={member.id} selected={member.id === selectedVariant?.id}>{Object.entries(member.values).map(([label, value]) => `${label}: ${value}`).join(' / ')}</option>)}
+                  </select>
+                  <button type="submit">View option</button>
+                </form>
+              </noscript>
+            </>}
             {managed && <p class="product-detail__price" data-product-price><strong data-regular-price>{managed.price.regularText}</strong></p>}
             {unmanaged && <p class="product-detail__price" data-product-price>{unmanaged.price.saleText ? <><s data-regular-price>{unmanaged.price.regularText}</s> <strong data-sale-price>{unmanaged.price.saleText}</strong></> : <strong data-regular-price>{unmanaged.price.regularText}</strong>}</p>}
             <p class="product-detail__status" data-product-status data-availability-status={linkedStatus ?? unmanaged?.storefront.status}>{status}</p>
@@ -302,6 +315,9 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
     }
   }
   for (const input of choices) input.addEventListener("change", update);
+  for (const picker of document.querySelectorAll<HTMLElement>("[data-product-variants]")) {
+    picker.dataset.variantPickerReady = "1";
+  }
 </script>
 <style>
   .product-page > :global(.missing-page){padding-top:0}
@@ -331,7 +347,12 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
   .product-detail__price{display:flex;gap:.7rem;align-items:baseline;font-size:1.5rem}.product-detail__price[hidden]{display:none}.product-detail__price s{color:var(--store-muted)}
   .product-detail__status{font-size:1.25rem;font-weight:800;margin:2rem 0 .5rem}
   .product-detail__notice{line-height:1.5;color:var(--store-muted)}
-  .product-variants{display:flex;flex-wrap:wrap;gap:.5rem;border:0;padding:0;margin:1rem 0}.product-variants legend{font-weight:800;margin-bottom:.5rem}
+  .product-variants{display:none;flex-wrap:wrap;gap:.5rem;border:0;padding:0;margin:1rem 0}.product-variants[data-variant-picker-ready]{display:flex}.product-variants legend{font-weight:800;margin-bottom:.5rem}
+  .product-options-fallback{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;margin:1rem 0}
+  .product-options-fallback label{flex-basis:100%;font-weight:600}
+  .product-options-fallback p{flex-basis:100%;margin:0;color:var(--store-muted)}
+  .product-options-fallback select{min-width:0;max-width:100%;min-height:48px;padding:.5rem;color:inherit;background:var(--store-surface);border:1px solid var(--store-line);border-radius:var(--store-radius-card);font:inherit}
+  .product-options-fallback button{min-height:48px;padding:.7rem 1rem;border:0;border-radius:var(--store-radius-card);background:var(--brb-yellow);color:var(--store-ink);font:inherit;font-weight:600;cursor:pointer}
   .product-variant{display:inline-flex;gap:.35rem;align-items:center;padding:.45rem .8rem;border:1.5px solid var(--store-ink-border);border-radius:.4rem;background:var(--store-surface);box-shadow:2px 2px 0 var(--store-shadow);cursor:pointer}
   .product-variant__sold-out{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
   .product-variant:has(input[data-variant-sold-out="true"]){color:var(--store-muted);box-shadow:none}
