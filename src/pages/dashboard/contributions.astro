@@ -1,5 +1,6 @@
 ---
 import DashboardReport from '../../features/experiment-report/DashboardReport.astro';
 export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'no-store');
 ---
 <DashboardReport view="contributions" />
