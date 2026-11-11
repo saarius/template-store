@@ -1,6 +1,6 @@
 # EmDash Bugs & Friction — For Human Review
 
-Updated November 10, 2026. No EmDash upstream issue, PR or comment has been opened. These observations are not all confirmed CMS defects; unknown causes/versions are explicitly marked. Live Node24.22.2, EmDash1.4.0 and @emdash-cms/sandbox-workerd0.9.6 are currently resolved; candidate/baseline use Node24.22.0, EmDash1.4.0. Historical component versions not separately captured remain unqualified.
+Updated November 11, 2026. No EmDash upstream issue, PR or comment has been opened. These observations are not all confirmed CMS defects; unknown causes/versions are explicitly marked. Live Node24.22.2, EmDash1.4.0 and @emdash-cms/sandbox-workerd0.9.6 are currently resolved; candidate/baseline use Node24.22.0, EmDash1.4.0. Historical component versions not separately captured remain unqualified.
 
 ## 1. Standalone Node image transforms need an explicit Sharp dependency
 - Observed: November9 initial built store returned HTTP500 for transformed images; declaring Sharp at the application root restored HTTP200. Current resolved Sharp is0.34.5; the exact original pre-fix dependency resolution was not retained.
@@ -28,5 +28,12 @@ Updated November 10, 2026. No EmDash upstream issue, PR or comment has been open
 - Reproduce: original deployment/restart with unbounded worker stop or omitted required encryption configuration; do not repeat on the serving store.
 - Root cause: slow worker shutdown remains unqualified; missing encryption configuration is an expected fail-closed deployment prerequisite, not evidence of a CMS defect.
 - Workaround: immutable staged releases, bounded10-second shutdown and required private encryption configuration loaded by systemd. Never bypass encryption/auth checks or expose keys. Dashboard serving history and evidence/2026-11-09-cycle.md preserve the observations.
+
+## 5. Block Kit Section text does not preserve newline layout
+- Versions: signed Commerce0.8.0, EmDash1.4.0 / Blocks renderer, Node24.22.2; local compiled candidate uses Node24.22.0 and EmDash1.4.0.
+- Reproduce: native Commerce Orders → Inspect a paid TEST order at1440px/390px. All detail labels/values share one Section text node with26 newline characters; computed white-space is normal, so status, payment and delivery/billing addresses become one paragraph.
+- Root cause: expected plain-text Section rendering, not a confirmed EmDash defect. Commerce used newlines as layout; the host Fields alternative truncates long values. The fix belongs in Commerce, not an EmDash theme override.
+- Workaround: read the current paragraph carefully and use Correct address for separate labeled inputs. Commerce PR261 proposes one wrapping Section per fact;848 unit/workflow,111 integration, official Registry size and installed desktop/phone checks pass locally. Signed store plugin remains unchanged pending release.
+- Evidence: evidence/2026-11-11-order-detail-live-baseline.json and2026-11-11-address-dogfood-cycle.md. Native merchant captures are private/ignored; the upstream PR includes synthetic tests only. No EmDash upstream contact.
 
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.
