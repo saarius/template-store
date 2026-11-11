@@ -82,6 +82,7 @@ try {
     const imageResponse = page.waitForResponse(response => response.url() === new URL(href, base).href && response.request().isNavigationRequest());
     await detail.focus(); await page.keyboard.press('Enter');
     const response = await imageResponse; expect(response.status()).toBe(200); expect(response.headers()['content-type']).toMatch(/^image\/png/);
+    await expect(page).toHaveURL(new URL(href, base).href); await page.waitForLoadState('load');
     await page.goBack(); await expect(page).toHaveURL(base + productPath); await expect(page.locator('h1')).toHaveText('Switchback Bandana');
     expect(await page.locator('[data-product-price]').textContent()).toBe(currentPrice);
     results.push({ width, javaScript: false, inertControlsHidden: true, publicImageLinks: 2, keyboardDetailImage: true, imageHttp: 200, browserBackWorks: true, fits: true });

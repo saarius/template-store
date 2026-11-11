@@ -136,6 +136,15 @@ The live Wrong Turn Tee now has Size M/L/XL, all Regular34, with M/L In stock an
 ### Publication recovery · November11
 Native Unpublish Product removed the bandana from shop, collections and search and returned404 for its page; a saved two-item quantity stayed in the cart but could not be bought. Native Publish now restored the same Commerce identity, media and16-dollar price without changing saved intent. The missing row exposed a catalog UUID as its heading/control name, reported as [template-store217](https://github.com/dinkuskit/template-store/issues/217). The theme now uses numbered neutral labels for unknown details and Unavailable item for confirmed missing/unlisted responses, never stored draft names or a new identity; Commerce supplies real names on recovery. This changes no price, sellability or checkout authority. Generic `saarius/template-store:fix/cart-fallback-labels` at6aa52a7 has the same rule, nine unit cases and concise docs; it is prepared/pushed but not generically qualified or submitted as a PR.
 
+### Bandana gallery · November11
+Added one detail crop through native Media Library and signed Commerce’s Product image & gallery panel, with alt/caption and persistent read-back. Original primary, SKU, pricing, publication and all seven Orders are unchanged. The crop comes from the existing `public/backroad/bandana.svg`, not new product photography; PNG and source/crop/hash sidecar stay in ignored runs and uploaded media.
+
+```bash
+node scripts/render-backroadbum-artwork.mjs --source=public/backroad/bandana.svg --output=runs/backroadbum/gallery/switchback-bandana-detail.png --view-box=280,225,240,180
+node scripts/verify-backroadbum-gallery.mjs
+```
+The renderer creates a local file only; do not repeat native upload/attachment when the private gallery action guard already records completion. The verifier uses real public media, keyboard selection and no-JavaScript image links without merchant state, checkout requests or network writes. [Issue221](https://github.com/dinkuskit/template-store/issues/221) records the inert no-JavaScript buttons found during adoption; the merchant fallback is deployed, but no generic patch or shared release is claimed.
+
 ### Switchback Bandana · native creation, November10
 Created `/products/switchback-bandana` through the native EmDash editor, saved its SKU/Regular16/In stock/physical2oz through signed Commerce0.8.0, and confirmed the draft had no public catalog entry before native publication. Copy, Design & care and Road day/Slow camp membership were edited in EmDash; the original `public/backroad/bandana.svg` was rasterized in Chromium, uploaded through Media Library and selected through Commerce's media panel. The PNG lives only in EmDash uploads and ignored verification captures; the initial five-product seed intentionally does not replay this later merchant adoption.
 
