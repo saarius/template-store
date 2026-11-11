@@ -6,6 +6,7 @@
  */
 import { getEmDashEntry, getEmDashCollection, type PortableTextBlock } from "emdash";
 import FieldNoteFooter from "../features/store-shell/FieldNoteFooter.astro";
+import TestStoreActions from "../features/store-shell/TestStoreActions.astro";
 import { fieldNote, fieldNotes } from "../features/store-shell/field-notes.js";
 import { Blocks, PortableText, type BlockValue } from "emdash/ui";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
@@ -29,6 +30,7 @@ const content = Array.isArray(data?.content) ? data.content : [];
 const title = data?.title?.trim() || "Page not found";
 const profile = readStorefrontProfile();
 const note = layout.length === 0 ? fieldNote(entry) : null;
+const testGuide = Boolean(entry && slug === "test-store" && layout.length === 0);
 // Related reading is optional; a failed collection read must not hide the article.
 const relatedNotes = note ? await getEmDashCollection<"pages", Record<string, unknown>>("pages", { status: "published" })
   .then(({ entries }) => fieldNotes(entries).filter(item => item.slug !== note.slug).slice(0, 2))
@@ -49,7 +51,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
   <body data-storefront-profile={profile}>
     <div class="store-demo-banner" role="status">{storeBannerText(checkoutAvailable)} <a href="/test-store">How to try it</a></div>
     <StoreHeader profile={profile} />
-    <main id="main-content" class:list={["cms-page", { "field-note": Boolean(note) }]} data-cms-page={entry ? slug : undefined}>
+    <main id="main-content" class:list={["cms-page", { "field-note": Boolean(note), "cms-reading": Boolean(note) || testGuide }]} data-cms-page={entry ? slug : undefined}>
       {entry ? (
         <>
           {note && <a class="field-note__back" href="/field-notes">Back to field notes</a>}
@@ -64,6 +66,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
             </div>
           )}
           {note && <FieldNoteFooter notes={relatedNotes} />}
+          {testGuide && <TestStoreActions />}
         </>
       ) : (
         <section class="cms-page__missing" data-page-not-found>
@@ -84,10 +87,10 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
   .cms-page__body :global(h2){margin:1.5rem 0 .5rem;font-size:1.3rem;letter-spacing:-.02em}
   .cms-page__body :global(p){margin:0 0 1rem;color:var(--store-ink)}
   .cms-page__missing a{font-weight:700;color:var(--store-ink)}
-  .field-note{max-width:52rem}
+  .cms-reading{max-width:52rem}
   .field-note__back{display:inline-block;margin-bottom:1.5rem;padding:.5rem 0;color:var(--store-ink);text-underline-offset:.2em}
-  .field-note .cms-page__title{max-width:20ch;text-wrap:balance}
-  .field-note .cms-page__body{font-size:1.0625rem;max-width:68ch}
-  .field-note .cms-page__body :global(h2){margin-top:2.25rem;margin-bottom:.65rem;font-size:1.65rem;line-height:1.2}
-  .field-note .cms-page__body :global(p:first-child){font-size:1.15rem;color:var(--store-muted);margin-bottom:2rem}
+  .cms-reading .cms-page__title{max-width:20ch;text-wrap:balance}
+  .cms-reading .cms-page__body{font-size:1.0625rem;max-width:68ch}
+  .cms-reading .cms-page__body :global(h2){margin-top:2.25rem;margin-bottom:.65rem;font-size:1.65rem;line-height:1.2}
+  .cms-reading .cms-page__body :global(p:first-child){font-size:1.15rem;color:var(--store-muted);margin-bottom:2rem}
 </style>

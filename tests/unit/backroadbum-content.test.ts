@@ -20,12 +20,32 @@ describe('Backroad Bum initial merchant content', () => {
     expect(content).toContain('Try a test purchase');
     expect(content).toContain('Your last checkout in the footer');
     expect(content).toContain('Only this browser’s latest checkout');
-    expect(content).toContain('Email and account-based recovery are not verified');
+    expect(content).toContain('Email sign-in is paused because delivery is unavailable');
+    expect(content).toContain('hosted DinkusKit Ship');
+    expect(content).toContain('not a fulfillment timeline or tracking');
+    expect(content).toContain('separate merchant step');
+    expect(content).not.toMatch(/Browse five products|Ship label automation is not connected|receipt then shows Demo fulfillment complete/);
     expect(content).not.toContain('Checkout is not connected yet');
     expect(content).toContain('4242 4242 4242 4242');
     expect(content).toContain('No real charges');
     expect(content).toContain('Never enter a real card');
     expect(content).not.toContain('sk_test_');
+  });
+  it('keeps shipping aligned with hosted sandbox fulfillment and the signed guest receipt', () => {
+    const content = JSON.stringify(pages.find((p: any) => p.slug === 'shipping').sections);
+    expect(content).toContain('hosted DinkusKit Ship');
+    expect(content).toContain('No live postage is bought');
+    expect(content).toContain('not a fulfillment timeline or tracking');
+    expect(content).not.toMatch(/automation is not connected|shown on the guest receipt as Demo fulfillment complete/);
+  });
+  it('keeps guide actions scoped to the published prose guide, not ordinary or missing pages', () => {
+    const route = readFileSync('src/pages/[slug].astro', 'utf8');
+    expect(route).toContain('Boolean(entry && slug === "test-store" && layout.length === 0)');
+    expect(route).toContain('{testGuide && <TestStoreActions />}');
+    const actions = readFileSync('src/features/store-shell/TestStoreActions.astro', 'utf8');
+    expect(actions).toContain('href="/shop"');
+    expect(actions).toContain('href="/checkout/success"');
+    expect(actions).not.toMatch(/<script|localStorage|receiptId|capability/);
   });
   it('links policy support to the test guide without inventing shipping terms', () => {
     const support = JSON.parse(readFileSync('seed/backroadbum-policy-support.json', 'utf8'));
