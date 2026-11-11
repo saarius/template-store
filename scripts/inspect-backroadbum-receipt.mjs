@@ -1,6 +1,7 @@
 // Inspect one retained guest checkout without opening new-checkout admission.
 // No prepare/start, payment submission, operator dispatcher or saved-state writes.
 import assert from 'node:assert/strict';
+import { boundedResponseJson } from './lib/bounded-response-json.mjs';
 import { openRetainedReceipt, nativeReceiptStatusPath as nativePath, receiptStatusPath as statusPath, retainedCheckoutKey as key } from './lib/backroadbum-retained-receipt.mjs';
 
 if (!process.argv.includes('--check')) {
@@ -32,14 +33,7 @@ try {
   page.on('response', response => {
     if (new URL(response.url()).pathname !== statusPath) return;
     reads.push((async () => {
-      let body, timer;
-      try {
-        body = await Promise.race([
-          response.finished().then(() => response.json()),
-          new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Response unavailable')), 5000); }),
-        ]);
-      } catch { /* An unreadable body stays unavailable, not a false domain refusal. */ }
-      finally { clearTimeout(timer); }
+      const body = await boundedResponseJson(response);
       report.responses.push(summarize(response.status(), body));
     })());
   });
