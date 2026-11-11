@@ -102,7 +102,7 @@ Corners are gently squared. Most large surfaces use the small radius; product li
 Primary links have a sun field, dark ink, a 48px minimum height and a small corner radius. Hover deepens the yellow. Focus uses a visible 3px outline with separation from the control. Secondary links remain visibly underlined in content.
 
 ### Product listings
-Image, name, authoritative price and availability, in that order. The whole listing links to its product page. Illustrations have cool flat grounds; prices must never be baked into artwork or copied into editorial content.
+Image, name, authoritative price and availability or option guidance, in that order. Variant listings say Check options in the existing quiet availability line, not the default member's stock state or an inferred family stock total; simple items keep their Commerce stock label. The whole listing links to its product page. Illustrations have cool flat grounds; prices must never be baked into artwork or copied into editorial content.
 
 ### Product inspection
 The Switchback Bandana illustration is original source-authored artwork in `public/backroad/bandana.svg` (November10,2026), rasterized in Chromium and uploaded to EmDash Media, not committed as a PNG. Its blue cloth, cream decorative contours and yellow BRB corner belong to the fictional product, not new interface tokens. Commerce's media reference supplies the shopper image and authored alt text; never bake the price into the art.
