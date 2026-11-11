@@ -304,6 +304,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
   for (const input of choices) input.addEventListener("change", update);
 </script>
 <style>
+  .product-page > :global(.missing-page){padding-top:0}
   .product-page{width:min(70rem,calc(100% - 2rem));margin:0 auto;min-height:65vh}
   .browse-breadcrumb{display:flex;flex-wrap:wrap;gap:.7rem;padding:2rem 0;color:var(--store-muted)}
   .browse-breadcrumb a{color:inherit;text-underline-offset:.2em}

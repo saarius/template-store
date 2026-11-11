@@ -1,4 +1,4 @@
-// Public, read-only missing-page recovery checks. No retained checkout capability or merchant session.
+// Public missing-page recovery checks. A synthetic browser-local cart only; no server writes, retained checkout capability or merchant session.
 import { chromium, expect } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 const base = process.env.BACKROADBUM_ORIGIN || 'https://backroadbum.com';
@@ -23,9 +23,14 @@ try {
       if (!['GET', 'HEAD'].includes(request.method())) writes.push(new URL(request.url()).pathname);
       if (/checkout\/(start|prepare|status)|guest-cart\/snapshot/.test(request.url())) checkoutRequests.push(new URL(request.url()).pathname);
     });
+    await page.goto(base + '/field-notes');
+    const cartFixture = JSON.stringify({ version: 1, lines: [{ id: 'missing-page-browser-fixture', quantity: 2 }] });
+    await page.evaluate(raw => localStorage.setItem('dinkus.guest-cart.v1', raw), cartFixture);
     for (const [path, title] of routes) {
       const response = await page.goto(base + path);
       expect(response.status()).toBe(404);
+      expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'))).toBe(cartFixture);
+      expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-checkout.v1'))).toBeNull();
       const missing = page.locator('[data-page-not-found]');
       await expect(page.locator('h1')).toHaveCount(1);
       await expect(missing.locator('h1')).toHaveText(title);
@@ -55,14 +60,22 @@ try {
         await expect(page.locator('[data-search-results]')).toContainText('Switchback Bandana');
       }
     }
+    // Recovery in this fresh browser explains that no checkout is retained; it cannot invent one.
+    await page.locator('[data-page-not-found] a[href="/checkout/success"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(base + '/checkout/success');
+    await expect(page.locator('main')).toContainText('No saved checkout in this browser');
+    await page.goto(base + '/not-published');
     // One keyboard activation reaches the ordinary shop; it cannot start a checkout.
     await page.locator('[data-page-not-found] a[href="/shop"]').focus();
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(base + '/shop');
     expect((await page.locator('[data-commerce-product]').count())).toBeGreaterThan(0);
+    expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'))).toBe(cartFixture);
+    expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-checkout.v1'))).toBeNull();
     expect(errors).toEqual([]); expect(writes).toEqual([]); expect(checkoutRequests).toEqual([]);
     results.push({ width, routes: routes.length, http404: true, noindex: true, noCanonicalOrProductMetadata: true, noQueryReflection: true,
-      nativeSearch: true, keyboardOrder: true, controls48px: true, fits: true, writes: 0, checkoutRequests: 0, browserErrors: 0 });
+      nativeSearch: true, keyboardOrder: true, controls48px: true, fits: true, cartUnchanged: true, emptyBrowserRecovery: true, writes: 0, checkoutRequests: 0, browserErrors: 0 });
     await context.close();
   }
   const context = await browser.newContext({ ...options, javaScriptEnabled: false, viewport: { width: 390, height: 844 } });

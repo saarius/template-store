@@ -52,7 +52,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
   <body data-storefront-profile={profile}>
     <div class="store-demo-banner" role="status">{storeBannerText(checkoutAvailable)} <a href="/test-store">How to try it</a></div>
     <StoreHeader profile={profile} />
-    <main id="main-content" class:list={["cms-page", { "field-note": Boolean(note), "cms-reading": Boolean(note) || testGuide }]} data-cms-page={entry ? slug : undefined}>
+    <main id="main-content" class:list={["cms-page", { "field-note": Boolean(note), "cms-reading": Boolean(note) || testGuide, "cms-page--missing": !entry }]} data-cms-page={entry ? slug : undefined}>
       {entry ? (
         <>
           {note && <a class="field-note__back" href="/field-notes">Back to field notes</a>}
@@ -78,6 +78,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
 </html>
 <style>
   .cms-page{width:min(70rem,calc(100% - 2rem));margin:2.5rem auto 4rem;min-height:60vh;line-height:1.65}
+  .cms-page--missing{margin-block:0}
   .cms-page .cms-composition{width:100%}
   .cms-page__title{margin:0 0 1rem;font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.02;letter-spacing:-.025em}
   .cms-page__body{max-width:44rem}

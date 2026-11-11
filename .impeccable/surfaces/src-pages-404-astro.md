@@ -19,3 +19,6 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 
 ## Verification
 Keep HTTP404, noindex and no false canonical/product metadata. Do not reflect the missing address or its query. Verify nested and CMS routes, product/collection misses, native GET search without JavaScript, keyboard links, narrow widths, and absence of checkout/write requests. No new shipping, payment, CMS mutation or upstream report is needed.
+
+## Finish review · November 11
+Built in the existing world; no new image assets. Reviewed desktop and phone renders of the generic page and all three route-specific misses: search and browse remain prominent, the last-checkout text stays separate, and no framework chrome or reflected address remains. Removed duplicate top spacing inherited by CMS and product wrappers. Native GET search and field-note navigation pass without JavaScript; 1440/390/320 Chromium checks cover keyboard order, 48px controls, real 404/noindex, unchanged synthetic browser cart and neutral empty-browser recovery. This is emulated Chromium, not a physical-device or screen-reader claim. Verdict: ship the merchant recovery paths; no generic upstream proposal or altered payment policy.
