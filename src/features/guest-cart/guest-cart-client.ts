@@ -779,15 +779,18 @@ function isSingleAddBlocked(button: HTMLButtonElement, container: Element | null
 let hydrateListenerRegistered = false;
 let storedCartListenersRegistered = false;
 
-function syncStoredCart(): void {
+function syncStoredCart(refreshFacts = false): void {
   // Failed writes deliberately keep an in-memory cart. An active checkout also
   // keeps its reviewed intent until its existing recovery flow settles it.
   if (persistFailed() || checkoutLocked()) return;
   const next = loadSession();
   if (next.notice === "storage-unavailable") return;
-  if (next.notice === session.notice && JSON.stringify(next.intent) === JSON.stringify(session.intent)) return;
-  session = next;
-  mutationNotice = null;
+  const changed = next.notice !== session.notice || JSON.stringify(next.intent) !== JSON.stringify(session.intent);
+  if (!changed && !refreshFacts) return;
+  if (changed) {
+    session = next;
+    mutationNotice = null;
+  }
   const root = document.querySelector("[data-guest-cart]");
   if (root instanceof HTMLElement) void refreshSnapshot(root);
   else renderNav();
@@ -811,8 +814,11 @@ export function hydrateGuestCartControls(): void {
       // Read the latest validated value, not a possibly superseded event payload.
       syncStoredCart();
     });
-    window.addEventListener("focus", syncStoredCart);
-    window.addEventListener("pageshow", syncStoredCart);
+    // Returning to an unchanged cart still needs current Commerce prices/stock.
+    // Ordinary pageshow already has the initial load; only a BFCache restore
+    // needs another facts refresh. Storage events remain intent-change driven.
+    window.addEventListener("focus", () => syncStoredCart(true));
+    window.addEventListener("pageshow", (event) => syncStoredCart(event.persisted));
   }
   if (!hydrateListenerRegistered && typeof document.addEventListener === "function") {
     hydrateListenerRegistered = true;
