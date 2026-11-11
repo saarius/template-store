@@ -58,7 +58,7 @@ try {
     await expect(qty).toBeFocused();
     expect(await stored()).toBe(initialIntent);
     phase = 'out'; await restore();
-    await expect(page.locator('[data-guest-cart-line-reason]')).toContainText('out of stock');
+    await expect(page.locator('[data-guest-cart-line-reason]')).toContainText('Out of stock');
     await expect(page.locator('[data-guest-cart-checkout]')).toBeDisabled();
     expect(await stored()).toBe(initialIntent);
     await fits();
@@ -95,11 +95,27 @@ try {
     expect(await stored()).toBe(threeIntent);
     await fits();
     await page.screenshot({ path: new URL(`checkout-${width}.png`, output).pathname, fullPage: true });
+    // A deliberately unsaved cart must not be replaced or refreshed on return.
+    await page.evaluate(() => {
+      const original = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (key, value) {
+        if (key === 'dinkus.guest-cart.v1') throw new Error('Synthetic blocked cart write');
+        return original.call(this, key, value);
+      };
+    });
+    await qty.fill('4');
+    await expect(page.locator('[data-guest-cart-status]')).toContainText('could not be saved');
+    const beforeFailedWriteReturn = snapshots;
+    phase = 'initial'; await focus(); await restore(); await page.waitForTimeout(150);
+    expect(snapshots).toBe(beforeFailedWriteReturn);
+    await expect(qty).toHaveValue('4');
+    await expect(subtotal).toHaveText(money(Number(changedMinor) * 4));
+    expect(await stored()).toBe(threeIntent);
     expect(errors).toEqual([]);
     expect(checkout.some(path => /\/start$/.test(path))).toBe(false);
     results.push({ width, cartAndCheckoutRefreshPrice: true, restoredPageRefreshesStock: true,
       invalidDraftPreserved: true, failedRefreshBlocksPurchase: true, retryRecovers: true,
-      checkoutContactPreserved: true, focusPreserved: true, intentUnchangedByRefresh: true,
+      checkoutContactPreserved: true, failedWriteMemoryPreserved: true, focusPreserved: true, intentUnchangedByRefresh: true,
       noOverflow: true, browserErrors: 0, checkoutPaths: checkout });
     await context.close();
   }
