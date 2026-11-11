@@ -66,7 +66,7 @@ try {
       if (width === 390) {
         await page.setViewportSize({ width: 320, height: 800 });
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-        if (capture) await page.screenshot({ path: new URL('after-320.png', output).pathname });
+        if (capture) await manifest.screenshot({ path: new URL('after-320.png', output).pathname });
         await page.setViewportSize({ width, height: 1000 });
       }
       await page.getByRole('link', { name: 'Edit cart', exact: true }).focus();
@@ -109,6 +109,7 @@ try {
     await expect(notice).toContainText('Checkout needs JavaScript');
     await expect(notice.getByRole('link', { name: 'browse the gear', exact: true })).toHaveAttribute('href', '/shop');
     await expect(page.locator('.guest-checkout-grid')).toBeHidden();
+    expect(await notice.getByRole('link').evaluate(e => getComputedStyle(e).color)).toBe(await notice.evaluate(e => getComputedStyle(e).color));
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     if (capture) await page.screenshot({ path: new URL('no-script-390.png', output).pathname });
   }
