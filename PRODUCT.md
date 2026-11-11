@@ -16,6 +16,9 @@ Three existing unpaid sessions remain pending after their recorded payment windo
 ## Native merchant pricing · November 11
 The bandana now has Regular $16 / Sale $14 in signed Commerce, saved through the native product panel. Public shop, collections, product/JSON-LD and previously open cart/checkout views use $14; the existing paid order1007 still shows its frozen $16 line and $21 total. No shopper-facing comparison or countdown is invented from the effective-price-only payload. A hosted Ship quote for the existing unlabelled order at3oz returned three sandbox rates without creating a label; order revision3 is unchanged.
 
+## Native editorial publication · November 11
+A fourth field note, A lunch stop worth taking, is published through EmDash’s native Title, Slug and rich-text editor with four section headings. Its saved draft matched the authored source after reload and remained absent from the public route, index and search until native publication. The existing reading shell, published index, search and related-reading links adopted it without a runtime change. Desktop, phone and no-JavaScript discovery pass; all seven earlier pages, catalog and Orders are unchanged. This is practical authored advice, not a claimed field test of the fictional merchandise.
+
 ## Native backorders · November 11
 The Glovebox Field Tote is now On backorder in signed Commerce, with its $32 price, SKU, media and EmDash copy unchanged. Shop, product/JSON-LD, saved cart and checkout review retain that distinction; already-open cart/checkout pages refresh without changing intent or contact text. This is a persistent catalog scenario, not a physical stock count or promised dispatch date. Native save/read-back worked without a framework repair; no payment, order or label was created.
 

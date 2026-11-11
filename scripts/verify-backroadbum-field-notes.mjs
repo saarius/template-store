@@ -17,8 +17,9 @@ try {
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await page.goto(base + '/field-notes')).status()).toBe(200);
     const notes = await page.locator('.brb-story-link').evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.querySelector('h2').textContent })));
-    expect(notes.length).toBeGreaterThanOrEqual(3);
+    expect(notes.length).toBeGreaterThanOrEqual(4);
     expect(notes.some(note => note.href === '/field-note-wet-gear-reset')).toBe(true);
+    expect(notes.some(note => note.href === '/field-note-lunch-stop')).toBe(true);
     await page.locator('.brb-photo').evaluate(image => image.decode());
     await page.evaluate(() => document.fonts.ready);
     await fits();
@@ -34,8 +35,12 @@ try {
       await expect(page.locator('.field-note-shop a')).toHaveAttribute('href', '/shop');
       await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /\S/);
       await fits();
-      if (note.href === '/field-note-wet-gear-reset') {
-        await expect(page.locator('main')).toContainText('Unpack before the sofa');
+      if (note.href === '/field-note-lunch-stop') {
+        await expect(page.locator('.cms-page__body h2')).toHaveText([
+          'Choose the stop before you are hungry', 'Bring a meal, not a kitchen',
+          'Give the stop a little time', 'Make leaving the easy part',
+        ]);
+        await expect(page.locator('.cms-page__body')).toContainText('Take food waste home');
         await page.evaluate(() => document.fonts.ready);
         await page.screenshot({ path: new URL(`article-${width}.png`, output).pathname, fullPage: true });
         await page.locator('.field-note-shop a').click();
@@ -46,6 +51,9 @@ try {
       await page.locator('.field-note__back').click();
       await expect(page).toHaveURL(base + '/field-notes');
     }
+    await page.goto(base + '/search?q=picnic');
+    await page.getByRole('region', { name: 'Field notes & guides' }).getByRole('link', { name: 'A lunch stop worth taking', exact: true }).click();
+    await expect(page.locator('h1')).toHaveText('A lunch stop worth taking');
     expect((await page.goto(base + '/test-store')).status()).toBe(200);
     await expect(page.locator('.field-note-footer')).toHaveCount(0);
     expect((await page.goto(base + '/field-note-not-published')).status()).toBe(404);
@@ -53,10 +61,18 @@ try {
     await expect(page.locator('.field-note-footer')).toHaveCount(0);
     expect(errors).toEqual([]);
     expect(checkoutRequests).toEqual([]);
-    results.push({ width, publishedNotes: notes.length, articlesRead: notes.length, backAndShopLinks: true, relatedReading: true, ordinaryPageUnchanged: true, unknownNote404: true, noOverflow: true, browserErrors: 0, checkoutRequests: 0 });
+    results.push({ width, publishedNotes: notes.length, articlesRead: notes.length, lunchSearchDiscovery: true, backAndShopLinks: true, relatedReading: true, ordinaryPageUnchanged: true, unknownNote404: true, noOverflow: true, browserErrors: 0, checkoutRequests: 0 });
     await context.close();
   }
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 1000 }, userAgent: 'BackroadBum-SelfCheck/1.0' });
+  const page = await context.newPage();
+  await page.goto(base + '/search?q=picnic');
+  await page.getByRole('link', { name: 'A lunch stop worth taking', exact: true }).click();
+  await expect(page.locator('.cms-page__body h2')).toHaveCount(4);
+  await page.locator('.field-note__back').click();
+  await expect(page.locator('a[href="/field-note-lunch-stop"]')).toHaveCount(1);
+  await context.close();
 } finally { await browser.close(); }
-const evidence = { verifiedAt: new Date().toISOString(), base, results };
+const evidence = { verifiedAt: new Date().toISOString(), base, results, noJavaScriptDiscoveryAndReading: true };
 await writeFile(new URL('verification.json', output), JSON.stringify(evidence, null, 2));
 console.log(JSON.stringify(evidence, null, 2));

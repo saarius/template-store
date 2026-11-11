@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 const catalog = JSON.parse(readFileSync('seed/backroadbum-catalog.json', 'utf8'));
 const pages = JSON.parse(readFileSync('seed/backroadbum-pages.json', 'utf8'));
-describe('Backroad Bum initial merchant content', () => {
+describe('Backroad Bum source-authored merchant content', () => {
   it('has unique product identities and valid USD seed prices', () => {
     expect(catalog).toHaveLength(5);
     for (const key of ['slug', 'sku']) expect(new Set(catalog.map((p: any) => p[key])).size).toBe(5);
@@ -58,12 +58,20 @@ describe('Backroad Bum initial merchant content', () => {
   });
   it('keeps field notes editable in EmDash Pages', () => {
     const notes = pages.filter((p: any) => p.slug.startsWith('field-note-'));
-    expect(notes).toHaveLength(3);
+    expect(notes).toHaveLength(4);
     expect(new Set(notes.map((p: any) => p.slug)).size).toBe(notes.length);
     expect(notes.every((p: any) => p.sections.some(([style]: string[]) => style === 'h2'))).toBe(true);
     const reset = notes.find((p: any) => p.slug === 'field-note-wet-gear-reset');
     expect(JSON.stringify(reset.sections)).toContain('care instructions');
     expect(JSON.stringify(reset.sections)).toContain('fully dry');
     expect(JSON.stringify(reset.sections)).not.toMatch(/\$\d|waterproof|guaranteed/i);
+    const lunch = notes.find((p: any) => p.slug === 'field-note-lunch-stop');
+    expect(lunch.title).toBe('A lunch stop worth taking');
+    expect(lunch.sections.filter(([style]: string[]) => style === 'h2')).toHaveLength(4);
+    const prose = JSON.stringify(lunch.sections);
+    for (const guidance of ['stopping is permitted', 'safe temperature', 'Do not feed animals', 'Take food waste home']) {
+      expect(prose).toContain(guidance);
+    }
+    expect(prose).not.toMatch(/\$\d|field-tested|guaranteed|buy now/i);
   });
 });
