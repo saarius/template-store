@@ -22,6 +22,27 @@ class HostedCutoverTests(unittest.TestCase):
         self.assertNotIn('/_emdash', source)  # Don't block Registry public proofs.
         self.assertNotIn('/*', [path for path in paths if path != '/api/ship/*'])
 
+    def test_public_account_exceptions_are_exact_and_keep_merchant_routes_private(self):
+        source = (ROOT / 'public-storefront.caddy').read_text()
+        matcher = next(line for line in source.splitlines() if line.startswith('not path '))
+        paths = matcher.split()[2:]
+        prefix = '/_emdash/api/plugins/r_gshdrqaldna3r7sn/'
+        accounts = {prefix + route for route, _, _ in cutover.ACCOUNT_PROBES}
+        self.assertEqual({path for path in paths if '/account/' in path}, accounts)
+        self.assertEqual(len(paths), len(set(paths)))
+        self.assertEqual({path for path in paths if '*' in path}, {
+            '/_emdash/api/media/file/*', '/_emdash/api/plugins/*/store-proof'})
+        for route in ['orders', 'admin', 'product-panel', 'account/not-a-route']:
+            self.assertNotIn(prefix + route, paths)
+        self.assertNotIn('/_emdash/*', paths)
+        self.assertNotIn('reverse_proxy', source)
+
+    def test_public_account_probes_never_supply_an_email_code_or_capability(self):
+        self.assertEqual({method for _, method, _ in cutover.ACCOUNT_PROBES}, {'GET', 'POST'})
+        self.assertTrue(all(code in {'INVALID_INPUT', 'SESSION_DENIED', 'INVALID_PLUGIN_REQUEST'}
+                            for _, _, code in cutover.ACCOUNT_PROBES))
+        self.assertNotIn(('account/sign-in/start', 'GET', 'INVALID_INPUT'), cutover.ACCOUNT_PROBES)
+
     def test_digests_keep_row_order_stable_and_detect_saved_fact_changes(self):
         with sqlite3.connect(':memory:') as db:
             db.execute('CREATE TABLE _plugin_storage(plugin_id, collection, id, data)')

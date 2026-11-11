@@ -17,6 +17,17 @@ PLUGINS = {
     'r_3brsc2on3bu673rn': '0.5.0',
     'r_ehdlg5cxkb3ffqvr': '0.3.1',
 }
+# These public routes authorize in Commerce, not with the merchant's Basic Auth.
+# Empty bodies deliberately cannot send mail or create a shopper session.
+ACCOUNT_PROBES = [
+    ('account/sign-in/start', 'POST', 'INVALID_INPUT'),
+    ('account/sign-in/verify', 'POST', 'INVALID_INPUT'),
+    ('account/sign-out', 'POST', 'SESSION_DENIED'),
+    ('account/orders', 'GET', 'SESSION_DENIED'),
+    # Commerce 0.8.0's GET declaration is fixed upstream (#257), not yet released here.
+    ('account/profile', 'GET', 'INVALID_PLUGIN_REQUEST'),
+    ('account/profile', 'POST', 'SESSION_DENIED'),
+]
 RETIRED = [
     '/.well-known/jwks.json', '/api/store-passes', '/api/commerce-settings',
     '/api/commerce-ship', '/v1/checkout-binding', '/v1/existing-binding',
@@ -34,15 +45,17 @@ def require(condition, code):
         raise RuntimeError(code)
 
 
-def request(path, method='GET'):
+def request(path, method='GET', *, empty_json=False, read_json=False):
     req = urllib.request.Request(ORIGIN + path, method=method,
-                                 headers={'User-Agent': 'BackroadBum-SelfCheck/1.0'})
+                                 data=b'{}' if empty_json else None,
+                                 headers={'User-Agent': 'BackroadBum-SelfCheck/1.0',
+                                          'Origin': ORIGIN, 'Content-Type': 'application/json'})
     try:
         response = urllib.request.urlopen(req, timeout=15)
     except urllib.error.HTTPError as error:
         response = error
     with response:
-        body = json.load(response) if path == '/api/checkout/health' else None
+        body = json.load(response) if read_json or path == '/api/checkout/health' else None
         return response.status, bool(response.headers.get('WWW-Authenticate')), body
 
 
@@ -81,6 +94,18 @@ def verify(before=None):
         code, challenge, _ = request(f'/_emdash/api/plugins/{plugin}/store-proof')
         require(code == 400 and not challenge, 'public_store_proof_blocked')
     result['publicProofsAnonymous'] = True
+    result['publicAccounts'] = []
+    prefix = '/_emdash/api/plugins/r_gshdrqaldna3r7sn/'
+    for route, method, expected in ACCOUNT_PROBES:
+        code, challenge, body = request(prefix + route, method, empty_json=method == 'POST', read_json=True)
+        payload = body.get('data', body) if body.get('success') is True else body
+        require(not challenge and code in (200, 400) and payload.get('ok') is not True and
+                payload.get('error', {}).get('code') == expected, 'public_account_boundary_changed')
+        result['publicAccounts'].append({'route': route, 'method': method, 'http': code, 'code': expected})
+    for route in ['orders', 'admin', 'account/not-a-route']:
+        code, challenge, _ = request(prefix + route, 'POST', empty_json=True)
+        require(code == 401 and challenge, 'private_commerce_route_exposed')
+    result['privateCommerceProtected'] = True
     code, _, health = request('/api/checkout/health')
     require(code == 503 and health.get('admission') == 'closed' and health.get('mode') is None, 'checkout_gate_changed')
     result['checkout'] = health

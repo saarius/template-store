@@ -127,6 +127,9 @@ Product names are ordinary underlined links back to their published EmDash produ
 
 Use flat item rows rather than full-width enclosing cards. Keep artwork beside product facts and quantity controls; place a quieter blue summary alongside on desktop and below on phones. The empty state offers Browse the gear, and Continue shopping stays visible above the list. Quantity and Remove controls name their product for assistive technology. Invalid quantity drafts keep their typed text through catalog refresh, show a nearby correction and suppress stale line/subtotals; every draft must be corrected or removed before checkout. Valid typing updates totals without dropping focus. A no-JavaScript explanation retains a browse path rather than showing an inert checkout.
 
+### Shopper account
+Account is an Operate surface. When sign-in email is unavailable, replace the sign-in form with a plain explanation and one yellow Open your last checkout link, followed by the same-browser/latest-checkout limits and a quieter Continue shopping link. Do not collect an email, imply a code was sent, introduce a fake demo login or decorate the pause as a stamp/card. Keep existing-session loading independent of this signed-out notice. The route and its links work without JavaScript; say that the receipt check itself needs it. Dashboard monitoring distinguishes a public route protected by Commerce capability from one blocked by merchant Basic Auth; neither proves email delivery.
+
 ### Checkout and receipts
 When checkout is not admitted, say it is unavailable right now; admission alone cannot diagnose a missing connection or promise a first launch. Keep the same neutral wording in the banner, catalog, cart and request refusals. Operational setup details belong on the dashboard, not in shopper error copy.
 

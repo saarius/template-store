@@ -1,11 +1,13 @@
 ---
 interface Props {
   playgroundMode?: boolean;
+  /** Merchant-only pause until sign-in email delivery is verified. Existing sessions still load. */
+  emailSignInPaused?: boolean;
   /** Set on a Playground PR preview, where Commerce refuses account calls. */
   previewUnavailableOrigin?: string;
 }
 
-const { playgroundMode = false, previewUnavailableOrigin } = Astro.props;
+const { playgroundMode = false, emailSignInPaused = false, previewUnavailableOrigin } = Astro.props;
 ---
 <section class="shopper-account" aria-labelledby="shopper-account-title" data-shopper-account data-playground-mode={playgroundMode ? "true" : "false"} data-account-preview-unavailable={previewUnavailableOrigin ? "true" : "false"}>
   <h1 id="shopper-account-title">Account</h1>
@@ -22,6 +24,16 @@ const { playgroundMode = false, previewUnavailableOrigin } = Astro.props;
   <p data-account-status role="status" hidden></p>
 
   <div class="account-signed-out" data-account-signed-out>
+    {emailSignInPaused ? (
+      <section class="account-email-pause" aria-labelledby="account-email-pause-title" data-account-email-paused>
+        <h2 id="account-email-pause-title">Looking for your order?</h2>
+        <p>Email sign-in isn’t available right now. If you checked out in this browser, you can still return to your receipt.</p>
+        <a class="brb-action" data-account-receipt-link href="/checkout/success">Open your last checkout</a>
+        <p class="account-recovery-hint">Use the same browser and keep its site data. Only its latest checkout is saved; the page address alone cannot recover an order.</p>
+        <noscript><p>The receipt check needs JavaScript to read this browser’s saved checkout.</p></noscript>
+        <a class="account-browse-link" href="/shop">Continue shopping</a>
+      </section>
+    ) : (
     <div class="account-card account-card--stamp" data-account-stamp-card>
       <div class="account-card__eyebrow">Verified Access · Tactile Stamp</div>
       <h2>{playgroundMode ? "Option 1: Verified Email Sign-In + Updates Opt-In" : "Sign in with a 6-digit email code"}</h2>
@@ -48,6 +60,7 @@ const { playgroundMode = false, previewUnavailableOrigin } = Astro.props;
         <button type="submit" data-account-verify>Verify &amp; sign in</button>
       </form>
     </div>
+    )}
 
     {playgroundMode && (
       <div class="account-card account-card--demo account-card--vault" data-account-demo-card data-account-vault-card>
@@ -135,9 +148,34 @@ const { playgroundMode = false, previewUnavailableOrigin } = Astro.props;
     overflow-wrap: anywhere;
   }
   h1 {
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    letter-spacing: -0.05em;
+    font-size: clamp(2.8rem, 5.7vw, 5rem);
+    letter-spacing: -0.025em;
     margin: 0 0 1.25rem;
+  }
+  .account-email-pause {
+    grid-column: 1 / -1;
+    max-width: 44rem;
+    padding-block: 1rem;
+  }
+  .account-email-pause h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.65rem;
+  }
+  .account-email-pause p {
+    max-width: 65ch;
+    margin: 0 0 1.25rem;
+    line-height: 1.65;
+  }
+  .account-email-pause .account-recovery-hint {
+    margin: 1.25rem 0 0.5rem;
+    color: var(--store-muted);
+  }
+  .account-browse-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 3rem;
+    color: inherit;
+    text-underline-offset: 0.2em;
   }
   [data-account-status] {
     margin: 0 0 1.5rem;
