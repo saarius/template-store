@@ -18,9 +18,9 @@ const safeCode = value => typeof value === 'string' && /^[A-Z_]{1,80}$/u.test(va
 const summarize = (http, body) => {
   const value = body?.success === true ? body.data : body;
   return { http, transportSuccess: typeof body?.success === 'boolean' ? body.success : null,
-    ok: value?.ok === true, code: safeCode(value?.error?.code),
+    ok: typeof value?.ok === 'boolean' ? value.ok : null, code: safeCode(value?.error?.code),
     state: ['paid', 'pending', 'recoverable-failure', 'released-retry'].includes(value?.checkout?.state) ? value.checkout.state : null,
-    hasPaidOrder: Boolean(value?.ok && value.checkout?.state === 'paid' && value.checkout.order) };
+    hasPaidOrder: typeof value?.ok === 'boolean' ? Boolean(value.ok && value.checkout?.state === 'paid' && value.checkout.order) : null };
 };
 let browser;
 try {
@@ -45,7 +45,7 @@ try {
     if (new URL(response.url()).pathname !== statusPath) return;
     reads.push((async () => {
       let body;
-      try { body = await response.json(); } catch { /* Only shape/codes leave this process. */ }
+      try { await response.finished(); body = await response.json(); } catch { /* An unreadable body stays unavailable, not a false domain refusal. */ }
       report.responses.push(summarize(response.status(), body));
     })());
   });

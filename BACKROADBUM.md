@@ -4,7 +4,12 @@
 
 Merchant branch: `backroadbum/store`, serving https://backroadbum.com. This is an explicit merchant composition, not a generic self-hosting release or upstream proposal. `PRODUCT.md` and `DESIGN.md` record the provisional brand; the original starter design is at `docs/template-design.md`.
 
-## Hosted migration in progress
+## Hosted resume · November 11
+The provisioned owner session is now verified/refreshed through account/sites. All three hosted consents are complete; Payments was reauthorized through its native Sign in again flow. Hosted Commerce settings are TEST, flat$5/free from$75 and Ship enabled, refreshed normally in native Commerce. The retained paid receipt now renders while new checkout stays closed. Stripe's confirmed TEST onboarding stops at a CAPTCHA; do not automate around it or claim a fresh hosted payment.
+
+Hosted Ship saved demo ship-from/6×4×3in/1oz packing and bought/printed a free Pitney Bowes USPS Ground Advantage sandbox label for existing TEST order1002 at16oz. PDF signature/type and TEST/VOID marking verified; Commerce picked up completion/tracking. No live carrier scans or new paid order are claimed. The Box name label points to the ship-from field due to duplicate IDs; scoped entry worked around it. `saarius/ship:fix/settings-box-label`/PR94 fixes this, fully tested locally but not deployed to the shared service. Signed receipt projections lack legacy number/TEST/fulfillment extras; old receipt-print proofs are not the current contract.
+
+## Hosted migration history
 Production Node builds set `BACKROADBUM_HOSTED_REGISTRY=1`, explicitly disable the paired Commerce mount and keep the official workerd runner for real Registry installs. Install stable Commerce0.8.0, Payments0.5.0 and Ship0.3.1 from EmDash Registry under their original IDs; do not mount custom overlays. Checkout is independently paused until hosted TEST readiness and shopper proof. Before removing mounts, a private snapshot and catalog/order digests were captured; only the obsolete Commerce/Ship connection secrets were cleared using EmDash’s supported null-clear settings API. Hosted keys must come from normal Connect consent, never injection.
 
 ### Verified November 10, 16:24 UTC
