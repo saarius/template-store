@@ -19,6 +19,9 @@ The bandana now has Regular $16 / Sale $14 in signed Commerce, saved through the
 ## Visible checkout corrections · November 11
 An empty-email checkout submission left focus on Continue and its alert offscreen above the header on desktop and phone. Local contact-validation messages now appear inside their fieldset and receive focus only after an explicit invalid submission; editing input or selecting a country clears them without moving focus. Existing validation rules, Commerce refusal, cart identities and payment/recovery semantics are unchanged. Generic PR223 atceae366 passes typecheck,581units,115workflows,Registry checks and six targeted desktop/phone cases; the inherited local admin startup failure remains disclosed, with GitHub CI pending.
 
+## Generic buying-control repair · November 11
+Template-store PR225 at8d017dd now isolates handler readiness without the merchant-only GET selection form: unready buying controls stay hidden, with plain guidance and the default option named. Node24.22.0 typecheck,578units,115workflows,six desktop/phone cases and Registry checks pass; the full local suite stops at the known admin welcome timeout, and CI remains pending. The merchant theme keeps its existing selection route and now sets cart readiness only after binding; no signed plugin, catalog or hosted workflow changes.
+
 ## Native collection merchandising · November 11
 Road day now leads with the bandana, followed by the cap, tee and backordered tote, saved and published through EmDash’s native reference controls. The custom theme had ignored native order; collection pages now use published references to order their already-filtered Commerce products. Saved drafts kept the prior published sequence until the confirmation step, and desktop/phone no-JavaScript checks preserve every Commerce fact. No upstream defect or shared-service change is claimed; the existing starter ordering helper already supported this behavior.
 

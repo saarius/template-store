@@ -241,6 +241,7 @@ describe("guest cart quantity mutation", () => {
         return this.attrs.get(name) ?? null;
       }
       addEventListener(type: string, cb: () => void) {
+        if (this.getAttribute("data-add-to-cart")) expect(this.dataset.guestCartReady).toBeUndefined();
         const list = this.listeners.get(type) ?? [];
         list.push(cb);
         this.listeners.set(type, list);
@@ -327,6 +328,8 @@ describe("guest cart quantity mutation", () => {
 
     try {
       hydrateGuestCartControls();
+      expect(addButton.dataset.guestCartReady).toBe("1");
+      hydrateGuestCartControls(); // Do not double-bind the saved-cart action.
       expect(viewCart.hidden).toBe(true);
       // Step single quantity to 3 and click Add to cart
       stepUp.click();
