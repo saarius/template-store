@@ -1,4 +1,5 @@
-// Public smoke test with no admin session, checkout creation or payment.
+// Public smoke with no admin session, checkout start or payment submission.
+// Populated carts may prepare guest capabilities; the health GET creates nothing.
 // Default requires open TEST checkout; --expect-closed verifies a deliberate pause.
 import { chromium, expect } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -61,7 +62,7 @@ try {
     expect(await checkout.json()).toMatchObject(checkoutOpen
       ? { admission: 'open', readiness: 'supported', mode: 'test' }
       : { admission: 'closed', readiness: 'unavailable', mode: null });
-    results.push({ viewport: name, width, productCount: 6, cartPersistence: true, quantitySubtotal: '72.00', checkoutAdmission: checkoutOpen ? 'open TEST' : 'closed', nonCreatingProbe: true, adminProtected: true, imagesLoaded: true, browserErrors: 0 });
+    results.push({ viewport: name, width, productCount: 6, cartPersistence: true, quantitySubtotal: '72.00', checkoutAdmission: checkoutOpen ? 'open TEST' : 'closed', healthProbeNonCreating: true, cartMayPrepareCapability: checkoutOpen, checkoutStarts: 0, adminProtected: true, imagesLoaded: true, browserErrors: 0 });
     await context.close();
   }
 } finally { await browser.close(); }
