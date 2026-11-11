@@ -424,6 +424,27 @@ describe("guest cart snapshot presentation", () => {
     expect(intent.lines).toEqual([{ id: "demo-mug", quantity: 1 }]);
   });
 
+  it("keeps a backordered physical line explicit and follows Commerce sellability, not the status label", () => {
+    const intent = addGuestCartLine(emptyGuestCartIntent(), "demo-tote", 2).intent;
+    const product = {
+      id: "demo-tote", found: true as const, name: "Demo tote", sku: "DEMO-TOTE",
+      fulfillment: "physical" as const,
+      price: { listable: true, regularText: "$32.00", saleText: null, unitMinor: "3200" },
+      availability: { status: "available-on-backorder", sellable: true, listable: true },
+    };
+    const allowed = presentGuestCart({ intent, checkoutAdmitted: true, snapshots: [product] });
+    expect(allowed.lines[0]).toMatchObject({
+      availabilityLabel: "Available on backorder", sellable: true, reason: null, lineTotalText: "$64.00",
+    });
+    expect(allowed).toMatchObject({ subtotalText: "$64.00", checkoutEnabled: true, needsDelivery: true });
+    // A backorder label cannot override either Commerce's refusal or the merchant's checkout gate.
+    expect(presentGuestCart({ intent, checkoutAdmitted: true, snapshots: [
+      { ...product, availability: { ...product.availability, sellable: false } },
+    ] }).checkoutEnabled).toBe(false);
+    expect(presentGuestCart({ intent, checkoutAdmitted: false, snapshots: [product] }).checkoutEnabled).toBe(false);
+    expect(intent.lines).toEqual([{ id: "demo-tote", quantity: 2 }]);
+  });
+
   it("keeps intent when the catalog snapshot fails and never enables checkout", () => {
     const intent = addGuestCartLine(emptyGuestCartIntent(), "hat-1", 2).intent;
     const failed = presentGuestCart({
