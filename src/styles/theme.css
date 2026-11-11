@@ -28,7 +28,8 @@
  --brb-yellow:#f3cf62;
 }
 html{scrollbar-color:#7c9eaf #e1edf2;scroll-padding-top:1rem}
-body{line-height:1.6}
+/* A rem-based body minimum grows with the shopper's default font preference. */
+body{min-width:0;line-height:1.6}
 ::selection{background:#f3cf62;color:#183f52}
 input,textarea{caret-color:#235e7a}
 input::placeholder{color:#486371;opacity:1}
@@ -55,7 +56,7 @@ p{max-width:72ch}
 .product-page .product-detail .product-detail__price{font-family:var(--font-sans)}
 .product-page .product-detail .product-detail__identifier{font-family:var(--font-sans);font-size:.8rem;color:var(--store-muted)}
 .catalog-guidance{display:none}
-.brb-page{width:min(70rem,calc(100% - 2rem));margin:3rem auto 5rem}
+.brb-page{width:min(70rem,calc(100% - 2rem));margin:3rem auto 5rem;overflow-wrap:anywhere}
 .brb-page h1{font-size:clamp(2.75rem,6vw,4.75rem);line-height:1.05;letter-spacing:-.025em;margin:0 0 1.5rem}
 .brb-page h2{font-size:2rem;line-height:1.2;margin:2.5rem 0 .75rem}
 .brb-page .lead{font-size:1.2rem;max-width:55ch}

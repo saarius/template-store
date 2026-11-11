@@ -97,6 +97,8 @@ Barlow Semi Condensed is self-hosted in weights 600 and 700. Use it for headings
 ## Layout
 Containers are at most 70rem wide with 1rem minimum side gutters. Desktop product grids have three columns, then two below 45rem and one below 34rem. The main navigation moves beneath the wordmark on small screens. Wide photographic regions and blue text regions stack cleanly on phones; no content waits for an entrance animation.
 
+The body has no minimum width tied to rem: a real 32px browser default must not turn a phone into a 640px canvas. Reading-shell text may break an otherwise overflowing word; the homepage reading invitation uses a shrinkable single-column track on phones. Footer navigation uses auto-fitting 10rem columns, capped by the available width, so it stacks when enlarged type needs the space. Do not shrink fonts or hide horizontal overflow to pass a reflow check; browser default-font preference, zoom and OS text scaling are distinct evidence.
+
 ## Elevation & Depth
 The brand layer is flat: color fields, whitespace and quiet borders separate regions. The shadow token is transparent. Product imagery scales gently in its image plane on hover, without lifting an entire card.
 

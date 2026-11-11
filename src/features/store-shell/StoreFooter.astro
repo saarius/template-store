@@ -18,5 +18,5 @@ interface Props { profile: string; currentPath?: string; note?: string }
 .brb-footer nav a{display:block;width:fit-content;line-height:1.5;margin:.5rem 0;color:var(--store-vault-muted);font-size:.95rem}
 .brb-footer p{color:var(--store-vault-muted);margin:.5rem 0}
 .brb-footer__bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding-top:2rem;margin-top:2rem;border-top:1px solid #547587;font-size:.8rem;color:var(--store-vault-muted)}
-@media(max-width:38rem){.brb-footer__inner{grid-template-columns:1fr 1fr}.brb-footer__inner>div{grid-column:1/-1}}
+@media(max-width:38rem){.brb-footer__inner{grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr))}.brb-footer__inner>div{grid-column:1/-1}}
 </style>
