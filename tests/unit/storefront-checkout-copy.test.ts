@@ -149,6 +149,34 @@ describe("saved checkout rediscovery", () => {
   });
 });
 
+describe("checkout review before contact", () => {
+  it("keeps one editable summary before contact and the payment action in source order", () => {
+    const markup = readFileSync("src/features/guest-cart/GuestCheckout.astro", "utf8");
+    const summary = markup.indexOf('data-checkout-manifest hidden');
+    const contact = markup.indexOf('data-checkout-vault>');
+    const payment = markup.indexOf('data-checkout-payment-handoff>');
+    expect(summary).toBeGreaterThan(0);
+    expect(contact).toBeGreaterThan(summary);
+    expect(payment).toBeGreaterThan(contact);
+    expect(markup.match(/data-checkout-manifest hidden/g)).toHaveLength(1);
+    expect(markup.match(/data-guest-cart-lines/g)).toHaveLength(1);
+    expect(markup.match(/data-guest-cart-subtotal-amount/g)).toHaveLength(1);
+    expect(markup).toContain('grid-template-areas:"contact review"');
+    expect(markup).toContain('grid-template-areas:"review" "contact"');
+  });
+
+  it("gives non-scripted checkout a browse path instead of an unusable contact form", () => {
+    const markup = readFileSync("src/features/guest-cart/GuestCheckout.astro", "utf8");
+    const fallback = markup.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? '';
+    expect(fallback).toContain('data-checkout-no-script');
+    expect(fallback).toContain('Checkout needs JavaScript');
+    expect(fallback).toContain('href="/shop"');
+    // Keep this inside noscript; a bundled/global Astro style would hide JS checkout too.
+    expect(fallback).toContain('<style is:inline>');
+    expect(fallback).toContain('[data-guest-checkout-page] .guest-checkout-grid{display:none}');
+  });
+});
+
 describe("empty cart on a store that takes checkouts", () => {
   it("says the cart is empty instead of that checkout is unavailable", async () => {
     const { emptyGuestCartIntent, presentGuestCart, GUEST_CHECKOUT_LABEL, GUEST_CHECKOUT_REASON } =
