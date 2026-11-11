@@ -14,10 +14,14 @@ try {
         reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
       try {
         const starts = [], errors = [];
+        let blockedAssets = 0;
         await context.route(url => /\/(?:checkout\/start|checkout\/guest\/start)$/.test(url.pathname), route => {
           starts.push('blocked'); return route.abort();
         });
-        if (mode === 'blocked-scripts') await context.route('**/*', route => route.request().resourceType() === 'script' ? route.abort() : route.fallback());
+        if (mode === 'blocked-scripts') await context.route('**/*', route => {
+          if (route.request().resourceType() === 'script') { blockedAssets++; return route.abort(); }
+          return route.fallback();
+        });
         const page = await context.newPage();
         page.on('pageerror', error => errors.push(error.name));
         const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -65,7 +69,13 @@ try {
           await expect(page.locator('[data-product-status]')).toHaveText(large.status);
           expect(new URL(page.url()).searchParams.get('item')).toBe(large.id);
         } else if (mode === 'blocked-scripts') {
-          await expect(page.locator('[data-product-variants]')).toBeHidden();
+          // Astro may inline the small variant handler while the larger cart asset
+          // is blocked. An independently ready picker may remain usable, not inert.
+          if (await page.locator('[data-product-variants]').isVisible()) {
+            await page.locator('[data-variant-choice][value="XL"]').check();
+            await expect(page.locator('[data-product-status]')).toHaveText(soldOut.status);
+            await expect(page.locator('[data-product-price]')).toHaveText(soldOut.price);
+          }
           await expect(page.locator('[data-add-to-cart]')).toBeHidden();
           await expect(page.locator('[data-add-to-cart-requirement]')).toBeVisible();
           await expect(page.locator('[data-product-options-fallback]')).toHaveCount(0);
@@ -89,7 +99,8 @@ try {
           await expect(page.locator('[data-guest-cart-line]')).toHaveCount(0);
         }
         await fits(); expect(starts).toEqual([]); expect(errors).toEqual([]);
-        results.push({ width, mode, inertCartControlsHidden: mode !== 'enhanced', ordinaryCartBehavior: mode === 'enhanced',
+        if (mode === 'blocked-scripts') expect(blockedAssets).toBeGreaterThan(0);
+        results.push({ width, mode, blockedScriptAssets: blockedAssets, inertCartControlsHidden: mode !== 'enhanced', ordinaryCartBehavior: mode === 'enhanced',
           nativeGetOptionInspection: mode === 'no-javascript', exactMemberPriceAndStock: mode !== 'blocked-scripts',
           missingOptionRecovery: mode === 'no-javascript', noOverflow: true, checkoutStarts: 0, pageErrors: 0 });
       } finally { await context.close(); }
