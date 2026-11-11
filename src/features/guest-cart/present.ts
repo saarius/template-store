@@ -256,7 +256,7 @@ export function presentGuestCart(options: {
 }): GuestCartView {
   const byId = new Map((options.snapshots ?? []).map((snapshot) => [snapshot.id, snapshot]));
   const totalsUnconfirmed = options.snapshotFailed === true || options.retrying === true;
-  const lines = options.intent.lines.map((line) => {
+  const lines = options.intent.lines.map((line, index) => {
     const snapshot = options.snapshots ? byId.get(line.id) : undefined;
     const blocked = options.snapshotFailed && !snapshot
       ? {
@@ -265,9 +265,12 @@ export function presentGuestCart(options: {
           sellable: false,
         }
       : lineBlockReason(snapshot);
-    const name = snapshot?.found ? snapshot.name : line.id;
-    const sku = snapshot?.found ? snapshot.sku : null;
     const listable = snapshot?.found ? snapshot.price.listable || snapshot.availability.listable : false;
+    // A position is presentation only, not a guessed product name or a new identity.
+    const name = snapshot?.found && listable
+      ? snapshot.name
+      : `${snapshot ? "Unavailable item" : "Item"} ${index + 1}`;
+    const sku = snapshot?.found ? snapshot.sku : null;
     const thumbnail = snapshot?.found
       ? projectPublicThumbnail(snapshot.thumbnail, name, line.id, listable)
       : null;

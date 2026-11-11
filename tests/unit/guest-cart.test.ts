@@ -218,7 +218,7 @@ describe("guest cart quantity mutation", () => {
     expect(addToCartAstro).toContain(".guest-cart-add :global([hidden]){display:none}");
     expect(addToCartAstro).toContain(".guest-cart-add__single:not([hidden]){display:flex");
     expect(addToCartAstro).toContain("data-add-to-cart-sellable");
-    expect(productPageAstro).toContain("<AddToCart product={cartProduct} variants={variants} />");
+    expect(productPageAstro).toContain("<AddToCart product={cartProduct} variants={variants} selectionRequired={selection.stale} />");
     expect(productPageAstro).toContain("add.dataset.addToCartSellable = String(view.sellable)");
     expect(productPageAstro).toContain("data-variant-option={option.label}");
 
