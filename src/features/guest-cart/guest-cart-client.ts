@@ -42,6 +42,7 @@ import {
   type GuestCheckoutWireResult,
 } from "./index.js";
 import { pendingCheckoutAmount } from "./pending-review.js";
+import { setCheckoutContactFeedback } from "./contact-feedback.js";
 import {
   SHOPPER_ORDERS_ENDPOINT,
   SHOPPER_SESSION_HEADER,
@@ -914,10 +915,10 @@ export function hydrateGuestCartPage(): void {
         return;
       }
       const originalIntent = structuredClone(session.intent);
+      setCheckoutContactFeedback(root, null);
       const contactInput = readCheckoutContact(root, view().needsDelivery);
       if (contactInput.error || !contactInput.contact) {
-        setCheckoutMessage(contactInput.error ?? "Complete the checkout contact fields.", true);
-        renderCart(root);
+        setCheckoutContactFeedback(root, contactInput.error ?? "Complete the checkout contact fields.");
         return;
       }
       // Coupons are coming soon: Registry Commerce refuses every code for v1,
@@ -1008,6 +1009,13 @@ export function hydrateGuestCartPage(): void {
   root.addEventListener("input", (event) => {
     if (event.target instanceof HTMLInputElement) updateQuantity(event.target);
   });
+  const clearContactFeedback = (event: Event) => {
+    if (event.target instanceof Element && event.target.closest("[data-guest-cart-contact]")) {
+      setCheckoutContactFeedback(root, null);
+    }
+  };
+  root.addEventListener("input", clearContactFeedback);
+  root.addEventListener("change", clearContactFeedback);
   root.addEventListener("change", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLInputElement)) return;
