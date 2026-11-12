@@ -39,11 +39,13 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('stable Block Kit identities');
+        await expect(page.locator('#history')).toContainText('captured native Orders output');
         await expect(page.locator('#history')).toContainText('the signed plugin is unchanged');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
         await expect(page.locator('#emdash-bugs li')).toHaveCount(7);
         await expect(page.locator('#emdash-bugs')).toContainText('Reopen Shipping');
+        await expect(page.locator('#emdash-bugs')).toContainText('shutdown coordination remains unimplemented');
+        await expect(page.locator('#contributions')).toContainText('green checks are not review clearance');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Contact corrections' })).toContainText('validation and payment guards unchanged');
         const recovery = page.locator('.status-list > div').filter({ hasText: 'Recovery coverage' });
         await expect(recovery).toContainText('encrypted settings recovered locally');
@@ -99,6 +101,10 @@ try {
         await expect(returnStartup).toContainText('without changing payment, storage, retry or receipt logic');
         const chronology = candidates.locator('tr').filter({ hasText: 'fix/native-order-chronology' });
         await expect(chronology).toContainText('signed store plugin is unchanged');
+        await expect(chronology).toContainText('same installed-admin test fails on unchanged base');
+        await expect(chronology).toContainText('presentation policy still needs the maintainer decision');
+        await expect(candidates.locator('tr').filter({ hasText: 'fix/invalid-cart-quantity' })).toContainText('cannot prove the proposed behavior');
+        await expect(candidates.locator('tr').filter({ hasText: 'fix/public-variant-sku' })).toContainText('contract still needs a maintainer decision');
         await expect(chronology.getByRole('link', { name: 'PR #266', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/266');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/checkout-settings-layout' })).toContainText('not shared-deployed');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/checkout-settings-layout' }).getByRole('link', { name: 'PR #124', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/dinkuskit/pull/124');
