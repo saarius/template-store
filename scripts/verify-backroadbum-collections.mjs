@@ -56,14 +56,29 @@ try {
     await page.locator('[data-guest-cart-line]').filter({ hasText: 'Creekside Camp Mug' }).waitFor();
     await page.reload();
     await page.locator('[data-guest-cart-line]').filter({ hasText: 'Creekside Camp Mug' }).waitFor();
-    await visit('/categories/hats');
-    assert.equal(await page.locator('[data-commerce-product]').count(), 0);
-    assert.match(await page.locator('[data-commerce-empty]').textContent(), /No gear/);
-    await visit('/categories/not-a-real-collection', 404);
-    assert.equal(await page.getByRole('link', { name: 'Browse all gear', exact: true }).getAttribute('href'), '/shop');
+    // Starter records remain private drafts; saved old URLs keep honest 404s.
+    for (const slug of ['hats', 'tees', 'hoodies', 'not-a-real-collection']) {
+      await visit('/categories/' + slug, 404);
+      assert.equal(await page.locator('[data-commerce-product]').count(), 0);
+      assert.equal(await page.locator('h1').textContent(), 'That collection isn’t here.');
+      assert.equal(await page.getByRole('link', { name: 'Browse all gear', exact: true }).getAttribute('href'), '/shop');
+      assert.equal(await page.locator('meta[name="robots"]').getAttribute('content'), 'noindex, follow');
+      if (captures && slug === 'tees') await page.screenshot({ path: `${captures}/retired-${width}.png`, fullPage: true });
+    }
     assert.deepEqual(errors, []);
-    result.viewports.push({ width, products: 6, collections: 2, collectionCounts: [4, 4], cartPersists: true, emptyAndMissing: true, pageErrors: 0, overflow: false });
+    result.viewports.push({ width, products: 6, collections: 2, collectionCounts: [4, 4], cartPersists: true, retiredAndMissing404: true, pageErrors: 0, overflow: false });
     await page.close();
   }
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 960 }, userAgent: 'BackroadBum-SelfCheck/1.0' });
+  const page = await context.newPage();
+  for (const slug of ['tees', 'hats', 'hoodies']) {
+    const response = await page.goto(origin + '/categories/' + slug);
+    assert.equal(response.status(), 404);
+    await page.getByRole('link', { name: 'Browse all gear', exact: true }).click();
+    assert.equal(new URL(page.url()).pathname, '/shop');
+    assert.equal(await page.locator('[data-commerce-product]').count(), 6);
+  }
+  await context.close();
+  result.noJavaScriptRetiredRecovery = true;
   console.log(JSON.stringify(result, null, 2));
 } finally { await browser.close(); }

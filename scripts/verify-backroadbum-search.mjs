@@ -25,13 +25,25 @@ try {
     await expect(page).toHaveURL(base + '/search?q=mug');
     const gear = page.getByRole('region', { name: 'Gear', exact: true });
     await expect(gear.getByRole('link', { name: 'Creekside Camp Mug', exact: true })).toHaveAttribute('href', '/products/creekside-camp-mug');
-    await expect(page.getByRole('region', { name: 'Collections', exact: true })).toContainText('Slow camp');
     await expect(page.getByRole('region', { name: 'Field notes & guides', exact: true })).toContainText('The wet-gear reset');
     await fits(); await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: new URL(`results-${width}.png`, output).pathname, fullPage: true });
     await gear.getByRole('link', { name: 'Creekside Camp Mug', exact: true }).click();
     await expect(page.locator('h1')).toHaveText('Creekside Camp Mug');
     await expect(page.locator('[data-product-price]')).toBeVisible();
+    // Native starter categories were unpublished, not removed from the database.
+    // Current published collections remain searchable; empty starter hits must stay gone.
+    await page.goto(base + '/search?q=camp');
+    await expect(page.getByRole('region', { name: 'Collections', exact: true }).getByRole('link', { name: 'Slow camp', exact: true })).toHaveAttribute('href', '/categories/slow-camp');
+    for (const [query, title] of [['tee', 'Tees'], ['hat', 'Hats'], ['hoodie', 'Hoodies']]) {
+      await page.goto(base + '/search?q=' + query);
+      await expect(page.locator('[data-search-results]').getByRole('link', { name: title, exact: true })).toHaveCount(0);
+      if (query === 'tee') {
+        await expect(page.getByRole('region', { name: 'Gear', exact: true }).getByRole('link', { name: 'Wrong Turn Tee', exact: true })).toHaveAttribute('href', '/products/wrong-turn-tee');
+        await fits();
+        await page.screenshot({ path: new URL(`tee-${width}.png`, output).pathname, fullPage: true });
+      }
+    }
     await page.goto(base + '/search?q=wet');
     await page.getByRole('region', { name: 'Field notes & guides' }).getByRole('link', { name: 'The wet-gear reset', exact: true }).click();
     await expect(page.locator('h1')).toHaveText('The wet-gear reset');
@@ -56,7 +68,7 @@ try {
       await expect(page.locator('[data-guest-cart-line]')).toHaveCount(0); cart = true;
     }
     expect(errors).toEqual([]); expect(checkout).toEqual([]);
-    results.push({ width, oneSearchField: true, groupedDestinations: true, gearAndStoryLinks: true, emptyAndShortStates: true, boundedQuery: true, keyboardFocus: true, noOverflow: true, cartAddedAndRemoved: cart, browserErrors: 0, checkoutRequests: 0 });
+    results.push({ width, oneSearchField: true, groupedDestinations: true, gearAndStoryLinks: true, emptyAndShortStates: true, boundedQuery: true, nativeStarterCategoriesAbsent: true, publishedCollectionFindable: true, keyboardFocus: true, noOverflow: true, cartAddedAndRemoved: cart, browserErrors: 0, checkoutRequests: 0 });
     await context.close();
   }
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 1000 }, userAgent: 'BackroadBum-SelfCheck/1.0' });
@@ -65,6 +77,9 @@ try {
   await page.getByLabel('What are you looking for?', { exact: true }).fill('mug');
   await page.getByRole('button', { name: 'Search', exact: true }).click();
   await expect(page.getByRole('region', { name: 'Gear' })).toContainText('Creekside Camp Mug');
+  await page.goto(base + '/search?q=tee');
+  await expect(page.getByRole('region', { name: 'Gear' })).toContainText('Wrong Turn Tee');
+  await expect(page.locator('[data-search-results]').getByRole('link', { name: 'Tees', exact: true })).toHaveCount(0);
   await context.close();
 } finally { await browser.close(); }
 const evidence = { checkedAt: new Date().toISOString(), results, noJavaScriptSearch: true };

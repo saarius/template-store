@@ -111,6 +111,9 @@ The test guide and Shipping page previously asked shoppers to invent a street, d
 ## Encrypted connection recovery · November 12
 Local snapshots now retain the matching EmDash encryption ring alongside the database, fixing an omission that made archived hosted connection settings unreadable on their own. A temporary offline copy decrypts all three encrypted settings with EmDash’s actual decoder and refuses missing keys; live settings and all eight Orders stay unchanged. The archive is itself a credential, kept private at0600; full runtime and off-host recovery remain unverified.
 
+## Retired starter collections · November 12
+A shopper search for the tee led to an empty published Tees collection. Native EmDash Unpublish now retains Tees, Hats and Hoodies as private drafts with their original copy, rather than adding a storefront filter or deleting records. Road day, Slow camp, all six product records and all eight Orders remain unchanged; current gear stays searchable and saved starter URLs return the existing helpful404. Empty merchant-authored collections can still be published intentionally; this cleanup is not a new global visibility rule.
+
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
 - Main navigation and footer navigation use actual 48×48px minimum link boxes, not surrounding margins. Preserve ordinary links, visible focus, wrapping and enlarged-font reflow; keep footer recovery and policy destinations easy to tap.

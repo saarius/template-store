@@ -37,6 +37,9 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(0);
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
+        const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
+        await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
+        await expect(page.locator('#history')).toContainText('Native EmDash Unpublish');
         const recovery = page.locator('.status-list > div').filter({ hasText: 'Recovery coverage' });
         await expect(recovery).toContainText('encrypted settings recovered locally');
         await expect(recovery).toContainText('full runtime and off-host recovery unverified');
