@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""Online SQLite + uploads and narrowly scoped private Ship recovery material."""
+"""Online SQLite + uploads, private EmDash encryption and retired Ship recovery material."""
 import argparse
+import base64
+import hashlib
 import contextlib
 import datetime
 import fcntl
@@ -94,7 +96,45 @@ def check_ship_binding(db, config):
         raise RuntimeError('Ship admission does not match its orders')
 
 
-def snapshot(root=pathlib.Path('/var/lib/backroadbum'), ship_config=None):
+def emdash_inputs(config_path):
+    """Read only the encryption key ring; never source a shell file or copy unrelated env."""
+    if config_path is None:
+        return None
+    path = regular_file(pathlib.Path(config_path).absolute())
+    if stat.S_IMODE(path.stat().st_mode) != 0o600:
+        raise RuntimeError('EmDash recovery configuration must have mode 0600')
+    lines = [line.strip() for line in path.read_text().splitlines()
+             if line.strip() and not line.lstrip().startswith('#')]
+    if len(lines) != 1 or not lines[0].startswith('EMDASH_ENCRYPTION_KEY='):
+        raise RuntimeError('Expected only EmDash encryption configuration')
+    entries = [entry.strip() for entry in lines[0].split('=', 1)[1].split(',') if entry.strip()]
+    if not entries:
+        raise RuntimeError('EmDash recovery encryption key is missing')
+    kids = set()
+    for entry in entries:
+        if not re.fullmatch(r'emdash_enc_v1_[A-Za-z0-9_-]{43}', entry):
+            raise RuntimeError('Invalid EmDash recovery encryption key')
+        body = entry[len('emdash_enc_v1_'):]
+        key = base64.urlsafe_b64decode(body + '=')
+        if len(key) != 32 or base64.urlsafe_b64encode(key).decode().rstrip('=') != body:
+            raise RuntimeError('Invalid EmDash recovery encryption key')
+        kids.add(hashlib.sha256(key).hexdigest()[:8])
+    return ('EMDASH_ENCRYPTION_KEY=' + ','.join(entries) + '\n').encode(), kids
+
+
+def check_emdash_keys(path, private):
+    """Ensure every archived encrypted plugin setting has its matching archived key."""
+    with contextlib.closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True)) as db:
+        if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='options'").fetchone():
+            return
+        for (raw,) in db.execute("SELECT value FROM options WHERE name LIKE 'plugin:%:settings:%'"):
+            value = json.loads(raw)
+            if isinstance(value, dict) and value.get('$emdash') == 'plugin-setting':
+                if not private or value.get('kid') not in private[1]:
+                    raise RuntimeError('EmDash snapshot requires the matching encryption key')
+
+
+def snapshot(root=pathlib.Path('/var/lib/backroadbum'), ship_config=None, emdash_config=None):
     root = pathlib.Path(root).absolute()
     backups = root / 'backups'
     backups.mkdir(mode=0o700, exist_ok=True)
@@ -105,6 +145,7 @@ def snapshot(root=pathlib.Path('/var/lib/backroadbum'), ship_config=None):
         stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ')
         with tempfile.TemporaryDirectory(dir=root) as temp:
             temp = pathlib.Path(temp)
+            encryption = emdash_inputs(emdash_config)
             sources = [('content.db', root / 'content.db')]
             payment_db = root / 'payments/attempts.db'
             if payment_db.exists():
@@ -116,23 +157,28 @@ def snapshot(root=pathlib.Path('/var/lib/backroadbum'), ship_config=None):
                 if private and name.startswith(str(SHIP_NAMESPACE)) and path.name != 'metadata.sqlite':
                     with contextlib.closing(sqlite3.connect(temp / name)) as db:
                         check_ship_binding(db, private[1])
-            # Refuse a mixed generation or a changing namespace rather than claim a coherent copy.
+            check_emdash_keys(temp / 'content.db', encryption)
+            # Refuse a mixed generation or key rotation rather than claim a coherent copy.
             after_sources, after_private = ship_inputs(root, ship_config)
             if ship_sources != after_sources or private != after_private:
                 raise RuntimeError('Ship recovery inputs changed during snapshot')
-            if private:
-                secret = temp / 'recovery/ship.json'
-                secret.parent.mkdir(mode=0o700)
-                secret.touch(mode=0o600)
-                secret.write_bytes(private[0])
+            if encryption != emdash_inputs(emdash_config):
+                raise RuntimeError('EmDash recovery inputs changed during snapshot')
+            for name, value in [('ship.json', private), ('emdash.env', encryption)]:
+                if value:
+                    secret = temp / 'recovery' / name
+                    secret.parent.mkdir(mode=0o700, exist_ok=True)
+                    secret.touch(mode=0o600)
+                    secret.write_bytes(value[0])
             archive_path = temp / 'recovery.tar.gz'
             archive_path.touch(mode=0o600)
             with tarfile.open(archive_path, 'w:gz') as archive:
                 for name, _ in sources:
                     archive.add(temp / name, arcname=name)
                 archive.add(root / 'uploads', arcname='uploads')
-                if private:
-                    archive.add(temp / 'recovery/ship.json', arcname='recovery/ship.json')
+                for name, value in [('ship.json', private), ('emdash.env', encryption)]:
+                    if value:
+                        archive.add(temp / 'recovery' / name, arcname='recovery/' + name)
             target = backups / f'{stamp}.tar.gz'
             archive_path.replace(target)
         for path in sorted(backups.glob('*.tar.gz'), key=lambda p: p.stat().st_mtime_ns, reverse=True)[3:]:
@@ -147,6 +193,10 @@ def restore_ship_copy(archive_path, destination):
     with tarfile.open(regular_file(pathlib.Path(archive_path).absolute())) as archive:
         selected = []
         for member in archive.getmembers():
+            if member.name == 'recovery/emdash.env':
+                if not member.isfile() or member.mode != 0o600:
+                    raise RuntimeError('Unexpected EmDash recovery archive member')
+                continue  # A retired Ship drill must not extract the active store's key.
             if member.name.startswith('ship/') or member.name.startswith('recovery/'):
                 allowed = (member.name == 'recovery/ship.json' or
                            re.fullmatch(re.escape(str(SHIP_NAMESPACE)) + r'/(metadata|[a-f0-9]{64})\.sqlite', member.name))
@@ -176,10 +226,38 @@ def restore_ship_copy(archive_path, destination):
     return len(sources)
 
 
+def restore_emdash_copy(archive_path, destination):
+    """Extract only content + its key into a NEW private offline drill directory."""
+    destination = pathlib.Path(destination).absolute()
+    if destination.resolve() != destination:
+        raise RuntimeError('EmDash recovery destination must not traverse symlinks')
+    destination.mkdir(mode=0o700, parents=False, exist_ok=False)
+    required = {'content.db', 'recovery/emdash.env'}
+    with tarfile.open(regular_file(pathlib.Path(archive_path).absolute())) as archive:
+        selected = [member for member in archive.getmembers() if member.name in required]
+        if len(selected) != len(required) or {member.name for member in selected} != required:
+            raise RuntimeError('EmDash recovery content/key missing or duplicated')
+        if any(not member.isfile() or member.mode != 0o600 for member in selected):
+            raise RuntimeError('Unexpected EmDash recovery archive member')
+        for member in selected:
+            target = destination / member.name
+            target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            with target.open('xb') as output, archive.extractfile(member) as source:
+                target.chmod(0o600)
+                while chunk := source.read(1024 * 1024):
+                    output.write(chunk)
+    path = destination / 'content.db'
+    with contextlib.closing(sqlite3.connect(path.as_uri() + '?mode=ro', uri=True)) as db:
+        if db.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
+            raise RuntimeError('Restored EmDash SQLite integrity check failed')
+    check_emdash_keys(path, emdash_inputs(destination / 'recovery/emdash.env'))
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=pathlib.Path, default=pathlib.Path('/var/lib/backroadbum'))
     parser.add_argument('--ship-config', type=pathlib.Path, default=pathlib.Path('/etc/backroadbum/ship.json'))
+    parser.add_argument('--emdash-config', type=pathlib.Path, default=pathlib.Path('/etc/backroadbum/emdash.env'))
     args = parser.parse_args()
-    snapshot(args.root, args.ship_config)
+    snapshot(args.root, args.ship_config, args.emdash_config)
     print('Backroad Bum private recovery snapshot complete')

@@ -108,6 +108,9 @@ A read-only phone browse found the footer’s recovery/policy links had roughly 
 ## Safe test addresses · November 12
 The test guide and Shipping page previously asked shoppers to invent a street, despite a real sandbox carrier refusal on order1008. Native EmDash edits now offer an invented name, reserved example.com email and the public U.S. fixture already accepted for1006 and corrected1008, with no home-address request or future carrier guarantee. Draft isolation, native publication and desktop/phone/no-JavaScript reading are verified; the copy distinguishes label refusal from payment failure and preserves original-browser recovery. No catalog, paid order, label or signed-plugin change is part of this correction.
 
+## Encrypted connection recovery · November 12
+Local snapshots now retain the matching EmDash encryption ring alongside the database, fixing an omission that made archived hosted connection settings unreadable on their own. A temporary offline copy decrypts all three encrypted settings with EmDash’s actual decoder and refuses missing keys; live settings and all eight Orders stay unchanged. The archive is itself a credential, kept private at0600; full runtime and off-host recovery remain unverified.
+
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
 - Main navigation and footer navigation use actual 48×48px minimum link boxes, not surrounding margins. Preserve ordinary links, visible focus, wrapping and enlarged-font reflow; keep footer recovery and policy destinations easy to tap.

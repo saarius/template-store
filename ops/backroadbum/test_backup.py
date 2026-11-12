@@ -1,5 +1,7 @@
 """Reusable recovery tests; no production files or credentials are read."""
+import base64
 import contextlib
+import hashlib
 import importlib.util
 import io
 import json
@@ -9,6 +11,7 @@ import sqlite3
 import tarfile
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('backroadbum_backup', pathlib.Path(__file__).with_name('backup.py'))
 backup = importlib.util.module_from_spec(spec)
@@ -206,6 +209,118 @@ class SnapshotTests(unittest.TestCase):
                 archive.addfile(member, io.BytesIO(b'{}'))
         with self.assertRaisesRegex(RuntimeError, 'Duplicate'):
             backup.restore_ship_copy(bad, self.root / 'drill')
+
+    def emdash_fixture(self, byte=7):
+        key = bytes([byte]) * 32
+        value = 'emdash_enc_v1_' + base64.urlsafe_b64encode(key).decode().rstrip('=')
+        path = self.root / 'private-emdash.env'
+        path.touch(mode=0o600)
+        path.write_text('EMDASH_ENCRYPTION_KEY=' + value + '\n')
+        with contextlib.closing(sqlite3.connect(self.root / 'content.db')) as db:
+            db.execute('CREATE TABLE options (name TEXT, value TEXT)')
+            # Ciphertext authenticity is exercised by the Node drill tests; this tests key coverage.
+            envelope = {'$emdash': 'plugin-setting', 'v': 1,
+                        'kid': hashlib.sha256(key).hexdigest()[:8], 'iv': 'fixture', 'ciphertext': 'fixture'}
+            db.execute('INSERT INTO options VALUES (?, ?)', ('plugin:fixture:settings:connection', json.dumps(envelope)))
+            db.commit()
+        return path
+
+    def test_emdash_content_and_private_key_restore_without_other_environment(self):
+        config = self.emdash_fixture()
+        config.write_text('# never archive comments\n' + config.read_text())
+        path = backup.snapshot(self.root, emdash_config=config)
+        with tarfile.open(path) as archive:
+            member = archive.getmember('recovery/emdash.env')
+            self.assertEqual(member.mode, 0o600)
+            self.assertNotIn(b'comments', archive.extractfile(member).read())
+        restored = self.root / 'restored'
+        backup.restore_emdash_copy(path, restored)
+        self.assertEqual(os.stat(restored).st_mode & 0o777, 0o700)
+        self.assertEqual(os.stat(restored / 'recovery/emdash.env').st_mode & 0o777, 0o600)
+        self.assertEqual(backup.emdash_inputs(config), backup.emdash_inputs(restored / 'recovery/emdash.env'))
+        self.assertFalse((restored / 'uploads').exists())
+
+    def test_emdash_missing_unknown_key_or_extra_environment_keeps_last_good(self):
+        config = self.emdash_fixture()
+        good = backup.snapshot(self.root, emdash_config=config)
+        with self.assertRaisesRegex(RuntimeError, 'matching encryption key'):
+            backup.snapshot(self.root)
+        original = config.read_text()
+        wrong = 'emdash_enc_v1_' + base64.urlsafe_b64encode(bytes([8]) * 32).decode().rstrip('=')
+        config.write_text('EMDASH_ENCRYPTION_KEY=' + wrong + '\n')
+        with self.assertRaisesRegex(RuntimeError, 'matching encryption key'):
+            backup.snapshot(self.root, emdash_config=config)
+        for value in [original + 'UNRELATED_SECRET=must-not-copy\n', 'EMDASH_ENCRYPTION_KEY=\n',
+                      'EMDASH_ENCRYPTION_KEY=invalid\n', original.rstrip() + 'x\n']:
+            config.write_text(value)
+            with self.assertRaises(RuntimeError):
+                backup.snapshot(self.root, emdash_config=config)
+        self.assertEqual(list((self.root / 'backups').glob('*.tar.gz')), [good])
+
+    def test_emdash_permissions_symlink_and_rotation_refuse_publication(self):
+        config = self.emdash_fixture()
+        good = backup.snapshot(self.root, emdash_config=config)
+        config.chmod(0o640)
+        with self.assertRaises(RuntimeError):
+            backup.snapshot(self.root, emdash_config=config)
+        config.chmod(0o600)
+        link = self.root / 'linked.env'
+        link.symlink_to(config)
+        with self.assertRaises(RuntimeError):
+            backup.snapshot(self.root, emdash_config=link)
+        original = backup.emdash_inputs(config)
+        with patch.object(backup, 'emdash_inputs', side_effect=[original, None]):
+            with self.assertRaisesRegex(RuntimeError, 'changed during snapshot'):
+                backup.snapshot(self.root, emdash_config=config)
+        self.assertEqual(list((self.root / 'backups').glob('*.tar.gz')), [good])
+
+    def test_emdash_rotation_ring_retains_the_old_key_for_existing_settings(self):
+        config = self.emdash_fixture()
+        old = config.read_text().strip().split('=', 1)[1]
+        new = 'emdash_enc_v1_' + base64.urlsafe_b64encode(bytes([8]) * 32).decode().rstrip('=')
+        config.write_text('EMDASH_ENCRYPTION_KEY=' + new + ', ' + old + '\n')
+        path = backup.snapshot(self.root, emdash_config=config)
+        backup.restore_emdash_copy(path, self.root / 'restored')
+        self.assertEqual(len(backup.emdash_inputs(config)[1]), 2)
+
+    def test_emdash_restore_refuses_missing_duplicate_unsafe_and_existing_destination(self):
+        config = self.emdash_fixture()
+        path = backup.snapshot(self.root, emdash_config=config)
+        with self.assertRaises(FileExistsError):
+            backup.restore_emdash_copy(path, self.root)
+        for variant in ['missing', 'duplicate', 'symlink', 'public-mode']:
+            bad = self.root / (variant + '.tar.gz')
+            with tarfile.open(bad, 'w:gz') as archive:
+                content = archive.gettarinfo(self.root / 'content.db', arcname='content.db')
+                content.mode = 0o600
+                with (self.root / 'content.db').open('rb') as data:
+                    archive.addfile(content, data)
+                if variant == 'missing':
+                    continue
+                member = tarfile.TarInfo('recovery/emdash.env')
+                member.mode = 0o644 if variant == 'public-mode' else 0o600
+                if variant == 'symlink':
+                    member.type = tarfile.SYMTYPE
+                    member.linkname = '/etc/passwd'
+                archive.addfile(member)
+                if variant == 'duplicate':
+                    archive.addfile(member)
+            with self.assertRaises(RuntimeError):
+                backup.restore_emdash_copy(bad, self.root / ('restore-' + variant))
+        self.assertTrue((self.root / 'content.db').exists())
+        link = self.root / 'linked-directory'
+        link.symlink_to(self.root, target_is_directory=True)
+        with self.assertRaisesRegex(RuntimeError, 'symlinks'):
+            backup.restore_emdash_copy(path, link / 'never-extract')
+        self.assertFalse((self.root / 'never-extract').exists())
+
+    def test_ship_drill_ignores_active_emdash_key_in_combined_archive(self):
+        self.ship_fixture()
+        config = self.emdash_fixture()
+        path = backup.snapshot(self.root, self.config_path, config)
+        destination = self.root / 'restored'
+        self.assertEqual(backup.restore_ship_copy(path, destination), 2)
+        self.assertFalse((destination / 'recovery/emdash.env').exists())
 
     def test_failed_copy_does_not_publish_or_remove_a_good_archive(self):
         good = backup.snapshot(self.root)

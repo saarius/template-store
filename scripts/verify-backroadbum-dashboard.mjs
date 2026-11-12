@@ -37,6 +37,11 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(0);
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
+        const recovery = page.locator('.status-list > div').filter({ hasText: 'Recovery coverage' });
+        await expect(recovery).toContainText('encrypted settings recovered locally');
+        await expect(recovery).toContainText('full runtime and off-host recovery unverified');
+        await recovery.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: new URL(`recovery-${width}.png`, output).pathname });
         const probe = page.locator('[data-checkout-probe]');
         await expect(probe).toContainText(/ · [\d,]+ ms$/);
         await expect(probe).not.toContainText('Unavailable');
@@ -94,7 +99,7 @@ try {
         await page.locator('#contributions').scrollIntoViewIfNeeded();
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      for (const secret of ['sk_test_', 'whsec_', 'github_pat_', '/var/lib/', 'session_file']) await expect(page.locator('main')).not.toContainText(secret);
+      for (const secret of ['sk_test_', 'whsec_', 'github_pat_', 'emdash_enc_v1_', '/var/lib/', 'session_file']) await expect(page.locator('main')).not.toContainText(secret);
       await page.screenshot({ path: new URL(`${view}-${width}.png`, output).pathname });
       if (view !== 'overview') {
         await page.getByRole('navigation', { name: 'Return to the overview' }).getByRole('link').click();
