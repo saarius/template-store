@@ -41,12 +41,13 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('Twenty synthetic captures across five UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Twenty-four synthetic captures across six UI PRs are publicly hosted outside git');
         await expect(page.locator('#history')).toContainText('additive contract still needs the maintainer decision');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
         await expect(page.locator('#emdash-bugs li')).toHaveCount(7);
         await expect(page.locator('#emdash-bugs')).toContainText('Reopen Shipping');
-        await expect(page.locator('#emdash-bugs')).toContainText('first live shutdown remains unverified');
+        await expect(page.locator('#emdash-bugs')).toContainText('initial activation was not a live shutdown test');
+        await expect(page.locator('#history')).toContainText('Buying controls #225');
         await expect(page.locator('#history')).toContainText('Eleven offline lifecycle checks pass');
         await expect(page.locator('#history')).toContainText('eight-second deadline');
         await expect(page.locator('#history')).toContainText('past deployment failures and unknown outage durations stay on record');
@@ -114,6 +115,10 @@ try {
         await expect(returnStartup).toContainText('without changing payment, storage, retry or receipt logic');
         await expect(returnStartup).toContainText('captured disabled, blocked and delayed-script output');
         await expect(returnStartup).toContainText('proves neither provider recovery nor email delivery');
+        const controls = candidates.locator('tr').filter({ hasText: 'fix/product-control-readiness' });
+        await expect(controls).toContainText('four public Before/After desktop/phone captures');
+        await expect(controls).toContainText('actual script-refusal diagnostics');
+        await expect(controls).toContainText('not a new signed installation');
         const gallery = candidates.locator('tr').filter({ hasText: 'fix/gallery-no-script' });
         await expect(gallery).toContainText('four public Before/After desktop/phone screenshots');
         await expect(gallery).toContainText('browser Back and enhanced Space/Enter selection preserved');
