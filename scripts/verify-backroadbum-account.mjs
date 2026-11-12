@@ -55,7 +55,8 @@ try {
         assert.equal(await page.locator('[data-guest-checkout-order]').isVisible(), false);
       } else {
         // The recovery controller itself needs JavaScript; this only proves navigation.
-        assert.equal(await page.locator('#guest-checkout-return-title').innerText(), 'Order confirmation');
+        assert.equal(await page.locator('#guest-checkout-return-title').innerText(), 'Checkout status');
+        assert.match(await page.locator('[data-guest-checkout-return-status]').innerText(), /enable JavaScript and reload/);
       }
       assert.equal(blockedWrites, 0);
       assert.equal(accountRequests, 0);

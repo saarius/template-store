@@ -77,7 +77,10 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(3);
         const candidates = page.getByRole('table', { name: 'Framework candidates · release state is separate', exact: true });
-        await expect(candidates.locator('tbody tr')).toHaveCount(16);
+        await expect(candidates.locator('tbody tr')).toHaveCount(17);
+        const returnStartup = candidates.locator('tr').filter({ hasText: 'fix/checkout-return-initial-state' });
+        await expect(returnStartup.getByRole('link', { name: 'PR #226', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/template-store/pull/226');
+        await expect(returnStartup).toContainText('without changing payment, storage, retry or receipt logic');
         const chronology = candidates.locator('tr').filter({ hasText: 'fix/native-order-chronology' });
         await expect(chronology).toContainText('signed store plugin is unchanged');
         await expect(chronology.getByRole('link', { name: 'PR #266', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/266');
@@ -101,7 +104,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 16, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
+    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 17, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
     await context.close();
   }
   await writeFile(new URL('verification.json', output), JSON.stringify(results, null, 2));
