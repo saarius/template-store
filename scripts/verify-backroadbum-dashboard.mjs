@@ -41,7 +41,7 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('Twelve synthetic captures across three UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Twenty synthetic captures across five UI PRs are publicly hosted outside git');
         await expect(page.locator('#history')).toContainText('additive contract still needs the maintainer decision');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
         await expect(page.locator('#emdash-bugs li')).toHaveCount(7);
@@ -109,6 +109,12 @@ try {
         const returnStartup = candidates.locator('tr').filter({ hasText: 'fix/checkout-return-initial-state' });
         await expect(returnStartup.getByRole('link', { name: 'PR #226', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/template-store/pull/226');
         await expect(returnStartup).toContainText('without changing payment, storage, retry or receipt logic');
+        await expect(returnStartup).toContainText('captured disabled, blocked and delayed-script output');
+        await expect(returnStartup).toContainText('proves neither provider recovery nor email delivery');
+        const gallery = candidates.locator('tr').filter({ hasText: 'fix/gallery-no-script' });
+        await expect(gallery).toContainText('four public Before/After desktop/phone screenshots');
+        await expect(gallery).toContainText('browser Back and enhanced Space/Enter selection preserved');
+        await expect(gallery).toContainText('not a new signed installation');
         const chronology = candidates.locator('tr').filter({ hasText: 'fix/native-order-chronology' });
         await expect(chronology).toContainText('signed store plugin is unchanged');
         await expect(chronology).toContainText('same installed-admin test fails on unchanged base');
