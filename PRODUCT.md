@@ -78,6 +78,9 @@ Fresh deployment, November 9, 2026. No pre-existing store content, photography, 
 ## Experiment reading path · November 11
 The overview now keeps current operations, activity, costs and archived owner instructions together, with short latest-work and open-review summaries. `/dashboard/history/` preserves the entire dated history, newest first; `/dashboard/contributions/` keeps the full report/fork/release ledger. Both routes work without JavaScript and link back to current state. PR223 remains queued with no jobs; an operator cancellation request was permission-denied, so no rerun or check result is claimed.
 
+## Keyboard cart removal · November 12
+A fresh shopper keyboard check found that removing the middle of three items jumped back to the first item’s quantity. Cart and checkout now focus the next surviving row, or the nearest prior row at the end; the final removal retains empty-state focus. This merchant-only refinement preserves saved quantities, invalid drafts, Commerce refresh and payment guards; no new upstream item is opened while fourteen prior PRs await review.
+
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
 - Respect the shopper’s browser default font size. Shopping, reading and reporting should reflow rather than impose a rem-based body minimum, clip content or shrink text; footer columns may stack and long headings may wrap. Verify actual font preferences independently of browser zoom or synthetic CSS scaling.

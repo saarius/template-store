@@ -43,6 +43,7 @@ import {
 } from "./index.js";
 import { pendingCheckoutAmount } from "./pending-review.js";
 import { setCheckoutContactFeedback } from "./contact-feedback.js";
+import { cartRemovalFocusId } from "./remove-focus.js";
 import {
   SHOPPER_ORDERS_ENDPOINT,
   SHOPPER_SESSION_HEADER,
@@ -369,9 +370,15 @@ function reconcileLines(container: HTMLElement, current: GuestCartView): void {
   }
 }
 
-function focusAfterRemove(root: Element, removedId: string): void {
-  const nextInput = root.querySelector("[data-guest-cart-qty]");
-  if (nextInput instanceof HTMLElement) {
+function cartLineIds(root: Element): string[] {
+  return [...root.querySelectorAll("[data-guest-cart-line]")]
+    .map(line => line.getAttribute("data-guest-cart-line")!);
+}
+
+function focusAfterRemove(root: Element, removedId: string, previousIds: readonly string[]): void {
+  const nextId = cartRemovalFocusId(previousIds, removedId, cartLineIds(root));
+  const nextInput = nextId ? root.querySelector(`${lineSelector(nextId)} [data-guest-cart-qty]`) : null;
+  if (nextInput instanceof HTMLInputElement && !nextInput.disabled) {
     nextInput.focus();
     return;
   }
@@ -382,7 +389,6 @@ function focusAfterRemove(root: Element, removedId: string): void {
   }
   const retry = root.querySelector("[data-guest-cart-retry]");
   if (retry instanceof HTMLElement && !retry.hidden) retry.focus();
-  void removedId;
 }
 
 /**
@@ -974,6 +980,7 @@ export function hydrateGuestCartPage(): void {
     if (!persistFailed()) {
       session = loadSession();
     }
+    const previousIds = cartLineIds(root);
     const result = removeGuestCartLine(session.intent, removeId);
     if (!result.accepted) {
       mutationNotice = result.reason;
@@ -982,7 +989,7 @@ export function hydrateGuestCartPage(): void {
     }
     mutationNotice = null;
     applyIntent(result.intent, session.notice, root);
-    focusAfterRemove(root, removeId);
+    focusAfterRemove(root, removeId, previousIds);
     void refreshSnapshot(root);
   });
   const updateQuantity = (target: HTMLInputElement) => {
