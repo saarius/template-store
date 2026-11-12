@@ -123,6 +123,9 @@ A real checkout with only its postal code missing still asked for five delivery 
 ## Native variant shipping weights · November 12
 Signed Commerce’s tee Shipping form now stores illustrative demo weights of M6 oz, L6.5 oz and XL7 oz; the bandana’s existing2 oz and all other products are unchanged. An invalid member refused the entire form without writing, and all typed values survived behind a disclosure that unexpectedly closed; reopening it allowed a normal corrected save and reload. Only one Commerce root record’s weights/version changed, with all eight Orders, CMS content, pricing, stock and option identities intact. Existing completed shipment1008 still has its one label; no backfill, resync or measured-sample claim is implied. EmDash human-review ledger item7 records the default-open/identity sharp edge; no signed plugin or host patch is deployed.
 
+## Product-card continuation · November 12
+The native Shipping refusal now has an isolated Commerce repair, not a speculative host reset. On unchanged main, four real pinned-renderer cases collapse Shipping after refusal; stable product/member-scoped Block Kit identities retain the open card through validation-banner insertion and removal. Commerce PR267 at2bd422a passes typecheck,850unit/workflow,111integration,Registry and targeted renderer checks. It is not released or installed in the signed store; reopening Shipping remains the live workaround and no catalog save was repeated.
+
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
 - Main navigation and footer navigation use actual 48×48px minimum link boxes, not surrounding margins. Preserve ordinary links, visible focus, wrapping and enlarged-font reflow; keep footer recovery and policy destinations easy to tap.

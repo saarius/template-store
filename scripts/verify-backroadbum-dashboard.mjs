@@ -39,8 +39,8 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('the cause is not yet proven');
-        await expect(page.locator('#history')).toContainText('no extra probe or automatic retry');
+        await expect(page.locator('#history')).toContainText('stable Block Kit identities');
+        await expect(page.locator('#history')).toContainText('the signed plugin is unchanged');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
         await expect(page.locator('#emdash-bugs li')).toHaveCount(7);
         await expect(page.locator('#emdash-bugs')).toContainText('Reopen Shipping');
@@ -90,7 +90,10 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(3);
         const candidates = page.getByRole('table', { name: 'Framework candidates · release state is separate', exact: true });
-        await expect(candidates.locator('tbody tr')).toHaveCount(17);
+        await expect(candidates.locator('tbody tr')).toHaveCount(18);
+        const cardState = candidates.locator('tr').filter({ hasText: 'fix/product-card-state' });
+        await expect(cardState).toContainText('no host change or repeated live save');
+        await expect(cardState.getByRole('link', { name: 'PR #267', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/267');
         const returnStartup = candidates.locator('tr').filter({ hasText: 'fix/checkout-return-initial-state' });
         await expect(returnStartup.getByRole('link', { name: 'PR #226', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/template-store/pull/226');
         await expect(returnStartup).toContainText('without changing payment, storage, retry or receipt logic');
@@ -117,7 +120,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 17, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
+    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 18, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
     await context.close();
   }
   await writeFile(new URL('verification.json', output), JSON.stringify(results, null, 2));
