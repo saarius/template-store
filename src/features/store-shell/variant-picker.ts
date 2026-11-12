@@ -5,6 +5,8 @@
 
 export interface VariantPickerMember {
   id: string;
+  /** Only this member's public Commerce SKU, when the projection supplies it. */
+  sku?: string;
   /** Option label to value label, e.g. { Color: "Black", Size: "Small" }. */
   values: Record<string, string>;
   price: string;

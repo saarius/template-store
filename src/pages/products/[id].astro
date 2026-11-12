@@ -21,6 +21,7 @@ import { availabilityLabels } from "../../features/commerce-catalog/index.js";
 import { demoPlaceholderImage } from "../../features/playground/demo-products.js";
 import { variantPickerView, NO_OFFER_JSON_LD_KEY, type VariantPickerMember } from "../../features/store-shell/variant-picker.js";
 import { productSelection } from "../../features/store-shell/product-selection.js";
+import { productIdentifiers } from "../../features/store-shell/product-identifiers.js";
 import { STORE_TITLE, categoryPath, loadStorefrontRouteContext, productPath } from "../../features/store-shell/index.js";
 import { hydrateProductCollectionMembership, productPageOffersCart, readProductEntries } from "../../features/store-shell/product-routes.js";
 import { leftCommerceCatalog } from "../../features/store-shell/merch-catalog.js";
@@ -107,6 +108,7 @@ const sandboxCheckout = showsSandboxCheckoutNotice({ profile, isPlayground, isDe
 const variants = linkedProduct?.variants ?? [];
 const selection = productSelection(variants, Astro.url.searchParams);
 const selectedVariant = selection.member;
+const identifiers = linkedProduct ? productIdentifiers(linkedProduct, selectedVariant) : null;
 // One picker per option (Color, then Size), like Shopify or WooCommerce
 // product pages. The browser matches the picked values to one member.
 const variantOptions = [...new Set(variants.flatMap((member) => member.selections.map(([option]) => option)))]
@@ -117,6 +119,7 @@ const variantOptions = [...new Set(variants.flatMap((member) => member.selection
 const selectedValue = (option: string) => selectedVariant?.selections.find(([name]) => name === option)?.[1];
 const variantMembers: VariantPickerMember[] = variants.map((member) => ({
   id: member.id,
+  ...(member.sku ? { sku: member.sku } : {}),
   values: Object.fromEntries(member.selections),
   price: member.priceText,
   availability: member.availability.status,
@@ -220,9 +223,9 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
           <div class="product-detail__body">
             <h1>{productName}</h1>
             {summary ? <div class="product-detail__summary" data-product-summary><PortableText value={summary} components={legacyPortableTextComponents} /></div> : <p class="product-detail__description">{item.description}</p>}
-            {linkedProduct && <p class="product-detail__identifier" data-product-sku={linkedProduct.sku}>SKU {linkedProduct.sku}</p>}
-            {linkedProduct?.gtin && <p class="product-detail__identifier" data-product-gtin={linkedProduct.gtin}>GTIN {linkedProduct.gtin}</p>}
-            {linkedProduct?.mpn && <p class="product-detail__identifier" data-product-mpn={linkedProduct.mpn}>MPN {linkedProduct.mpn}</p>}
+            {identifiers && <p class="product-detail__identifier" data-product-sku={identifiers.sku ?? ""} hidden={!identifiers.sku}>SKU {identifiers.sku}</p>}
+            {identifiers?.gtin && <p class="product-detail__identifier" data-product-gtin={identifiers.gtin}>GTIN {identifiers.gtin}</p>}
+            {identifiers?.mpn && <p class="product-detail__identifier" data-product-mpn={identifiers.mpn}>MPN {identifiers.mpn}</p>}
             {linkedProduct?.brand && <p class="product-detail__identifier" data-product-brand={linkedProduct.brand}>Brand {linkedProduct.brand}</p>}
             {linkedProduct && <p class="product-detail__price" data-product-price hidden={selection.stale}>{linkedProduct.price.saleText ? <><s data-regular-price>{linkedProduct.price.regularText}</s> <strong data-sale-price>{linkedProduct.price.saleText}</strong></> : <strong data-regular-price data-variant-price>{selectedVariant?.priceText ?? linkedProduct.price.regularText}</strong>}</p>}
             {selection.stale && <p class="product-detail__notice" data-product-selection-notice role="status">That saved option is no longer available. Choose from the options below before adding to your cart.</p>}
@@ -289,6 +292,13 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
     const price = document.querySelector("[data-variant-price]");
     if (priceRow) priceRow.hidden = view.price === null;
     if (price && view.price !== null) price.textContent = view.price;
+    const sku = document.querySelector<HTMLElement>("[data-product-sku]");
+    if (sku) {
+      const selectedSku = view.member?.sku ?? "";
+      sku.hidden = !selectedSku;
+      sku.dataset.productSku = selectedSku;
+      sku.textContent = selectedSku ? `SKU ${selectedSku}` : "";
+    }
     const status = document.querySelector("[data-product-status]");
     if (status) {
       status.textContent = view.status;
