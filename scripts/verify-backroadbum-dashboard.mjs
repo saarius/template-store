@@ -65,7 +65,10 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(3);
         const candidates = page.getByRole('table', { name: 'Framework candidates · release state is separate', exact: true });
-        await expect(candidates.locator('tbody tr')).toHaveCount(15);
+        await expect(candidates.locator('tbody tr')).toHaveCount(16);
+        const chronology = candidates.locator('tr').filter({ hasText: 'fix/native-order-chronology' });
+        await expect(chronology).toContainText('signed store plugin is unchanged');
+        await expect(chronology.getByRole('link', { name: 'PR #266', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/266');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/checkout-settings-layout' })).toContainText('not shared-deployed');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/checkout-settings-layout' }).getByRole('link', { name: 'PR #124', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/dinkuskit/pull/124');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/missing-item-weight' })).toContainText('substantive CI awaits maintainer approval');
@@ -86,7 +89,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 15, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, writes: 0, bytes: sizes });
+    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 16, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, writes: 0, bytes: sizes });
     await context.close();
   }
   await writeFile(new URL('verification.json', output), JSON.stringify(results, null, 2));
