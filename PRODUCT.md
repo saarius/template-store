@@ -117,6 +117,9 @@ A shopper search for the tee led to an empty published Tees collection. Native E
 ## Specific address corrections · November 12
 A real checkout with only its postal code missing still asked for five delivery fields. Local validation now names the missing delivery or billing field, keeping the existing focused summary, input/change clearing and all acceptance rules. Email priority, optional address lines/regions, U.S. delivery-state checks, digital-only billing and Commerce’s completely-empty-delivery refusal remain unchanged; no contact is sent or payment started during the correction proof. This is merchant-only copy refinement, not an update to the queued generic feedback-placement PR223.
 
+## Native variant shipping weights · November 12
+Signed Commerce’s tee Shipping form now stores illustrative demo weights of M6 oz, L6.5 oz and XL7 oz; the bandana’s existing2 oz and all other products are unchanged. An invalid member refused the entire form without writing, and all typed values survived behind a disclosure that unexpectedly closed; reopening it allowed a normal corrected save and reload. Only one Commerce root record’s weights/version changed, with all eight Orders, CMS content, pricing, stock and option identities intact. Existing completed shipment1008 still has its one label; no backfill, resync or measured-sample claim is implied. EmDash human-review ledger item7 records the default-open/identity sharp edge; no signed plugin or host patch is deployed.
+
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
 - Main navigation and footer navigation use actual 48×48px minimum link boxes, not surrounding margins. Preserve ordinary links, visible focus, wrapping and enlarged-font reflow; keep footer recovery and policy destinations easy to tap.
