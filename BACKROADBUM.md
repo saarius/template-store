@@ -4,6 +4,9 @@
 
 Merchant branch: `backroadbum/store`, serving https://backroadbum.com. This is an explicit merchant composition, not a generic self-hosting release or upstream proposal. `PRODUCT.md` and `DESIGN.md` record the provisional brand; the original starter design is at `docs/template-design.md`.
 
+## Native package-weight inspection · November 12
+Existing TEST order1008 remains Processing/revision1 with no label. Its two item weights are not set: native Ship displays0oz without warning and prefills only the box weight, while hosted Ship warns; do not fill in fictional weights or buy a label just for coverage. Ship PR97, `saarius/ship:fix/missing-item-weight`e838486 (`../ship-missing-weight`), proposes an incomplete marker and native weighing prompt; full Node24.22.0 checks and actual-admin-renderer desktop/phone proof with synthetic responses pass, with substantive CI approval-gated and no signed/shared deployment. Both Ship views also omit the frozen M/L choices; Commerce263 only repairs native Orders, so Ship needs a separate owning handoff decision. Evidence: workspace `evidence/2026-11-12-weight-cycle.md`; temporary synthetic browser code/captures stay ignored under `runs/backroadbum/order-workflow/`.
+
 ## Hosted resume · November 11
 The provisioned owner session and all three hosted consents are verified. Fresh native Check connection now reports Stripe TEST ready, superseding the earlier CAPTCHA snapshot; how onboarding changed is not established. Hosted settings remain TEST, flat$5/free from$75 and Ship enabled. A normal guest purchase through the private same-origin preview paid$21 ($16 bandana+$5 shipping) with a Stripe test card and became TEST order1006; native Payments confirms provider payment and Commerce persistence. Public TEST checkout reopened after that proof, and the preview is stopped.
 
