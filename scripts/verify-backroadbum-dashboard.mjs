@@ -37,6 +37,11 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(0);
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
+        const probe = page.locator('[data-checkout-probe]');
+        await expect(probe).toContainText(/ · [\d,]+ ms$/);
+        await expect(probe).not.toContainText('Unavailable');
+        await probe.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: new URL(`checkout-probe-${width}.png`, output).pathname });
         const observations = page.locator('[data-checkout-history]');
         await expect(observations.getByRole('heading', { name: 'Checkout readiness history', exact: true })).toBeVisible();
         await expect(observations).toContainText('Monitoring began');
