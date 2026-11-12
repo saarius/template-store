@@ -39,7 +39,8 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('illustrative tee weights');
+        await expect(page.locator('#history')).toContainText('the cause is not yet proven');
+        await expect(page.locator('#history')).toContainText('no extra probe or automatic retry');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
         await expect(page.locator('#emdash-bugs li')).toHaveCount(7);
         await expect(page.locator('#emdash-bugs')).toContainText('Reopen Shipping');
