@@ -989,8 +989,10 @@ export function hydrateGuestCartPage(): void {
     }
     mutationNotice = null;
     applyIntent(result.intent, session.notice, root);
-    focusAfterRemove(root, removeId, previousIds);
+    // Enter the refresh layout before focusing, so its status/totals cannot
+    // immediately push the newly focused field below the phone viewport.
     void refreshSnapshot(root);
+    focusAfterRemove(root, removeId, previousIds);
   });
   const updateQuantity = (target: HTMLInputElement) => {
     if (checkoutLocked()) return;

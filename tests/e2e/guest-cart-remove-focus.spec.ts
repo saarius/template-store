@@ -43,6 +43,7 @@ for (const path of ["/cart", "/checkout"]) {
     await expect.poll(() => snapshots).toBeGreaterThan(1);
     await expect(page.locator("[data-guest-cart-status]")).not.toContainText("Updating current product details.");
     await expect(quantity("bandana")).toBeFocused();
+    await expect(quantity("bandana")).toBeInViewport({ ratio: 1 });
     await remove("bandana").focus();
     await page.keyboard.press("Enter");
     await expect(quantity("mug")).toBeFocused();
