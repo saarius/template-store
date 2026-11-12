@@ -1,6 +1,9 @@
 // Read-only dashboard navigation check. No admin, provider or shopper capabilities.
 import { chromium, expect } from '@playwright/test';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+const source = await readFile(new URL('../src/features/experiment-report/DashboardReport.astro', import.meta.url), 'utf8');
+const historyTitles = [...source.matchAll(/<article class="cycle-entry"><h3>([^<]+)<\/h3>/g)].map(match => match[1]);
+expect(historyTitles.length).toBeGreaterThan(0);
 const base = process.env.STORE_URL || 'https://backroadbum.com';
 const output = new URL('../runs/backroadbum/dashboard/', import.meta.url);
 await mkdir(output, { recursive: true });
@@ -38,8 +41,8 @@ try {
         await page.waitForURL(url => url.hash === '#history');
         await expect(page.locator('#history').getByRole('link', { name: 'Read the full build history', exact: true })).toHaveAttribute('href', '/dashboard/history/');
       } else if (view === 'history') {
-        expect(await page.locator('.cycle-entry').count()).toBeGreaterThanOrEqual(77);
-        await expect(page.locator('.cycle-entry').first()).toContainText('Missing is not zero');
+        await expect(page.locator('.cycle-entry')).toHaveCount(historyTitles.length);
+        expect(await page.locator('.cycle-entry h3').allTextContents()).toEqual(historyTitles);
         await expect(page.locator('.cycle-entry').last()).toContainText('November 9');
         await expect(page.locator('table')).toHaveCount(0);
         await expect(page.locator('[data-activity-metrics]')).toHaveCount(0);
@@ -67,7 +70,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, javaScriptEnabled: false, views: 3, archiveMinimum: 77, candidateRows: 14, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, writes: 0, bytes: sizes });
+    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 14, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, writes: 0, bytes: sizes });
     await context.close();
   }
   await writeFile(new URL('verification.json', output), JSON.stringify(results, null, 2));

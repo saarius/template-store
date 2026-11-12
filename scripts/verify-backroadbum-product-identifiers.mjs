@@ -59,6 +59,7 @@ try {
             await input.focus(); await input.press('Space');
             await expect(input).toBeChecked(); await expect(input).toBeFocused();
             expect(await input.evaluate(node => getComputedStyle(node).outlineStyle)).not.toBe('none');
+            await expect(page.locator('[data-add-to-cart]')).toHaveAttribute('data-add-to-cart', member.id);
             await expect(page.locator('[data-add-to-cart]')).toBeEnabled({ enabled: member.sellable });
           }
           expect(new URL(page.url()).searchParams.get('item')).toBe(member.id);
