@@ -37,6 +37,13 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(0);
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
+        const observations = page.locator('[data-checkout-history]');
+        await expect(observations.getByRole('heading', { name: 'Checkout readiness history', exact: true })).toBeVisible();
+        await expect(observations).toContainText('Monitoring began');
+        await expect(observations).toContainText('sampled observations, not continuous uptime or payment outcomes');
+        expect(await observations.locator('li').count()).toBeLessThanOrEqual(6);
+        await observations.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: new URL(`readiness-history-${width}.png`, output).pathname });
         await expect(page.getByRole('link', { name: 'Original · captured November 9, 2026', exact: true })).toHaveAttribute('href', '/dashboard/instructions/original-2026-11-09.txt');
         await expect(page.getByRole('link', { name: 'Steer 1 · November 10, 2026', exact: true })).toHaveAttribute('href', '/dashboard/instructions/steer-1-2026-11-10.txt');
         expect(await page.locator('#instructions a').allTextContents()).toEqual([
@@ -89,7 +96,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 16, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, writes: 0, bytes: sizes });
+    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 16, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
     await context.close();
   }
   await writeFile(new URL('verification.json', output), JSON.stringify(results, null, 2));
