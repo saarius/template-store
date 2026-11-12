@@ -132,6 +132,8 @@ Keep the primary product illustration, CMS summary, price, availability and yell
 ### Navigation
 A compact uppercase wordmark and short plain-language links. The cart remains visible on phones. Current-page and hover states use underlines, not color alone.
 
+Main-navigation links and footer-navigation links keep at least 48×48px actual anchor boxes. Vertically center their existing text with internal padding rather than margins that are not clickable; retain fit-content widths, normal wrapping and the existing type/color treatment. Footer columns still stack when enlarged browser fonts need the space, without clipping or shrinking the text. Keyboard order, all destinations and the 3px focus outline remain unchanged.
+
 ### Shopping collections
 Homepage discovery puts the current nonempty published collections between the hero and full catalog: two plain, ruled columns on desktop, stacked on phones. The collection name is an underlined heading link with a 48px target and visible keyboard focus; its EmDash description follows without added counts, copied prices, cards or illustration. Catalog failure omits this secondary surface while the main catalog reports the error. Keep empty collections off this shortlist without treating a sold-out product as absent.
 

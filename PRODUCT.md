@@ -90,8 +90,12 @@ A refused automatic checkout check discarded the request-limit explanation and l
 ## Keyboard cart removal · November 12
 A fresh shopper keyboard check found that removing the middle of three items jumped back to the first item’s quantity. Cart and checkout now focus the next surviving row, or the nearest prior row at the end; the final removal retains empty-state focus. This merchant-only refinement preserves saved quantities, invalid drafts, Commerce refresh and payment guards; no new upstream item is opened while fourteen prior PRs await review.
 
+## Shared navigation targets · November 12
+A read-only phone browse found the footer’s recovery/policy links had roughly 23px-high tap areas and the main navigation about 41px. Both now keep at least 48×48px actual link targets, with unchanged labels, routes, type and colors; the footer adds clickable padding instead of inert gaps. Keyboard navigation, no-JavaScript browsing and a real 32px browser-font preference are checked without opening a payment or changing merchant records.
+
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
+- Main navigation and footer navigation use actual 48×48px minimum link boxes, not surrounding margins. Preserve ordinary links, visible focus, wrapping and enlarged-font reflow; keep footer recovery and policy destinations easy to tap.
 - Respect the shopper’s browser default font size. Shopping, reading and reporting should reflow rather than impose a rem-based body minimum, clip content or shrink text; footer columns may stack and long headings may wrap. Verify actual font preferences independently of browser zoom or synthetic CSS scaling.
 - Missing storefront addresses keep HTTP404 and provide native search, current gear and field-note links within the store shell. Offer last-checkout recovery with its same-browser/latest-checkout limits, never a payment conclusion; do not echo missing addresses or query strings. API/security refusals and temporary service failures retain their own semantics.
 - Collection pages honor the native category’s published reference order, never its saved draft. Sort only already-visible Commerce products; missing/failed ordering reads keep discovery available in stable catalog order, and stale references never add products. The homepage’s full catalog and related-gear selection keep their existing order.
