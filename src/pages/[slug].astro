@@ -90,4 +90,8 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
   .cms-reading .cms-page__body{font-size:1.0625rem;max-width:68ch}
   .cms-reading .cms-page__body :global(h2){margin-top:2.25rem;margin-bottom:.65rem;font-size:1.65rem;line-height:1.2}
   .cms-reading .cms-page__body :global(p:first-child){font-size:1.15rem;color:var(--store-muted);margin-bottom:2rem}
+  .cms-reading .cms-page__body :global(ol),.cms-reading .cms-page__body :global(ul){margin:0 0 1.5rem;padding-inline-start:1.6em}
+  .cms-reading .cms-page__body :global(li + li){margin-top:.75rem}
+  .cms-reading .cms-page__body :global(a){color:var(--store-ink);text-decoration:underline;text-underline-offset:.18em}
+  .cms-reading .cms-page__body :global(a:hover){text-decoration-thickness:2px}
 </style>

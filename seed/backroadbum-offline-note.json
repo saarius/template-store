@@ -1,0 +1,22 @@
+{
+  "slug": "field-note-before-the-signal-drops",
+  "title": "Before the signal drops",
+  "sections": [
+    { "style": "normal", "text": "The useful moment to prepare for a quiet stretch of road is while you still have a connection, a place to park and time to change the plan. A map that works offline is one part of that preparation, not permission to follow every line it shows. This is a routine for an easy day trip on maintained public roads, not a remote-travel or emergency guide." },
+    { "style": "h2", "text": "Make the plan small enough to change" },
+    { "style": "normal", "text": "Choose a familiar main route, a legal place to stop and a straightforward way home. Check current road and weather information from the responsible local authority before leaving. If access or conditions are unclear, keep the outing somewhere you can verify. A saved map cannot tell you that a gate is open today." },
+    { "style": "normal", "text": "Leave room in the day for a closed picnic area, a slow section or an early return. Pick a turnaround time before the view starts making the decisions. The point is a good afternoon, not finishing a line on a screen." },
+    { "style": "h2", "text": "Four things to do while connected" },
+    { "style": "normal", "listItem": "number", "text": "Save the map for the whole outing, including the way back and your alternative stop. Follow your map app’s instructions, then check that the area and useful place names are available without a connection before you leave." },
+    { "style": "normal", "listItem": "number", "text": "Write down the main road names, the permitted stop and the return route. Keep the note somewhere you can read while safely parked, rather than relying on an open browser tab." },
+    { "style": "normal", "listItem": "number", "text": "Tell a trusted person your planned route, who is going and when you expect to check in. Agree what they should do if you do not check in; do not leave that decision to a vague promise to be back later." },
+    { "style": "normal", "listItem": "number", "text": "Charge the phone and any backup power, and check the right cable is in the car. Keep the route note and essential supplies accessible. A charged device is useful, but it is not a guarantee of reception." },
+    { "style": "normal", "text": "For the ordinary things that belong beside the map, start with ", "link": { "text": "The glovebox list", "href": "/field-note-glovebox-list" }, "after": ". Adapt both lists to the actual people, vehicle and weather, not an imaginary expedition." },
+    { "style": "h2", "text": "Read the road, not just the screen" },
+    { "style": "normal", "text": "Check directions only when safely and legally parked. Signs, closures, land ownership and the conditions in front of you matter more than a suggested shortcut. Stay on permitted roads and established stopping places. Do not enter a track, cross water or drive around a barrier because the map draws a route through it." },
+    { "style": "normal", "text": "When the plan stops feeling simple, change it. Take an earlier safe return option rather than adding an uncertain detour. If you need specialist route, vehicle or emergency advice for the outing, get it before setting off; this short note cannot provide it." },
+    { "style": "h2", "text": "Close the loop" },
+    { "style": "normal", "text": "Check in with the person expecting you once you are back in contact, and say when the trip is finished. At home, note the one thing that was awkward: a missing road name, a cable in the wrong bag or a stop that was closed. Fix that small thing before the next day out." },
+    { "style": "normal", "text": "An early return still leaves time for ", "link": { "text": "a lunch stop worth taking", "href": "/field-note-lunch-stop" }, "after": ". You do not have to lose the signal to find the good part of the day." }
+  ]
+}
