@@ -38,8 +38,8 @@ try {
         await page.waitForURL(url => url.hash === '#history');
         await expect(page.locator('#history').getByRole('link', { name: 'Read the full build history', exact: true })).toHaveAttribute('href', '/dashboard/history/');
       } else if (view === 'history') {
-        expect(await page.locator('.cycle-entry').count()).toBeGreaterThanOrEqual(75);
-        await expect(page.locator('.cycle-entry').first()).toContainText('A shorter experiment overview');
+        expect(await page.locator('.cycle-entry').count()).toBeGreaterThanOrEqual(76);
+        await expect(page.locator('.cycle-entry').first()).toContainText('Two sizes, one paid order');
         await expect(page.locator('.cycle-entry').last()).toContainText('November 9');
         await expect(page.locator('table')).toHaveCount(0);
         await expect(page.locator('[data-activity-metrics]')).toHaveCount(0);
@@ -48,7 +48,8 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(3);
         const candidates = page.getByRole('table', { name: 'Framework candidates · release state is separate', exact: true });
-        await expect(candidates.locator('tbody tr')).toHaveCount(12);
+        await expect(candidates.locator('tbody tr')).toHaveCount(13);
+        await expect(candidates.locator('tr').filter({ hasText: 'fix/order-variant-labels' })).toContainText('signed store plugin is unchanged');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/product-control-readiness' })).toContainText('aggregate checks pass');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/checkout-contact-feedback' })).toContainText('queued with no jobs');
         await expect(page.locator('[data-activity-metrics]')).toHaveCount(0);
@@ -65,7 +66,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, javaScriptEnabled: false, views: 3, archiveMinimum: 75, candidateRows: 12, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, writes: 0, bytes: sizes });
+    results.push({ width, javaScriptEnabled: false, views: 3, archiveMinimum: 76, candidateRows: 13, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, writes: 0, bytes: sizes });
     await context.close();
   }
   await writeFile(new URL('verification.json', output), JSON.stringify(results, null, 2));
