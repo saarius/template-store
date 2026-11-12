@@ -92,7 +92,7 @@ describe("guest checkout delivery contact", () => {
     });
     expect(readCheckoutContact(form({}), false)).toEqual({
       contact: null,
-      error: "Complete the billing name, address, city, postal code, and country fields.",
+      error: "Enter the billing name to continue.",
     });
   });
 
@@ -104,7 +104,45 @@ describe("guest checkout delivery contact", () => {
       error: null,
     });
     expect(readCheckoutContact(contactForm({ region: "NY", ...billing, "billing-city": "" }, false), true).error)
-      .toBe("Complete the billing name, address, city, postal code, and country fields.");
+      .toBe("Enter the billing city to continue.");
+  });
+
+  it.each([
+    ["name", "Enter the delivery recipient name to continue."],
+    ["line1", "Enter the delivery address line 1 to continue."],
+    ["city", "Enter the delivery city to continue."],
+    ["postal-code", "Enter the delivery postal code to continue."],
+    ["country", "Choose a delivery country to continue."],
+  ])("names the blank delivery %s without accepting the partial address", (field, error) => {
+    for (const value of ["", "   "]) {
+      expect(readCheckoutContact(contactForm({ region: "NY", [field]: value }), true)).toEqual({ contact: null, error });
+    }
+  });
+
+  it.each([
+    ["name", "Enter the billing name to continue."],
+    ["line1", "Enter the billing address line 1 to continue."],
+    ["city", "Enter the billing city to continue."],
+    ["postal-code", "Enter the billing postal code to continue."],
+    ["country", "Choose a billing country to continue."],
+  ])("names the blank billing %s for physical and digital baskets", (field, error) => {
+    const fields = { "billing-name": "Bill Payer", "billing-line1": "9 Billing Way", "billing-city": "Toronto", "billing-postal-code": "M5V 1A1", "billing-country": "CA", ["billing-" + field]: " " };
+    for (const needsDelivery of [true, false]) {
+      expect(readCheckoutContact(contactForm({ region: "NY", ...fields }, false), needsDelivery)).toEqual({ contact: null, error });
+    }
+  });
+
+  it("names the first missing field in form order without changing email validation priority", () => {
+    expect(readCheckoutContact(contactForm({ name: "", city: "", "postal-code": "" }), true).error).toBe("Enter the delivery recipient name to continue.");
+    expect(readCheckoutContact(contactForm({ email: "", name: "" }), true).error).toBe("Enter your email address to continue.");
+    expect(readCheckoutContact(contactForm({ email: "not-an-email", name: "" }), true).error).toBe("Enter a valid email address to continue.");
+  });
+
+  it("keeps malformed country refusal and optional address fields independent", () => {
+    expect(readCheckoutContact(contactForm({ region: "NY", country: "USA" }), true).error).toBe("Choose a country this store ships to.");
+    const fields = { "billing-name": "Bill Payer", "billing-line1": "9 Billing Way", "billing-city": "Toronto", "billing-postal-code": "M5V 1A1", "billing-country": "CAN" };
+    expect(readCheckoutContact(contactForm(fields), false).error).toBe("Choose a billing country to continue.");
+    expect(readCheckoutContact(contactForm({ region: "NY", line2: "" }), true).error).toBeNull();
   });
 
   it("leaves an empty delivery address for Commerce to refuse rather than sending an empty billing copy", () => {

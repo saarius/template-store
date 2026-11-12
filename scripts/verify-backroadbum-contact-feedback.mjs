@@ -40,16 +40,27 @@ try {
     await correction('Enter a valid email address to continue.');
     await email.fill('contact-proof@example.test');
     await page.getByLabel('Recipient', { exact: true }).fill('Test shopper');
-    await correction('Complete the recipient, address, city, postal code, and country fields.');
-    await page.getByLabel('Address line 1', { exact: true }).fill('1 Example Way');
-    await page.getByLabel('City', { exact: true }).fill('Portland');
-    await page.getByLabel('Postal code', { exact: true }).fill('97201');
+    await correction('Enter the delivery address line 1 to continue.');
+    await page.getByLabel('Address line 1', { exact: true }).fill('510 Townsend St');
+    await page.getByLabel('City', { exact: true }).fill('San Francisco');
     await page.getByLabel('Country', { exact: true }).selectOption('US');
+    await correction('Enter the delivery postal code to continue.');
+    if (capture) await page.screenshot({ path: `${dir}/postal-${width}.png` });
+    await page.getByLabel('Postal code', { exact: true }).fill('94103');
     await correction('Enter a state for United States delivery.');
     if (capture) await page.screenshot({ path: `${dir}/delivery-${width}.png` });
-    await page.getByLabel('State or region (required for United States delivery)', { exact: true }).fill('OR');
+    await page.getByLabel('State or region (required for United States delivery)', { exact: true }).fill('CA');
     await page.getByLabel('Billing address same as delivery address').uncheck();
-    await correction('Complete the billing name, address, city, postal code, and country fields.');
+    await correction('Enter the billing name to continue.');
+    await page.getByLabel('Billing name', { exact: true }).fill('Test payer');
+    await page.getByLabel('Billing address line 1', { exact: true }).fill('510 Townsend St');
+    await page.getByLabel('Billing city', { exact: true }).fill('San Francisco');
+    await page.getByLabel('Billing country', { exact: true }).selectOption('US');
+    await correction('Enter the billing postal code to continue.');
+    if (capture) await page.screenshot({ path: `${dir}/billing-${width}.png` });
+    await page.getByLabel('Billing postal code', { exact: true }).fill('94103');
+    await page.getByLabel('Billing city', { exact: true }).fill('');
+    await correction('Enter the billing city to continue.');
     const country = page.getByLabel('Billing country', { exact: true });
     await country.focus(); await country.selectOption('CA');
     await expect(feedback).toBeHidden(); await expect(country).toBeFocused();
@@ -58,7 +69,7 @@ try {
     expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'))).toBe(intent);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect(starts).toEqual([]); expect(errors).toEqual([]);
-    results.push({ width, invalidCases: 5, errorFocusedAndVisible: true, tabToEmail: true,
+    results.push({ width, invalidCases: 8, fieldSpecificAddressCorrections: true, errorFocusedAndVisible: true, tabToEmail: true,
       clearsOnInputAndSelectWithoutFocusChange: true, contactAndIntentPreserved: true, noOverflow: true, checkoutStarts: 0, browserErrors: 0 });
     await context.close();
   }

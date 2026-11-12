@@ -499,7 +499,7 @@ test("checkout contact proof covers physical validation, Commerce refusal, fille
 
     await physical.getByLabel("City", { exact: true }).fill("");
     await physical.getByRole("button", { name: "Continue to secure checkout" }).click();
-    await expect(physical.locator("[data-guest-cart-contact-error]")).toContainText("Complete the recipient");
+    await expect(physical.locator("[data-guest-cart-contact-error]")).toHaveText("Enter the delivery city to continue.");
     await physical.screenshot({ path: resolve(root, "physical-validation-error.png"), fullPage: true, animations: "disabled" });
 
     await physical.getByLabel("Recipient", { exact: true }).fill("");

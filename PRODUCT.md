@@ -114,6 +114,9 @@ Local snapshots now retain the matching EmDash encryption ring alongside the dat
 ## Retired starter collections · November 12
 A shopper search for the tee led to an empty published Tees collection. Native EmDash Unpublish now retains Tees, Hats and Hoodies as private drafts with their original copy, rather than adding a storefront filter or deleting records. Road day, Slow camp, all six product records and all eight Orders remain unchanged; current gear stays searchable and saved starter URLs return the existing helpful404. Empty merchant-authored collections can still be published intentionally; this cleanup is not a new global visibility rule.
 
+## Specific address corrections · November 12
+A real checkout with only its postal code missing still asked for five delivery fields. Local validation now names the missing delivery or billing field, keeping the existing focused summary, input/change clearing and all acceptance rules. Email priority, optional address lines/regions, U.S. delivery-state checks, digital-only billing and Commerce’s completely-empty-delivery refusal remain unchanged; no contact is sent or payment started during the correction proof. This is merchant-only copy refinement, not an update to the queued generic feedback-placement PR223.
+
 ## Product Principles
 - Make the next shopping action clear, including a findable route back to the latest browser-bound checkout.
 - Main navigation and footer navigation use actual 48×48px minimum link boxes, not surrounding margins. Preserve ordinary links, visible focus, wrapping and enlarged-font reflow; keep footer recovery and policy destinations easy to tap.

@@ -220,8 +220,17 @@ async function prefillShopperContact(root: Element): Promise<void> {
   }
 }
 
-/** Reads one address block; "missing" when a required field is blank. */
-function readAddress(root: Element, kind: "delivery" | "billing"): GuestCheckoutDelivery | "empty" | "missing" {
+type RequiredAddressField = "name" | "line1" | "city" | "postalCode" | "country";
+const REQUIRED_ADDRESS_FIELDS: readonly RequiredAddressField[] = ["name", "line1", "city", "postalCode", "country"];
+
+function addressCorrection(kind: "delivery" | "billing", field: RequiredAddressField): string {
+  if (field === "country") return `Choose a ${kind} country to continue.`;
+  const label = { name: kind === "delivery" ? "recipient name" : "name", line1: "address line 1", city: "city", postalCode: "postal code" }[field];
+  return `Enter the ${kind} ${label} to continue.`;
+}
+
+/** Reads one address block; identifies the first blank required field in form order. */
+function readAddress(root: Element, kind: "delivery" | "billing"): GuestCheckoutDelivery | "empty" | { missing: RequiredAddressField } {
   const field = (name: string) => inputValue(root, `[data-guest-cart-${kind}-${name}]`);
   const fields = {
     name: field("name"),
@@ -233,8 +242,8 @@ function readAddress(root: Element, kind: "delivery" | "billing"): GuestCheckout
     country: field("country").toUpperCase(),
   };
   if (!Object.values(fields).some(Boolean)) return "empty";
-  for (const [key, value] of Object.entries(fields)) {
-    if (!value && key !== "line2" && key !== "region") return "missing";
+  for (const key of REQUIRED_ADDRESS_FIELDS) {
+    if (!fields[key]) return { missing: key };
   }
   return {
     name: fields.name,
@@ -261,8 +270,8 @@ export function readCheckoutContact(
   let delivery: GuestCheckoutDelivery | undefined;
   if (needsDelivery) {
     const read = readAddress(root, "delivery");
-    if (read === "missing") {
-      return { contact: null, error: "Complete the recipient, address, city, postal code, and country fields." };
+    if (read !== "empty" && "missing" in read) {
+      return { contact: null, error: addressCorrection("delivery", read.missing) };
     }
     if (read !== "empty") {
       if (!/^[A-Z]{2}$/u.test(read.country)) return { contact: null, error: "Choose a country this store ships to." };
@@ -279,8 +288,11 @@ export function readCheckoutContact(
     return { contact: delivery ? { email, delivery, billing: { ...delivery } } : { email }, error: null };
   }
   const billing = readAddress(root, "billing");
-  if (billing === "empty" || billing === "missing" || !/^[A-Z]{2}$/u.test(billing.country)) {
-    return { contact: null, error: "Complete the billing name, address, city, postal code, and country fields." };
+  if (billing === "empty" || "missing" in billing) {
+    return { contact: null, error: addressCorrection("billing", billing === "empty" ? "name" : billing.missing) };
+  }
+  if (!/^[A-Z]{2}$/u.test(billing.country)) {
+    return { contact: null, error: addressCorrection("billing", "country") };
   }
   return { contact: { email, ...(delivery ? { delivery } : {}), billing }, error: null };
 }
