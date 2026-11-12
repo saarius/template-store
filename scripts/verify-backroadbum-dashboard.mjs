@@ -41,8 +41,8 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('Eight synthetic captures are publicly hosted outside git');
-        await expect(page.locator('#history')).toContainText('presentation policy still needs the maintainer decision');
+        await expect(page.locator('#history')).toContainText('Twelve synthetic captures across three UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('additive contract still needs the maintainer decision');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
         await expect(page.locator('#emdash-bugs li')).toHaveCount(7);
         await expect(page.locator('#emdash-bugs')).toContainText('Reopen Shipping');
@@ -115,7 +115,12 @@ try {
         await expect(chronology).toContainText('proof item');
         await expect(chronology).toContainText('maintainer’s presentation-policy decision');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/invalid-cart-quantity' })).toContainText('cannot prove the proposed behavior');
-        await expect(candidates.locator('tr').filter({ hasText: 'fix/public-variant-sku' })).toContainText('contract still needs a maintainer decision');
+        const memberSku = candidates.locator('tr').filter({ hasText: 'fix/public-variant-sku' });
+        await expect(memberSku).toContainText('contract still needs a maintainer decision');
+        await expect(memberSku).toContainText('captured anonymous compiled-Registry list/default/member HTTP output');
+        const detailRows = candidates.locator('tr').filter({ hasText: 'fix/order-detail-rows' });
+        await expect(detailRows).toContainText('four hosted Before/After desktop/phone screenshots');
+        await expect(detailRows).toContainText('thirteen separate rows');
         await expect(chronology.getByRole('link', { name: 'PR #266', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/266');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/checkout-settings-layout' })).toContainText('not shared-deployed');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/checkout-settings-layout' }).getByRole('link', { name: 'PR #124', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/dinkuskit/pull/124');
