@@ -18,10 +18,14 @@ Environment=BACKROADBUM_CHECKOUT_ENABLED=1
 Environment=DINKUS_TEMPLATE_DB_URL=file:/var/lib/backroadbum/content.db
 Environment=DINKUS_TEMPLATE_UPLOADS_DIR=/var/lib/backroadbum/uploads
 Environment=PATH=/opt/node/bin:/usr/local/bin:/usr/bin:/bin
-ExecStart=/opt/node/bin/node /var/lib/backroadbum/current/server/entry.mjs
+ExecStart=/opt/node/bin/node /var/lib/trialrun/workspace/ops/start-store.mjs /var/lib/backroadbum/current/server/entry.mjs
 Restart=on-failure
 RestartSec=5
 TimeoutStopSec=10
+# Main closes HTTP before forwarding SIGTERM to the runner. Children remain
+# available for admitted requests; systemd kills the whole group at the bound.
+KillSignal=SIGINT
+KillMode=mixed
 NoNewPrivileges=true
 PrivateTmp=true
 UMask=0077

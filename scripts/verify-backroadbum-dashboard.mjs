@@ -46,7 +46,10 @@ try {
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
         await expect(page.locator('#emdash-bugs li')).toHaveCount(7);
         await expect(page.locator('#emdash-bugs')).toContainText('Reopen Shipping');
-        await expect(page.locator('#emdash-bugs')).toContainText('shutdown coordination remains unimplemented');
+        await expect(page.locator('#emdash-bugs')).toContainText('first live shutdown remains unverified');
+        await expect(page.locator('#history')).toContainText('Eleven offline lifecycle checks pass');
+        await expect(page.locator('#history')).toContainText('eight-second deadline');
+        await expect(page.locator('#history')).toContainText('past deployment failures and unknown outage durations stay on record');
         await expect(page.locator('#contributions')).toContainText('a failing review-status check is not a failed test suite or release');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Contact corrections' })).toContainText('validation and payment guards unchanged');
         const recovery = page.locator('.status-list > div').filter({ hasText: 'Recovery coverage' });
