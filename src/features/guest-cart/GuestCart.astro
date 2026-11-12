@@ -67,6 +67,7 @@ const { checkoutAdmission = null } = Astro.props;
   .guest-cart-checkout [data-guest-cart-availability-message][role="alert"]{color:var(--store-alert-ink)}
   .guest-cart-checkout [data-guest-cart-availability-message]:focus{outline:3px solid var(--store-focus-ring);outline-offset:2px;scroll-margin-block:1rem}
   .guest-cart-checkout [data-guest-cart-availability-retry]{margin-top:1rem}
+  .guest-cart-checkout [data-guest-cart-availability-retry][aria-disabled="true"]{color:var(--store-muted);cursor:not-allowed}
   .guest-cart-checkout [data-guest-cart-recover]{margin-top:1rem}
   .guest-cart-retry{margin-top:1rem}
   .guest-cart :global([data-guest-cart-line]){display:grid;grid-template-columns:7rem minmax(0,1fr) auto;gap:.75rem 1.25rem;align-items:start;padding:1.5rem 0;border-top:1px solid var(--store-line);min-width:0;overflow-wrap:anywhere}

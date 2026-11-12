@@ -188,6 +188,7 @@ const BILLING_COUNTRIES = Array.from({ length: 26 * 26 }, (_, i) => String.fromC
   .guest-checkout-actions [data-guest-cart-checkout]:not(:disabled):hover{background:#eac04b}
   .guest-checkout-actions [data-guest-cart-checkout]:disabled{background:var(--store-bg);color:var(--store-muted);cursor:not-allowed}
   .guest-checkout-actions [data-guest-cart-checkout-reason]{margin:.5rem 0 0;color:var(--store-muted);line-height:1.6}
+  .guest-checkout-actions [data-guest-cart-availability-retry][aria-disabled="true"]{color:var(--store-muted);cursor:not-allowed}
   .guest-checkout-actions [data-guest-cart-availability-message][role="alert"]{color:var(--store-alert-ink)}
   .guest-checkout-actions [data-guest-cart-availability-message]:focus{outline:3px solid var(--store-focus-ring);outline-offset:2px;scroll-margin-block:1rem}
   .guest-checkout-actions [data-guest-cart-resume]{display:inline-block;min-height:48px;margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1px solid var(--store-line);border-radius:.25rem;color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:.2em}

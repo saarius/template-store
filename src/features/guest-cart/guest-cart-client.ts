@@ -534,7 +534,9 @@ function renderCart(root: Element): void {
   }
   if (availabilityRetry instanceof HTMLButtonElement) {
     availabilityRetry.hidden = !availabilityRetryAllowed();
-    availabilityRetry.disabled = checkoutLocked();
+    // aria-disabled plus the click guard preserves focus during this async check.
+    // Native disabled would blur the button before its result can receive focus.
+    availabilityRetry.setAttribute("aria-disabled", String(checkoutLocked()));
   }
   const messages = [
     pendingCheckout ? "Checking your checkout." : checkoutMessage,

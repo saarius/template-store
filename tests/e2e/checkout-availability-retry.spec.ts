@@ -76,7 +76,7 @@ test("an active checkout cannot turn availability retry into a new prepare", asy
   await expect(page.locator("[data-guest-cart-recover]")).toBeVisible();
   const retry = page.locator("[data-guest-cart-availability-retry]");
   await expect(retry).toBeHidden();
-  await retry.evaluate((button: HTMLButtonElement) => { button.hidden = false; button.disabled = false; });
+  await retry.evaluate((button: HTMLButtonElement) => { button.hidden = false; button.disabled = false; button.removeAttribute("aria-disabled"); });
   await retry.click();
   expect(calls).toBe(0);
   expect(await page.evaluate(key => JSON.parse(localStorage.getItem(key)!).attemptId, GUEST_CHECKOUT_CAPABILITY_STORAGE_KEY)).toBe("attempt-1");
@@ -94,7 +94,7 @@ test("a closed server admission never offers or accepts a prepare retry", async 
   await expect(page.locator("[data-guest-cart-line] h2")).toHaveText("Blue bandana");
   const retry = page.locator("[data-guest-cart-availability-retry]");
   await expect(retry).toBeHidden();
-  await retry.evaluate((button: HTMLButtonElement) => { button.hidden = false; button.disabled = false; });
+  await retry.evaluate((button: HTMLButtonElement) => { button.hidden = false; button.disabled = false; button.removeAttribute("aria-disabled"); });
   await retry.click(); expect(probes).toBe(0);
 });
 
