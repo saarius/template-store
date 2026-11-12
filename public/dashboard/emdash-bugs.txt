@@ -1,6 +1,6 @@
 # EmDash Bugs & Friction — For Human Review
 
-Updated November 11, 2026. No EmDash upstream issue, PR or comment has been opened. These observations are not all confirmed CMS defects; unknown causes/versions are explicitly marked. Live Node24.22.2, EmDash1.4.0 and @emdash-cms/sandbox-workerd0.9.6 are currently resolved; candidate/baseline use Node24.22.0, EmDash1.4.0. Historical component versions not separately captured remain unqualified.
+Updated November 12, 2026. No EmDash upstream issue, PR or comment has been opened. These observations are not all confirmed CMS defects; unknown causes/versions are explicitly marked. Live Node24.22.2, EmDash1.4.0 and @emdash-cms/sandbox-workerd0.9.6 are currently resolved; candidate/baseline use Node24.22.0, EmDash1.4.0. Historical component versions not separately captured remain unqualified.
 
 ## 1. Standalone Node image transforms need an explicit Sharp dependency
 - Observed: November9 initial built store returned HTTP500 for transformed images; declaring Sharp at the application root restored HTTP200. Current resolved Sharp is0.34.5; the exact original pre-fix dependency resolution was not retained.
@@ -35,5 +35,12 @@ Updated November 11, 2026. No EmDash upstream issue, PR or comment has been open
 - Root cause: expected plain-text Section rendering, not a confirmed EmDash defect. Commerce used newlines as layout; the host Fields alternative truncates long values. The fix belongs in Commerce, not an EmDash theme override.
 - Workaround: read the current paragraph carefully and use Correct address for separate labeled inputs. Commerce PR261 proposes one wrapping Section per fact;848 unit/workflow,111 integration, official Registry size and installed desktop/phone checks pass locally. Signed store plugin remains unchanged pending release.
 - Evidence: evidence/2026-11-11-order-detail-live-baseline.json and2026-11-11-address-dogfood-cycle.md. Native merchant captures are private/ignored; the upstream PR includes synthetic tests only. No EmDash upstream contact.
+
+## 6. Expanded product-block keyboard reordering needs a collapsed-view workaround
+- Versions: serving EmDash1.4.0 (`10beb8c5a` in admin), Node24.22.2, Chromium through Playwright1.61.1.
+- Observed November12 while authoring tee fit content: with three unequal-height expanded blocks (care, fit instructions, specification rows), Space → ArrowDown → ArrowDown → Space moved the first block only one position in an automated native-editor task. A subsequent mixed-handle sequence did not achieve the desired order. This is an observed editing sharp edge, not an isolated CMS defect or manual/physical-keyboard reproduction.
+- Root cause: unknown; keyboard sensor geometry, scrolling and automation timing have not been separated. Do not infer data loss or a broken publication operation; read-back preserved the existing published content and draft.
+- Workaround: collapse all three blocks through native controls, use the first reorder handle with the same keyboard sequence, then expand, Save and reload. The final order and all fields persisted correctly; publish only after exact draft comparison. No CMS/runtime patch.
+- Evidence: evidence/2026-11-12-tee-fit-cycle.md,2026-11-12-tee-fit-native-order.txt and native draft/published screenshots under ignored template-store runs/backroadbum/tee-fit/. No EmDash upstream contact; a human should reproduce before reporting.
 
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.

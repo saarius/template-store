@@ -1,0 +1,14 @@
+{
+  "slug": "wrong-turn-tee",
+  "summary": "An easy everyday layer, from the first coffee stop to the drive home. A relaxed unisex fit in pine green; choose your size below.",
+  "link": { "text": "Compare tee measurements", "href": "#product-details" },
+  "heading": "Choosing a size",
+  "instructions": "Lay a tee you like flat without stretching it. Measure straight across the chest just below the sleeves, then from the high shoulder beside the collar to the hem. Compare garment measurements, not body measurements.",
+  "scope": "These are illustrative measurements for our demo design, not measurements of a manufactured sample. Width is measured flat, not all the way around.",
+  "tableHeading": "Tee measurements in inches",
+  "rows": [
+    { "label": "M", "value": "21 chest width · 28 length" },
+    { "label": "L", "value": "23 chest width · 29 length" },
+    { "label": "XL", "value": "25 chest width · 30 length" }
+  ]
+}

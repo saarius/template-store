@@ -56,6 +56,20 @@ describe('Backroad Bum source-authored merchant content', () => {
     expect(paragraph.children.find((span: any) => span.text === 'Test-store guide').marks).toEqual(['guide']);
     expect(JSON.stringify(support)).not.toMatch(/shipping charge|sk_test_|guaranteed/i);
   });
+  it('keeps tee measurements illustrative, separate from Commerce facts and reachable without script', () => {
+    const fit = JSON.parse(readFileSync('seed/backroadbum-tee-fit.json', 'utf8'));
+    expect(fit.slug).toBe('wrong-turn-tee');
+    expect(fit.rows.map((row: { label: string }) => row.label)).toEqual(['M', 'L', 'XL']);
+    expect(fit.tableHeading).toContain('inches');
+    expect(fit.instructions).toContain('Compare garment measurements, not body measurements');
+    expect(fit.scope).toContain('not measurements of a manufactured sample');
+    expect(fit.scope).toContain('Width is measured flat');
+    expect(JSON.stringify(fit)).not.toMatch(/\$|in stock|sold out|shipping|guaranteed|sk_test_/i);
+    expect(fit.link.href).toBe('#product-details');
+    const route = readFileSync('src/pages/products/[id].astro', 'utf8');
+    expect(route).toContain('{details && <section id="product-details" tabindex="-1"');
+    expect(route.match(/id="product-details"/g)).toHaveLength(1);
+  });
   it('keeps field notes editable in EmDash Pages', () => {
     const notes = pages.filter((p: any) => p.slug.startsWith('field-note-'));
     expect(notes).toHaveLength(4);
