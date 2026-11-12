@@ -58,7 +58,9 @@
   ["h2","What works today"],
   ["normal","Browse the gear and roadwear, inspect their design notes and prices, and add them to your guest cart. You can change quantities, remove items and return later in the same browser. Prices and availability are read from the installed DinkusKit Commerce plugin, not saved as checkout authority in your browser."],
   ["h2","Try a test purchase"],
-  ["normal","Add an item to your cart and choose Checkout. Enter a fictional email, name and U.S. delivery address, then continue to Stripe. Do not enter personal contact details or a home address in this demo."],
+  ["normal","Add an item to your cart and choose Checkout. Use an invented name such as Demo Shopper and an email such as demo@example.com, not your personal contact details."],
+  ["normal","For U.S. delivery, try this public test address: 510 Townsend St, San Francisco, CA 94103, United States. Leave address line 2 empty. This fixture has worked for our sandbox labels; do not use a home address."],
+  ["normal","An invented street can pass checkout but be refused by the sandbox carrier later. That refusal is not a failed payment: the merchant can correct the delivery address while the paid items and total stay unchanged."],
   ["normal","On Stripe’s test checkout, use card 4242 4242 4242 4242 with any future expiry date and any three-digit CVC. Never enter a real card. Return to the store after payment; the receipt appears only when Commerce has verified the payment with the provider."],
   ["h2","Keep your receipt"],
   ["normal","Choose Your last checkout in the footer, or Open your last checkout below, using the browser you paid with. Only this browser’s latest checkout is kept; preserve its site data. The page address alone cannot recover an order. If payment is pending, check its status before starting again. Email sign-in is paused because delivery is unavailable; use the original browser for your receipt."],
@@ -76,7 +78,8 @@
   ["normal","Paid test orders begin in Processing. The merchant can use hosted DinkusKit Ship to create a sandbox label and record completion in Commerce. This is a separate merchant step, not an automatic delivery after payment. No live postage is bought."],
   ["normal","The current guest receipt shows paid items and totals, not a fulfillment timeline or tracking. A sandbox label or completed admin order is not a carrier scan or delivery."],
   ["h2","Address details"],
-  ["normal","Use fictional U.S. address details when trying checkout. Do not submit a home address or any information you would not want stored in a demo order."]
+  ["normal","Use an invented name and demo@example.com, not personal contact details or a home address. A public test address that has worked for our sandbox labels is 510 Townsend St, San Francisco, CA 94103, United States; leave address line 2 empty."],
+  ["normal","An invented street can pass checkout but be refused by the sandbox carrier. The merchant can correct the delivery address without changing the paid items or total. A label refusal is not a payment failure; check your last checkout in the original browser before trying another payment."]
  ]},
  {"slug":"returns","title":"Returns","replaceStarter":true,"sections":[
   ["normal","Because this store does not sell or ship physical goods, there is nothing to send back. Please do not mail items or submit personal information for a return."],

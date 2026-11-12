@@ -63,12 +63,25 @@ try {
   }
   const context = await browser.newContext({ ...contextOptions, javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
-  await page.goto(base + '/test-store');
+  const writes = [], checkoutRequests = [];
+  page.on('request', request => {
+    if (!['GET', 'HEAD'].includes(request.method())) writes.push(request.method());
+    if (new URL(request.url()).pathname.startsWith('/api/checkout/')) checkoutRequests.push(request.method());
+  });
+  for (const slug of ['shipping', 'test-store']) {
+    expect((await page.goto(base + '/' + slug)).status()).toBe(200);
+    const body = page.locator(slug === 'test-store' ? '[data-cms-page-body]' : '[data-policy-body]');
+    expect(await body.locator(':scope > p, :scope > h2').evaluateAll(elements => elements
+      .filter(element => element.textContent.trim()).map(element => [element.tagName === 'H2' ? 'h2' : 'normal', element.textContent])))
+      .toEqual(source.find(item => item.slug === slug).sections);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
   const actions = page.getByRole('navigation', { name: 'Ready to try it?', exact: true });
   await expect(actions.getByRole('link', { name: 'Open your last checkout', exact: true })).toHaveAttribute('href', '/checkout/success');
   await actions.getByRole('link', { name: 'Browse the gear', exact: true }).click();
   await expect(page).toHaveURL(base + '/shop');
-  results.push({ javaScript: false, guideReadable: true, shopLinkWorks: true, receiptLinkPresent: true });
+  expect(writes).toEqual([]); expect(checkoutRequests).toEqual([]);
+  results.push({ javaScript: false, guideAndShippingMatchCMS: true, noOverflow: true, shopLinkWorks: true, receiptLinkPresent: true, writes: 0, checkoutRequests: 0 });
   await context.close();
 } finally { await browser.close(); }
 const evidence = { verifiedAt: new Date().toISOString(), base, results };
