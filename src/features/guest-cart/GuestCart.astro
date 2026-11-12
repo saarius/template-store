@@ -28,6 +28,8 @@ const { checkoutAdmission = null } = Astro.props;
       <div class="guest-cart-checkout">
         <button type="button" data-guest-cart-checkout data-guest-cart-proceed disabled>{checkoutAdmission ? GUEST_CHECKOUT_READY_LABEL : GUEST_CHECKOUT_LABEL}</button>
         <p data-guest-cart-checkout-reason>{checkoutAdmission ? "" : GUEST_CHECKOUT_REASON}</p>
+        <p data-guest-cart-availability-message role="status" tabindex="-1" hidden></p>
+        <button type="button" data-guest-cart-availability-retry hidden>Check checkout availability</button>
         <a data-guest-cart-resume hidden rel="noopener noreferrer">Return to secure checkout</a>
         <button type="button" data-guest-cart-recover hidden>Check checkout status</button>
       </div>
@@ -62,6 +64,9 @@ const { checkoutAdmission = null } = Astro.props;
   .guest-cart-checkout [data-guest-cart-checkout]:disabled{color:var(--store-muted);cursor:not-allowed}
   .guest-cart-checkout [data-guest-cart-resume]{display:inline-block;margin-top:1rem;line-height:1.6}
   .guest-cart-checkout [data-guest-cart-resume][hidden]{display:none}
+  .guest-cart-checkout [data-guest-cart-availability-message][role="alert"]{color:var(--store-alert-ink)}
+  .guest-cart-checkout [data-guest-cart-availability-message]:focus{outline:3px solid var(--store-focus-ring);outline-offset:2px;scroll-margin-block:1rem}
+  .guest-cart-checkout [data-guest-cart-availability-retry]{margin-top:1rem}
   .guest-cart-checkout [data-guest-cart-recover]{margin-top:1rem}
   .guest-cart-retry{margin-top:1rem}
   .guest-cart :global([data-guest-cart-line]){display:grid;grid-template-columns:7rem minmax(0,1fr) auto;gap:.75rem 1.25rem;align-items:start;padding:1.5rem 0;border-top:1px solid var(--store-line);min-width:0;overflow-wrap:anywhere}

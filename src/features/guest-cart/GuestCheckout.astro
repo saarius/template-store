@@ -138,6 +138,8 @@ const BILLING_COUNTRIES = Array.from({ length: 26 * 26 }, (_, i) => String.fromC
         <p class="guest-checkout-handoff-note" data-checkout-payment-note>Payment is processed securely through the store's configured payment provider.</p>
         <button type="button" data-guest-cart-checkout disabled>{checkoutAdmission ? GUEST_CHECKOUT_READY_LABEL : GUEST_CHECKOUT_LABEL}</button>
         <p data-guest-cart-checkout-reason>{checkoutAdmission ? "" : GUEST_CHECKOUT_REASON}</p>
+        <p data-guest-cart-availability-message role="status" tabindex="-1" hidden></p>
+        <button type="button" data-guest-cart-availability-retry hidden>Check checkout availability</button>
         <button type="button" data-guest-cart-retry hidden>Try again</button>
         <a data-guest-cart-resume hidden rel="noopener noreferrer">Return to secure checkout</a>
         <button type="button" data-guest-cart-recover hidden>Check checkout status</button>
@@ -186,6 +188,8 @@ const BILLING_COUNTRIES = Array.from({ length: 26 * 26 }, (_, i) => String.fromC
   .guest-checkout-actions [data-guest-cart-checkout]:not(:disabled):hover{background:#eac04b}
   .guest-checkout-actions [data-guest-cart-checkout]:disabled{background:var(--store-bg);color:var(--store-muted);cursor:not-allowed}
   .guest-checkout-actions [data-guest-cart-checkout-reason]{margin:.5rem 0 0;color:var(--store-muted);line-height:1.6}
+  .guest-checkout-actions [data-guest-cart-availability-message][role="alert"]{color:var(--store-alert-ink)}
+  .guest-checkout-actions [data-guest-cart-availability-message]:focus{outline:3px solid var(--store-focus-ring);outline-offset:2px;scroll-margin-block:1rem}
   .guest-checkout-actions [data-guest-cart-resume]{display:inline-block;min-height:48px;margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1px solid var(--store-line);border-radius:.25rem;color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:.2em}
   .guest-checkout-actions [data-guest-cart-resume][hidden]{display:none}
   .guest-checkout-manifest{grid-area:review;padding:1.25rem;border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:var(--store-surface);min-width:0}

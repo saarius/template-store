@@ -44,6 +44,7 @@ import {
 import { pendingCheckoutAmount } from "./pending-review.js";
 import { setCheckoutContactFeedback } from "./contact-feedback.js";
 import { cartRemovalFocusId } from "./remove-focus.js";
+import { canRetryCheckoutAvailability, checkoutAvailabilityFailure } from "./availability-retry.js";
 import {
   SHOPPER_ORDERS_ENDPOINT,
   SHOPPER_SESSION_HEADER,
@@ -70,6 +71,9 @@ let pendingCheckout = false;
 let checkoutRecovery = false;
 let checkoutController: ReturnType<typeof createGuestCheckoutController> | null = null;
 let checkoutAdmitted = false;
+let checkoutServerAdmitted = false;
+let checkoutProbeFailed = false;
+let checkoutProbeNotice: string | null = null;
 let mutationNotice: string | null = null;
 // Invalid edits are drafts, never cart intent. Keep them visible across catalog
 // refreshes until corrected or removed, rather than silently buying the old qty.
@@ -521,6 +525,17 @@ function renderCart(root: Element): void {
       control.disabled = checkoutLocked();
     }
   }
+  const availabilityMessage = root.querySelector("[data-guest-cart-availability-message]");
+  const availabilityRetry = root.querySelector("[data-guest-cart-availability-retry]");
+  if (availabilityMessage instanceof HTMLElement) {
+    availabilityMessage.hidden = current.empty || checkoutRecovery || !checkoutProbeNotice;
+    availabilityMessage.textContent = checkoutProbeNotice ?? "";
+    availabilityMessage.setAttribute("role", checkoutProbeFailed && !checkoutProbePending ? "alert" : "status");
+  }
+  if (availabilityRetry instanceof HTMLButtonElement) {
+    availabilityRetry.hidden = !availabilityRetryAllowed();
+    availabilityRetry.disabled = checkoutLocked();
+  }
   const messages = [
     pendingCheckout ? "Checking your checkout." : checkoutMessage,
     current.storageNotice,
@@ -582,12 +597,27 @@ function commerceErrorText(error: { code: string; message: string; reason?: stri
   return wording[error.reason ?? ""] ?? "That coupon can't be used for this order.";
 }
 
-async function probeGuestCheckout(root: Element): Promise<void> {
+function availabilityRetryAllowed(): boolean {
+  return canRetryCheckoutAvailability({
+    serverAdmitted: checkoutServerAdmitted,
+    failed: checkoutProbeFailed,
+    hasItems: session.intent.lines.length > 0,
+    recovering: checkoutRecovery,
+    hasRetention: Boolean(readGuestCheckoutRetention(checkoutStorage())),
+    canStart: Boolean(checkoutController?.canStart()),
+    canPrepareNew: Boolean(checkoutController?.canPrepareNew()),
+  });
+}
+
+async function probeGuestCheckout(root: Element, explicitRetry = false): Promise<void> {
   // A closed server admission must not trigger a proactive prepare attempt.
   // Recovery remains separate and can still query a retained paid checkout.
   if (
     !checkoutController ||
-    !checkoutAdmitted ||
+    !checkoutServerAdmitted ||
+    (checkoutProbeFailed && !explicitRetry) ||
+    pendingCheckout ||
+    checkoutRecovery ||
     checkoutProbePending ||
     session.intent.lines.length === 0
   ) return;
@@ -595,21 +625,26 @@ async function probeGuestCheckout(root: Element): Promise<void> {
   // prepare new stays with its status check; prepare() would only refuse.
   if (checkoutController.canStart()) return;
   if (readGuestCheckoutRetention(checkoutStorage()) && !checkoutController.canPrepareNew()) return;
+  const retry = root.querySelector("[data-guest-cart-availability-retry]");
   checkoutProbePending = true;
-  checkoutMessage = "Checking Commerce checkout availability.";
-  checkoutMessageError = false;
+  checkoutProbeNotice = "Checking checkout availability.";
   renderCart(root);
   const prepared = await checkoutController.prepare();
   checkoutProbePending = false;
+  checkoutProbeFailed = !prepared.result?.ok;
   if (prepared.result?.ok) {
-    checkoutMessage = null;
-    checkoutMessageError = false;
+    checkoutAdmitted = true;
+    checkoutProbeNotice = explicitRetry && checkoutController.canStart()
+      ? "Checkout is available. Continue when you’re ready." : null;
   } else {
     checkoutAdmitted = false;
-    checkoutMessage = checkoutFailureText(prepared.failure);
-    checkoutMessageError = true;
+    checkoutProbeNotice = checkoutAvailabilityFailure(prepared);
   }
+  // Do not steal focus if the shopper moved away while this explicit check ran.
+  const returnFocus = explicitRetry && document.activeElement === retry;
   renderCart(root);
+  const message = root.querySelector("[data-guest-cart-availability-message]");
+  if (returnFocus && message instanceof HTMLElement && !message.hidden) message.focus();
 }
 
 // A quiet check is the cart's own reload check of a capability this browser
@@ -879,6 +914,9 @@ export function hydrateGuestCartPage(): void {
   if (!(root instanceof HTMLElement)) return;
   session = loadSession();
   checkoutAdmitted = root.dataset.guestCheckoutAdmitted === "true";
+  checkoutServerAdmitted = checkoutAdmitted;
+  checkoutProbeFailed = false;
+  checkoutProbeNotice = null;
   checkoutController = createGuestCheckoutController({
     // Capability preparation does not establish readiness. The server's
     // registry/catalog admission is the only browser-facing admission input.
@@ -914,6 +952,11 @@ export function hydrateGuestCartPage(): void {
   root.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
+    if (target.closest("[data-guest-cart-availability-retry]")) {
+      if (!availabilityRetryAllowed() || checkoutLocked()) return;
+      void probeGuestCheckout(root, true);
+      return;
+    }
     if (target.closest("[data-guest-cart-checkout]")) {
       if (!checkoutController || checkoutLocked() || invalidQuantities.size > 0 || !view().checkoutEnabled) return;
       if (!root.hasAttribute("data-guest-checkout-page")) {
