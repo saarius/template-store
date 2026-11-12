@@ -1,0 +1,5 @@
+## Owner Steer 2 — November 11, 2026
+
+### PR Worktree Disk Hygiene
+- Once an isolated PR or baseline git worktree under `/var/lib/trialrun/workspace/repos/` has a clean pushed branch and local verification is complete, remove its gitignored build and dependency directories (`node_modules`, `.artifacts`, `dist`, `.astro`, `test-results`) so idle worktrees stay small (`pnpm install` rehydrates quickly from the shared pnpm store whenever a PR needs follow-up edits).
+- Never remove `node_modules` from the primary `/var/lib/trialrun/workspace/repos/template-store` checkout while live services resolve binaries (such as `workerd`) from it, and remove completed PR worktrees (`git worktree remove`) once their upstream PRs merge or close.

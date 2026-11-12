@@ -4,6 +4,8 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const source = await readFile(new URL('../src/features/experiment-report/DashboardReport.astro', import.meta.url), 'utf8');
 const historyTitles = [...source.matchAll(/<article class="cycle-entry"><h3>([^<]+)<\/h3>/g)].map(match => match[1]);
 expect(historyTitles.length).toBeGreaterThan(0);
+const steer2Path = '/dashboard/instructions/steer-2-2026-11-11.txt';
+const steer2Text = await readFile(new URL('../public' + steer2Path, import.meta.url), 'utf8');
 const base = process.env.STORE_URL || 'https://backroadbum.com';
 const output = new URL('../runs/backroadbum/dashboard/', import.meta.url);
 await mkdir(output, { recursive: true });
@@ -37,6 +39,18 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         await expect(page.getByRole('link', { name: 'Original · captured November 9, 2026', exact: true })).toHaveAttribute('href', '/dashboard/instructions/original-2026-11-09.txt');
         await expect(page.getByRole('link', { name: 'Steer 1 · November 10, 2026', exact: true })).toHaveAttribute('href', '/dashboard/instructions/steer-1-2026-11-10.txt');
+        expect(await page.locator('#instructions a').allTextContents()).toEqual([
+          'Original · captured November 9, 2026', 'Steer 1 · November 10, 2026', 'Steer 2 · November 11, 2026',
+        ]);
+        const steer2 = page.getByRole('link', { name: 'Steer 2 · November 11, 2026', exact: true });
+        await expect(steer2).toHaveAttribute('href', steer2Path);
+        await steer2.scrollIntoViewIfNeeded();
+        await page.screenshot({ path: new URL(`instructions-${width}.png`, output).pathname });
+        const archiveResponse = page.waitForResponse(response => new URL(response.url()).pathname === steer2Path);
+        await steer2.click();
+        expect(await (await archiveResponse).text()).toBe(steer2Text);
+        await expect(page.locator('body')).toContainText('PR Worktree Disk Hygiene');
+        await page.goBack();
         await page.getByRole('navigation', { name: 'Dashboard sections' }).getByRole('link', { name: 'Latest work', exact: true }).click();
         await page.waitForURL(url => url.hash === '#history');
         await expect(page.locator('#history').getByRole('link', { name: 'Read the full build history', exact: true })).toHaveAttribute('href', '/dashboard/history/');
@@ -70,7 +84,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 14, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, writes: 0, bytes: sizes });
+    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 14, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 3, steer2ArchiveExact: true, writes: 0, bytes: sizes });
     await context.close();
   }
   await writeFile(new URL('verification.json', output), JSON.stringify(results, null, 2));
