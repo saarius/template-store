@@ -75,6 +75,9 @@ components:
 ---
 # Design System: Backroad Bum
 
+## Legacy server-cart qualification reporting · November13
+Keep this nonvisual migration experiment in the existing latest-work paragraph and one dated entry, without a badge, new controls or raw fixture output. Distinguish actual0.8.0 kernel writes, candidate installed Registry reads without Payments and candidate-kernel replay with synthetic Payments; frozen facts are preserved, not whole-response equivalence or hosted/signed qualification. The merchant wrapper still needs the new cart-read protocol, and Template229 remains separately unqualified. Current gallery wording now describes its already-deployed HTML/grid/snap behavior; all127earlier article bodies stay unchanged.
+
 ## Hosted-account settings proof · November13
 The #124 rework is an Operate surface in DinkusKit’s existing visual system, not a Backroad Bum reskin. Native horizontal links separate plugin controls from shipping and payments; labeled conditional dollar fields and independent saves preserve task boundaries without JavaScript. Inspected 1440/390 card captures retain the narrow wrapper and accepted light tokens; the dashboard reports published92fbb24 and stage-by-stage qualification separately from new-head CI, review and shared deployment. Keep the initial local connection failure and unchanged-source retry explicit without calling it a serving incident or an uninterrupted full-suite pass; preserve all126earlier history bodies. Broader account-page redesign remains in #123. The same plain ledger now dates the late observation that229is a paired server-cart code candidate, not ledger-only; source implementation is distinct from independent paired qualification or adoption, and existing shopper browsers are not migrated.
 
