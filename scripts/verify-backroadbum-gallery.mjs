@@ -60,8 +60,14 @@ try {
         await image.evaluate(node => node.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'end' }));
         await expect.poll(() => image.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
         expect(await image.evaluate(node => new URL(node.currentSrc).origin)).toBe(new URL(base).origin);
-        await expect(image).toHaveAttribute('width', '1200'); await expect(image).toHaveAttribute('height', '900');
-        await expect(image).toHaveAttribute('srcset', /300w.*600w.*1200w/);
+        // Both authored illustrations are 4:3. The installed primary renders at 640x480,
+        // the detail at 1200x900; responsive candidates are capped by source width.
+        const dimensions = await image.evaluate(node => ({ width: Number(node.getAttribute('width')), height: Number(node.getAttribute('height')) }));
+        expect(dimensions.width).toBeGreaterThan(0); expect(dimensions.height).toBeGreaterThan(0);
+        expect(dimensions.width / dimensions.height).toBeCloseTo(4 / 3);
+        await expect(image).toHaveAttribute('srcset', /300w.*600w/);
+        if (dimensions.width >= 1200) await expect(image).toHaveAttribute('srcset', /1200w/);
+        else await expect(image).not.toHaveAttribute('srcset', /1200w/);
       }
       await expect(images.first()).toHaveAttribute('src', initialSrc);
       expect(await page.locator('[data-product-price]').textContent()).toBe(price);

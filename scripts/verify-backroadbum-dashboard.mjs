@@ -49,8 +49,8 @@ try {
         await expect(page.locator('#contributions')).toContainText('Fresh review accepts #223’s field-level contact proof');
         await expect(page.locator('#history')).toContainText('Checkout contact #223');
         await expect(page.locator('#history')).toContainText('Ship #96 is now merged');
-        await expect(page.locator('#contributions')).toContainText('Twelve source fixes are merged upstream');
-        await expect(page.locator('#contributions')).toContainText('six fork PRs remain open');
+        await expect(page.locator('#contributions')).toContainText('Thirteen source fixes are merged upstream');
+        await expect(page.locator('#contributions')).toContainText('three fork PRs remain open');
         await expect(page.locator('#contributions')).toContainText('a merge is not a signed release or deployment');
         await expect(page.locator('#history')).toContainText('synthetic checkout protocol and an admission flag');
         await expect(page.locator('#history')).toContainText('Cart return #220');
@@ -180,7 +180,7 @@ try {
         await expect(contact).toContainText('exact committed empty-email regression body fails on unchanged main');
         await expect(contact).toContainText('not provider readiness or a fresh signed installation');
         const controls = candidates.locator('tr').filter({ hasText: 'fix/product-control-readiness' });
-        await expect(controls).toContainText('draft/on hold for the server-held-cart decision');
+        await expect(controls).toContainText('closed without merge on November 13 at16:15');
         await expect(controls).toContainText('four public Before/After desktop/phone captures');
         await expect(controls).toContainText('actual script-refusal diagnostics');
         await expect(controls).toContainText('not a new signed installation');

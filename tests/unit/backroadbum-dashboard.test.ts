@@ -9,7 +9,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('Checkout contact #223');
     expect(source).toContain('synthetic checkout protocol and an admission flag');
     expect(source).toContain('its own edits clear the correction without moving focus');
-    expect(source).toContain('draft/on hold for the server-held-cart decision');
+    expect(source).toContain('closed without merge on November 13 at16:15');
     expect(source).toContain('Cart return #220');
     expect(source).toContain('trusted browser tab returns');
     expect(source).toContain('same saved intent and focused quantity element');
@@ -98,12 +98,14 @@ describe('Backroad Bum dashboard route boundaries', () => {
 
   it('distinguishes merged source from open review and signed deployment', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
-    expect(source).toContain('six fork PRs remain open');
-    expect(source).toContain('Twelve source fixes are merged upstream');
+    expect(source).toContain('three fork PRs remain open');
+    expect(source).toContain('Thirteen source fixes are merged upstream');
     expect(source).toContain('Pictures without a script');
     expect(source).toContain('9123f4d');
     expect(source).toContain('synthetic Chromium touch');
-    expect(source).toContain('draft/on hold by owner decision');
+    expect(source).toContain('closed without merge on November 13 at16:15');
+    expect(source).toContain('open ledger-only PR #229');
+    expect(source).toContain('merged upstream November 13 at16:10 as27fd637');
     expect(source).toContain('Closed by merged PR #212');
     const ship = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/ship\/tree\/fix\/label-history-phone">.*?<\/tr>/)?.[0];
     expect(ship).toContain('1598a92');
