@@ -67,6 +67,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).toContain('both retain the entered 16.5 oz after See prices');
     expect(row).toContain('Unsigned local Registry-shaped installations use synthetic issuer and hosted HTTP ports');
     expect(row).toContain('exact-head owning GitHub CI is green');
+    expect(row).toContain('fresh review accepts e838486’s installed proof at 5/6 with no findings');
     expect(row).toContain('the signed store plugin remains unchanged');
     expect(row).not.toContain('CI awaits maintainer approval');
   });
