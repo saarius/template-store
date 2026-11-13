@@ -1,8 +1,16 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { fieldNote, fieldNotes } from '../../src/features/store-shell/field-notes.js';
 
 const intro = (text: string) => ({ _type: 'block', style: 'normal', children: [{ _type: 'span', text }] });
 describe('EmDash field-note navigation', () => {
+  it('names each whole-row link from its published heading without hiding its excerpt', () => {
+    const source = readFileSync('src/pages/field-notes.astro', 'utf8');
+    expect(source).toContain('aria-labelledby={`${note.slug}-title`}><h2 id={`${note.slug}-title`}>{note.title}</h2>');
+    expect(source).toContain('{note.excerpt && <p>{note.excerpt}</p>}');
+    expect(source).not.toContain('aria-hidden');
+    expect(source).not.toContain('tabindex');
+  });
   it('uses published CMS titles and prose, without seed text or commerce facts', () => {
     expect(fieldNote({ id: 'field-note-new-story', data: {
       title: '  A merchant-edited title  ', content: [
