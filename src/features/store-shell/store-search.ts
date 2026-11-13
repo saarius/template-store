@@ -11,6 +11,8 @@ export interface StoreSearchHit {
 export interface StoreSearchDependencies {
   search: (query: string) => Promise<readonly StoreSearchHit[]>;
   visibleProducts: () => Promise<ReadonlySet<string>>;
+  /** Optional published opening paragraphs, not another search or match-location claim. */
+  fieldNotePreviews?: (slugs: readonly string[]) => Promise<ReadonlyMap<string, string>>;
 }
 const scopes = [
   { collection: 'products', label: 'Gear' },
@@ -27,6 +29,22 @@ export function searchResultHref(hit: StoreSearchHit): string | null {
   return null;
 }
 
+function snippetParts(hit: StoreSearchHit) {
+  const title = hit.title?.trim() || hit.slug || hit.id;
+  const parts = renderHighlightedSnippetParts(hit.snippet);
+  return parts.map(part => part.text).join('').trim().toLowerCase() === title.toLowerCase() ? [] : parts;
+}
+
+/** Keep previews compact without splitting a Unicode code point or inventing a query highlight. */
+export function compactSearchPreview(raw: string): string {
+  const text = raw.replace(/\s+/gu, ' ').trim();
+  const characters = Array.from(text);
+  if (characters.length <= 240) return text;
+  const prefix = characters.slice(0, 239).join('');
+  const boundary = prefix.lastIndexOf(' ');
+  return (boundary > 120 ? prefix.slice(0, boundary) : prefix).trimEnd() + '…';
+}
+
 /** No prices from indexed text; Commerce visibility still decides which gear can be found. */
 export async function loadStoreSearch(raw: string, dependencies: StoreSearchDependencies) {
   const query = raw.trim().slice(0, 120);
@@ -38,11 +56,20 @@ export async function loadStoreSearch(raw: string, dependencies: StoreSearchDepe
     const visible = hits.some(hit => hit.collection === 'products') ? await dependencies.visibleProducts() : new Set<string>();
     const filtered = filterStorefrontSearchHits(hits, visible).filter(hit => searchResultHref(hit) !== null);
     const selected = filtered.slice(0, 20);
+    const previewSlugs = [...new Set(selected.filter(hit => hit.collection === 'pages' &&
+      /^field-note-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(hit.slug ?? '') && snippetParts(hit).length === 0)
+      .map(hit => hit.slug!))];
+    // Preview failure must not turn usable index results into a search outage.
+    let previews: ReadonlyMap<string, string> = new Map();
+    if (previewSlugs.length && dependencies.fieldNotePreviews) {
+      try { previews = await dependencies.fieldNotePreviews(previewSlugs); } catch { /* Titles still work. */ }
+    }
     const groups = scopes.map(scope => ({ ...scope, items: selected.filter(hit => hit.collection === scope.collection).map(hit => {
       const title = hit.title?.trim() || hit.slug || hit.id;
-      const parts = renderHighlightedSnippetParts(hit.snippet);
-      const redundant = parts.map(part => part.text).join('').trim().toLowerCase() === title.toLowerCase();
-      return { title, href: searchResultHref(hit)!, parts: redundant ? [] : parts };
+      const parts = snippetParts(hit);
+      const preview = hit.collection === 'pages' && previewSlugs.includes(hit.slug ?? '')
+        ? compactSearchPreview(previews.get(hit.slug!) ?? '') : '';
+      return { title, href: searchResultHref(hit)!, parts: parts.length || !preview ? parts : [{ text: preview, highlighted: false }] };
     }) })).filter(group => group.items.length > 0);
     return { query, groups, count: selected.length, limited: hits.length >= 20,
       state: selected.length ? 'results' as const : 'empty' as const };

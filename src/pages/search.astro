@@ -1,12 +1,23 @@
 ---
-import { search } from 'emdash';
+import { getEmDashCollection, getRequestContext, search } from 'emdash';
 import BackroadPage from '../features/store-shell/BackroadPage.astro';
 import { loadVisibleStorefrontProductSlugs } from '../features/store-shell/search-visibility.js';
 import { loadStoreSearch, type StoreSearchHit } from '../features/store-shell/store-search.js';
+import { fieldNotes } from '../features/store-shell/field-notes.js';
 
 const results = await loadStoreSearch(Astro.url.searchParams.get('q') ?? '', {
   search: async query => (await search(query, { collections: ['products', 'categories', 'pages'], status: 'published', limit: 20 })).items as StoreSearchHit[] ?? [],
   visibleProducts: () => loadVisibleStorefrontProductSlugs({ runtime: Astro.locals.emdash, request: Astro.request }, process.env, { throwOnUnavailable: true }),
+  fieldNotePreviews: async slugs => {
+    // The CMS loader intentionally serves drafts in editor/preview contexts.
+    // Search is published-only, so omit optional previews in those contexts.
+    const context = getRequestContext();
+    if (context?.preview || context?.editMode) return new Map();
+    const { entries } = await getEmDashCollection<'pages', Record<string, unknown>>('pages', {
+      status: 'published', where: { slug: [...slugs] }, limit: 20,
+    });
+    return new Map(fieldNotes(entries).map(note => [note.slug, note.excerpt]));
+  },
 });
 Astro.response.headers.set('Cache-Control', 'no-store');
 Astro.response.headers.set('X-Robots-Tag', 'noindex, follow');
@@ -76,7 +87,7 @@ if (results.state === 'unavailable') Astro.response.status = 503;
   .search-group ul{list-style:none;margin:0;padding:0}
   .search-group li{padding:1rem 0;border-bottom:1px solid var(--store-line)}
   .search-group li>a{font-weight:600;overflow-wrap:anywhere}
-  .search-group li p{margin:.5rem 0 0;color:var(--store-muted)}
+  .search-group li p{margin:.5rem 0 0;color:var(--store-muted);overflow-wrap:anywhere}
   mark{background:var(--brb-yellow);color:var(--store-ink)}
   @media(max-width:30rem){.search-controls{flex-direction:column}.search-controls button{align-self:flex-start}}
 </style>
