@@ -104,7 +104,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('9123f4d');
     expect(source).toContain('synthetic Chromium touch');
     expect(source).toContain('closed without merge on November 13 at16:15');
-    expect(source).toContain('open ledger-only PR #229');
+    expect(source).toContain('now contains a server-cart implementation candidate');
     expect(source).toContain('merged upstream November 13 at16:10 as27fd637');
     expect(source).toContain('Closed by merged PR #212');
     const ship = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/ship\/tree\/fix\/label-history-phone">.*?<\/tr>/)?.[0];
@@ -150,6 +150,12 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).toContain('not shared-deployed');
     expect(row).not.toContain('still running');
     expect(row).not.toContain('not pushed');
+    const currentReviews = source.match(/<section id="contributions"><h2>Open reviews<\/h2>.*?<\/section>/)?.[0];
+    expect(currentReviews).toContain('PR #229');
+    expect(currentReviews).toContain('c088bfe paired with');
+    expect(currentReviews).toContain('not to merge it alone');
+    expect(currentReviews).not.toContain('ledger-only');
+    expect(currentReviews).not.toContain('awaiting full qualification');
   });
 
   it('keeps instruction versions ordered and archives the live-dependency guard', () => {
