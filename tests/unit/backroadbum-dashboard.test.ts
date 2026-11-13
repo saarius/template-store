@@ -111,8 +111,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(ship).toContain('1598a92');
     expect(ship).toContain('main bfb95f3 was merged without rebasing');
     expect(ship).toContain('maintainers merged the source at 15:00 UTC');
-    expect(source).toContain('Report remains open; source repair PR #96 merged on November 13');
-    expect(source).not.toContain('Closed by merged PR #96');
+    expect(source).toContain('Closed November 13 on owner confirmation of merged source repair PR #96');
+    expect(source).toContain('commerce/pull/271');
+    expect(source).toContain('commerce/pull/273');
+    expect(source).toContain('existing test orders are not resynced');
     const metadata = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/template-store\/tree\/fix\/selected-variant-jsonld">.*?<\/tr>/)?.[0];
     expect(metadata).toContain('40e95ea');
     expect(metadata).toContain('changing no runtime, test or pin');
