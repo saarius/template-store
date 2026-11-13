@@ -20,20 +20,21 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('not a signed installation or payment-readiness proof');
     expect(source).toContain('Variant cards #216');
     expect(source).toContain('the isolated fixture does not prove payment readiness');
-    expect(source).toContain('fixed-label assertion against captured results fails on main and passes on head');
+    expect(source).toContain('mixed family Out of stock becomes In stock');
     expect(source).toContain('not a new signed installation or hosted settings submission');
     expect(source).toContain('normal November 12 stop at 22:24 UTC');
     expect(source).toContain('do not prove continuous uptime or background-job drain');
     expect(source).toContain('initial activation was not a live shutdown test');
   });
 
-  it('reports quantity restoration proof without claiming the requested family revision is implemented', () => {
+  it('reports quantity restoration separately from the implemented family revision', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Cart quantity #212');
     expect(source).toContain('in-memory 2/$48 while persisted intent stays 3');
     expect(source).toContain('no payment starts, errors or overflow');
     expect(source).toContain('merchant’s different retained-draft repair is not used as proof');
-    expect(source).toContain('That requested revision is not yet implemented');
+    expect(source).toContain('Implements the maintainer’s requested family summary');
+    expect(source).toContain('same helper is dogfooded in this theme');
     expect(source).toContain('Fresh review accepts #223’s field-level contact proof');
   });
 

@@ -167,7 +167,10 @@ try {
         await expect(quantity).toContainText('in-memory 2/$48 while persisted intent stays 3');
         await expect(quantity).toContainText('merchant’s different retained-draft repair is not used as proof');
         await expect(quantity).toContainText('not signed installation or provider readiness');
-        await expect(candidates.locator('tr').filter({ hasText: 'fix/variant-card-availability' })).toContainText('That requested revision is not yet implemented');
+        const family = candidates.locator('tr').filter({ hasText: 'fix/variant-card-availability' });
+        await expect(family).toContainText('1c808f0');
+        await expect(family).toContainText('same helper is dogfooded in this theme');
+        await expect(family).toContainText('All new-head GitHub desktop, phone, Registry, Playground and aggregate checks pass');
         const memberSku = candidates.locator('tr').filter({ hasText: 'fix/public-variant-sku' });
         await expect(memberSku).toContainText('contract still needs a maintainer decision');
         await expect(memberSku).toContainText('captured anonymous compiled-Registry list/default/member HTTP output');
