@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createRequire } from 'node:module';
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, rm, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -17,7 +17,7 @@ async function store(host) {
   return ns.get(ns.idFromName('backroadbum'));
 }
 
-test('online archive restores disabled single-order admission, practice label, PDF and pending event through restart', async () => {
+test('online archive restores disabled admission, label/PDF/event through restart and real/linked CLI', async () => {
   const root = await mkdtemp(join(tmpdir(), 'brb-ship-recovery-test-'));
   let host;
   try {
@@ -67,7 +67,30 @@ spec.loader.exec_module(backup)
 print(backup.snapshot(root, pathlib.Path(sys.argv[3])))
 `, fileURLToPath(new URL('./backup.py', import.meta.url)), root, configPath], { encoding: 'utf8', timeout: 60000 });
     assert.equal(result.status, 0, 'synthetic archive created');
-    const proof = await withRestoredShip(result.stdout.trim(), async restored => {
+    const archive = result.stdout.trim();
+    const command = fileURLToPath(new URL('./verify-ship-recovery.mjs', import.meta.url));
+    const linkedCommand = join(root, 'linked-ship-verifier.mjs');
+    await symlink(command, linkedCommand);
+    for (const entry of [command, linkedCommand]) {
+      const cli = spawnSync(process.execPath, [entry, archive], {
+        // Miniflare requires the peer bundle to be inside its working root.
+        cwd: fileURLToPath(new URL('../../../', import.meta.url)), encoding: 'utf8', timeout: 30000,
+        env: { ...process.env, NODE_NO_WARNINGS: '1' },
+      });
+      assert.equal(cli.error, undefined);
+      assert.equal(cli.status, 0);
+      assert.notEqual(cli.stdout.trim(), '', 'Successful Ship CLI must emit an actual recovery result');
+      assert.equal(cli.stderr, '');
+      const restored = JSON.parse(cli.stdout);
+      assert.equal(restored.schema, 'backroadbum.ship-recovery-check/v1');
+      assert.equal(restored.restart, 'ok');
+      assert.equal(restored.admission, 'closed');
+      assert.equal(restored.commerceConnected, false);
+      assert.equal(restored.outboundRequests, 0);
+      assert.ok(!cli.stdout.includes(root));
+      assert.ok(!cli.stdout.includes(config.sessionSecret));
+    }
+    const proof = await withRestoredShip(archive, async restored => {
       const target = await store(restored);
       const state = await target.getMerchantAdmission();
       assert.equal(state.orderId, orderId); assert.equal(state.enabled, false);

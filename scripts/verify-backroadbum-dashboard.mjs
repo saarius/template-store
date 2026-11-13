@@ -82,7 +82,9 @@ try {
         await expect(recovery).toContainText('all three retained archives restore seven media files with matching sizes/hashes');
         await expect(recovery).toContainText('full runtime and off-host recovery unverified');
         await expect(recovery).toContainText('future backups are not automatically certified');
-        await expect(page.locator('#history')).toContainText('Cached plugin files are restored, not newly signature-qualified');
+        await expect(page.locator('#history')).toContainText('workspace symlinks no longer produce a silent successful exit without a check');
+        await expect(page.locator('#history')).toContainText('retired Ship restart fixture still needs the shared repository parent');
+        await expect(page.locator('#history')).toContainText('cached plugin files are restored, not newly signature-qualified');
         await recovery.scrollIntoViewIfNeeded();
         await page.screenshot({ path: new URL(`recovery-${width}.png`, output).pathname });
         const probe = page.locator('[data-checkout-probe]');

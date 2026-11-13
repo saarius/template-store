@@ -17,14 +17,23 @@ sudo systemctl start backroadbum-backup.service
 node ops/backroadbum/verify-emdash-recovery.mjs PRIVATE_ARCHIVE
 ```
 
-Choose a completed private `.tar.gz` under `/var/lib/backroadbum/backups/`; do not send its contents to stdout. The verifier creates a new 0700 temporary directory, extracts only regular 0600 `content.db` and `recovery/emdash.env`, checks SQLite/key coverage, and uses EmDash's installed authenticated decoder for every encrypted plugin setting. It also checks that decryption without a key is refused. Output contains only counts and outcomes; exceptions, key IDs, decrypted values and rows are not relayed. The temporary copy is removed on success or failure.
+Choose a completed private `.tar.gz` under `/var/lib/backroadbum/backups/`; do not send its contents to stdout. Node 24's native `import.meta.main` now recognizes both direct invocation and the workspace `ops` symlink; the former URL/argv comparison silently skipped symlinked commands. Require a JSON result with the expected schema and counts, not just exit status 0. The verifier creates a new 0700 temporary directory, extracts only regular 0600 `content.db` and `recovery/emdash.env`, checks SQLite/key coverage, and uses EmDash's installed authenticated decoder for every encrypted plugin setting. It also checks that decryption without a key is refused. Output contains only counts and outcomes; exceptions, key IDs, decrypted values and rows are not relayed. The temporary copy is removed on success or failure.
 
 No HTTP server, provider request, plugin reconnect, checkout, label, live-file replacement or runtime restart occurs. The retired Ship drill ignores the active EmDash key and continues to extract only its own scoped material. Unit coverage uses synthetic secrets and never reads production configuration:
 
 ```sh
 python3 -m unittest discover -s ops/backroadbum -p test_backup.py -v
-node --test ops/backroadbum/test_emdash_recovery.mjs
+node --test ops/backroadbum/test_emdash_recovery.mjs ops/backroadbum/test_recovery_cli.mjs
 ```
+
+The shared CLI tests use synthetic/missing archives and check direct paths, file symlinks, directory symlinks and inert imports for both verifiers. The retired Ship verifier uses the same native entrypoint fix, but its unchanged Miniflare runtime still needs the peer bundle inside its working root. Run its synthetic restart/label/PDF/event test from the shared repository parent, not from inside template-store:
+
+```sh
+cd /var/lib/trialrun/workspace/repos
+node --test template-store/ops/backroadbum/test_ship_recovery.mjs
+```
+
+That test now also checks actual JSON results from direct and symlinked Ship CLIs against its disposable archive; it never starts a retired live service or reads live Ship data. Invocation coverage does not make the retired runtime working-directory-independent.
 
 ## Restore limits
 

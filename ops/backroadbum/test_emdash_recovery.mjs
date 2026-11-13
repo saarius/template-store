@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
@@ -85,6 +85,34 @@ test('wrong key and malformed envelopes fail the offline inspection', async () =
     const db = new DatabaseSync(database);
     db.prepare('UPDATE options SET value=? WHERE name LIKE ?').run(JSON.stringify({ $emdash: 'plugin-setting', v: 9 }), '%:connection'); db.close();
     await assert.rejects(inspectEmDashCopy(database, configuration), /recovery_envelope_refused/);
+  });
+});
+
+test('direct and symlinked credential CLIs emit an actual archive result', async () => {
+  await fixture(async ({ root, configuration }) => {
+    const archive = snapshot(root, configuration);
+    const source = fileURLToPath(new URL('./verify-emdash-recovery.mjs', import.meta.url));
+    const link = join(root, 'linked-verifier.mjs');
+    await symlink(source, link);
+    await rm(configuration); // The archive, not the source key, must supply recovery.
+    for (const entry of [source, link]) {
+      const result = spawnSync(process.execPath, [entry, archive], {
+        cwd: root, encoding: 'utf8', timeout: 20000, env: { ...process.env, NODE_NO_WARNINGS: '1' },
+      });
+      assert.equal(result.error, undefined);
+      assert.equal(result.status, 0);
+      assert.notEqual(result.stdout.trim(), '', 'Successful CLI must emit a recovery result, not silently skip the drill');
+      assert.equal(result.stderr, '');
+      const proof = JSON.parse(result.stdout);
+      assert.equal(proof.schema, 'backroadbum.emdash-recovery-check/v1');
+      assert.equal(proof.encryptedSettings, 3);
+      assert.equal(proof.decryption, 'ok');
+      assert.equal(proof.missingKeyRefused, true);
+      assert.equal(proof.outboundRequests, 0);
+      assert.equal(proof.liveFilesReplaced, false);
+      assert.ok(!result.stdout.includes(root));
+      assert.ok(!result.stdout.includes('synthetic-connection'));
+    }
   });
 });
 

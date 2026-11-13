@@ -4,7 +4,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import { decodePluginSettingValue, isEncryptedPluginSetting, resolvePluginEncryptionKeys } from 'emdash';
 
 export async function inspectEmDashCopy(database, configuration) {
@@ -64,7 +64,8 @@ backup.restore_emdash_copy(sys.argv[2], pathlib.Path(sys.argv[3]))
   } finally { await rm(temp, { recursive: true, force: true }); }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Node 24 tracks the entrypoint even when argv names a file/directory symlink.
+if (import.meta.main) {
   process.umask(0o077);
   if (process.argv.length !== 3) { console.error('Usage: node ops/backroadbum/verify-emdash-recovery.mjs PRIVATE_ARCHIVE'); process.exitCode = 1; }
   else try { console.log(JSON.stringify(await withRestoredEmDash(process.argv[2]))); }
