@@ -1,65 +1,44 @@
-import {
-  PRESET_COOKIE_NAME,
-  THEME_COOKIE_NAME,
-  isStorePresetName,
-  isStoreThemeMode,
-  type StorePresetName,
-  type StoreThemeMode,
-} from "./store-menu.js";
-
-function readCookie(name: string): string | null {
-  const match = document.cookie.match(
-    new RegExp(`(?:^|;\\s*)${name}=([^;]*)`, "u"),
-  );
-  return match?.[1] ? decodeURIComponent(match[1]) : null;
+export type Appearance = 'system' | 'light' | 'dark';
+export const APPEARANCE_KEY = 'backroadbum.theme';
+export function appearance(value: unknown): Appearance {
+  return value === 'light' || value === 'dark' ? value : 'system';
 }
 
-function writeCookie(name: string, value: string): void {
-  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=31536000; SameSite=Lax`;
-}
-
-function applyThemeMode(mode: StoreThemeMode): void {
-  document.documentElement.dataset.theme = mode;
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-theme-choice]")) {
-    button.setAttribute("aria-pressed", String(button.dataset.themeChoice === mode));
-  }
-}
-
-function applyPresetName(preset: StorePresetName): void {
-  document.documentElement.dataset.preset = preset;
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-preset-choice]")) {
-    button.setAttribute("aria-pressed", String(button.dataset.presetChoice === preset));
-  }
+/** Preference persistence is optional; a storage refusal must never break shopping. */
+export function saveAppearance(storage: Pick<Storage, 'setItem' | 'removeItem'>, mode: Appearance): boolean {
+  try {
+    if (mode === 'system') storage.removeItem(APPEARANCE_KEY);
+    else storage.setItem(APPEARANCE_KEY, mode);
+    return true;
+  } catch { return false; }
 }
 
 export function hydrateStoreTheme(): void {
-  const initialThemeRaw = document.documentElement.dataset.theme ?? readCookie(THEME_COOKIE_NAME);
-  const initialTheme: StoreThemeMode = isStoreThemeMode(initialThemeRaw) ? initialThemeRaw : "light";
-  applyThemeMode(initialTheme);
-
-  const initialPresetRaw = document.documentElement.dataset.preset ?? readCookie(PRESET_COOKIE_NAME);
-  const initialPreset: StorePresetName = isStorePresetName(initialPresetRaw) ? initialPresetRaw : "aizome";
-  applyPresetName(initialPreset);
-
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-theme-choice]")) {
-    if (button.dataset.themeBound === "true") continue;
-    button.dataset.themeBound = "true";
-    button.addEventListener("click", () => {
-      const choice = button.dataset.themeChoice;
-      if (!isStoreThemeMode(choice)) return;
-      writeCookie(THEME_COOKIE_NAME, choice);
-      applyThemeMode(choice);
+  const root = document.documentElement;
+  const controls = document.querySelectorAll<HTMLSelectElement>('[data-theme-select]');
+  const sync = (mode: Appearance) => {
+    root.dataset.theme = mode;
+    for (const select of controls) select.value = mode;
+  };
+  sync(appearance(root.dataset.theme));
+  for (const select of controls) {
+    if (select.dataset.themeBound) continue;
+    select.dataset.themeBound = 'true';
+    select.addEventListener('change', () => {
+      const mode = appearance(select.value);
+      sync(mode);
+      const persisted = saveAppearance(localStorageSafe(), mode);
+      const message = select.closest('[data-theme-control]')?.querySelector('[data-theme-message]');
+      if (message) message.textContent = persisted ? '' : 'Applied for this page. Your browser couldn’t save the preference.';
     });
+    select.closest<HTMLElement>('[data-theme-control]')?.removeAttribute('hidden');
   }
+  window.addEventListener('storage', event => {
+    if (event.key === APPEARANCE_KEY || event.key === null) sync(appearance(event.newValue));
+  });
+}
 
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-preset-choice]")) {
-    if (button.dataset.presetBound === "true") continue;
-    button.dataset.presetBound = "true";
-    button.addEventListener("click", () => {
-      const choice = button.dataset.presetChoice;
-      if (!isStorePresetName(choice)) return;
-      writeCookie(PRESET_COOKIE_NAME, choice);
-      applyPresetName(choice);
-    });
-  }
+function localStorageSafe(): Pick<Storage, 'setItem' | 'removeItem'> {
+  try { return window.localStorage; }
+  catch { return { setItem() { throw Error('Storage unavailable'); }, removeItem() { throw Error('Storage unavailable'); } }; }
 }

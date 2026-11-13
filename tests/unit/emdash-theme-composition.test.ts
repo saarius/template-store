@@ -59,8 +59,10 @@ describe("Upstream EmDash theming (tokens.css + theme.css) & multi-preset suppor
     const themeCss = readFileSync(resolve("src/styles/theme.css"), "utf8");
     const uncommented = themeCss.replace(/\/\*[\s\S]*?\*\//gu, "");
     expect(uncommented).not.toContain("@layer");
-    expect(uncommented).toContain('--store-bg:#f8fbfc');
-    expect(uncommented).toContain('--font-display:"Barlow Semi Condensed"');
+    expect(uncommented).toContain('--store-bg:var(--color-bg)');
+    expect(uncommented).toContain('--font-display:"Fraunces"');
+    expect(uncommented).toContain('color-scheme: light dark');
+    expect(uncommented).toContain('font-family:"DM Sans"');
 
     const globalCss = readFileSync(resolve("src/features/store-shell/global.css"), "utf8");
     const tokensImportIndex = globalCss.indexOf('@import "../../styles/tokens.css";');
@@ -103,8 +105,9 @@ describe("Shared StoreFooter.astro & public route mounting", () => {
     for (const path of ['/shop', '/field-notes', '/test-store', '/dashboard/', '/shipping', '/returns']) {
       expect(footer).toContain(`href="${path}"`);
     }
-    expect(footer).toContain('BACKROAD BUM');
-    expect(footer).not.toContain('data-theme-switcher');
+    expect(footer).toContain('Backroad Bum');
+    expect(footer).toContain('data-theme-select');
+    for (const mode of ['system', 'light', 'dark']) expect(footer).toContain(`value="${mode}"`);
 
     // Never hide merchant-configured footer menu widgets via CSS:
     const globalCss = readFileSync(resolve("src/features/store-shell/global.css"), "utf8");

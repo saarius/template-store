@@ -6,17 +6,21 @@ const links = [{url:'/shop',label:'Shop'},{url:'/field-notes',label:'Field notes
 ---
 <a class="skip-link" href="#main-content">Skip to content</a>
 <header class="store-header" data-store-header>
-  <a class="store-header__mark" href="/" aria-label="Backroad Bum home">BACKROAD BUM</a>
+  <a class="store-header__mark" href="/" aria-label="Backroad Bum home"><span>BACKROAD</span><span>BUM</span></a>
   <nav class="brb-main-nav" aria-label="Main">
     {links.map(link => <a href={link.url} aria-current={path === link.url ? 'page' : link.url === '/shop' && path.startsWith('/categories/') ? 'true' : undefined}>{link.label}</a>)}
   </nav>
   <nav class="store-header__nav" aria-label="Your shopping bag"><GuestCartNav /></nav>
 </header>
 <style>
-.brb-main-nav{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem 1.5rem;font-size:.95rem}
-.brb-main-nav a{display:inline-flex;align-items:center;min-width:48px;min-height:48px;box-sizing:border-box;padding:.6rem 0}
-.brb-main-nav a:hover,.brb-main-nav [aria-current]{text-decoration:underline;text-decoration-thickness:2px}
-.skip-link{position:absolute;top:-5rem;left:1rem;z-index:100;padding:.7rem 1rem;background:var(--brb-yellow);color:var(--store-ink)}
+.store-header__mark{display:flex;flex-direction:column;justify-content:center;min-height:48px}
+.brb-main-nav{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-2) var(--space-5);font-size:var(--text-sm)}
+.brb-main-nav a{display:inline-flex;align-items:center;min-width:48px;min-height:48px;padding:.6rem 0;color:var(--color-text-muted)}
+.brb-main-nav a:hover,.brb-main-nav [aria-current]{color:var(--color-text);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:.4em}
+.store-header__nav{margin-left:auto}
+.store-header__nav :global(a){display:inline-flex;align-items:center;min-height:48px;min-width:48px;justify-content:center;font-weight:600}
+.skip-link{position:absolute;top:-6rem;left:1rem;z-index:100;padding:.7rem 1rem;background:var(--color-primary);color:var(--color-primary-fg);border-radius:var(--radius-control)}
 .skip-link:focus{top:.5rem}
-@media(max-width:40rem){.brb-main-nav{order:3;width:100%;gap:1.25rem;border-top:1px solid var(--store-line);padding-top:.25rem;font-size:.85rem}.store-header{padding-bottom:.5rem}}
+@media(min-width:60rem){.brb-main-nav{margin-inline:auto;gap:var(--space-6)}.store-header__nav{margin-left:0}}
+@media(max-width:40rem){.brb-main-nav{order:3;width:100%;justify-content:space-between;gap:.25rem .75rem;border-top:1px solid var(--color-border);padding-top:.25rem}.store-header{padding-bottom:.5rem}}
 </style>

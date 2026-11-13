@@ -1,6 +1,7 @@
 ---
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import { GuestCart } from "../features/guest-cart/ui.ts";
 import { acquireGuestCheckoutAdmission } from "../features/guest-cart/checkout-admission.js";
 import { STORE_TITLE, readStorefrontProfile } from "../features/store-shell/index.js";
@@ -27,6 +28,7 @@ const effectiveAdmission = playgroundAdmission ?? checkoutAdmission;
 <!doctype html>
 <html lang="en">
   <head>
+    <ThemeHead />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Cart | {STORE_TITLE}</title>

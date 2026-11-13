@@ -7,6 +7,7 @@
  */
 import { getEmDashEntry } from "emdash";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import { STORE_TITLE, readStorefrontProfile } from "../features/store-shell/index.js";
 import { TOUR_PAGE_SLUG } from "../features/playground-tour/copy.js";
@@ -27,7 +28,7 @@ const done = goals.filter((step) => step.done).length;
 ---
 <!doctype html>
 <html lang="en">
-  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="robots" content="noindex, nofollow" /><title>{entry.data?.title ?? "Playground tour"} | {STORE_TITLE}</title></head>
+  <head><ThemeHead /><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="robots" content="noindex, nofollow" /><title>{entry.data?.title ?? "Playground tour"} | {STORE_TITLE}</title></head>
   <body data-storefront-profile={profile}>
     <StoreHeader profile={profile} />
     <main class="tour-page">

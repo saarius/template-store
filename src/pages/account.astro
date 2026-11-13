@@ -1,6 +1,7 @@
 ---
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import { ShopperAccount } from "../features/shopper-account/ui.ts";
 import { isMerchantEmailSignInPaused } from "../features/shopper-account/merchant-email.server.js";
 import { acquireGuestCheckoutAdmission } from "../features/guest-cart/checkout-admission.js";
@@ -32,6 +33,7 @@ const previewUnavailable = isPlayground && isPlaygroundPreviewHost(Astro.url, pl
 <!doctype html>
 <html lang="en">
   <head>
+    <ThemeHead />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Account | {STORE_TITLE}</title>

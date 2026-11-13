@@ -1,0 +1,13 @@
+<!-- Merchant-only preference: never read or write the cart or checkout capability. -->
+<script is:inline>
+  (() => {
+    let mode = 'system';
+    try {
+      const saved = localStorage.getItem('backroadbum.theme');
+      if (saved === 'light' || saved === 'dark') mode = saved;
+    } catch { /* Blocked storage still follows the device. */ }
+    document.documentElement.dataset.theme = mode;
+  })();
+</script>
+<link rel="preload" href="/backroad/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/backroad/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />

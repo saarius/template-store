@@ -8,6 +8,8 @@ const steer2Path = '/dashboard/instructions/steer-2-2026-11-11.txt';
 const steer2Text = await readFile(new URL('../public' + steer2Path, import.meta.url), 'utf8');
 const steer3Path = '/dashboard/instructions/steer-3-2026-11-12.txt';
 const steer3Text = await readFile(new URL('../public' + steer3Path, import.meta.url), 'utf8');
+const steer4Path = '/dashboard/instructions/steer-4-2026-11-13.txt';
+const steer4Text = await readFile(new URL('../public' + steer4Path, import.meta.url), 'utf8');
 const base = process.env.STORE_URL || 'https://backroadbum.com';
 const output = new URL('../runs/backroadbum/dashboard/', import.meta.url);
 await mkdir(output, { recursive: true });
@@ -119,7 +121,7 @@ try {
         await expect(page.getByRole('link', { name: 'Original · captured November 9, 2026', exact: true })).toHaveAttribute('href', '/dashboard/instructions/original-2026-11-09.txt');
         await expect(page.getByRole('link', { name: 'Steer 1 · November 10, 2026', exact: true })).toHaveAttribute('href', '/dashboard/instructions/steer-1-2026-11-10.txt');
         expect(await page.locator('#instructions a').allTextContents()).toEqual([
-          'Original · captured November 9, 2026', 'Steer 1 · November 10, 2026', 'Steer 2 · November 11, 2026', 'Steer 3 · November 12, 2026',
+          'Original · captured November 9, 2026', 'Steer 1 · November 10, 2026', 'Steer 2 · November 11, 2026', 'Steer 3 · November 12, 2026', 'Steer 4 · November 13, 2026',
         ]);
         const steer2 = page.getByRole('link', { name: 'Steer 2 · November 11, 2026', exact: true });
         await expect(steer2).toHaveAttribute('href', steer2Path);
@@ -137,6 +139,13 @@ try {
         expect(await (await archive3Response).text()).toBe(steer3Text);
         await expect(page.locator('body')).toContainText('Visual & Runtime Behavior Proof');
         await expect(page.locator('body')).toContainText('[owner account email redacted]');
+        await page.goBack();
+        const steer4 = page.getByRole('link', { name: 'Steer 4 · November 13, 2026', exact: true });
+        await expect(steer4).toHaveAttribute('href', steer4Path);
+        const archive4Response = page.waitForResponse(response => new URL(response.url()).pathname === steer4Path);
+        await steer4.click();
+        expect(await (await archive4Response).text()).toBe(steer4Text);
+        await expect(page.locator('body')).toContainText('Full Redesign');
         await page.goBack();
         await page.getByRole('navigation', { name: 'Dashboard sections' }).getByRole('link', { name: 'Latest work', exact: true }).click();
         await page.waitForURL(url => url.hash === '#history');

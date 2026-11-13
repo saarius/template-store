@@ -1,6 +1,7 @@
 ---
 import { getEmDashEntry, getSection, type PortableTextBlock } from "emdash";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import PolicyContent from "../features/store-shell/PolicyContent.astro";
 import {
@@ -22,7 +23,7 @@ const canonical = canonicalUrl("/shipping", Astro.site, Astro.url);
 ---
 <!doctype html>
 <html lang="en">
-  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><link rel="canonical" href={canonical} /><title>{title} | {STORE_TITLE}</title></head>
+  <head><ThemeHead /><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><link rel="canonical" href={canonical} /><title>{title} | {STORE_TITLE}</title></head>
   <body data-storefront-profile={profile}>
     <StoreHeader profile={profile} />
     <PolicyContent kind="shipping" title={title} intro={intro} content={content} supportContent={supportSection?.content} />

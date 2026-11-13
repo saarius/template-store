@@ -8,6 +8,7 @@
 import { getEmDashEntry, type PortableTextBlock } from "emdash";
 import { PortableText } from "emdash/ui";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import { STORE_TITLE, readStorefrontProfile } from "../features/store-shell/index.js";
 import { legacyPortableTextComponents } from "../features/store-shell/portable-text/index.js";
@@ -24,7 +25,7 @@ const back = /^\/_emdash\/admin\/plugins\/[A-Za-z0-9_-]+\/[A-Za-z0-9_-]+$/.test(
 ---
 <!doctype html>
 <html lang="en">
-  <head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="robots" content="noindex, nofollow" /><title>{entry.data?.title ?? "Connect to DinkusKit"} | {STORE_TITLE}</title></head>
+  <head><ThemeHead /><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="robots" content="noindex, nofollow" /><title>{entry.data?.title ?? "Connect to DinkusKit"} | {STORE_TITLE}</title></head>
   <body data-storefront-profile={profile}>
     <StoreHeader profile={profile} />
     <main class="connect-page">

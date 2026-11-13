@@ -6,25 +6,31 @@ const { value, index } = Astro.props as BlockComponentProps<HomeValue>;
 const Heading = index === 0 ? 'h1' : 'h2';
 ---
 <section class="backroad-opener" data-home-opener>
-  <img src="/backroad/forest.jpg" alt="A still lake reflecting tall trees beneath distant mountains" width="1600" height="1067" fetchpriority="high" />
   <div class="backroad-opener__notice">
+    <p class="backroad-opener__intro">Everyday camp. Out-of-the-way places.</p>
     <Heading>{value.headline}</Heading>
-    <div>
-      {value.deck && <p>{value.deck}</p>}
-      <nav aria-label="Start exploring">
-        {value.primary_label && value.primary_href && <a class="brb-action" href={sanitizeHref(value.primary_href)}>{value.primary_label}</a>}
-        {value.secondary_label && value.secondary_href && <a href={sanitizeHref(value.secondary_href)}>{value.secondary_label}</a>}
-      </nav>
-    </div>
+    {value.deck && <p class="backroad-opener__deck">{value.deck}</p>}
+    <nav aria-label="Start exploring">
+      {value.primary_label && value.primary_href && <a class="brb-action" href={sanitizeHref(value.primary_href)}>{value.primary_label}</a>}
+      {value.secondary_label && value.secondary_href && <a class="backroad-opener__secondary" href={sanitizeHref(value.secondary_href)}>{value.secondary_label}</a>}
+    </nav>
   </div>
+  <figure>
+    <img src="/backroad/forest.jpg" alt="A still lake reflecting tall trees beneath distant mountains" width="1600" height="1067" fetchpriority="high" loading="eager" />
+    <figcaption>Less itinerary. More outside.</figcaption>
+  </figure>
 </section>
 <style>
-.backroad-opener{margin:1.5rem 0 0;background:var(--brb-blue);overflow:hidden;border-radius:4px}
-.backroad-opener>img{display:block;width:100%;height:clamp(12rem,24vw,20rem);object-fit:cover;object-position:50% 56%}
-.backroad-opener__notice{display:grid;grid-template-columns:1fr 1.05fr;gap:2rem;padding:2rem 2.5rem 2.5rem;align-items:center}
-.backroad-opener h1,.backroad-opener h2{font-size:clamp(2.8rem,5.7vw,5rem);line-height:1;letter-spacing:-.025em;max-width:10ch;margin:0}
-.backroad-opener p{font-size:1.05rem;line-height:1.7;max-width:42ch;margin:0 0 1.25rem}
-.backroad-opener nav{display:flex;gap:1rem 1.5rem;flex-wrap:wrap;align-items:center}
-.backroad-opener nav a{color:var(--store-ink);font-size:.95rem}
-@media(max-width:42rem){.backroad-opener__notice{grid-template-columns:1fr;padding:1.5rem;gap:1rem}.backroad-opener>img{height:14rem}.backroad-opener h1,.backroad-opener h2{max-width:13ch}.backroad-opener p{font-size:1rem}}
+.backroad-opener{display:grid;grid-template-columns:minmax(0,1fr);margin:var(--space-6) 0 0;gap:var(--space-7);align-items:center}
+.backroad-opener__notice{padding:var(--space-5) 0;min-width:0}
+.backroad-opener__intro{font-size:var(--text-sm);font-weight:500;color:var(--color-text-muted);margin:0 0 var(--space-5)}
+.backroad-opener h1,.backroad-opener h2{font-size:var(--text-display);line-height:1.08;letter-spacing:-.04em;max-width:12ch;margin:0 0 var(--space-5);font-weight:500}
+.backroad-opener__deck{font-size:1rem;line-height:var(--leading-body);max-width:37ch;margin:0 0 var(--space-6);color:var(--color-text-muted)}
+.backroad-opener nav{display:flex;gap:var(--space-4) var(--space-5);flex-wrap:wrap;align-items:center}
+.backroad-opener__secondary{display:inline-flex;align-items:center;min-height:48px;color:var(--color-text);font-size:var(--text-sm);font-weight:500}
+.backroad-opener__secondary:hover{text-decoration-thickness:2px}
+.backroad-opener figure{margin:0;min-width:0;background:var(--color-surface-muted);border-radius:var(--radius-card);overflow:hidden}
+.backroad-opener img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 55%}
+.backroad-opener figcaption{padding:var(--space-3) var(--space-5);font-size:var(--text-sm);color:var(--color-text-muted)}
+@media(min-width:60rem){.backroad-opener{grid-template-columns:minmax(0,1fr) minmax(0,1.618fr);gap:var(--space-8);margin-top:var(--space-7)}.backroad-opener img{aspect-ratio:1.25;min-height:28rem}.backroad-opener__notice{padding:var(--space-7) 0}}
 </style>

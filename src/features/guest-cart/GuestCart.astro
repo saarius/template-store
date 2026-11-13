@@ -41,7 +41,7 @@ const { checkoutAdmission = null } = Astro.props;
 <style>
   .guest-cart{width:min(70rem,calc(100% - 2rem));margin:3rem auto;min-height:60vh;overflow-wrap:anywhere}
   .guest-cart [hidden]{display:none}
-  .guest-cart a{color:var(--store-ink);text-underline-offset:.2em}
+  .guest-cart a:not(.guest-cart-shop){color:var(--store-ink);text-underline-offset:.2em}
   .guest-cart-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
   h1{font-size:clamp(2.8rem,5.7vw,5rem);letter-spacing:-.025em;line-height:1;margin:0}
   h2{font-size:1.65rem;line-height:1.15;margin:0 0 1rem}

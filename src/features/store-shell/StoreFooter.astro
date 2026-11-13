@@ -3,20 +3,41 @@ interface Props { profile: string; currentPath?: string; note?: string }
 ---
 <footer class="brb-footer" data-store-footer>
   <div class="brb-footer__inner">
-    <div><a class="brb-footer__brand" href="/">BACKROAD BUM</a><p>For the miles in between.</p></div>
+    <div class="brb-footer__intro"><a class="brb-footer__brand" href="/">Backroad Bum</a><p>For the miles in between.</p><p class="brb-footer__invitation">A little camp gear. A slower weekend.<br />A good reason to take the long way.</p></div>
     <nav aria-label="Explore"><h2>Take a look around</h2><a href="/shop">All gear</a><a href="/field-notes">Field notes</a><a href="/search">Search the shop</a></nav>
     <nav aria-label="Policies & Care"><h2>Before you go</h2><a href="/checkout/success" data-last-checkout-link>Your last checkout</a><a href="/test-store">Test-store guide</a><a href="/shipping">Shipping</a><a href="/returns">Returns</a><a href="/dashboard/">The experiment</a></nav>
+    <div class="theme-control" data-theme-control hidden>
+      <label for="store-appearance">Appearance</label>
+      <select id="store-appearance" data-theme-select aria-describedby="appearance-message">
+        <option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option>
+      </select>
+      <p id="appearance-message" data-theme-message role="status"></p>
+    </div>
+    <noscript><p class="theme-note">Appearance follows your device settings.</p></noscript>
   </div>
-  <div class="brb-footer__bottom">&copy; {new Date().getUTCFullYear()} Backroad Bum <span>Built with EmDash &amp; DinkusKit</span></div>
+  <div class="brb-footer__bottom"><span>&copy; {new Date().getUTCFullYear()} Backroad Bum</span><span>Built with EmDash &amp; DinkusKit</span></div>
 </footer>
+<script>
+  import { hydrateStoreTheme } from './theme-client';
+  hydrateStoreTheme();
+</script>
 <style>
-.brb-footer{margin-top:4rem;background:var(--store-vault-bg);color:var(--store-vault-ink);padding:3rem max(1rem,calc((100vw - 70rem)/2)) 1.25rem}
-.brb-footer__inner{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:2rem}
+.brb-footer{margin-top:var(--space-9);background:var(--color-surface-muted);color:var(--color-text);border-top:1px solid var(--color-border);padding:var(--space-8) max(1.25rem,calc((100vw - 80rem)/2)) var(--space-5)}
+.brb-footer__inner{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-7) var(--space-6)}
+.brb-footer__intro{grid-column:1/-1}
 .brb-footer a{color:inherit;text-decoration:none}.brb-footer a:hover{text-decoration:underline}
-.brb-footer__brand{font-family:var(--font-display);font-size:2rem;font-weight:700}
-.brb-footer h2{font-family:var(--font-sans);font-size:1rem;margin:.25rem 0 1rem;font-weight:600}
-.brb-footer nav a{display:flex;align-items:center;width:fit-content;max-width:100%;min-width:48px;min-height:48px;box-sizing:border-box;padding:.5rem 0;line-height:1.5;color:var(--store-vault-muted);font-size:.95rem}
-.brb-footer p{color:var(--store-vault-muted);margin:.5rem 0}
-.brb-footer__bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding-top:2rem;margin-top:2rem;border-top:1px solid #547587;font-size:.8rem;color:var(--store-vault-muted)}
-@media(max-width:38rem){.brb-footer__inner{grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr))}.brb-footer__inner>div{grid-column:1/-1}}
+.brb-footer__brand{display:inline-flex;align-items:center;min-height:48px;font-family:var(--font-display);font-size:var(--text-3xl);font-weight:500;letter-spacing:-.04em;line-height:1.15}
+.brb-footer h2,.theme-control label{display:block;font-family:var(--font-sans);font-size:var(--text-sm);margin:0 0 var(--space-3);font-weight:700}
+.brb-footer nav a{display:flex;align-items:center;width:fit-content;max-width:100%;min-width:48px;min-height:48px;padding:.5rem 0;line-height:1.5;color:var(--color-text-muted);font-size:var(--text-sm)}
+.brb-footer p{color:var(--color-text-muted);margin:var(--space-2) 0;overflow-wrap:anywhere}
+.brb-footer .brb-footer__invitation{margin-top:var(--space-5);font-size:var(--text-sm);max-width:32ch}
+.theme-control{min-width:0;grid-column:1/-1;align-self:start}
+.theme-control[hidden]{display:none}
+.theme-control select{display:block;width:12rem;max-width:100%;min-height:48px;border:1px solid var(--color-border-strong);border-radius:var(--radius-control);padding:.65rem .8rem;color:var(--color-text);background:var(--color-surface);font-size:1rem;cursor:pointer}
+.theme-control select:hover{background:var(--color-bg)}
+.theme-control p{font-size:var(--text-sm);max-width:24ch}
+.theme-control p:empty{display:none}
+.brb-footer__bottom{display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--space-4);padding-top:var(--space-5);margin-top:var(--space-8);border-top:1px solid var(--color-border);font-size:var(--text-sm);color:var(--color-text-muted)}
+@media(min-width:60rem){.brb-footer__inner{grid-template-columns:minmax(0,1.618fr) 1fr 1fr 1fr}.brb-footer__intro,.theme-control{grid-column:auto}}
+@media(max-width:24rem){.brb-footer__inner{grid-template-columns:1fr}.brb-footer__inner>*{grid-column:auto}}
 </style>

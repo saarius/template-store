@@ -11,6 +11,7 @@ import TestStoreActions from "../features/store-shell/TestStoreActions.astro";
 import { fieldNote, fieldNotes } from "../features/store-shell/field-notes.js";
 import { Blocks, PortableText, type BlockValue } from "emdash/ui";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import UnknownBlock from "../features/store-shell/blocks/UnknownBlock.astro";
 import { pageLayoutComponents } from "../features/store-shell/blocks/index.js";
@@ -42,6 +43,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
 <!doctype html>
 <html lang="en">
   <head>
+    <ThemeHead />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     {canonical && <link rel="canonical" href={canonical} />}

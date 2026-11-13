@@ -1,6 +1,7 @@
 ---
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import { getEmDashCollection } from "emdash";
 
 import { acquireGuestCheckoutAdmission } from "../features/guest-cart/checkout-admission.js";
@@ -57,6 +58,7 @@ const unmanaged = demonstrations.unmanaged;
 <!doctype html>
 <html lang="en">
   <head>
+    <ThemeHead />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={PROOF_STORE_DESCRIPTION} />

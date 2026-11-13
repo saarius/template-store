@@ -1,5 +1,6 @@
 ---
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
 import { getEmDashEntry, getEmDashCollection, getSiteSettings, type PortableTextBlock } from "emdash";
 import { Blocks, PortableText, type BlockValue } from "emdash/ui";
@@ -62,13 +63,14 @@ if (!composed && import.meta.env.DEV) {
 <!doctype html>
 <html lang="en">
   <head>
+    <ThemeHead />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={STORE_DESCRIPTION} />
     <title>{STORE_TITLE}</title>
   </head>
   <body data-storefront-profile={profile}>
-    <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(checkoutAvailable)} role="status">{storeBannerText(checkoutAvailable)}</div>
+    <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(checkoutAvailable)} role="status">{storeBannerText(checkoutAvailable)} <a href="/test-store">How to try it</a></div>
     <StoreHeader profile={profile} />
     <main id="main-content">
       {
@@ -97,7 +99,7 @@ if (!composed && import.meta.env.DEV) {
         <strong>{guidance.heading}</strong>
         <p>{guidance.detail}</p>
       </section>
-      <CommerceCatalog products={commerceProducts} unavailable={catalogUnavailable} productPaths={productPaths} checkoutAvailable={checkoutAvailable} />
+      <div class="home-catalog"><CommerceCatalog products={commerceProducts} unavailable={catalogUnavailable} productPaths={productPaths} checkoutAvailable={checkoutAvailable} /></div>
       <section class="brb-field-promo">
         <div><h2>A little less itinerary.</h2><p>Notes on packing light, stopping often and leaving a place better than you found it.</p><a href="/field-notes">Read the field notes</a></div>
         <p>Windows down.<br />Plans optional.<br />Leave no trace.</p>
@@ -110,8 +112,13 @@ if (!composed && import.meta.env.DEV) {
   </body>
 </html>
 <style>
-.brb-field-promo{width:min(70rem,calc(100% - 2rem));margin:4rem auto;display:grid;grid-template-columns:1.4fr 1fr;gap:2rem;background:var(--brb-blue);padding:2.5rem;border-radius:4px}
-.brb-field-promo h2{font-size:clamp(2.4rem,4vw,3.5rem);line-height:1.1;margin:0 0 1rem;letter-spacing:-.025em}
-.brb-field-promo p{max-width:43ch;margin:0 0 1.25rem}.brb-field-promo>p{font-family:var(--font-display);font-size:2rem;line-height:1.4;margin:auto 0 auto auto}.brb-field-promo a{color:inherit;font-weight:700}
-@media(max-width:40rem){.brb-field-promo{grid-template-columns:minmax(0,1fr);padding:1.5rem;overflow-wrap:anywhere}.brb-field-promo>p{margin:0;font-size:1.6rem}}
+.home-catalog :global(.shop-catalog){width:min(80rem,calc(100% - 2.5rem));margin:var(--space-9) auto}
+.home-catalog :global(.shop-catalog h2){font-size:var(--text-3xl);font-weight:500;letter-spacing:-.025em;margin-bottom:var(--space-7)}
+.home-catalog :global(.shop-grid){gap:var(--space-6)}
+.brb-field-promo{width:min(80rem,calc(100% - 2.5rem));margin:var(--space-9) auto;display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-7);background:var(--color-surface-muted);padding:var(--space-7);border-radius:var(--radius-panel);overflow-wrap:anywhere}
+.brb-field-promo h2{font-size:var(--text-3xl);line-height:1.15;margin:0 0 var(--space-5);letter-spacing:-.025em}
+.brb-field-promo p{max-width:43ch;margin:0 0 var(--space-5);color:var(--color-text-muted)}
+.brb-field-promo>p{font-family:var(--font-display);font-size:var(--text-2xl);line-height:1.35;margin:0;color:var(--color-text)}
+.brb-field-promo a{display:inline-flex;align-items:center;min-height:48px;color:inherit;font-weight:600}
+@media(min-width:50rem){.brb-field-promo{grid-template-columns:minmax(0,1.618fr) minmax(0,1fr);gap:var(--space-8);padding:var(--space-8)}.brb-field-promo>p{padding-left:var(--space-7);border-left:1px solid var(--color-border-strong);align-self:center}}
 </style>

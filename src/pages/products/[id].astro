@@ -1,6 +1,7 @@
 ---
 import StoreFooter from "../../features/store-shell/StoreFooter.astro";
 import StoreHeader from "../../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../../features/store-shell/ThemeHead.astro";
 import { getEmDashCollection, type PortableTextBlock } from "emdash";
 import { Blocks, PortableText, type BlockValue } from "emdash/ui";
 import { acquireGuestCheckoutAdmission } from "../../features/guest-cart/checkout-admission.js";
@@ -200,6 +201,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
 <!doctype html>
 <html lang="en">
   <head>
+    <ThemeHead />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={noLongerAvailable ? "This product is no longer available." : item?.description ?? "Product not found."} />

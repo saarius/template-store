@@ -1,5 +1,6 @@
 ---
 import StoreHeader from './StoreHeader.astro';
+import ThemeHead from './ThemeHead.astro';
 import StoreFooter from './StoreFooter.astro';
 import { STORE_TITLE, readStorefrontProfile } from './index.js';
 import { storeBannerText } from './checkout-copy.js';
@@ -10,5 +11,5 @@ const { title, description = 'Camp gear, roadwear and field notes for the miles 
 const profile = readStorefrontProfile();
 const available = Boolean(await acquireGuestCheckoutAdmission({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => null));
 ---
-<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="description" content={description} /><title>{title} | {STORE_TITLE}</title>{noindex ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={`https://backroadbum.com${Astro.url.pathname}`} />}</head>
+<!doctype html><html lang="en"><head><ThemeHead /><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="description" content={description} /><title>{title} | {STORE_TITLE}</title>{noindex ? <meta name="robots" content="noindex, follow" /> : <link rel="canonical" href={`https://backroadbum.com${Astro.url.pathname}`} />}</head>
 <body><div class="store-demo-banner" role="status">{storeBannerText(available)} <a href="/test-store">How to try it</a></div><StoreHeader profile={profile} /><main id="main-content"><slot /></main><StoreFooter profile={profile} /></body></html>
