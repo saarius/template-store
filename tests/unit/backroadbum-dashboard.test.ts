@@ -2,10 +2,13 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
-  it('separates checkout-form proof and observed shutdown from deployment claims', () => {
+  it('separates variant and checkout-form proof from payment readiness and deployment claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Hosted checkout settings #124');
-    expect(source).toContain('Twenty-eight synthetic captures across seven UI PRs');
+    expect(source).toContain('Thirty-two synthetic captures across eight UI PRs');
+    expect(source).toContain('Variant cards #216');
+    expect(source).toContain('the isolated fixture does not prove payment readiness');
+    expect(source).toContain('fixed-label assertion against captured results fails on main and passes on head');
     expect(source).toContain('not a new signed installation or hosted settings submission');
     expect(source).toContain('normal November 12 stop at 22:24 UTC');
     expect(source).toContain('do not prove continuous uptime or background-job drain');

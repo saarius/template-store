@@ -19,6 +19,9 @@ Template2227e3aa67 and2266f8106c now embed eight public Before/After desktop/pho
 ## Hosted checkout-settings proof · November12
 DinkusKit124f520af9 now has four public Before/After form captures against unchanged mainc429d72, plus real built-route output. Four no-JavaScript contexts per pin preserve native TEST saves, $5/$75 reloads, keyboard order and invalid-amount refusal; the flat amount gains its visible label and the following label moves to a separate row. The hosted form remains unchanged on a read-only check; local synthetic proof, signed installation, review clearance and shared deployment stay distinct.
 
+## Variant-card proof · November13
+Template216 at5845563 now embeds four public Before/After desktop/phone composites against unchanged main4a421e5, pairing each family card with selected Small/Large views. The card changes from Out of stock to Check options while Small refuses Add at$40 and Large enables it at$45; both sources retain empty shopper storage and no shopper writes. Fresh Node24.22.0 typecheck/587units/115workflow passes/Registry checks pass; these source-paired sandbox fixtures keep checkout unavailable and prove neither a new signed installation nor payment readiness. The saved body was independently verified before one standalone re-review request; the signed store and all business records are unchanged.
+
 ## Buying-control proof · November12
 Template2258d017dd now has four public Before/After desktop/phone captures against unchanged main4a421e5, showing fallback and enhanced states side by side. Six cases per pin across serial isolated runs cover disabled/CSP-blocked scripts, keyboard quantity/Add, sold-out refusal, exact-member intent and reload persistence with no checkout starts. The source-paired Commerce fixture and completed GitHub CI are not a new signed installation or review clearance; the merchant theme and live catalog stay unchanged.
 
