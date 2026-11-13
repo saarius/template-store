@@ -41,7 +41,10 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('Forty-four synthetic captures across eleven UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Current Before/After captures for twelve UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Cart quantity #212');
+        await expect(page.locator('#history')).toContainText('refused save');
+        await expect(page.locator('#contributions')).toContainText('Fresh review accepts #223’s field-level contact proof');
         await expect(page.locator('#history')).toContainText('Checkout contact #223');
         await expect(page.locator('#history')).toContainText('Three fixes are now merged upstream');
         await expect(page.locator('#contributions')).toContainText('Fifteen fork PRs remain open');

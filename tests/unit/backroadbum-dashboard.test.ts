@@ -5,7 +5,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('separates saved-cart, variant and checkout-form proof from payment readiness and deployment claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Hosted checkout settings #124');
-    expect(source).toContain('Forty-four synthetic captures across eleven UI PRs');
+    expect(source).toContain('Current Before/After captures for twelve UI PRs');
     expect(source).toContain('Checkout contact #223');
     expect(source).toContain('synthetic checkout protocol and an admission flag');
     expect(source).toContain('its own edits clear the correction without moving focus');
@@ -25,6 +25,16 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('normal November 12 stop at 22:24 UTC');
     expect(source).toContain('do not prove continuous uptime or background-job drain');
     expect(source).toContain('initial activation was not a live shutdown test');
+  });
+
+  it('reports quantity restoration proof without claiming the requested family revision is implemented', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('Cart quantity #212');
+    expect(source).toContain('in-memory 2/$48 while persisted intent stays 3');
+    expect(source).toContain('no payment starts, errors or overflow');
+    expect(source).toContain('merchant’s different retained-draft repair is not used as proof');
+    expect(source).toContain('That requested revision is not yet implemented');
+    expect(source).toContain('Fresh review accepts #223’s field-level contact proof');
   });
 
   it('distinguishes merged source from open review and signed deployment', () => {
