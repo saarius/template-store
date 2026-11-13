@@ -43,13 +43,13 @@ try {
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
         await expect(page.locator('#history')).toContainText('Current Before/After captures for reviewed UI PRs are publicly hosted outside git');
         await expect(page.locator('#history')).toContainText('Selected metadata #214');
-        await expect(page.locator('#history')).toContainText('legacy no-Offer contract still needs a maintainer decision');
+        await expect(page.locator('#history')).toContainText('owner approved the legacy no-Offer contract');
         await expect(page.locator('#history')).toContainText('Cart quantity #212');
         await expect(page.locator('#history')).toContainText('refused save');
         await expect(page.locator('#contributions')).toContainText('Fresh review accepts #223’s field-level contact proof');
         await expect(page.locator('#history')).toContainText('Checkout contact #223');
-        await expect(page.locator('#history')).toContainText('Three fixes are now merged upstream');
-        await expect(page.locator('#contributions')).toContainText('Fifteen fork PRs remain open');
+        await expect(page.locator('#history')).toContainText('Ten fixes are now merged upstream');
+        await expect(page.locator('#contributions')).toContainText('Eight fork PRs remain open');
         await expect(page.locator('#contributions')).toContainText('a merge is not a signed release or deployment');
         await expect(page.locator('#history')).toContainText('synthetic checkout protocol and an admission flag');
         await expect(page.locator('#history')).toContainText('Cart return #220');
@@ -60,7 +60,7 @@ try {
         await expect(page.locator('#history')).toContainText('not a signed installation or payment-readiness proof');
         await expect(page.locator('#history')).toContainText('Variant cards #216');
         await expect(page.locator('#history')).toContainText('the isolated fixture does not prove payment readiness');
-        await expect(page.locator('#history')).toContainText('additive contract still needs the maintainer decision');
+        await expect(page.locator('#history')).toContainText('owner approved its additive contract');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
         await expect(page.locator('#emdash-bugs li')).toHaveCount(8);
         await expect(page.locator('#history')).toContainText('Product-card continuation #267');
@@ -198,7 +198,7 @@ try {
         await expect(family).toContainText('same helper is dogfooded in this theme');
         await expect(family).toContainText('All new-head GitHub desktop, phone, Registry, Playground and aggregate checks pass');
         const memberSku = candidates.locator('tr').filter({ hasText: 'fix/public-variant-sku' });
-        await expect(memberSku).toContainText('contract still needs a maintainer decision');
+        await expect(memberSku).toContainText('owner has now approved the additive public contract');
         await expect(memberSku).toContainText('captured anonymous compiled-Registry list/default/member HTTP output');
         const detailRows = candidates.locator('tr').filter({ hasText: 'fix/order-detail-rows' });
         await expect(detailRows).toContainText('four hosted Before/After desktop/phone screenshots');
@@ -214,8 +214,8 @@ try {
         const selectedMetadata = candidates.locator('tr').filter({ hasText: 'fix/selected-variant-jsonld' });
         await expect(selectedMetadata).toContainText('24 selected cases and eight preserved simple-product Offers');
         await expect(selectedMetadata).toContainText('intentionally retain the visible parent SKU');
-        await expect(selectedMetadata).toContainText('legacy no-Offer contract still needs the maintainer decision');
-        await expect(selectedMetadata).toContainText('no signed release or live plugin replacement');
+        await expect(selectedMetadata).toContainText('owner approved the legacy no-Offer contract');
+        await expect(selectedMetadata).toContainText(/no signed release or live plugin replacement/i);
         const frozenChoices = candidates.locator('tr').filter({ hasText: 'fix/order-variant-labels' });
         await expect(frozenChoices).toContainText('signed store plugin is unchanged');
         await expect(frozenChoices).toContainText('four hosted Before/After desktop/phone screenshots');

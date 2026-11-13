@@ -45,7 +45,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('fits 390px rather than 532px');
     expect(source).toContain('Local synthetic sessions and practice history are not a hosted deployment or carrier proof');
     expect(source).toContain('Fresh review accepts both served proofs at 5/6 with no findings');
-    expect(source).toContain('Fresh review now separately accepts a733bcd’s installed proof at 5/6');
+    expect(source).toContain('Fresh review separately accepts a733bcd’s installed proof at 5/6');
     expect(source).toContain('fresh review accepts 1c808f0’s proof at 5/6');
     expect(source).toContain('no live record or label changed');
     expect(source).not.toContain('Ship’s substantive CI remains approval-gated');
@@ -81,8 +81,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).toContain('without response interception');
     expect(row).toContain('intentionally retain the visible parent SKU');
     expect(row).toContain('not claimed as a fresh local pass');
-    expect(row).toContain('legacy no-Offer contract still needs the maintainer decision');
-    expect(row).toContain('no signed release or live plugin replacement');
+    expect(row).toContain('owner approved the legacy no-Offer contract');
+    expect(row).toMatch(/no signed release or live plugin replacement/i);
   });
 
   it('reports quantity restoration separately from the implemented family revision', () => {
@@ -98,10 +98,16 @@ describe('Backroad Bum dashboard route boundaries', () => {
 
   it('distinguishes merged source from open review and signed deployment', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
-    expect(source).toContain('Fifteen fork PRs remain open');
+    expect(source).toContain('Eight fork PRs remain open');
     for (const number of [261, 263]) expect(source).toContain(`PR #${number}</a> merged upstream November 13`);
     expect(source).toContain('3285ebc</a>, merged upstream November 13');
     expect(source).toContain('a merge is not a signed release or deployment');
+    for (const [repo, number] of [['commerce', 266], ['ship', 94], ['ship', 97], ['template-store', 220], ['template-store', 223]] as const) {
+      expect(source).toContain(`https://github.com/dinkuskit/${repo}/pull/${number}\">PR #${number}</a>, merged upstream November 13`);
+    }
+    expect(source).toContain('1c808f0</a>, merged upstream November 13 for');
+    expect(source).toContain('73d8523</a>, merged upstream November 13 with green CI');
+    expect(source).toContain('owner has now approved the additive public contract');
     expect(source).toContain('Closed November 13 by merged');
   });
 
