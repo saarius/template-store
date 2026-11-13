@@ -75,6 +75,9 @@ components:
 ---
 # Design System: Backroad Bum
 
+## Creekside mug inspection · November13
+Extend the existing Operate product surface without new styling: keep the original lead illustration, show handle/rim crops in the existing desktop grid and phone snap strip, then use native specification rows before the open care disclosure. The Illustrated demo design heading qualifies the nominal capacity/material/finish; retain the original microwave/hot-handle cautions rather than inventing product performance. Native draft/reload/publication and four desktop/phone JS states are inspected, including keyboard disclosure and unchanged price/metadata/cart intent. Generated rasters/provenance stay outside git; the overview and one dated entry report the native content change, while previous history remains untouched.
+
 ## Legacy server-cart qualification reporting · November13
 Keep this nonvisual migration experiment in the existing latest-work paragraph and one dated entry, without a badge, new controls or raw fixture output. Distinguish actual0.8.0 kernel writes, candidate installed Registry reads without Payments and candidate-kernel replay with synthetic Payments; frozen facts are preserved, not whole-response equivalence or hosted/signed qualification. The merchant wrapper still needs the new cart-read protocol, and Template229 remains separately unqualified. Current gallery wording now describes its already-deployed HTML/grid/snap behavior; all127earlier article bodies stay unchanged.
 

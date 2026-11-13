@@ -75,7 +75,8 @@ try {
       expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'))).toBe(cart);
       expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-checkout.v1'))).toBeNull();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      await page.goto(base + '/products/creekside-camp-mug');
+      // The mug now has its own native gallery; keep the cap as the single-picture case.
+      await page.goto(base + '/products/long-way-cap');
       await expect(page.locator('[data-product-gallery] img')).toHaveCount(1);
       await expect(page.locator('[data-gallery-extras], .product-gallery--multiple')).toHaveCount(0);
       expect(writes).toEqual([]); expect(errors).toEqual([]); expect(checkoutRequests).toEqual([]);

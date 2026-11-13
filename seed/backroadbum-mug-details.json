@@ -1,0 +1,16 @@
+{
+  "slug": "creekside-camp-mug",
+  "title": "Creekside Camp Mug",
+  "tableHeading": "Illustrated demo design",
+  "rows": [
+    { "label": "Capacity", "value": "12 fl oz" },
+    { "label": "Body", "value": "Enamel-coated steel" },
+    { "label": "Finish", "value": "Blue rim" }
+  ],
+  "careHeading": "Care at camp",
+  "care": "Hand wash and dry after use. Not for the microwave; hot drinks can heat the handle.",
+  "pictures": [
+    { "filename": "creekside-mug-handle-detail.png", "viewBox": "300,155,260,195", "alt": "Creekside Camp Mug — illustrated detail of the generous enamel-style handle", "caption": "Handle detail cropped from the original Creekside Camp Mug illustration. Demo design artwork, not product photography or a tested sample." },
+    { "filename": "creekside-mug-rim-detail.png", "viewBox": "180,125,260,195", "alt": "Creekside Camp Mug — illustrated detail of the blue rim and pale interior", "caption": "Rim detail cropped from the original Creekside Camp Mug illustration. Demo design artwork, not product photography or a tested sample." }
+  ]
+}
