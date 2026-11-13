@@ -10,9 +10,13 @@ try {
   for (const width of [1440, 390]) {
     const context = await browser.newContext({ viewport: { width, height: 1000 }, reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
     const page = await context.newPage();
-    const errors = [], checkout = [];
+    const errors = [], checkout = [], checkoutStarts = [];
     page.on('pageerror', error => errors.push(error.message));
-    page.on('request', request => { if (/\/api\/checkout\//.test(request.url())) checkout.push(new URL(request.url()).pathname); });
+    page.on('request', request => {
+      const path = new URL(request.url()).pathname;
+      if (/\/api\/checkout\//.test(path)) checkout.push(path);
+      if (path === '/api/checkout/start') checkoutStarts.push(path);
+    });
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await page.goto(base + '/shop')).status()).toBe(200);
     await expect(page.locator('[data-commerce-product][data-product-link]')).toHaveCount(6);
@@ -96,12 +100,12 @@ try {
     await expect(page.locator('#history')).toContainText('Variant cards #216');
     await fits();
     await page.screenshot({ path: new URL(`metadata-dashboard-${width}.png`, output).pathname, fullPage: false });
-    expect(errors).toEqual([]); expect(checkout).toEqual([]);
+    expect(errors).toEqual([]); expect(checkoutStarts).toEqual([]);
     results.push({ width, groupedShopFamilies: 6, distinctMemberIds: true, selectedTarget: true, savedFeedbackReset: true,
       soldOutRefused: true, independentCartQuantities: true, refreshedSubtotal: '102.00',
       removedOnlyChosenMember: true, selectedMetadataMatchesPublicProjection: true, simpleSaleMetadataPreserved: true,
       variantCardSummarizesMembers: true, simpleCardKeepsStock: true, keyboardCardNavigation: true,
-      noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout.length });
+      noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout, checkoutStarts: checkoutStarts.length });
     await context.close();
     const plainContext = await browser.newContext({ viewport: { width, height: 1000 }, javaScriptEnabled: false, userAgent: 'BackroadBum-SelfCheck/1.0' });
     try {
@@ -118,6 +122,6 @@ try {
     } finally { await plainContext.close(); }
   }
 } finally { await browser.close(); }
-const evidence = { checkedAt: new Date().toISOString(), base, scope: 'Variant card guidance with JavaScript on/off, keyboard navigation, selected metadata against the signed public projection, simple-sale metadata, variant/cart behavior and dashboard. No checkout or merchant writes.', results };
+const evidence = { checkedAt: new Date().toISOString(), base, scope: 'Variant card guidance with JavaScript on/off, keyboard navigation, selected metadata against the signed public projection, simple-sale metadata, variant/cart behavior and dashboard. No checkout starts or merchant writes; existing read-only checkout-status requests are recorded separately.', results };
 await writeFile(new URL('verification.json', output), JSON.stringify(evidence, null, 2));
 console.log(JSON.stringify(evidence, null, 2));
