@@ -18,8 +18,8 @@ try {
     await expect(page.locator('[data-commerce-product][data-product-link]')).toHaveCount(6);
     const tee = page.locator('[data-product-link][href="/products/wrong-turn-tee"]');
     await expect(tee).toHaveCount(1);
-    await expect(tee.locator('[data-commerce-availability]')).toHaveText('Check options');
-    await expect(tee.locator('[data-commerce-availability]')).toHaveAttribute('data-commerce-availability', 'options');
+    await expect(tee.locator('[data-commerce-availability]')).toHaveText('In stock');
+    await expect(tee.locator('[data-commerce-availability]')).toHaveAttribute('data-commerce-availability', 'in-stock');
     await expect(page.locator('[href="/products/creekside-camp-mug"] [data-commerce-availability]')).toHaveText('In stock');
     await page.screenshot({ path: new URL(`shop-options-${width}.png`, output).pathname, fullPage: true });
     await tee.focus(); await page.keyboard.press('Enter');
@@ -93,14 +93,14 @@ try {
     expect(mugMetadata.sku).toBe(await page.locator('[data-product-sku]').getAttribute('data-product-sku'));
     expect(mugMetadata.offers).toMatchObject({ price: '18.00', availability: 'https://schema.org/InStock' });
     await page.goto(base + '/dashboard/');
-    await expect(page.getByRole('heading', { name: 'November 10, 2026 · No borrowed identity' })).toBeVisible();
+    await expect(page.locator('#history')).toContainText('Variant cards #216');
     await fits();
     await page.screenshot({ path: new URL(`metadata-dashboard-${width}.png`, output).pathname, fullPage: false });
     expect(errors).toEqual([]); expect(checkout).toEqual([]);
     results.push({ width, groupedShopFamilies: 6, distinctMemberIds: true, selectedTarget: true, savedFeedbackReset: true,
       soldOutRefused: true, independentCartQuantities: true, refreshedSubtotal: '102.00',
       removedOnlyChosenMember: true, selectedMetadataMatchesPublicProjection: true, simpleSaleMetadataPreserved: true,
-      variantCardChecksOptions: true, simpleCardKeepsStock: true, keyboardCardNavigation: true,
+      variantCardSummarizesMembers: true, simpleCardKeepsStock: true, keyboardCardNavigation: true,
       noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout.length });
     await context.close();
     const plainContext = await browser.newContext({ viewport: { width, height: 1000 }, javaScriptEnabled: false, userAgent: 'BackroadBum-SelfCheck/1.0' });
@@ -108,13 +108,13 @@ try {
       const plain = await plainContext.newPage();
       expect((await plain.goto(base + '/shop')).status()).toBe(200);
       const plainTee = plain.locator('[data-product-link][href="/products/wrong-turn-tee"]');
-      await expect(plainTee.locator('[data-commerce-availability]')).toHaveText('Check options');
+      await expect(plainTee.locator('[data-commerce-availability]')).toHaveText('In stock');
       await expect(plain.locator('[href="/products/creekside-camp-mug"] [data-commerce-availability]')).toHaveText('In stock');
       expect(await plain.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await plain.screenshot({ path: new URL(`shop-options-no-js-${width}.png`, output).pathname, fullPage: true });
       await plainTee.focus(); await plain.keyboard.press('Enter');
       await expect(plain).toHaveURL(base + '/products/wrong-turn-tee');
-      results.push({ width, javaScript: false, variantCardChecksOptions: true, simpleCardKeepsStock: true, keyboardCardNavigation: true, noOverflow: true });
+      results.push({ width, javaScript: false, variantCardSummarizesMembers: true, simpleCardKeepsStock: true, keyboardCardNavigation: true, noOverflow: true });
     } finally { await plainContext.close(); }
   }
 } finally { await browser.close(); }
