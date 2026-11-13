@@ -2,10 +2,13 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
-  it('separates variant and checkout-form proof from payment readiness and deployment claims', () => {
+  it('separates saved-cart, variant and checkout-form proof from payment readiness and deployment claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Hosted checkout settings #124');
-    expect(source).toContain('Thirty-two synthetic captures across eight UI PRs');
+    expect(source).toContain('Thirty-six synthetic captures across nine UI PRs');
+    expect(source).toContain('Saved-cart names #218');
+    expect(source).toContain('without snapshot interception');
+    expect(source).toContain('not a signed installation or payment-readiness proof');
     expect(source).toContain('Variant cards #216');
     expect(source).toContain('the isolated fixture does not prove payment readiness');
     expect(source).toContain('fixed-label assertion against captured results fails on main and passes on head');

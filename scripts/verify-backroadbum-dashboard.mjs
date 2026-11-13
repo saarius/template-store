@@ -41,7 +41,10 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('Thirty-two synthetic captures across eight UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Thirty-six synthetic captures across nine UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Saved-cart names #218');
+        await expect(page.locator('#history')).toContainText('without snapshot interception');
+        await expect(page.locator('#history')).toContainText('not a signed installation or payment-readiness proof');
         await expect(page.locator('#history')).toContainText('Variant cards #216');
         await expect(page.locator('#history')).toContainText('the isolated fixture does not prove payment readiness');
         await expect(page.locator('#history')).toContainText('additive contract still needs the maintainer decision');
