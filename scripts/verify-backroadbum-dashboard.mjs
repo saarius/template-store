@@ -41,7 +41,9 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('Current Before/After captures for twelve UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Current Before/After captures for reviewed UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Selected metadata #214');
+        await expect(page.locator('#history')).toContainText('legacy no-Offer contract still needs a maintainer decision');
         await expect(page.locator('#history')).toContainText('Cart quantity #212');
         await expect(page.locator('#history')).toContainText('refused save');
         await expect(page.locator('#contributions')).toContainText('Fresh review accepts #223’s field-level contact proof');
@@ -197,7 +199,12 @@ try {
         await expect(hostedSettings).toContainText('native TEST saves, durable $5/$75 read-back');
         await expect(hostedSettings).toContainText('not a new signed installation or hosted settings submission');
         await expect(hostedSettings.getByRole('link', { name: 'PR #124', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/dinkuskit/pull/124');
-        await expect(candidates.locator('tr').filter({ hasText: 'fix/missing-item-weight' })).toContainText('substantive CI awaits maintainer approval');
+        await expect(candidates.locator('tr').filter({ hasText: 'fix/missing-item-weight' })).toContainText('fresh review accepts e838486’s installed proof at 5/6 with no findings');
+        const selectedMetadata = candidates.locator('tr').filter({ hasText: 'fix/selected-variant-jsonld' });
+        await expect(selectedMetadata).toContainText('24 selected cases and eight preserved simple-product Offers');
+        await expect(selectedMetadata).toContainText('intentionally retain the visible parent SKU');
+        await expect(selectedMetadata).toContainText('legacy no-Offer contract still needs the maintainer decision');
+        await expect(selectedMetadata).toContainText('no signed release or live plugin replacement');
         const frozenChoices = candidates.locator('tr').filter({ hasText: 'fix/order-variant-labels' });
         await expect(frozenChoices).toContainText('signed store plugin is unchanged');
         await expect(frozenChoices).toContainText('four hosted Before/After desktop/phone screenshots');

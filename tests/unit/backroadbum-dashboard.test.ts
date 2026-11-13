@@ -5,7 +5,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('separates saved-cart, variant and checkout-form proof from payment readiness and deployment claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Hosted checkout settings #124');
-    expect(source).toContain('Current Before/After captures for twelve UI PRs');
+    expect(source).toContain('Current Before/After captures for reviewed UI PRs');
     expect(source).toContain('Checkout contact #223');
     expect(source).toContain('synthetic checkout protocol and an admission flag');
     expect(source).toContain('its own edits clear the correction without moving focus');
@@ -70,6 +70,19 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).toContain('fresh review accepts e838486’s installed proof at 5/6 with no findings');
     expect(row).toContain('the signed store plugin remains unchanged');
     expect(row).not.toContain('CI awaits maintainer approval');
+  });
+
+  it('separates captured selected metadata from compatibility approval and signed deployment', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const row = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/template-store\/tree\/fix\/selected-variant-jsonld">.*?<\/tr>/)?.[0];
+    expect(source).toContain('Selected metadata #214');
+    expect(source).toContain('The selected size owns its identity');
+    expect(row).toContain('24 selected cases and eight preserved simple-product Offers');
+    expect(row).toContain('without response interception');
+    expect(row).toContain('intentionally retain the visible parent SKU');
+    expect(row).toContain('not claimed as a fresh local pass');
+    expect(row).toContain('legacy no-Offer contract still needs the maintainer decision');
+    expect(row).toContain('no signed release or live plugin replacement');
   });
 
   it('reports quantity restoration separately from the implemented family revision', () => {
