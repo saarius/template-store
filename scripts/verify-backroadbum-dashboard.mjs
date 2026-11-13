@@ -160,10 +160,14 @@ try {
         await expect(gallery).toContainText('not a new signed installation');
         const chronology = candidates.locator('tr').filter({ hasText: 'fix/native-order-chronology' });
         await expect(chronology).toContainText('signed store plugin is unchanged');
-        await expect(chronology).toContainText('same installed-admin test fails on unchanged base');
-        await expect(chronology).toContainText('proof item');
-        await expect(chronology).toContainText('maintainer’s presentation-policy decision');
-        await expect(candidates.locator('tr').filter({ hasText: 'fix/invalid-cart-quantity' })).toContainText('cannot prove the proposed behavior');
+        await expect(chronology).toContainText('merges current main de4805a without rebasing');
+        await expect(chronology).toContainText('all nine owning GitHub checks passed');
+        await expect(chronology).toContainText('Earlier a51860e clearance is not approval of this new merge head');
+        const quantity = candidates.locator('tr').filter({ hasText: 'fix/invalid-cart-quantity' });
+        await expect(quantity).toContainText('in-memory 2/$48 while persisted intent stays 3');
+        await expect(quantity).toContainText('merchant’s different retained-draft repair is not used as proof');
+        await expect(quantity).toContainText('not signed installation or provider readiness');
+        await expect(candidates.locator('tr').filter({ hasText: 'fix/variant-card-availability' })).toContainText('That requested revision is not yet implemented');
         const memberSku = candidates.locator('tr').filter({ hasText: 'fix/public-variant-sku' });
         await expect(memberSku).toContainText('contract still needs a maintainer decision');
         await expect(memberSku).toContainText('captured anonymous compiled-Registry list/default/member HTTP output');
@@ -185,7 +189,7 @@ try {
         await expect(frozenChoices).toContainText('b035d7b');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/product-control-readiness' })).toContainText('aggregate checks pass');
         await expect(contact).toContainText('exact-head GitHub desktop/phone/Registry/aggregate checks pass');
-        await expect(contact).toContainText('one standalone re-review requested after saved-body verification');
+        await expect(contact).toContainText('Fresh review accepts the field-level proof with no before-merge item');
         await expect(page.locator('[data-activity-metrics]')).toHaveCount(0);
         await page.locator('#contributions').scrollIntoViewIfNeeded();
       }
