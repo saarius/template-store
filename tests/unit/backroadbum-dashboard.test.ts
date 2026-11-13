@@ -57,6 +57,20 @@ describe('Backroad Bum dashboard route boundaries', () => {
     }
   });
 
+  it('qualifies installed Ship weight proof without claiming hosted integration or a signed release', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const row = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/ship\/tree\/fix\/missing-item-weight">.*?<\/tr>/)?.[0];
+    expect(source).toContain('Native package weight #97');
+    expect(source).toContain('A total that admits what is missing');
+    expect(row).toContain('without browser response interception');
+    expect(row).toContain('same added regressions fail on main’s missing warning and pass on head');
+    expect(row).toContain('both retain the entered 16.5 oz after See prices');
+    expect(row).toContain('Unsigned local Registry-shaped installations use synthetic issuer and hosted HTTP ports');
+    expect(row).toContain('exact-head owning GitHub CI is green');
+    expect(row).toContain('the signed store plugin remains unchanged');
+    expect(row).not.toContain('CI awaits maintainer approval');
+  });
+
   it('reports quantity restoration separately from the implemented family revision', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Cart quantity #212');
