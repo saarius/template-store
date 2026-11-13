@@ -67,7 +67,9 @@ try {
         await expect(page.locator('#history')).toContainText('the isolated fixture does not prove payment readiness');
         await expect(page.locator('#history')).toContainText('owner approved its additive contract');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
-        await expect(page.locator('#emdash-bugs li')).toHaveCount(8);
+        await expect(page.locator('#emdash-bugs li')).toHaveCount(9);
+        await expect(page.locator('#emdash-bugs')).toContainText('Search snippets select the title column even for body-text matches');
+        await expect(page.locator('#history')).toContainText('Search now gives matching field notes a short published opening-paragraph preview');
         await expect(page.locator('#history')).toContainText('Product-card continuation #267');
         await expect(page.locator('#history')).toContainText('Phone qualification stopped earlier');
         await expect(page.locator('#emdash-bugs')).toContainText('invalid-save phone continuation is not qualified');
