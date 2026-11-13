@@ -41,7 +41,9 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('Forty synthetic captures across ten UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Forty-four synthetic captures across eleven UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Checkout contact #223');
+        await expect(page.locator('#history')).toContainText('synthetic checkout protocol and an admission flag');
         await expect(page.locator('#history')).toContainText('Cart return #220');
         await expect(page.locator('#history')).toContainText('trusted browser tab returns');
         await expect(page.locator('#history')).toContainText('same saved intent and focused quantity element');
