@@ -174,7 +174,8 @@ try {
         await expect(frozenChoices).toContainText('both Orders cases pass locally');
         await expect(frozenChoices).toContainText('b035d7b');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/product-control-readiness' })).toContainText('aggregate checks pass');
-        await expect(candidates.locator('tr').filter({ hasText: 'fix/checkout-contact-feedback' })).toContainText('queued with no jobs');
+        await expect(contact).toContainText('exact-head GitHub desktop/phone/Registry/aggregate checks pass');
+        await expect(contact).toContainText('one standalone re-review requested after saved-body verification');
         await expect(page.locator('[data-activity-metrics]')).toHaveCount(0);
         await page.locator('#contributions').scrollIntoViewIfNeeded();
       }
