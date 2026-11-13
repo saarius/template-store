@@ -98,7 +98,15 @@ describe('Backroad Bum dashboard route boundaries', () => {
 
   it('distinguishes merged source from open review and signed deployment', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
-    expect(source).toContain('eight fork PRs remain open');
+    expect(source).toContain('seven fork PRs remain open');
+    expect(source).toContain('Eleven source fixes are merged upstream');
+    const ship = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/ship\/tree\/fix\/label-history-phone">.*?<\/tr>/)?.[0];
+    expect(ship).toContain('1598a92');
+    expect(ship).toContain('main bfb95f3 was merged without rebasing');
+    expect(ship).toContain('maintainers merged the source at 15:00 UTC');
+    const metadata = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/template-store\/tree\/fix\/selected-variant-jsonld">.*?<\/tr>/)?.[0];
+    expect(metadata).toContain('40e95ea');
+    expect(metadata).toContain('changing no runtime, test or pin');
     for (const number of [261, 263]) expect(source).toContain(`PR #${number}</a> merged upstream November 13`);
     expect(source).toContain('3285ebc</a>, merged upstream November 13');
     expect(source).toContain('a merge is not a signed release or deployment');

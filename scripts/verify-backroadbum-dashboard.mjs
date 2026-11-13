@@ -48,8 +48,9 @@ try {
         await expect(page.locator('#history')).toContainText('refused save');
         await expect(page.locator('#contributions')).toContainText('Fresh review accepts #223’s field-level contact proof');
         await expect(page.locator('#history')).toContainText('Checkout contact #223');
-        await expect(page.locator('#history')).toContainText('Ten fixes are now merged upstream');
-        await expect(page.locator('#contributions')).toContainText('eight fork PRs remain open');
+        await expect(page.locator('#history')).toContainText('Ship #96 is now merged');
+        await expect(page.locator('#contributions')).toContainText('Eleven source fixes are merged upstream');
+        await expect(page.locator('#contributions')).toContainText('seven fork PRs remain open');
         await expect(page.locator('#contributions')).toContainText('a merge is not a signed release or deployment');
         await expect(page.locator('#history')).toContainText('synthetic checkout protocol and an admission flag');
         await expect(page.locator('#history')).toContainText('Cart return #220');
@@ -154,6 +155,9 @@ try {
         await expect(shipHistory).toContainText('actual served owner-order Before/After');
         await expect(shipHistory).toContainText('532px on main versus 390px at head');
         await expect(shipHistory).toContainText('not hosted deployment or carrier proof');
+        await expect(shipHistory).toContainText('1598a92');
+        await expect(shipHistory).toContainText('main bfb95f3 was merged without rebasing');
+        await expect(shipHistory).toContainText('maintainers merged the source at 15:00 UTC');
         const cardState = candidates.locator('tr').filter({ hasText: 'fix/product-card-state' });
         await expect(cardState).toContainText('no host change or repeated live catalog save');
         await expect(cardState).toContainText('unsigned local installed Registry-format proof');
