@@ -130,6 +130,20 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('Closed November 13 by merged');
   });
 
+  it('distinguishes the native account-tab candidate from hosted setup and new-head review', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const row = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/dinkuskit\/tree\/fix\/checkout-settings-layout">.*?<\/tr>/)?.[0];
+    expect(source).toContain('One settings task at a time');
+    expect(row).toContain('Plugins/Shipping/Payments');
+    expect(row).toContain('independent native saves');
+    expect(row).toContain('legacy combined POST');
+    expect(row).toContain('51 shared-store tests');
+    expect(row).toContain('unchanged main 662dd47');
+    expect(row).toContain('all three candidate tabs');
+    expect(row).toContain('not a new signed installation or hosted settings submission');
+    expect(row).toContain('not pushed or shared-deployed');
+  });
+
   it('keeps instruction versions ordered and archives the live-dependency guard', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const archivePaths = [...source.matchAll(/href="(\/dashboard\/instructions\/[^" ]+)"/g)].map(match => match[1]);

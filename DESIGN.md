@@ -75,6 +75,9 @@ components:
 ---
 # Design System: Backroad Bum
 
+## Hosted-account settings proof · November13
+The #124 rework is an Operate surface in DinkusKit’s existing visual system, not a Backroad Bum reskin. Native horizontal links separate plugin controls from shipping and payments; labeled conditional dollar fields and independent saves preserve task boundaries without JavaScript. Inspected 1440/390 card captures retain the narrow wrapper and accepted light tokens; the dashboard reports local proof separately from shared deployment. Broader account-page redesign remains in #123.
+
 ## Overview
 **Creative North Star: "The swimming-hole noticeboard"**
 A clear daylight storefront: upright lettering, broad blue fields and useful yellow actions. Outdoors photography gives the site a place to breathe; flat product illustrations make the fictional merchandise easy to inspect. The identity is provisional and can evolve with actual merchant use.
