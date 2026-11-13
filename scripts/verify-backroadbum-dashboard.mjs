@@ -60,7 +60,10 @@ try {
         await expect(page.locator('#history')).toContainText('the isolated fixture does not prove payment readiness');
         await expect(page.locator('#history')).toContainText('additive contract still needs the maintainer decision');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Catalog shipping weights' })).toContainText('not measured samples');
-        await expect(page.locator('#emdash-bugs li')).toHaveCount(7);
+        await expect(page.locator('#emdash-bugs li')).toHaveCount(8);
+        await expect(page.locator('#history')).toContainText('Product-card continuation #267');
+        await expect(page.locator('#history')).toContainText('Phone qualification stopped earlier');
+        await expect(page.locator('#emdash-bugs')).toContainText('invalid-save phone continuation is not qualified');
         await expect(page.locator('#emdash-bugs')).toContainText('Reopen Shipping');
         await expect(page.locator('#emdash-bugs')).toContainText('initial activation was not a live shutdown test');
         await expect(page.locator('#history')).toContainText('Buying controls #225');
@@ -131,7 +134,9 @@ try {
         }
         await expect(page.getByRole('row').filter({ hasText: 'template-store #217 · Missing cart item names' })).toContainText('Closed November 13');
         const cardState = candidates.locator('tr').filter({ hasText: 'fix/product-card-state' });
-        await expect(cardState).toContainText('no host change or repeated live save');
+        await expect(cardState).toContainText('no host change or repeated live catalog save');
+        await expect(cardState).toContainText('unsigned local installed Registry-format proof');
+        await expect(cardState).toContainText('Phone qualification stops before refusal');
         await expect(cardState.getByRole('link', { name: 'PR #267', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/267');
         const returnStartup = candidates.locator('tr').filter({ hasText: 'fix/checkout-return-initial-state' });
         await expect(returnStartup.getByRole('link', { name: 'PR #226', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/template-store/pull/226');

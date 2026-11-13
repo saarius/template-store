@@ -27,6 +27,17 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('initial activation was not a live shutdown test');
   });
 
+  it('separates installed desktop continuation proof from the phone drawer limitation', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('Product-card continuation #267');
+    expect(source).toContain('unsigned local installed Registry-format proof');
+    expect(source).toContain('head retains Shipping and -1, saves 7 oz directly');
+    expect(source).toContain('entire Settings drawer disappeared after a successful save on both sources');
+    expect(source).toContain('invalid-save phone continuation is not qualified');
+    expect(source).toContain('The signed Commerce plugin and live catalog stay unchanged');
+    expect(source.match(/<li>/g)?.length).toBeGreaterThanOrEqual(8);
+  });
+
   it('reports quantity restoration separately from the implemented family revision', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Cart quantity #212');
