@@ -141,7 +141,15 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).toContain('unchanged main 662dd47');
     expect(row).toContain('all three candidate tabs');
     expect(row).toContain('not a new signed installation or hosted settings submission');
-    expect(row).toContain('not pushed or shared-deployed');
+    expect(row).toContain('is published at');
+    expect(row).toContain('92fbb24');
+    expect(row).toContain('Every local verification stage passes across serial runs');
+    expect(row).toContain('unchanged-source retry, with cause unproven');
+    expect(row).toContain('Full exact-head GitHub verification passes');
+    expect(row).toContain('The earlier f520af9 verdict is not a review of this revision');
+    expect(row).toContain('not shared-deployed');
+    expect(row).not.toContain('still running');
+    expect(row).not.toContain('not pushed');
   });
 
   it('keeps instruction versions ordered and archives the live-dependency guard', () => {

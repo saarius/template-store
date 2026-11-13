@@ -214,8 +214,13 @@ try {
         await expect(chronology.getByRole('link', { name: 'PR #266', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/266');
         const hostedSettings = candidates.locator('tr').filter({ hasText: 'fix/checkout-settings-layout' });
         await expect(hostedSettings).toContainText('not shared-deployed');
-        await expect(hostedSettings).toContainText('four public Before/After desktop/phone form captures');
-        await expect(hostedSettings).toContainText('native TEST saves, durable $5/$75 read-back');
+        await expect(hostedSettings).toContainText('Four public Before/After desktop/phone tab captures');
+        await expect(hostedSettings).toContainText('durable GET read-back and stale-opposite-half protection');
+        await expect(hostedSettings).toContainText('is published at');
+        await expect(hostedSettings).toContainText('92fbb24');
+        await expect(hostedSettings).toContainText('Every local verification stage passes across serial runs');
+        await expect(hostedSettings).toContainText('unchanged-source retry, with cause unproven');
+        await expect(hostedSettings).not.toContainText('not pushed');
         await expect(hostedSettings).toContainText('not a new signed installation or hosted settings submission');
         await expect(hostedSettings.getByRole('link', { name: 'PR #124', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/dinkuskit/pull/124');
         await expect(candidates.locator('tr').filter({ hasText: 'fix/missing-item-weight' })).toContainText('fresh review accepts e838486’s installed proof at 5/6 with no findings');
