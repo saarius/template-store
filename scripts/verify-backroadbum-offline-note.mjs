@@ -1,9 +1,16 @@
-// Read-only proof of the natively authored offline-planning note. No admin or checkout capability.
+// Read-only native field-note proof. Optional argv[2] selects another authored source JSON.
+// No admin or checkout capability; the default remains the offline-planning note.
 import { chromium, expect } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-const source = JSON.parse(await readFile(new URL('../seed/backroadbum-offline-note.json', import.meta.url), 'utf8'));
+import { resolve } from 'node:path';
+const customSource = process.argv[2];
+const source = JSON.parse(await readFile(customSource ? resolve(customSource) : new URL('../seed/backroadbum-offline-note.json', import.meta.url), 'utf8'));
+if (!/^field-note-[a-z0-9-]+$/.test(source.slug)) throw Error('Expected a field-note source');
+const listKinds = [...new Set(source.sections.filter(block => block.listItem).map(block => block.listItem))];
+if (listKinds.length !== 1 || !['number', 'bullet'].includes(listKinds[0])) throw Error('Expected one native list kind');
+const listTag = listKinds[0] === 'bullet' ? 'ul' : 'ol';
 const base = process.env.STORE_URL || 'https://backroadbum.com';
-const output = new URL('../runs/backroadbum/offline-note/', import.meta.url);
+const output = new URL(`../runs/backroadbum/${customSource ? source.slug : 'offline-note'}/`, import.meta.url);
 await mkdir(output, { recursive: true });
 const fullText = block => block.text + (block.link ? block.link.text + block.after : '');
 const headings = source.sections.filter(block => block.style === 'h2').map(fullText);
@@ -36,9 +43,9 @@ try {
       await expect(page.locator('meta[name=description]')).toHaveAttribute('content', source.sections[0].text);
       const body = page.locator('[data-cms-page-body]');
       await expect(body.locator('h2')).toHaveText(headings);
-      await expect(body.locator('ol')).toHaveCount(1);
-      await expect(body.locator('ol > li')).toHaveText(items);
-      const itemGap = await body.locator('ol > li').nth(1).evaluate(e => parseFloat(getComputedStyle(e).marginTop));
+      await expect(body.locator(listTag)).toHaveCount(1);
+      await expect(body.locator(`${listTag} > li`)).toHaveText(items);
+      const itemGap = await body.locator(`${listTag} > li`).nth(1).evaluate(e => parseFloat(getComputedStyle(e).marginTop));
       expect(itemGap).toBeGreaterThanOrEqual(12);
       await expect(body.locator(':scope > p')).toHaveText(paragraphs);
       await expect(body.getByRole('link')).toHaveCount(links.length);
@@ -69,12 +76,13 @@ try {
       }
       await page.locator('.field-note__back').click();
       await expect(page).toHaveURL(base + '/field-notes');
-      await page.goto(base + '/search?q=signal');
+      await page.goto(base + '/search?q=' + encodeURIComponent(source.searchTerm ?? 'signal'));
       await page.getByRole('region', { name: 'Field notes & guides', exact: true }).getByRole('link', { name: source.title, exact: true }).click();
       await expect(page).toHaveURL(base + '/' + source.slug);
       expect(writes).toEqual([]); expect(checkoutRequests).toEqual([]); expect(errors).toEqual([]);
       results.push({ width, javaScriptEnabled, sourceBlocks: source.sections.length, headings: headings.length,
-        orderedItems: items.length, inlineLinks: links.length, sameTabKeyboardLinks: true, sourceTextExact: true,
+        orderedItems: listKinds[0] === 'number' ? items.length : 0, bulletItems: listKinds[0] === 'bullet' ? items.length : 0,
+        inlineLinks: links.length, sameTabKeyboardLinks: true, sourceTextExact: true,
         indexAndSearchDiscovery: true, separatedListItems: true, brandedUnderlinedLinks: true, focusRing: true,
         noOverflow: true, writes: 0, checkoutRequests: 0, browserErrors: 0 });
     } finally { await context.close(); }
