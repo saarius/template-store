@@ -1,28 +1,32 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 const gallery = readFileSync('src/features/commerce-catalog/ProductGallery.astro', 'utf8');
+const media = readFileSync('src/features/commerce-catalog/ProductMedia.astro', 'utf8');
 
-describe('Product gallery progressive browsing', () => {
-  it('keeps interactive controls hidden until a main picture can be enhanced', () => {
-    expect(gallery).toContain('aria-label="Product pictures" data-gallery-controls hidden');
-    expect(gallery).toContain('.product-gallery__thumbs[hidden]{display:none}');
-    expect(gallery).toContain('if (main && controls) controls.hidden = false');
-    expect(gallery.indexOf('thumb.addEventListener("click"')).toBeLessThan(gallery.indexOf('controls.hidden = false'));
-  });
-
-  it('offers resolved public picture links instead of inert controls without JavaScript', () => {
-    const fallback = gallery.split('<noscript>')[1].split('</noscript>')[0];
-    expect(fallback).toContain('href={picture.src} data-gallery-open');
-    expect(fallback).toContain('aria-label={`Open picture ${index + 1} of ${pictures.length}');
-    expect(fallback).toContain('browser’s Back button');
-    expect(fallback).not.toContain('<button');
-    expect(fallback).not.toMatch(/target=|download|picture\.id|storageKey/);
+describe('Server-rendered product gallery', () => {
+  it('renders every approved picture without scripts, thumbnails or raw-file fallback', () => {
+    expect(gallery).not.toMatch(/<script|<noscript|<button|data-gallery-thumb|data-gallery-open|\bhidden\b/);
     expect(gallery).toContain('.map((entry) => resolveCommerceImage(entry, resolver))');
-    expect(gallery).toContain('{pictures.length > 1 && (');
+    expect(gallery).toContain('pictures.slice(1).map');
+    expect(gallery).toContain('alt={picture.alt}');
+    expect(gallery).toContain('width={picture.width ?? 640} height={picture.height ?? 480} loading="lazy"');
+    expect(gallery).not.toMatch(/localStorage|sessionStorage|checkout\/|window\.location/);
   });
 
-  it('preserves the existing main-image, alt-text and pressed-state selection without cart writes', () => {
-    for (const text of ['main.src = thumb.dataset.src', 'main.srcset = thumb.dataset.srcset', 'main.alt = thumb.dataset.alt', 'other.setAttribute("aria-pressed", String(other === thumb))']) expect(gallery).toContain(text);
-    expect(gallery).not.toMatch(/localStorage|sessionStorage|checkout\/|\.focus\(|window\.location/);
+  it('prioritizes only the product lead while cards keep lazy loading', () => {
+    expect(gallery).toContain('fallbackAlt={fallbackAlt} priority');
+    expect(media).toContain('priority = false');
+    expect(media).toContain('loading={priority ? "eager" : "lazy"}');
+    expect(media).toContain('fetchpriority={priority ? "high" : undefined}');
+    expect(media).toContain('data-pigment-drift="product-media"');
+  });
+
+  it('confines the phone strip to multi-picture products and retains the desktop grid', () => {
+    expect(gallery).toContain('const multiple = pictures.length > 1;');
+    expect(gallery).toContain('role={multiple ? "region" : undefined}');
+    expect(gallery).toContain('grid-template-columns: repeat(2, minmax(0, 1fr))');
+    expect(gallery).toContain('scroll-snap-type: x mandatory');
+    expect(gallery).toContain('flex: 0 0 88%');
+    expect(gallery).toContain('align-items: flex-start');
   });
 });

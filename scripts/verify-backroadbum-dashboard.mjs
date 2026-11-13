@@ -49,8 +49,8 @@ try {
         await expect(page.locator('#contributions')).toContainText('Fresh review accepts #223’s field-level contact proof');
         await expect(page.locator('#history')).toContainText('Checkout contact #223');
         await expect(page.locator('#history')).toContainText('Ship #96 is now merged');
-        await expect(page.locator('#contributions')).toContainText('Eleven source fixes are merged upstream');
-        await expect(page.locator('#contributions')).toContainText('seven fork PRs remain open');
+        await expect(page.locator('#contributions')).toContainText('Twelve source fixes are merged upstream');
+        await expect(page.locator('#contributions')).toContainText('six fork PRs remain open');
         await expect(page.locator('#contributions')).toContainText('a merge is not a signed release or deployment');
         await expect(page.locator('#history')).toContainText('synthetic checkout protocol and an admission flag');
         await expect(page.locator('#history')).toContainText('Cart return #220');
@@ -185,8 +185,11 @@ try {
         await expect(controls).toContainText('actual script-refusal diagnostics');
         await expect(controls).toContainText('not a new signed installation');
         const gallery = candidates.locator('tr').filter({ hasText: 'fix/gallery-no-script' });
-        await expect(gallery).toContainText('four public Before/After desktop/phone screenshots');
-        await expect(gallery).toContainText('browser Back and enhanced Space/Enter selection preserved');
+        await expect(gallery).toContainText('Four public Before/After desktop/phone screenshots');
+        await expect(gallery).toContainText('9123f4d');
+        await expect(gallery).toContainText('All approved pictures are server-rendered');
+        await expect(gallery).toContainText('synthetic Chromium touch');
+        await expect(gallery).toContainText('native arrow scrolling is unqualified');
         await expect(gallery).toContainText('not a new signed installation');
         const chronology = candidates.locator('tr').filter({ hasText: 'fix/native-order-chronology' });
         await expect(chronology).toContainText('signed store plugin is unchanged');

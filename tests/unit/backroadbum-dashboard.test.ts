@@ -98,8 +98,13 @@ describe('Backroad Bum dashboard route boundaries', () => {
 
   it('distinguishes merged source from open review and signed deployment', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
-    expect(source).toContain('seven fork PRs remain open');
-    expect(source).toContain('Eleven source fixes are merged upstream');
+    expect(source).toContain('six fork PRs remain open');
+    expect(source).toContain('Twelve source fixes are merged upstream');
+    expect(source).toContain('Pictures without a script');
+    expect(source).toContain('9123f4d');
+    expect(source).toContain('synthetic Chromium touch');
+    expect(source).toContain('draft/on hold by owner decision');
+    expect(source).toContain('Closed by merged PR #212');
     const ship = source.match(/<tr><td><a href="https:\/\/github.com\/saarius\/ship\/tree\/fix\/label-history-phone">.*?<\/tr>/)?.[0];
     expect(ship).toContain('1598a92');
     expect(ship).toContain('main bfb95f3 was merged without rebasing');
