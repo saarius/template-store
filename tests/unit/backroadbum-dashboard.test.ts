@@ -44,7 +44,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('stores the box through a native POST and reload');
     expect(source).toContain('fits 390px rather than 532px');
     expect(source).toContain('Local synthetic sessions and practice history are not a hosted deployment or carrier proof');
-    expect(source).toContain('Fresh review accepts #96’s served proof at 5/6 with no findings');
+    expect(source).toContain('Fresh review accepts both served proofs at 5/6 with no findings');
+    expect(source).toContain('Fresh review now separately accepts a733bcd’s installed proof at 5/6');
+    expect(source).toContain('fresh review accepts 1c808f0’s proof at 5/6');
     expect(source).toContain('no live record or label changed');
     expect(source).not.toContain('Ship’s substantive CI remains approval-gated');
     for (const slug of ['fix/settings-box-label', 'fix/label-history-phone']) {
