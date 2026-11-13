@@ -52,7 +52,8 @@ try {
         await expect(page.locator('#contributions')).toContainText('Thirteen source fixes are merged upstream');
         await expect(page.locator('#contributions')).toContainText('three fork PRs remain open');
         await expect(page.locator('#contributions')).toContainText('a merge is not a signed release or deployment');
-        await expect(page.locator('#contributions')).toContainText('c088bfe paired with');
+        await expect(page.locator('#contributions')).toContainText('580a054 paired with');
+        await expect(page.locator('#history')).toContainText('The serving store keeps signed Commerce0.8.0 and its unchanged legacy mode');
         await expect(page.locator('#contributions')).toContainText('not to merge it alone');
         await expect(page.locator('#contributions')).not.toContainText('ledger-only');
         await expect(page.locator('#history')).toContainText('synthetic checkout protocol and an admission flag');

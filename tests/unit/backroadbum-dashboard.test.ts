@@ -152,7 +152,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).not.toContain('not pushed');
     const currentReviews = source.match(/<section id="contributions"><h2>Open reviews<\/h2>.*?<\/section>/)?.[0];
     expect(currentReviews).toContain('PR #229');
-    expect(currentReviews).toContain('c088bfe paired with');
+    expect(currentReviews).toContain('580a054 paired with');
     expect(currentReviews).toContain('not to merge it alone');
     expect(currentReviews).not.toContain('ledger-only');
     expect(currentReviews).not.toContain('awaiting full qualification');

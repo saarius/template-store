@@ -13,14 +13,14 @@ describe('private merchant checkout rollout', () => {
     expect(merchantOperator({ role: 50 })).toBe(true);
   });
   it('covers all checkout entry and recovery routes without blocking cart intent', () => {
-    for (const action of ['prepare', 'start', 'status', 'readiness']) expect(merchantCheckoutPath('/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/' + action)).toBe(true);
+    for (const action of ['prepare', 'start', 'status', 'cart', 'readiness']) expect(merchantCheckoutPath('/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/' + action)).toBe(true);
     expect(merchantCheckoutPath('/api/checkout/status')).toBe(true);
     for (const path of ['/cart', '/api/guest-cart/snapshot', '/shop']) expect(merchantCheckoutPath(path)).toBe(false);
   });
   it('exempts only the exact installed and storefront status paths from the new-checkout gate', () => {
     for (const path of ['/api/checkout/status', '/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/status']) expect(merchantCheckoutStatusPath(path)).toBe(true);
     for (const path of ['/api/checkout/status/', '/api/checkout/status/prepare', '/foreign/status', '/_emdash/api/plugins/dinkus-commerce/checkout/guest/status',
-      ...['prepare', 'start', 'readiness'].map(action => '/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/' + action)]) expect(merchantCheckoutStatusPath(path)).toBe(false);
+      ...['prepare', 'start', 'cart', 'readiness'].map(action => '/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/' + action)]) expect(merchantCheckoutStatusPath(path)).toBe(false);
   });
   it('admits the merchant build-time sandbox on API requests, not only anonymous pages', async () => {
     vi.stubEnv('BACKROADBUM_MERCHANT_PROFILE', '1');

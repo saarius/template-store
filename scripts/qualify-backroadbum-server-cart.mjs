@@ -7,7 +7,7 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
@@ -70,6 +70,12 @@ export async function qualify({ old, candidate }) {
   const { PluginStorageRepository } = await import(pathToFileURL(require.resolve("emdash")).href);
   const Database = require("better-sqlite3");
   const directory = mkdtempSync(join(tmpdir(), "backroadbum-cart-upgrade-"));
+  // Keep this disposable Astro site under the merchant checkout so it resolves
+  // the exact serving project's peers, never a copied node_modules tree.
+  const merchant = resolve(import.meta.dirname, "..");
+  mkdirSync(join(merchant, "runs"), { recursive: true });
+  const site = mkdtempSync(join(merchant, "runs", "recovery-qualification-"));
+  const runtimeId = "r_gshdrqaldna3r7sn";
   const file = join(directory, "synthetic.db");
   const port = await freePort();
   const origin = `http://127.0.0.1:${port}`;
@@ -79,7 +85,7 @@ export async function qualify({ old, candidate }) {
   try {
     await runMigrations(db);
     await db.insertInto("options").values({ name: "emdash:site_url", value: JSON.stringify(origin) }).execute();
-    const collection = (name) => new PluginStorageRepository(db, "dinkus-commerce", name, []);
+    const collection = (name) => new PluginStorageRepository(db, runtimeId, name, []);
     const storage = Object.fromEntries([
       ["catalogItems", "catalog_items"], ["catalogPrices", "catalog_prices"],
       ["catalogBackorderPolicies", "catalog_backorder_policies"], ["catalogManualAvailability", "catalog_manual_availability"],
@@ -125,27 +131,59 @@ export async function qualify({ old, candidate }) {
     const price = await storage.catalogPrices.get("legacy-hat");
     await storage.catalogPrices.put("legacy-hat", { ...price, regular: { currency: "USD", minor: "1400" } });
     raw = new Database(file, { readonly: true });
-    const business = () => raw.prepare("SELECT collection,id,data,revision FROM _plugin_storage WHERE plugin_id='dinkus-commerce' AND collection IN ('checkout_carts','orders','order_numbers') ORDER BY collection,id").all();
+    const business = () => raw.prepare("SELECT collection,id,data,revision FROM _plugin_storage WHERE plugin_id=? AND collection IN ('checkout_carts','orders','order_numbers') ORDER BY collection,id").all(runtimeId);
+    assert.equal(business().filter(row => row.collection === "checkout_carts").length, 2);
+    assert.equal(business().filter(row => row.collection === "orders").length, 1);
     const baseline = hash(business());
-    // The new compiled Registry runs through actual EmDash + workerd. No Connect/Payments binding is installed.
-    server = spawn(process.execPath, [join(candidate, "node_modules/astro/bin/astro.mjs"), "dev", "--force", "--host", "127.0.0.1", "--port", String(port)], {
-      cwd: join(candidate, "tests/sandbox-site"), detached: true, stdio: ["ignore", "pipe", "pipe"],
-      env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=1100", ASTRO_DEV_BACKGROUND: "1", COMMERCE_PROOF_DB: `file:${file}`,
-        EMDASH_SITE_URL: origin, COMMERCE_SITE_URL: origin,
-        COMMERCE_SANDBOX_DESCRIPTOR: join(candidate, "dist/sandbox/index.mjs"), COMMERCE_SANDBOX_ARTIFACT: join(candidate, "dist/sandbox/plugin.mjs"),
-        NO_PROXY: "127.0.0.1,localhost,::1", no_proxy: "127.0.0.1,localhost,::1" },
-    });
-    // Retain no child logs: they can contain generated fixture capabilities. Report only fixed categories.
-    server.stdout.resume(); server.stderr.resume();
-    let ready = false;
-    for (let i = 0; i < 180 && server.exitCode === null; i++) {
-      try { ready = (await fetch(origin, { signal: AbortSignal.timeout(2000) })).status < 500; } catch {}
-      if (ready) break;
-      await pause(500);
-    }
-    assert.ok(ready, "Isolated EmDash runtime did not start");
+    // Actual merchant route and anonymous EmDash dispatcher, not an HTTP bridge
+    // or a replacement handler. Unsigned descriptor uses our runtime namespace.
+    mkdirSync(join(site, "src/pages/api/checkout"), { recursive: true });
+    writeFileSync(join(site, "src/pages/api/checkout/status.ts"),
+      `export { POST, prerender } from ${JSON.stringify(join(merchant, "src/pages/api/checkout/status.ts"))};\n`);
+    writeFileSync(join(site, "src/pages/index.astro"), "<h1>Disposable recovery qualification</h1>");
+    writeFileSync(join(site, "astro.config.mjs"), `
+import { defineConfig } from 'astro/config';
+import node from '@astrojs/node';
+import emdash, { local } from 'emdash/astro';
+import { sqlite } from 'emdash/db';
+import descriptor from ${JSON.stringify(pathToFileURL(join(candidate, "dist/sandbox/index.mjs")).href)};
+export default defineConfig({ output:'server', adapter:node({mode:'standalone'}),
+  integrations:[emdash({database:sqlite({url:${JSON.stringify(`file:${file}`)}}),
+    storage:local({directory:'.artifacts/uploads',baseUrl:'/_emdash/api/media/file'}),
+    siteUrl:${JSON.stringify(origin)},sandboxRunner:'@emdash-cms/sandbox-workerd/sandbox',
+    sandboxed:[{...descriptor,id:${JSON.stringify(runtimeId)},entrypoint:${JSON.stringify(join(candidate, "dist/sandbox/plugin.mjs"))}}]})],
+  vite:{server:{fs:{allow:[${JSON.stringify(merchant)},${JSON.stringify(candidate)}]}}},
+  devToolbar:{enabled:false} });\n`);
+    const startServer = async protocol => {
+      server = spawn(process.execPath, [join(merchant, "node_modules/astro/bin/astro.mjs"), "dev", "--force", "--host", "127.0.0.1", "--port", String(port)], {
+        cwd: site, detached: true, stdio: ["ignore", "pipe", "pipe"],
+        env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=1100", ASTRO_DEV_BACKGROUND: "1",
+          EMDASH_SITE_URL: origin, BACKROADBUM_MERCHANT_PROFILE: "1", BACKROADBUM_RECOVERY_PROTOCOL: protocol,
+          NO_PROXY: "127.0.0.1,localhost,::1", no_proxy: "127.0.0.1,localhost,::1" },
+      });
+      // Retain no logs: they may contain generated fixture capabilities.
+      server.stdout.resume(); server.stderr.resume();
+      let ready = false;
+      for (let i = 0; i < 180 && server.exitCode === null; i++) {
+        try { ready = (await fetch(origin, { signal: AbortSignal.timeout(2000) })).status < 500; } catch {}
+        if (ready) break;
+        await pause(500);
+      }
+      assert.ok(ready, "Isolated EmDash runtime did not start");
+    };
+    const wrapperPost = async (capability, from = origin, input = {}) => {
+      const response = await fetch(`${origin}/api/checkout/status`, { method: "POST",
+        headers: { origin: from, "content-type": "application/json", "x-commerce-guest-capability": capability },
+        body: JSON.stringify(input), signal: AbortSignal.timeout(60000) });
+      return { response, data: await response.json().catch(() => null) };
+    };
+    await startServer("status-v1");
+    const beforeWrapper = await wrapperPost(scenarios[0].headers["x-commerce-guest-capability"]);
+    assert.equal(beforeWrapper.response.status, 503, "Default legacy recovery must not silently switch routes");
+    await stop(server); server = null;
+    await startServer("cart-v1");
     const post = async (route, capability, from = origin, input = {}) => {
-      const response = await fetch(`${origin}/_emdash/api/plugins/dinkus-commerce/checkout/guest/${route}`, {
+      const response = await fetch(`${origin}/_emdash/api/plugins/${runtimeId}/checkout/guest/${route}`, {
         method: "POST", headers: { origin: from, "content-type": "application/json", "x-commerce-guest-capability": capability },
         body: JSON.stringify(input), signal: AbortSignal.timeout(60000),
       });
@@ -157,9 +195,17 @@ export async function qualify({ old, candidate }) {
       const read = await post("cart", scenario.headers["x-commerce-guest-capability"]);
       assert.equal(read.response.status, 200);
       assert.equal(read.data?.ok, true, "Installed cart read refused the old capability");
-      for (const fact of ["schema", "attemptId", "lines", "total", "order"]) {
+      for (const fact of ["schema", "attemptId", "lines", "total"]) {
         assert.deepEqual(read.data.checkout[fact], scenario.before[fact], `Installed cart must preserve frozen ${fact}`);
       }
+      if (scenario.before.order) {
+        for (const fact of ["orderId", "receiptId", "lines", "total"]) {
+          assert.deepEqual(read.data.checkout.order?.[fact], scenario.before.order[fact], `Installed cart must preserve frozen order ${fact}`);
+        }
+        // New candidate adds authorized frozen contact; whole-order equivalence
+        // with the old projection is deliberately NOT asserted.
+        if (read.data.checkout.order?.contact !== undefined) assert.equal(read.data.checkout.order.contact.email, contact.email);
+      } else assert.equal(read.data.checkout.order, null);
       assert.equal(read.data.checkout.state, scenario.state);
       if (scenario.state === "pending") assert.equal(read.data.checkout.redirectUrl, null, "An elapsed payment window is not a payable redirect");
       assert.deepEqual(read.data.cart.lines, []);
@@ -171,8 +217,34 @@ export async function qualify({ old, candidate }) {
       assert.ok(["ORIGIN_DENIED", "CSRF_REJECTED"].includes(foreign.data?.error?.code), "Host or plugin must refuse the foreign origin");
       const frozen = await post("cart", scenario.headers["x-commerce-guest-capability"], origin, { version: read.data.cart.version, lines: [] });
       assert.equal(frozen.data?.error?.code, "CHECKOUT_FROZEN");
+      const wrapped = await wrapperPost(scenario.headers["x-commerce-guest-capability"], origin, { attemptId: scenario.before.attemptId });
+      assert.equal(wrapped.response.status, 200, "Actual merchant wrapper must recover the original capability");
+      assert.equal(wrapped.data?.checkout?.state, scenario.state);
+      for (const fact of ["schema", "attemptId"]) assert.deepEqual(wrapped.data.checkout[fact], scenario.before[fact]);
+      // The existing merchant wire omits top-level total (it uses pricing when
+      // available). Do not invent pricing for this unpriced legacy fixture.
+      if (scenario.state === "paid") {
+        assert.equal(wrapped.data.checkout.order?.orderId, scenario.before.order?.orderId);
+        assert.equal(wrapped.data.checkout.order?.receiptId, scenario.before.order?.receiptId);
+        assert.equal(wrapped.data.checkout.order?.total?.minor, "3200");
+        assert.equal(wrapped.data.checkout.order?.lines?.[0]?.quantity, 2);
+        assert.equal(wrapped.data.checkout.order?.contact?.email, read.data.checkout.order?.contact?.email);
+      } else assert.equal(wrapped.data.checkout.redirectUrl, null);
+      assert.equal(wrapped.data.cart, undefined, "Wrapper cannot expose mutable cart data");
+      assert.match(wrapped.response.headers.get("cache-control"), /no-store/);
+      for (const [cap, from, input, expected] of [
+        ["guessed.key", origin, {}, 503], [scenario.headers["x-commerce-guest-capability"], "https://foreign.example.test", {}, 403],
+        [scenario.headers["x-commerce-guest-capability"], origin, { lines: [], version: read.data.cart.version }, 400],
+        [scenario.headers["x-commerce-guest-capability"], origin, { attemptId: "another-attempt" }, 503],
+      ]) {
+        const refused = await wrapperPost(cap, from, input);
+        assert.equal(refused.response.status, expected);
+        assert.equal(refused.data?.checkout, undefined);
+      }
       installed.push({ priorAttempt: scenario.state, oldStatusState: scenario.before.state, currentState: read.data.checkout.state,
-        frozenFactsEqual: true, frozenTotal: "3200", emptyNewCart: true, forgedDenied: true, foreignDenied: true, writeFrozen: true });
+        frozenFactsEqual: true, frozenTotal: "3200", emptyNewCart: true, forgedDenied: true, foreignDenied: true, writeFrozen: true,
+        merchantWrapperHTTP: wrapped.response.status, wrapperSameAttempt: true,
+        wrapperPaidReceiptTotalPreserved: scenario.state === "paid" ? true : null, wrapperRefusesMutationAndOtherAttempt: true });
     }
     assert.equal(hash(business()), baseline, "Installed inspection must not rewrite old carts or Orders");
     const status = await post("status", scenarios[0].headers["x-commerce-guest-capability"]);
@@ -199,14 +271,16 @@ export async function qualify({ old, candidate }) {
     assert.equal((await orders.query()).items.length, 2, "One canonical order per legacy attempt");
     return { checkedAt: new Date().toISOString(), oldHead, candidateHead,
       candidatePluginSHA256: createHash("sha256").update(readFileSync(join(candidate, "dist/sandbox/plugin.mjs"))).digest("hex"),
-      scope: "Actual 0.8.0 kernel writes; candidate installed Registry reads without Payments; candidate kernel replay with synthetic Payments",
-      installed, legacyStatusHTTP: status.response.status, installedBusinessUnchanged: true, kernel, canonicalOrders: 2,
+      scope: "Actual 0.8.0 kernel writes; candidate installed Registry and actual merchant wrapper reads without Payments; candidate kernel replay with synthetic Payments. Frozen facts, not whole-response equivalence",
+      installed, legacyStatusHTTP: status.response.status, defaultWrapperHTTP: beforeWrapper.response.status,
+      installedBusinessUnchanged: true, kernel, canonicalOrders: 2,
       liveDataUsed: false, hostedPaymentsProven: false, signedUpgradeProven: false };
   } finally {
     await stop(server);
     raw?.close();
     await db.destroy();
     rmSync(directory, { recursive: true, force: true });
+    rmSync(site, { recursive: true, force: true });
   }
 }
 

@@ -75,6 +75,9 @@ components:
 ---
 # Design System: Backroad Bum
 
+## Recovery adapter qualification reporting · November13
+Keep this backend work in the existing latest-work paragraph, one dated entry and the source ledger, with no new controls or styling. Distinguish the default legacy wrapper’s refusal against an unreleased candidate from an explicit opt-in source proof: actual anonymous EmDash dispatcher, original capabilities and paid$32receipt, but no installed Payments, whole-response equivalence, new-cart adoption or hosted TEST claim. The serving signed0.8.0 mode remains unchanged; preserve all130earlier history bodies and date other authors’ observed580a054/1ef8465heads rather than claiming their review or deployment.
+
 ## Latest-archive check reporting · November13
 Keep this Read surface in the existing definition list: one Latest archive media check row with plain counts, scope and UTC check time, followed by the separate recovery limits. Matching, failed, not-checked and unavailable are words, not colored badges or fabricated zeros; private archive identities, media keys and errors never render. The latest-work paragraph and one dated entry describe automatic CLI checking separately from full runtime/off-host recovery, preserving every earlier history body. No new styling, controls or JavaScript are needed; inspect real desktop/phone and enlarged-type reading after deployment.
 

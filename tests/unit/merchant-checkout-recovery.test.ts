@@ -16,9 +16,9 @@ const paid = { schema: 'dinkuskit.commerce.guest-checkout-projection/v1', state:
     lines: [{ catalogItemId: 'mug', quantity: 1 }], total: { currency: 'USD', minor: '2200' } } };
 
 afterEach(() => { vi.unstubAllEnvs(); vi.clearAllMocks(); });
-async function invoke(path: string, headers: Record<string, string> = {}, body = '{}', method = 'POST') {
+async function invoke(path: string, headers: Record<string, string> = {}, body = '{}', method = 'POST', enabled = '0') {
   vi.stubEnv('BACKROADBUM_MERCHANT_PROFILE', '1');
-  vi.stubEnv('BACKROADBUM_CHECKOUT_ENABLED', '0');
+  vi.stubEnv('BACKROADBUM_CHECKOUT_ENABLED', enabled);
   vi.stubEnv('EMDASH_SITE_URL', origin);
   vi.stubEnv('DINKUS_HOSTING_PROFILE', 'node');
   vi.stubEnv('DINKUS_STOREFRONT_PROFILE', 'shipping');
@@ -48,12 +48,27 @@ describe('receipt recovery during a merchant checkout pause', () => {
     expect(dispatch).toHaveBeenCalledOnce();
     expect(dispatch.mock.calls[0]?.slice(0, 3)).toEqual(['r_gshdrqaldna3r7sn', 'POST', 'checkout/guest/status']);
   });
+  it('keeps the same recovery rate budget during a pause in explicit cart-read mode', async () => {
+    vi.stubEnv('BACKROADBUM_RECOVERY_PROTOCOL', 'cart-v1');
+    const { response, dispatch } = await invoke('/api/checkout/status', {}, '{"attemptId":"attempt-1"}');
+    expect(response.status).toBe(200);
+    expect((await response.json()).checkout.order.orderId).toBe('order-1');
+    expect(take).toHaveBeenCalledWith('status', '192.0.2.1');
+    expect(dispatch).toHaveBeenCalledOnce();
+    expect(dispatch.mock.calls[0]?.slice(0, 3)).toEqual(['r_gshdrqaldna3r7sn', 'POST', 'checkout/guest/cart']);
+    expect(await dispatch.mock.calls[0]?.[3].text()).toBe('{}');
+  });
+  it('does not expose the mutable native cart endpoint when legacy checkout is open', async () => {
+    const { response, dispatch, next } = await invoke(base + 'cart', {}, '{"lines":[],"version":null}', 'POST', '1');
+    expect(response.status).toBe(403);
+    expect(dispatch).not.toHaveBeenCalled(); expect(next).not.toHaveBeenCalled(); expect(take).not.toHaveBeenCalled();
+  });
   it('also retains admission controls on the native status route', async () => {
     const { response, next } = await invoke(base + 'status');
     expect(response.status).toBe(200); expect(next).toHaveBeenCalledOnce();
     expect(take).toHaveBeenCalledWith('status', '192.0.2.1');
   });
-  it.each(['prepare', 'start', 'readiness', '%70repare', '%73tart'])('still blocks %s before any body, counter or runtime work', async action => {
+  it.each(['prepare', 'start', 'cart', 'readiness', '%70repare', '%73tart'])('still blocks %s before any body, counter or runtime work', async action => {
     const { response, next, dispatch } = await invoke(base + action);
     expect(response.status).toBe(503); expect(response.headers.get('cache-control')).toBe('no-store');
     expect(next).not.toHaveBeenCalled(); expect(dispatch).not.toHaveBeenCalled(); expect(take).not.toHaveBeenCalled();

@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 
 import {
-  COMMERCE_GUEST_CHECKOUT_STATUS_ENDPOINT,
   COMMERCE_REGISTRY_RUNTIME_ID,
   GUEST_CHECKOUT_CAPABILITY_HEADER,
   guestCheckoutWire,
@@ -153,16 +152,48 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return unavailable(503, "CHECKOUT_STATUS_UNAVAILABLE");
   }
   const isPlayground = Boolean((locals as { __playgroundDb?: unknown } | undefined)?.__playgroundDb);
+  // Merchant-only, explicit upgrade staging. Never probe/fall back between routes:
+  // the signed 0.8.0 store keeps status-v1 until a coordinated upgrade is qualified.
+  const protocol = env.BACKROADBUM_RECOVERY_PROTOCOL ?? "status-v1";
+  const cartRead = protocol === "cart-v1";
+  if ((protocol !== "status-v1" && !cartRead) || (cartRead && (env.BACKROADBUM_MERCHANT_PROFILE !== "1" || isPlayground))) {
+    return unavailable(503, "CHECKOUT_STATUS_UNAVAILABLE");
+  }
+  let expectedAttempt: string | undefined;
+  if (cartRead) {
+    // The new cart endpoint can also WRITE. This recovery wrapper must never
+    // forward lines/version/key (or silently turn a malformed body into a read).
+    try {
+      const input: unknown = JSON.parse(requestBody);
+      if (!input || typeof input !== "object" || Array.isArray(input) ||
+          Object.keys(input).some(key => key !== "attemptId")) return unavailable(400);
+      const hint = (input as { attemptId?: unknown }).attemptId;
+      if (hint !== undefined) {
+        if (typeof hint !== "string" || !/^[A-Za-z0-9._~-]{1,256}$/u.test(hint)) return unavailable(400);
+        expectedAttempt = hint;
+      }
+    } catch {
+      return unavailable(400);
+    }
+  }
   try {
-    if (!canDispatchInstalledGuestCheckout({ runtime, request }, { inStore: isPlayground })) {
+    const route = cartRead ? "checkout/guest/cart" : "checkout/guest/status";
+    if (cartRead) {
+      if (typeof runtime.getPluginRouteMeta === "function") {
+        const metadata = runtime.getPluginRouteMeta(COMMERCE_REGISTRY_RUNTIME_ID, route);
+        if (!metadata?.public || !metadata.methods?.some(method => method.toUpperCase() === "POST")) {
+          return unavailable(503, "CHECKOUT_STATUS_UNAVAILABLE");
+        }
+      }
+    } else if (!canDispatchInstalledGuestCheckout({ runtime, request }, { inStore: isPlayground })) {
       return unavailable(503, "CHECKOUT_STATUS_UNAVAILABLE");
     }
     const pluginId = COMMERCE_REGISTRY_RUNTIME_ID;
-    const target = new URL(COMMERCE_GUEST_CHECKOUT_STATUS_ENDPOINT, origin);
+    const target = new URL(`/_emdash/api/plugins/${pluginId}/${route}`, origin);
     const dispatch = () => runtime.handlePublicPluginApiRoute(
       pluginId,
       "POST",
-      "checkout/guest/status",
+      route,
       new Request(target, {
         method: "POST",
         headers: {
@@ -171,7 +202,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           origin,
           [GUEST_CHECKOUT_CAPABILITY_HEADER]: capability,
         },
-        body: requestBody,
+        body: cartRead ? "{}" : requestBody,
         cache: "no-store",
       }),
     );
@@ -189,6 +220,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const validated = parseGuestCheckoutWireResult(parsed);
     if (!validated) return unavailable(503, "CHECKOUT_STATUS_RESPONSE_INVALID");
     if (!validated.ok) return unavailable(503, domainFailureCode(validated.error.code));
+    // Cart reads select the current attempt, unlike old status's locator. Refuse
+    // a different attempt instead of relaying another checkout's receipt.
+    if (expectedAttempt && validated.checkout.attemptId !== expectedAttempt) {
+      return unavailable(503, "CHECKOUT_STATUS_NOT_FOUND");
+    }
     const terminal = validated.checkout.state === "paid" || validated.checkout.order !== null;
     if (isPlayground && playgroundCheckoutConfigured(env) && terminal) {
       const sessionId = request.headers.get("cookie")?.match(/(?:^|;\s*)emdash_playground=([^;]+)/u)?.[1] ?? "";

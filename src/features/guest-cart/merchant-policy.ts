@@ -18,5 +18,5 @@ export function merchantCheckoutStatusPath(path: string): boolean {
 
 export function merchantCheckoutPath(path: string): boolean {
   return merchantCheckoutStatusPath(path) ||
-    /^\/_emdash\/api\/plugins\/r_gshdrqaldna3r7sn\/checkout\/guest\/(prepare|start|status|readiness)$/.test(path);
+    /^\/_emdash\/api\/plugins\/r_gshdrqaldna3r7sn\/checkout\/guest\/(prepare|start|status|cart|readiness)$/.test(path);
 }

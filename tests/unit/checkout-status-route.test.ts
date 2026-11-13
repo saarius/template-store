@@ -117,6 +117,85 @@ describe("original caller and body bounds", () => {
   });
 });
 
+describe("merchant-only staged cart-read recovery", () => {
+  beforeEach(() => {
+    vi.stubEnv("BACKROADBUM_RECOVERY_PROTOCOL", "cart-v1");
+    vi.stubEnv("BACKROADBUM_MERCHANT_PROFILE", "1");
+    runtime.getPluginRouteMeta.mockImplementation((_id, path) => ({ public: path === "checkout/guest/cart", methods: ["POST"] }));
+  });
+  it("reads only the fixed cart route, preserving the capability but dropping the locator", async () => {
+    dispatch.mockResolvedValue({ success: true, data: { ok: true, capabilityId: "cap", checkout: { ...projection, attemptId: "attempt-1" },
+      cart: { lines: [], version: "private-version", expiresAt: 9999999999 } } });
+    const response = await call(request({ cookie: "private-cookie", authorization: "private-authorization" }, '{"attemptId":"attempt-1"}'));
+    expect(response.status).toBe(200);
+    expect(dispatch).toHaveBeenCalledOnce();
+    const [id, method, path, forwarded] = dispatch.mock.calls[0];
+    expect([id, method, path]).toEqual(["r_gshdrqaldna3r7sn", "POST", "checkout/guest/cart"]);
+    expect(forwarded.url).toBe(site + "/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/cart");
+    expect(await forwarded.text()).toBe("{}");
+    expect(Object.fromEntries(forwarded.headers)).toEqual({ accept: "application/json", "content-type": "application/json", origin: site,
+      "x-commerce-guest-capability": "cap.synthetic" });
+    expect(await response.json()).toEqual({ ok: true, capabilityId: "cap", checkout: { ...projection, attemptId: "attempt-1" } });
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+  });
+  it.each(['{"lines":[],"version":null}', '{"key":"retry"}', '{"attemptId":"attempt-1","lines":[]}',
+    '{"wake":true}', '{"attemptId":null}', '{"attemptId":""}', '{"attemptId":"foreign id"}',
+    '{"attemptId":"' + 'x'.repeat(257) + '"}', '[]', 'null', '', 'not-json'])
+  ("never forwards a mutation or malformed request: %s", async body => {
+    expect((await call(request({}, body))).status).toBe(400);
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+  it("refuses a different or missing current attempt instead of returning another receipt", async () => {
+    const money = { currency: "USD", minor: "3200" };
+    for (const attemptId of ["different-attempt", null]) {
+      dispatch.mockResolvedValue({ success: true, data: { ok: true, capabilityId: "cap", checkout: { ...projection, state: "paid", attemptId,
+        order: { orderId: "private-order", receiptId: "private-receipt", lines: [{ catalogItemId: "fixture", quantity: 2 }], total: money } } } });
+      const response = await call(request({}, '{"attemptId":"attempt-1"}'));
+      expect(response.status).toBe(503);
+      const body = await response.json();
+      expect(body.error.code).toBe("CHECKOUT_STATUS_NOT_FOUND");
+      expect(JSON.stringify(body)).not.toContain("private-");
+    }
+  });
+  it("keeps pending, paid and release states authoritative without inventing a redirect", async () => {
+    for (const state of ["pending", "paid", "recoverable-failure", "released-retry"]) {
+      const checkout = { ...projection, state, attemptId: "attempt-1", retryAfter: state === "released-retry" ? "attempt-1" : null,
+        order: state === "paid" ? { orderId: "order-1", receiptId: "receipt-1", lines: [{ catalogItemId: "fixture", quantity: 2 }] } : null };
+      dispatch.mockResolvedValue({ success: true, data: { ok: true, capabilityId: "cap", checkout } });
+      const response = await call(request({}, '{"attemptId":"attempt-1"}'));
+      expect(response.status).toBe(200);
+      expect((await response.json()).checkout).toEqual(checkout);
+    }
+  });
+  it("does not fall back after a cart refusal or missing route", async () => {
+    dispatch.mockResolvedValue({ success: true, data: { ok: false, error: { code: "CAPABILITY_DENIED", message: "Private" } } });
+    expect((await call()).status).toBe(503);
+    expect(dispatch).toHaveBeenCalledOnce();
+    runtime.getPluginRouteMeta.mockReturnValue(null);
+    expect((await call()).status).toBe(503);
+    expect(dispatch).toHaveBeenCalledOnce();
+  });
+  it.each(["", "guess", "cart-v2"])("fails closed for unknown configuration %s", async protocol => {
+    vi.stubEnv("BACKROADBUM_RECOVERY_PROTOCOL", protocol);
+    expect((await call()).status).toBe(503); expect(dispatch).not.toHaveBeenCalled();
+  });
+  it("does not enable the cart adapter in a generic store or playground", async () => {
+    vi.stubEnv("BACKROADBUM_MERCHANT_PROFILE", "0");
+    expect((await call()).status).toBe(503);
+    vi.stubEnv("BACKROADBUM_MERCHANT_PROFILE", "1");
+    expect((await POST({ request: request(), locals: { emdash: runtime, __playgroundDb: {} } } as never)).status).toBe(503);
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+  it("keeps legacy status-v1 explicitly selectable without guessing from metadata", async () => {
+    vi.stubEnv("BACKROADBUM_RECOVERY_PROTOCOL", "status-v1");
+    runtime.getPluginRouteMeta.mockReturnValue({ public: true, methods: ["POST"] });
+    expect((await call(request({}, '{"attemptId":"attempt-1"}'))).status).toBe(200);
+    expect(dispatch.mock.calls[0]?.[2]).toBe("checkout/guest/status");
+    expect(await dispatch.mock.calls[0]?.[3].text()).toBe('{"attemptId":"attempt-1"}');
+  });
+});
+
 // The playground runs Commerce's Registry build too (template-one-build-registry-20261031): status recovery
 // dispatches to the visitor's own Commerce under its Registry id, and a configured playground shows a terminal
 // status only to the visitor whose session started that payment.
