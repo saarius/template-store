@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates checkout-form proof and observed shutdown from deployment claims', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('Hosted checkout settings #124');
+    expect(source).toContain('Twenty-eight synthetic captures across seven UI PRs');
+    expect(source).toContain('not a new signed installation or hosted settings submission');
+    expect(source).toContain('normal November 12 stop at 22:24 UTC');
+    expect(source).toContain('do not prove continuous uptime or background-job drain');
+    expect(source).toContain('initial activation was not a live shutdown test');
+  });
+
   it('keeps instruction versions ordered and archives the live-dependency guard', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const archivePaths = [...source.matchAll(/href="(\/dashboard\/instructions\/[^" ]+)"/g)].map(match => match[1]);
@@ -9,6 +19,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/original-2026-11-09.txt',
       '/dashboard/instructions/steer-1-2026-11-10.txt',
       '/dashboard/instructions/steer-2-2026-11-11.txt',
+      '/dashboard/instructions/steer-3-2026-11-12.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');
@@ -17,6 +28,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(steer).toContain('Never remove `node_modules` from the primary');
     expect(steer).toContain('once their upstream PRs merge or close');
     for (const path of archivePaths.slice(0, 2)) expect(readFileSync('public' + path, 'utf8')).not.toContain('Owner Steer 2');
+    const mediaSteer = readFileSync('public' + archivePaths[3], 'utf8');
+    expect(mediaSteer).toContain('Owner Steer 3 — November 12, 2026');
+    expect(mediaSteer).toContain('Before (unchanged `main`) and After (PR head)');
+    expect(mediaSteer).toContain('@clawsweeper re-review');
   });
 
   it.each([
