@@ -82,10 +82,14 @@ try {
         await expect(page.locator('#contributions')).toContainText('A failing review-status check is not a failed test suite or release');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Contact corrections' })).toContainText('validation and payment guards unchanged');
         const recovery = page.locator('.status-list > div').filter({ hasText: 'Recovery coverage' });
-        await expect(recovery).toContainText('encrypted settings recovered locally');
-        await expect(recovery).toContainText('all three retained archives restore seven media files with matching sizes/hashes');
-        await expect(recovery).toContainText('full runtime and off-host recovery unverified');
-        await expect(recovery).toContainText('future backups are not automatically certified');
+        await expect(recovery).toContainText('encrypted settings recovered in a separate local drill');
+        await expect(recovery).toContainText('ready media sizes/hashes only');
+        await expect(recovery).toContainText('full runtime, admin sign-in, hosted authorization and off-host recovery unverified');
+        const mediaCheck = page.locator('[data-upload-recovery]');
+        await expect(mediaCheck).toContainText(/9 ready media files match archived sizes and hashes · 15 upload files restored · checked/);
+        await expect(mediaCheck).not.toContainText('Unavailable');
+        await expect(mediaCheck).not.toContainText('/var/');
+        await expect(page.locator('#history')).toContainText('a newer or changed archive cannot inherit an older passing result');
         const email = page.locator('.status-list > div').filter({ has: page.locator('dt').filter({ hasText: /^Email sign-in$/ }) });
         await expect(email).toContainText('no email provider on November 13');
         await expect(email).toContainText('delivery remains unverified');

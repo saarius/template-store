@@ -5,6 +5,7 @@ from checkout_probe import probe_checkout, failure_event
 from activity_metrics import activity_metrics
 from account_metrics import account_metrics
 from checkout_history import record_checkout_history
+from upload_recovery_status import public_status as upload_recovery_status
 ROOT = pathlib.Path('/var/lib/backroadbum')
 def service(name):
     p = subprocess.run(['systemctl', 'is-active', name], capture_output=True, text=True)
@@ -66,7 +67,7 @@ except Exception:
     # Preserve corrupt/unwritable evidence and keep current telemetry running.
     # Never publish exception text, external bodies or a fabricated empty history.
     checkout_history = None
-result = {'collectedAt':collected_at, 'services':{name:service(name) for name in ['backroadbum','caddy','backroadbum-payments','backroadbum-ship']}, 'http':health, 'host':{'cpuPercent':cpu(),**memory(),'diskUsedGiB':round(disk.used/2**30,1),'diskTotalGiB':round(disk.total/2**30,1)}, 'checkout':checkout, 'checkoutProbe':checkout_probe, 'checkoutHistory':checkout_history, 'shopperAccounts':accounts, 'paymentsTransport':None, 'usage':{'visitors':None,'orders':None,'tokens':activity['tokens']['totalTokens'] if activity else None,'apiEquivalentUSD':activity['apiEquivalentUSD'] if activity else None}, 'activity':activity, 'backupAt':None}
+result = {'collectedAt':collected_at, 'services':{name:service(name) for name in ['backroadbum','caddy','backroadbum-payments','backroadbum-ship']}, 'http':health, 'host':{'cpuPercent':cpu(),**memory(),'diskUsedGiB':round(disk.used/2**30,1),'diskTotalGiB':round(disk.total/2**30,1)}, 'checkout':checkout, 'checkoutProbe':checkout_probe, 'checkoutHistory':checkout_history, 'shopperAccounts':accounts, 'paymentsTransport':None, 'usage':{'visitors':None,'orders':None,'tokens':activity['tokens']['totalTokens'] if activity else None,'apiEquivalentUSD':activity['apiEquivalentUSD'] if activity else None}, 'activity':activity, 'backupAt':None, 'uploadRecovery':upload_recovery_status(ROOT)}
 backups = list((ROOT/'backups').glob('*.tar.gz'))
 if backups: result['backupAt'] = datetime.datetime.fromtimestamp(max(p.stat().st_mtime for p in backups),datetime.timezone.utc).isoformat()
 p = ROOT/'telemetry.json.tmp'; p.write_text(json.dumps(result)); p.replace(ROOT/'telemetry.json')

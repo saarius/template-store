@@ -260,4 +260,11 @@ if __name__ == '__main__':
     parser.add_argument('--emdash-config', type=pathlib.Path, default=pathlib.Path('/etc/backroadbum/emdash.env'))
     args = parser.parse_args()
     snapshot(args.root, args.ship_config, args.emdash_config)
-    print('Backroad Bum private recovery snapshot complete')
+    # Timer and deploy use this CLI. Check the latest completed archive before
+    # reporting success; a failed drill retains the snapshot but fails the command.
+    from upload_recovery_status import check_latest
+    try:
+        check_latest(args.root)
+    except Exception:
+        parser.exit(1, 'Recovery snapshot retained, but its offline upload check failed.\n')
+    print('Backroad Bum private recovery snapshot and offline upload check complete')

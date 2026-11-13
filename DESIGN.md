@@ -75,6 +75,9 @@ components:
 ---
 # Design System: Backroad Bum
 
+## Latest-archive check reporting · November13
+Keep this Read surface in the existing definition list: one Latest archive media check row with plain counts, scope and UTC check time, followed by the separate recovery limits. Matching, failed, not-checked and unavailable are words, not colored badges or fabricated zeros; private archive identities, media keys and errors never render. The latest-work paragraph and one dated entry describe automatic CLI checking separately from full runtime/off-host recovery, preserving every earlier history body. No new styling, controls or JavaScript are needed; inspect real desktop/phone and enlarged-type reading after deployment.
+
 ## Creekside mug inspection · November13
 Extend the existing Operate product surface without new styling: keep the original lead illustration, show handle/rim crops in the existing desktop grid and phone snap strip, then use native specification rows before the open care disclosure. The Illustrated demo design heading qualifies the nominal capacity/material/finish; retain the original microwave/hot-handle cautions rather than inventing product performance. Native draft/reload/publication and four desktop/phone JS states are inspected, including keyboard disclosure and unchanged price/metadata/cart intent. Generated rasters/provenance stay outside git; the overview and one dated entry report the native content change, while previous history remains untouched.
 
