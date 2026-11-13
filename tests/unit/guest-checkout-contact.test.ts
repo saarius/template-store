@@ -52,6 +52,7 @@ describe("guest checkout delivery contact", () => {
     expect(readCheckoutContact(contactForm({ region, country: "us" }), true)).toEqual({
       contact: null,
       error: "Enter a state for United States delivery.",
+      field: "delivery-region",
     });
   });
 
@@ -93,6 +94,7 @@ describe("guest checkout delivery contact", () => {
     expect(readCheckoutContact(form({}), false)).toEqual({
       contact: null,
       error: "Enter the billing name to continue.",
+      field: "billing-name",
     });
   });
 
@@ -115,7 +117,7 @@ describe("guest checkout delivery contact", () => {
     ["country", "Choose a delivery country to continue."],
   ])("names the blank delivery %s without accepting the partial address", (field, error) => {
     for (const value of ["", "   "]) {
-      expect(readCheckoutContact(contactForm({ region: "NY", [field]: value }), true)).toEqual({ contact: null, error });
+      expect(readCheckoutContact(contactForm({ region: "NY", [field]: value }), true)).toEqual({ contact: null, error, field: `delivery-${field}` });
     }
   });
 
@@ -128,7 +130,7 @@ describe("guest checkout delivery contact", () => {
   ])("names the blank billing %s for physical and digital baskets", (field, error) => {
     const fields = { "billing-name": "Bill Payer", "billing-line1": "9 Billing Way", "billing-city": "Toronto", "billing-postal-code": "M5V 1A1", "billing-country": "CA", ["billing-" + field]: " " };
     for (const needsDelivery of [true, false]) {
-      expect(readCheckoutContact(contactForm({ region: "NY", ...fields }, false), needsDelivery)).toEqual({ contact: null, error });
+      expect(readCheckoutContact(contactForm({ region: "NY", ...fields }, false), needsDelivery)).toEqual({ contact: null, error, field: `billing-${field}` });
     }
   });
 

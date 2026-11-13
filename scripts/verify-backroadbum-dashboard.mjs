@@ -132,7 +132,13 @@ try {
         await expect(cartReturn).toContainText('one worker, disclosed 15-second local timeout');
         await expect(cartReturn).toContainText('not a new signed installation, real BFCache restoration or payment-readiness proof');
         await expect(cartReturn).toContainText('same focused quantity element');
+        const contact = candidates.locator('tr').filter({ hasText: 'fix/checkout-contact-feedback' });
+        await expect(contact.getByRole('link', { name: 'PR #223', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/template-store/pull/223');
+        await expect(contact).toContainText('only that control’s edits clear it');
+        await expect(contact).toContainText('exact committed empty-email regression body fails on unchanged main');
+        await expect(contact).toContainText('not provider readiness or a fresh signed installation');
         const controls = candidates.locator('tr').filter({ hasText: 'fix/product-control-readiness' });
+        await expect(controls).toContainText('draft/on hold for the server-held-cart decision');
         await expect(controls).toContainText('four public Before/After desktop/phone captures');
         await expect(controls).toContainText('actual script-refusal diagnostics');
         await expect(controls).toContainText('not a new signed installation');

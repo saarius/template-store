@@ -5,7 +5,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('separates saved-cart, variant and checkout-form proof from payment readiness and deployment claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Hosted checkout settings #124');
-    expect(source).toContain('Forty synthetic captures across ten UI PRs');
+    expect(source).toContain('Forty-four synthetic captures across eleven UI PRs');
+    expect(source).toContain('Checkout contact #223');
+    expect(source).toContain('synthetic checkout protocol and an admission flag');
+    expect(source).toContain('its own edits clear the correction without moving focus');
+    expect(source).toContain('draft/on hold for the server-held-cart decision');
     expect(source).toContain('Cart return #220');
     expect(source).toContain('trusted browser tab returns');
     expect(source).toContain('same saved intent and focused quantity element');

@@ -499,7 +499,8 @@ test("checkout contact proof covers physical validation, Commerce refusal, fille
 
     await physical.getByLabel("City", { exact: true }).fill("");
     await physical.getByRole("button", { name: "Continue to secure checkout" }).click();
-    await expect(physical.locator("[data-guest-cart-contact-error]")).toHaveText("Enter the delivery city to continue.");
+    await expect(physical.locator('[data-guest-cart-contact-error="delivery-city"]')).toHaveText("Enter the delivery city to continue.");
+    await expect(physical.getByLabel('City', { exact: true })).toBeFocused();
     await physical.screenshot({ path: resolve(root, "physical-validation-error.png"), fullPage: true, animations: "disabled" });
 
     await physical.getByLabel("Recipient", { exact: true }).fill("");
@@ -575,7 +576,7 @@ test("checkout start sends delivery only while the cart needs it, even after fie
     await expect(page.getByLabel("State or region (required for United States delivery)", { exact: true })).toBeVisible();
     await fillContact(page);
     await page.getByRole("button", { name: "Continue to secure checkout" }).click();
-    const status = page.locator("[data-guest-cart-contact-error]");
+    const status = page.locator('[data-guest-cart-contact-error="delivery-region"]');
     await expect(status).toHaveAttribute("role", "alert");
     await expect(status).toHaveText("Enter a state for United States delivery.");
     expect(harness.counts().startCalls).toBe(0);

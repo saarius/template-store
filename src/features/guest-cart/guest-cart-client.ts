@@ -42,7 +42,7 @@ import {
   type GuestCheckoutWireResult,
 } from "./index.js";
 import { pendingCheckoutAmount } from "./pending-review.js";
-import { setCheckoutContactFeedback } from "./contact-feedback.js";
+import { clearCheckoutContactFeedback, setCheckoutContactFeedback, type CheckoutContactField } from "./contact-feedback.js";
 import { cartRemovalFocusId } from "./remove-focus.js";
 import { canRetryCheckoutAvailability, checkoutAvailabilityFailure } from "./availability-retry.js";
 import {
@@ -222,6 +222,9 @@ async function prefillShopperContact(root: Element): Promise<void> {
 
 type RequiredAddressField = "name" | "line1" | "city" | "postalCode" | "country";
 const REQUIRED_ADDRESS_FIELDS: readonly RequiredAddressField[] = ["name", "line1", "city", "postalCode", "country"];
+function addressField(kind: "delivery" | "billing", name: RequiredAddressField): CheckoutContactField {
+  return `${kind}-${name === "postalCode" ? "postal-code" : name}`;
+}
 
 function addressCorrection(kind: "delivery" | "billing", field: RequiredAddressField): string {
   if (field === "country") return `Choose a ${kind} country to continue.`;
@@ -259,11 +262,11 @@ function readAddress(root: Element, kind: "delivery" | "billing"): GuestCheckout
 export function readCheckoutContact(
   root: Element,
   needsDelivery: boolean,
-): { contact: GuestCheckoutContact | null; error: string | null } {
+): { contact: GuestCheckoutContact; error: null } | { contact: null; error: string; field: CheckoutContactField } {
   const email = inputValue(root, "[data-guest-cart-email]");
-  if (!email) return { contact: null, error: "Enter your email address to continue." };
+  if (!email) return { contact: null, error: "Enter your email address to continue.", field: "email" };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(email)) {
-    return { contact: null, error: "Enter a valid email address to continue." };
+    return { contact: null, error: "Enter a valid email address to continue.", field: "email" };
   }
   // A digital-only cart hides the delivery section; values left there from an
   // earlier physical cart must never reach Commerce or block checkout.
@@ -271,12 +274,12 @@ export function readCheckoutContact(
   if (needsDelivery) {
     const read = readAddress(root, "delivery");
     if (read !== "empty" && "missing" in read) {
-      return { contact: null, error: addressCorrection("delivery", read.missing) };
+      return { contact: null, error: addressCorrection("delivery", read.missing), field: addressField("delivery", read.missing) };
     }
     if (read !== "empty") {
-      if (!/^[A-Z]{2}$/u.test(read.country)) return { contact: null, error: "Choose a country this store ships to." };
+      if (!/^[A-Z]{2}$/u.test(read.country)) return { contact: null, error: "Choose a country this store ships to.", field: "delivery-country" };
       if (read.country === "US" && !read.region) {
-        return { contact: null, error: "Enter a state for United States delivery." };
+        return { contact: null, error: "Enter a state for United States delivery.", field: "delivery-region" };
       }
       delivery = read;
     }
@@ -289,10 +292,10 @@ export function readCheckoutContact(
   }
   const billing = readAddress(root, "billing");
   if (billing === "empty" || "missing" in billing) {
-    return { contact: null, error: addressCorrection("billing", billing === "empty" ? "name" : billing.missing) };
+    return { contact: null, error: addressCorrection("billing", billing === "empty" ? "name" : billing.missing), field: addressField("billing", billing === "empty" ? "name" : billing.missing) };
   }
   if (!/^[A-Z]{2}$/u.test(billing.country)) {
-    return { contact: null, error: addressCorrection("billing", "country") };
+    return { contact: null, error: addressCorrection("billing", "country"), field: "billing-country" };
   }
   return { contact: { email, ...(delivery ? { delivery } : {}), billing }, error: null };
 }
@@ -418,6 +421,11 @@ export function renderBilling(root: Element, needsDelivery: boolean): void {
   if (sameRow instanceof HTMLElement) sameRow.hidden = !needsDelivery;
   if (billing instanceof HTMLElement) {
     billing.hidden = needsDelivery && same instanceof HTMLInputElement && same.checked;
+    if (billing.hidden) clearCheckoutContactFeedback(billing);
+  }
+  if (!needsDelivery) {
+    const delivery = root.querySelector("[data-guest-cart-delivery]");
+    if (delivery) clearCheckoutContactFeedback(delivery);
   }
 }
 
@@ -978,10 +986,10 @@ export function hydrateGuestCartPage(): void {
         return;
       }
       const originalIntent = structuredClone(session.intent);
-      setCheckoutContactFeedback(root, null);
+      clearCheckoutContactFeedback(root);
       const contactInput = readCheckoutContact(root, view().needsDelivery);
-      if (contactInput.error || !contactInput.contact) {
-        setCheckoutContactFeedback(root, contactInput.error ?? "Complete the checkout contact fields.");
+      if (contactInput.error !== null) {
+        setCheckoutContactFeedback(root, { field: contactInput.field, message: contactInput.error });
         return;
       }
       // Coupons are coming soon: Registry Commerce refuses every code for v1,
@@ -1077,7 +1085,7 @@ export function hydrateGuestCartPage(): void {
   });
   const clearContactFeedback = (event: Event) => {
     if (event.target instanceof Element && event.target.closest("[data-guest-cart-contact]")) {
-      setCheckoutContactFeedback(root, null);
+      clearCheckoutContactFeedback(root, event.target);
     }
   };
   root.addEventListener("input", clearContactFeedback);
