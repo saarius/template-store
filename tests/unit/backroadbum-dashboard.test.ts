@@ -146,7 +146,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).toContain('Every local verification stage passes across serial runs');
     expect(row).toContain('unchanged-source retry, with cause unproven');
     expect(row).toContain('Full exact-head GitHub verification passes');
-    expect(row).toContain('The earlier f520af9 verdict is not a review of this revision');
+    expect(row).toContain('Fresh review accepts 92fbb24’s screenshot/native-save proof with no findings');
     expect(row).toContain('not shared-deployed');
     expect(row).not.toContain('still running');
     expect(row).not.toContain('not pushed');
