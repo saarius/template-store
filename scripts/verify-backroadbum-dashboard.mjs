@@ -73,7 +73,7 @@ try {
         await expect(page.locator('#history')).toContainText('Eleven offline lifecycle checks pass');
         await expect(page.locator('#history')).toContainText('eight-second deadline');
         await expect(page.locator('#history')).toContainText('past deployment failures and unknown outage durations stay on record');
-        await expect(page.locator('#contributions')).toContainText('a failing review-status check is not a failed test suite or release');
+        await expect(page.locator('#contributions')).toContainText('A failing review-status check is not a failed test suite or release');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Contact corrections' })).toContainText('validation and payment guards unchanged');
         const recovery = page.locator('.status-list > div').filter({ hasText: 'Recovery coverage' });
         await expect(recovery).toContainText('encrypted settings recovered locally');
