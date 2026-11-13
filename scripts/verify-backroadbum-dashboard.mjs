@@ -133,6 +133,14 @@ try {
           await expect(candidates.locator('tr').filter({ hasText: slug })).toContainText('merged upstream November 13');
         }
         await expect(page.getByRole('row').filter({ hasText: 'template-store #217 · Missing cart item names' })).toContainText('Closed November 13');
+        const shipSettings = candidates.locator('tr').filter({ hasText: 'fix/settings-box-label' });
+        await expect(shipSettings).toContainText('actual served Settings Before/After');
+        await expect(shipSettings).toContainText('submits one native box POST');
+        await expect(shipSettings).toContainText('live packing remains unchanged');
+        const shipHistory = candidates.locator('tr').filter({ hasText: 'fix/label-history-phone' });
+        await expect(shipHistory).toContainText('actual served owner-order Before/After');
+        await expect(shipHistory).toContainText('532px on main versus 390px at head');
+        await expect(shipHistory).toContainText('not hosted deployment or carrier proof');
         const cardState = candidates.locator('tr').filter({ hasText: 'fix/product-card-state' });
         await expect(cardState).toContainText('no host change or repeated live catalog save');
         await expect(cardState).toContainText('unsigned local installed Registry-format proof');

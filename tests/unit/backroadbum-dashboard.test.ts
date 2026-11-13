@@ -38,6 +38,22 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source.match(/<li>/g)?.length).toBeGreaterThanOrEqual(8);
   });
 
+  it('separates served Ship proof from hosted deployment and carrier qualification', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('actual served Worker-route Before/After desktop and phone proof');
+    expect(source).toContain('stores the box through a native POST and reload');
+    expect(source).toContain('fits 390px rather than 532px');
+    expect(source).toContain('local synthetic sessions and practice history are not a hosted deployment or carrier proof');
+    expect(source).toContain('no live record or label changed');
+    expect(source).not.toContain('Ship’s substantive CI remains approval-gated');
+    for (const slug of ['fix/settings-box-label', 'fix/label-history-phone']) {
+      const row = source.match(new RegExp(`<tr><td><a href="https://github.com/saarius/ship/tree/${slug}">.*?</tr>`))?.[0];
+      expect(row).toContain('actual served');
+      expect(row).toContain('owning GitHub tests pass');
+      expect(row).toContain('One fresh re-review is requested');
+    }
+  });
+
   it('reports quantity restoration separately from the implemented family revision', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Cart quantity #212');
