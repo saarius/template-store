@@ -43,14 +43,15 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('actual served Worker-route Before/After desktop and phone proof');
     expect(source).toContain('stores the box through a native POST and reload');
     expect(source).toContain('fits 390px rather than 532px');
-    expect(source).toContain('local synthetic sessions and practice history are not a hosted deployment or carrier proof');
+    expect(source).toContain('Local synthetic sessions and practice history are not a hosted deployment or carrier proof');
+    expect(source).toContain('Fresh review accepts #96’s served proof at 5/6 with no findings');
     expect(source).toContain('no live record or label changed');
     expect(source).not.toContain('Ship’s substantive CI remains approval-gated');
     for (const slug of ['fix/settings-box-label', 'fix/label-history-phone']) {
       const row = source.match(new RegExp(`<tr><td><a href="https://github.com/saarius/ship/tree/${slug}">.*?</tr>`))?.[0];
       expect(row).toContain('actual served');
       expect(row).toContain('owning GitHub tests pass');
-      expect(row).toContain('One fresh re-review is requested');
+      expect(row).toContain('One fresh re-review was requested');
     }
   });
 
