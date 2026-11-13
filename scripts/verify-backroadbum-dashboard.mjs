@@ -159,7 +159,8 @@ try {
         await expect(shipHistory).toContainText('main bfb95f3 was merged without rebasing');
         await expect(shipHistory).toContainText('maintainers merged the source at 15:00 UTC');
         const cardState = candidates.locator('tr').filter({ hasText: 'fix/product-card-state' });
-        await expect(cardState).toContainText('no host change or repeated live catalog save');
+        await expect(cardState).toContainText('merged upstream November 13 at16:10 as27fd637');
+        await expect(cardState).toContainText('no signed release, host change or repeated live catalog save');
         await expect(cardState).toContainText('unsigned local installed Registry-format proof');
         await expect(cardState).toContainText('Phone qualification stops before refusal');
         await expect(cardState.getByRole('link', { name: 'PR #267', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/267');
