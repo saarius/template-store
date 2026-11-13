@@ -19,6 +19,9 @@ Template2227e3aa67 and2266f8106c now embed eight public Before/After desktop/pho
 ## Hosted checkout-settings proof · November12
 DinkusKit124f520af9 now has four public Before/After form captures against unchanged mainc429d72, plus real built-route output. Four no-JavaScript contexts per pin preserve native TEST saves, $5/$75 reloads, keyboard order and invalid-amount refusal; the flat amount gains its visible label and the following label moves to a separate row. The hosted form remains unchanged on a read-only check; local synthetic proof, signed installation, review clearance and shared deployment stay distinct.
 
+## Accepted fixes and interrupted closeout · November13
+Commerce261/263 and Template218 have merged upstream; fifteen other PRs remain open. Their public proof stays available, while clean completed worktrees are retired after preserving ignored proof files; signed plugin versions and hosted services are unchanged. The interrupted contact closeout is now independently verified on desktop/phone with no checkout starts or changed Orders; no completed publication or re-review request is replayed.
+
 ## Field-level contact correction · November13
 Template223 at2107100 responds to the revised request inside the existing PR: inline corrections, associated ARIA and focus on the first invalid field. Own-field edits clear the correction without taking focus or removing other description tokens; unrelated edits leave it visible, and hidden address groups clear stale errors. The merchant theme retains its more specific address wording while sharing the field behavior; validation, cart intent, Commerce empty-delivery refusal and payment recovery remain unchanged. Browser proof uses rendered Astro forms with synthetic checkout protocol and a disclosed admission flag, not provider readiness or a fresh signed-plugin installation;225 remains draft/on hold pending the server-held-cart decision.
 

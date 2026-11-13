@@ -43,6 +43,9 @@ try {
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
         await expect(page.locator('#history')).toContainText('Forty-four synthetic captures across eleven UI PRs are publicly hosted outside git');
         await expect(page.locator('#history')).toContainText('Checkout contact #223');
+        await expect(page.locator('#history')).toContainText('Three fixes are now merged upstream');
+        await expect(page.locator('#contributions')).toContainText('Fifteen fork PRs remain open');
+        await expect(page.locator('#contributions')).toContainText('a merge is not a signed release or deployment');
         await expect(page.locator('#history')).toContainText('synthetic checkout protocol and an admission flag');
         await expect(page.locator('#history')).toContainText('Cart return #220');
         await expect(page.locator('#history')).toContainText('trusted browser tab returns');
@@ -120,6 +123,10 @@ try {
         await expect(page.locator('table')).toHaveCount(3);
         const candidates = page.getByRole('table', { name: 'Framework candidates · release state is separate', exact: true });
         await expect(candidates.locator('tbody tr')).toHaveCount(18);
+        for (const slug of ['fix/order-detail-rows', 'fix/order-variant-labels', 'fix/cart-fallback-labels']) {
+          await expect(candidates.locator('tr').filter({ hasText: slug })).toContainText('merged upstream November 13');
+        }
+        await expect(page.getByRole('row').filter({ hasText: 'template-store #217 · Missing cart item names' })).toContainText('Closed November 13');
         const cardState = candidates.locator('tr').filter({ hasText: 'fix/product-card-state' });
         await expect(cardState).toContainText('no host change or repeated live save');
         await expect(cardState.getByRole('link', { name: 'PR #267', exact: true })).toHaveAttribute('href', 'https://github.com/dinkuskit/commerce/pull/267');

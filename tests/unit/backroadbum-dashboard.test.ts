@@ -27,6 +27,15 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source).toContain('initial activation was not a live shutdown test');
   });
 
+  it('distinguishes merged source from open review and signed deployment', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('Fifteen fork PRs remain open');
+    for (const number of [261, 263]) expect(source).toContain(`PR #${number}</a> merged upstream November 13`);
+    expect(source).toContain('3285ebc</a>, merged upstream November 13');
+    expect(source).toContain('a merge is not a signed release or deployment');
+    expect(source).toContain('Closed November 13 by merged');
+  });
+
   it('keeps instruction versions ordered and archives the live-dependency guard', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const archivePaths = [...source.matchAll(/href="(\/dashboard\/instructions\/[^" ]+)"/g)].map(match => match[1]);
