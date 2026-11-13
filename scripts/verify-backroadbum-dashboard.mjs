@@ -41,7 +41,10 @@ try {
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
-        await expect(page.locator('#history')).toContainText('Thirty-six synthetic captures across nine UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Forty synthetic captures across ten UI PRs are publicly hosted outside git');
+        await expect(page.locator('#history')).toContainText('Cart return #220');
+        await expect(page.locator('#history')).toContainText('trusted browser tab returns');
+        await expect(page.locator('#history')).toContainText('same saved intent and focused quantity element');
         await expect(page.locator('#history')).toContainText('Saved-cart names #218');
         await expect(page.locator('#history')).toContainText('without snapshot interception');
         await expect(page.locator('#history')).toContainText('not a signed installation or payment-readiness proof');
@@ -123,6 +126,12 @@ try {
         await expect(returnStartup).toContainText('without changing payment, storage, retry or receipt logic');
         await expect(returnStartup).toContainText('captured disabled, blocked and delayed-script output');
         await expect(returnStartup).toContainText('proves neither provider recovery nor email delivery');
+        const cartReturn = candidates.locator('tr').filter({ hasText: 'fix/cart-return-facts' });
+        await expect(cartReturn).toContainText('four public Before/After cart captures');
+        await expect(cartReturn).toContainText('no snapshot interception');
+        await expect(cartReturn).toContainText('one worker, disclosed 15-second local timeout');
+        await expect(cartReturn).toContainText('not a new signed installation, real BFCache restoration or payment-readiness proof');
+        await expect(cartReturn).toContainText('same focused quantity element');
         const controls = candidates.locator('tr').filter({ hasText: 'fix/product-control-readiness' });
         await expect(controls).toContainText('four public Before/After desktop/phone captures');
         await expect(controls).toContainText('actual script-refusal diagnostics');
