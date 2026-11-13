@@ -82,7 +82,7 @@ try {
         await expect(recovery).toContainText('all three retained archives restore seven media files with matching sizes/hashes');
         await expect(recovery).toContainText('full runtime and off-host recovery unverified');
         await expect(recovery).toContainText('future backups are not automatically certified');
-        const email = page.locator('.status-list > div').filter({ hasText: 'Email sign-in' });
+        const email = page.locator('.status-list > div').filter({ has: page.locator('dt').filter({ hasText: /^Email sign-in$/ }) });
         await expect(email).toContainText('no email provider on November 13');
         await expect(email).toContainText('delivery remains unverified');
         await expect(page.locator('#history')).toContainText('no installed or selected provider and no test-email action');
