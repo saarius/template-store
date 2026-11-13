@@ -98,7 +98,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
 
   it('distinguishes merged source from open review and signed deployment', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
-    expect(source).toContain('Eight fork PRs remain open');
+    expect(source).toContain('eight fork PRs remain open');
     for (const number of [261, 263]) expect(source).toContain(`PR #${number}</a> merged upstream November 13`);
     expect(source).toContain('3285ebc</a>, merged upstream November 13');
     expect(source).toContain('a merge is not a signed release or deployment');

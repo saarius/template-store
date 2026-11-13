@@ -49,7 +49,7 @@ try {
         await expect(page.locator('#contributions')).toContainText('Fresh review accepts #223’s field-level contact proof');
         await expect(page.locator('#history')).toContainText('Checkout contact #223');
         await expect(page.locator('#history')).toContainText('Ten fixes are now merged upstream');
-        await expect(page.locator('#contributions')).toContainText('Eight fork PRs remain open');
+        await expect(page.locator('#contributions')).toContainText('eight fork PRs remain open');
         await expect(page.locator('#contributions')).toContainText('a merge is not a signed release or deployment');
         await expect(page.locator('#history')).toContainText('synthetic checkout protocol and an admission flag');
         await expect(page.locator('#history')).toContainText('Cart return #220');
