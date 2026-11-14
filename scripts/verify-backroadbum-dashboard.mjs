@@ -234,7 +234,10 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(3);
         const candidates = page.getByRole('table', { name: 'Framework candidates · release state is separate', exact: true });
-        await expect(candidates.locator('tbody tr')).toHaveCount(18);
+        await expect(candidates.locator('tbody tr')).toHaveCount(21);
+        const shellControls = candidates.locator('tr').filter({ hasText: 'fix/header-control-targets' });
+        await expect(shellControls).toContainText('aa13a38');
+        await expect(shellControls).toContainText('not a merchant visual change');
         for (const slug of ['fix/order-detail-rows', 'fix/order-variant-labels', 'fix/cart-fallback-labels']) {
           await expect(candidates.locator('tr').filter({ hasText: slug })).toContainText('merged upstream November 13');
         }
@@ -343,7 +346,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, colorScheme, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 18, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 6, steer2ArchiveExact: true, steer3ArchiveExact: true, steer4ArchiveExact: true, steer5ArchiveExact: true, nativeKeyboardDisclosures: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
+    results.push({ width, colorScheme, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 21, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 6, steer2ArchiveExact: true, steer3ArchiveExact: true, steer4ArchiveExact: true, steer5ArchiveExact: true, nativeKeyboardDisclosures: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
     await context.close();
   }
   for (const width of [390, 1440]) {
