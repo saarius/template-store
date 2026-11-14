@@ -91,6 +91,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 ## Native fit guidance
 Tee and fleece size tables are native EmDash specification blocks, with measuring instructions nearby and illustrative dimensions explicitly distinguished from manufactured samples. Signed Commerce alone supplies selected-size price and availability; the buyable XL fleece backorder must not imply a dispatch date. Browser-only cart proof refuses legacy preparation attempts and must not be described as checkout qualification.
 
+## Native merchant diagnostic evidence
+The public EmDash ledger links two synthetic phone captures showing a successful weight save dismissing the Settings sheet. They are before/after an interaction, not before/after a repair; the original EmDash/Kumo visual system is retained. Inspect `aria-hidden`, inertness and viewport geometry when testing a translated drawer: a CSS-visible offscreen element is not a usable open control.
+
 ## Protected runtime and completed phases
 Visual authorization is broad; business authority is not. Preserve signed Commerce0.8.0 / Payments0.5.0 / Ship0.3.1, hosted consents, test-only admission, authoritative prices/availability, distinct selected members, guest cart storage, pending checkout protection, retained receipt recovery/printing, every Order, native mug media/specs and all six field notes. No CMS publication, replacement payment, shipment resync, credential exposure or /proof runtime change is part of the rebrand.
 

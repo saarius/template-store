@@ -41,8 +41,8 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Last Light, in three sizes.');
-        await expect(page.locator('.dashboard-latest a[href="/products/last-light-fleece"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('A saved weight, a dismissed drawer.');
+        await expect(page.locator('.dashboard-latest a[href="#emdash-bugs"]')).toBeVisible();
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
@@ -109,6 +109,14 @@ try {
         await expect(page.locator('#history')).toContainText('Product-card continuation #267');
         await expect(page.locator('#history')).toContainText('Phone qualification stopped earlier');
         await expect(page.locator('#emdash-bugs')).toContainText('invalid-save phone continuation is not qualified');
+        await expect(page.locator('#emdash-bugs')).toContainText('detaches its focused button');
+        await expect(page.locator('#emdash-bugs')).toContainText('without another save');
+        await expect(page.locator('#emdash-bugs a[href="/pr-proof/emdash-phone-settings/before-save-390.png"]')).toHaveCount(1);
+        await expect(page.locator('#emdash-bugs a[href="/pr-proof/emdash-phone-settings/after-save-390.png"]')).toHaveCount(1);
+        await page.locator('.dashboard-latest').scrollIntoViewIfNeeded();
+        await page.screenshot({ path: new URL(`latest-${width}-${colorScheme}.png`, output).pathname });
+        await page.locator('#emdash-bugs').scrollIntoViewIfNeeded();
+        await page.screenshot({ path: new URL(`emdash-review-${width}-${colorScheme}.png`, output).pathname });
         await expect(page.locator('#emdash-bugs')).toContainText('Reopen Shipping');
         await expect(page.locator('#emdash-bugs')).toContainText('initial activation was not a live shutdown test');
         await expect(page.locator('#history')).toContainText('Buying controls #225');

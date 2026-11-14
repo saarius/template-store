@@ -82,6 +82,24 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(source.match(/<li>/g)?.length).toBeGreaterThanOrEqual(8);
   });
 
+  it('reports the observed phone focus chain without claiming a repaired host', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const finding = source.match(/<li>At phone width,[\s\S]*?<\/li>/)?.[0];
+    expect(finding).toContain('detaches its focused button');
+    expect(finding).toContain('click and keyboard Enter');
+    expect(finding).toContain('without another save');
+    expect(finding).toContain('not a fix');
+    expect(finding).toContain('owning repair remains for human review');
+    for (const name of ['before-save-390', 'after-save-390']) {
+      expect(finding).toContain(`/pr-proof/emdash-phone-settings/${name}.png`);
+    }
+    const ledger = readFileSync('public/dashboard/emdash-bugs.txt', 'utf8');
+    expect(ledger).toContain('Kumo2.6.0 Sidebar');
+    expect(ledger).toContain('null `relatedTarget`');
+    expect(ledger).toContain('No host/plugin patch, event suppression or response interception');
+    expect(ledger).toContain('Phone invalid-save continuation is NOT qualified');
+  });
+
   it('separates served Ship proof from hosted deployment and carrier qualification', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('actual served Worker-route Before/After desktop and phone proof');
