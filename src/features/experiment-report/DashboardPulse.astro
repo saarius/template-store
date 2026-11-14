@@ -1,0 +1,16 @@
+---
+interface Props { status: any; stale: boolean }
+const { status, stale } = Astro.props;
+const value = (n: unknown, suffix = '') => typeof n === 'number' && Number.isFinite(n) ? `${new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(n)}${suffix}` : 'Unavailable';
+const ready = status?.checkoutProbe?.outcome === 'ready-advisory';
+---
+<div class="dashboard-pulse" aria-label="Latest sampled operations" data-dashboard-pulse>
+  <div><span>Store process</span><strong>{status?.services?.backroadbum ?? 'Unavailable'}</strong><small>{stale ? 'Sample stale or unavailable' : 'Latest minute sample'}</small></div>
+  <div><span>Test checkout</span><strong>{!status?.checkoutProbe ? 'Unavailable' : stale ? 'Stale advisory' : ready ? 'Readiness supported' : 'Check needed'}</strong><small>Non-creating advisory · not a payment</small></div>
+  <div><span>Memory in use</span><strong>{value(status?.host?.usedMiB, ' MiB')}</strong><small>Of {value(status?.host?.totalMiB, ' MiB')} on this host</small></div>
+  <div><span>Visitor / order counts</span><strong>Unavailable</strong><small>Aggregate counting is not wired yet</small></div>
+</div>
+<div class="dashboard-brief">
+  <div><h3>What’s running</h3><p>Six product families, two collections and six field notes, backed by EmDash. Commerce owns prices and availability; guest carts, retained receipts and hosted Stripe TEST checkout are live.</p><p>Signed Registry plugins: Commerce <strong>0.8.0</strong>, Payments <strong>0.5.0</strong>, Ship <strong>0.3.1</strong>. No local cloud-service replicas are serving.</p></div>
+  <aside><h3>What’s still missing</h3><ul><li>Email sign-in is paused: no provider is configured and delivery is unverified.</li><li>Three retained attempts still need investigation; their pending state stays protected.</li><li>Upstream merges are not signed-plugin releases or hosted rollout proof.</li></ul></aside>
+</div>

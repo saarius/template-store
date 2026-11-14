@@ -1,0 +1,24 @@
+---
+const prefix = '/pr-proof/storefront-redesign/';
+const surfaces = [
+  { title: 'Home', before: 'before-home-1440.png', light: 'after-home-light-1440.png', dark: 'after-home-dark-1440.png', mobile: 'after-home-dark-390.png' },
+  { title: 'Shop', before: 'before-shop-1440.png', light: 'phase2-after-shop-1440-light.png', dark: 'phase2-after-shop-1440-dark.png', mobile: 'phase2-after-shop-390-dark.png' },
+  { title: 'Product detail', before: 'before-mug-1440.png', light: 'phase2-after-mug-1440-light.png', dark: 'phase2-after-mug-1440-dark.png', mobile: 'phase2-after-mug-390-dark.png' },
+  { title: 'Field Notes', before: 'before-field-notes-1440.png', light: 'phase3-after-field-notes-1440-light.png', dark: 'phase3-after-field-notes-1440-dark.png', mobile: 'phase3-after-field-notes-390-dark.png' },
+  { title: 'Cart', before: 'before-cart-1440.png', light: 'phase3-after-cart-1440-light.png', dark: 'phase3-after-cart-1440-dark.png', mobile: 'phase3-after-cart-390-dark.png' },
+  { title: 'Dashboard', before: 'before-dashboard-1440.png', light: 'phase4-after-overview-1440-light.png', dark: 'phase4-after-overview-1440-dark.png', mobile: 'phase4-after-overview-390-dark.png' },
+];
+---
+<section id="redesign" aria-labelledby="redesign-title" data-redesign-showcase>
+  <p class="dashboard-kicker">Field Journal · four phases</p>
+  <h2 id="redesign-title">The same store, a new point of view.</h2>
+  <p>From a flat light-only shell to warm mineral surfaces, self-hosted typography and System / Light / Dark appearance. The shopping, reading and reporting routes share one visual language; signed plugins, catalog facts and order records remain intact.</p>
+  <div class="dashboard-comparison">
+    <figure><a href={prefix + 'before-home-1440.png'} aria-label="Open original home capture"><img src={prefix + 'before-home-1440.png'} width="1440" height="1000" loading="lazy" alt="Original light-only home with a broad landscape banner above the blue store shell." /></a><figcaption>Before · original home</figcaption></figure>
+    <figure><a href={prefix + 'after-home-dark-1440.png'} aria-label="Open redesigned dark home capture"><img src={prefix + 'after-home-dark-1440.png'} width="1440" height="1000" loading="lazy" alt="Field Journal home with an asymmetric photograph, serif headline and warm dark canvas." /></a><figcaption>After · Field Journal in Dark</figcaption></figure>
+  </div>
+  <details class="dashboard-disclosure"><summary>Compare all six surfaces</summary>
+    <p class="small">Original desktop captures precede phase 1. Light and Dark are final-phase captures for each surface; phone links show Dark at 390px. Cart captures show an empty browser, not a new purchase.</p>
+    <ul class="dashboard-proof-links">{surfaces.map(surface => <li><strong>{surface.title}</strong><div><a href={prefix + surface.before}>Before<span class="sr-only"> {surface.title}</span></a><a href={prefix + surface.light}>Light<span class="sr-only"> {surface.title}</span></a><a href={prefix + surface.dark}>Dark<span class="sr-only"> {surface.title}</span></a><a href={prefix + surface.mobile}>Phone<span class="sr-only"> {surface.title}</span></a></div></li>)}</ul>
+  </details>
+</section>

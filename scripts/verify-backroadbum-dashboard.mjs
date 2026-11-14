@@ -16,8 +16,8 @@ await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ headless: true });
 const results = [];
 try {
-  for (const width of [1440, 390]) {
-    const context = await browser.newContext({ viewport: { width, height: 900 }, javaScriptEnabled: false, userAgent: 'BackroadBum-SelfCheck/1.0' });
+  for (const colorScheme of ['light', 'dark']) for (const width of [1440, 390]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme, javaScriptEnabled: false, userAgent: 'BackroadBum-SelfCheck/1.0' });
     const page = await context.newPage();
     const writes = [];
     page.on('request', request => { if (request.method() !== 'GET') writes.push(request.method()); });
@@ -37,6 +37,27 @@ try {
       await expect(nav.locator('[aria-current="page"]')).toHaveCount(1);
       await expect(nav.getByRole('link', { name: active, exact: true })).toHaveAttribute('aria-current', 'page');
       sizes[view] = (await response.body()).length;
+      expect(await page.locator('[data-dashboard-view] h1').evaluate(el => parseFloat(getComputedStyle(el).fontSize))).toBeLessThan(34);
+      const disclosures = page.locator('main details');
+      expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
+      if (view === 'overview') {
+        await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
+        await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
+        await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
+        await expect(page.locator('[data-redesign-showcase]')).toContainText('signed plugins, catalog facts and order records remain intact');
+      }
+      if (view === 'contributions') {
+        await expect(page.locator('#candidates .dashboard-evidence')).toHaveCount(18);
+        await expect(page.locator('#candidates .dashboard-evidence-summary')).toHaveCount(18);
+      }
+      // Native keyboard disclosure works with scripting disabled. Retain all earlier evidence assertions below.
+      for (const details of await disclosures.all()) {
+        const summary = details.locator(':scope > summary');
+        await summary.focus();
+        await page.keyboard.press('Enter');
+        await expect(details).toHaveAttribute('open', '');
+        expect(await summary.evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
+      }
       if (view === 'overview') {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(0);
@@ -147,6 +168,8 @@ try {
         expect(await (await archive4Response).text()).toBe(steer4Text);
         await expect(page.locator('body')).toContainText('Full Redesign');
         await page.goBack();
+        const jump = page.locator('.dashboard-jump');
+        if (!(await jump.evaluate(el => el.open))) await jump.locator('summary').click();
         await page.getByRole('navigation', { name: 'Dashboard sections' }).getByRole('link', { name: 'Latest work', exact: true }).click();
         await page.waitForURL(url => url.hash === '#history');
         await expect(page.locator('#history').getByRole('link', { name: 'Read the full build history', exact: true })).toHaveAttribute('href', '/dashboard/history/');
@@ -270,7 +293,38 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 18, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 4, steer2ArchiveExact: true, steer3ArchiveExact: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
+    results.push({ width, colorScheme, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 18, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 5, steer2ArchiveExact: true, steer3ArchiveExact: true, steer4ArchiveExact: true, nativeKeyboardDisclosures: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
+    await context.close();
+  }
+  for (const width of [390, 1440]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: 'dark', userAgent: 'BackroadBum-SelfCheck/1.0' });
+    const page = await context.newPage();
+    const unexpected = [];
+    page.on('request', request => { if (!['GET', 'HEAD'].includes(request.method())) unexpected.push(request.method()); });
+    page.on('pageerror', error => unexpected.push(error.message));
+    await page.goto(base + '/dashboard/');
+    const appearance = page.locator('[data-theme-select]');
+    await expect(appearance).toBeVisible();
+    await expect(appearance).toHaveValue('system');
+    const dark = await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor);
+    await appearance.selectOption('light');
+    const light = await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor);
+    expect(dark).not.toBe(light);
+    await page.goto(base + '/dashboard/contributions/');
+    await expect(appearance).toHaveValue('light');
+    const candidates = page.locator('#candidates');
+    const tree = await candidates.ariaSnapshot();
+    expect(tree).toContain('columnheader "Source"');
+    expect(tree).toContain('columnheader "Status & store friction"');
+    const first = candidates.locator('details').first();
+    await first.locator('summary').focus();
+    await page.keyboard.press('Enter');
+    await expect(first).toHaveAttribute('open', '');
+    await appearance.selectOption('dark');
+    expect(await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor)).toBe(dark);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    expect(unexpected).toEqual([]);
+    results.push({ width, javaScriptEnabled: true, appearanceAcrossRoutes: true, semanticTableHeaders: true, nativeDisclosure: true, writes: 0, pageErrors: 0 });
     await context.close();
   }
   await writeFile(new URL('verification.json', output), JSON.stringify(results, null, 2));

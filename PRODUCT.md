@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## Field Journal phase4 · November14
+All four design phases now share one System/Light/Dark visual system. The dashboard distinguishes sampled operations from deployed facts, pending reviews and historical proof; compact branch summaries disclose the complete original evidence notes without scripting. A six-surface comparison links the original store to final Light/Dark desktop and phone captures. All135 earlier cycle articles, source ledger notes and five owner-instruction archives remain intact; this is presentation work, not a new payment, migration or release.
+
 ## Field Journal phase3 · November14
 Cart, guest checkout and receipts now use a calmer operating scale, proportional address fields and separated screen/print styling. Field Notes opens like a journal, with a featured published read and a narrower article rhythm; stories, policies and the test guide retain their native CMS wording. Synthetic browser transport proves paid/pending layouts, corrections, conditional billing and printing without replacement checkout attempts. The dashboard detail redesign remains for phase4.
 

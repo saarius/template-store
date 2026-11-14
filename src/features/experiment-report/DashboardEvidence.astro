@@ -1,0 +1,6 @@
+---
+interface Props { summary: string }
+const { summary } = Astro.props;
+---
+<p class="dashboard-evidence-summary">{summary}</p>
+<details class="dashboard-evidence"><summary>Evidence &amp; deployment limits</summary><div class="dashboard-evidence-body"><slot /></div></details>

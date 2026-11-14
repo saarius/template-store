@@ -19,7 +19,7 @@ Two active self-hosted families, Latin variable WOFF2 with `font-display: swap`:
 - **Fraunces 500–700:** display, product names and editorial headings. Optical sizing enabled; weight 500 is the default, tracking −0.025em to −0.04em.
 - **DM Sans 400–700:** body, navigation, forms, prices and operations. Body is 1rem / 1.618; quiet text is .875rem, never a low-contrast substitute for hierarchy.
 - Files, exact sources and OFL licenses are in `public/backroad/fonts/`. Old Barlow files are retained for history but no longer declared or loaded.
-- Marketing follows the generated φ half-step scale: 16 / 20 / 26 / 33 / 42 / 68px. The hero's mobile floor is 40px, desktop ceiling 67.8px. Editorial uses √2, webapp 1.2, dashboard 1.125; those route-specific refinements ship in later phases.
+- Marketing follows the generated φ half-step scale: 16 / 20 / 26 / 33 / 42 / 68px. The hero's mobile floor is 40px, desktop ceiling 67.8px. Editorial uses √2, webapp 1.2, dashboard 1.125; all four route-specific phases are now implemented.
 - Text measure is at most 68ch, with a 54ch default for DM Sans’s wide numeral metric; headline measure is about 12–24ch. Use balanced headings and pretty paragraph wrapping; never shrink text to conceal overflow.
 - All prices, quantities, totals and telemetry use tabular numerals. Identifiers wrap; they are not decorative monospace.
 
@@ -80,12 +80,20 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - Field Notes opens with an asymmetric copy/photograph split, one featured published note and quieter two-column reading links. Ordinals are decorative/aria-hidden, not invented dates. The existing photograph/credit and native note ordering remain intact.
 - Articles use the generated editorial scale: expressive title, serif opening paragraph, DM Sans body at17–18px/1.75 and at most65ch. Chapter gaps are64px, versus24px paragraph spacing. Back/related/shop links work without JavaScript. Guides share this reading rhythm with smaller task headings and clear policy navigation; their native CMS words are not duplicated or edited by the theme.
 
-## Protected runtime and remaining phases
+## Public experiment dashboard · Phase 4
+- Operating typography follows the generated **1.125 scale**: a DM Sans title capped at2.027rem, section headings at1.266–1.424rem and1.125rem subheadings. No marketing-size reporting hero. Tabular numerals cover samples, tokens, amounts and identifiers.
+- Four sampled metric cards distinguish process state, advisory readiness, memory and explicitly unavailable visitor/order aggregates. A stale probe is called stale; advisory readiness is never payment proof. The sampled timestamp and detailed operations remain accessible through a native disclosure.
+- Separate open-review cards show the three checked heads and real store friction. The candidate table gives each branch a concise disposition, with every original evidence/deployment note retained behind a native keyboard-operable details control. On phones each semantic row becomes a stacked card; table captions and header associations remain available.
+- The overview keeps one current dispatch; older dispatches and review context remain in labeled disclosures. The dated history is still newest-first, with136 entries and all135 prior article bodies unchanged. No client pagination, search indexing of private logs or reporting-side write action is added.
+- A six-surface Before/After showcase links original1440px captures to final-phase Light/Dark desktop and390px phone captures. Media stays outside git. All five archived instruction versions, including Steer4, remain in date order and unchanged.
+- Dashboard components add no JavaScript. Navigation, disclosures, instructions and evidence work without scripting; only the existing shared appearance preference needs enhancement.
+
+## Protected runtime and completed phases
 Visual authorization is broad; business authority is not. Preserve signed Commerce0.8.0 / Payments0.5.0 / Ship0.3.1, hosted consents, test-only admission, authoritative prices/availability, distinct selected members, guest cart storage, pending checkout protection, retained receipt recovery/printing, every Order, native mug media/specs and all six field notes. No CMS publication, replacement payment, shipment resync, credential exposure or /proof runtime change is part of the rebrand.
 
 1. **Phase 1 — live:** baseline captures, tokens/fonts, appearance, shell and home.
 2. **Phase 2 — live:** shop/collection/PDP/search hierarchy, native gallery/spec/care and variant controls; Regular/Sale comparison only when the signed projection actually supplies both.
 3. **Phase 3 — live:** cart/checkout/receipt, guides and magazine-grade editorial; proportional forms, field-level correction and print-safe receipts.
-4. **Phase 4:** dashboard metric cards and contribution tables on the 1.125 scale; preserve every history article and ledger, publish the full Before/After showcase.
+4. **Phase 4 — live:** dashboard metric cards, native evidence disclosures and responsive contribution tables on the1.125scale; full history, source ledger, archived instructions and six-surface Before/After showcase preserved.
 
 Before each rollout, run the supplied DOM auditor at390/1440 in Light/Dark against the built site, inspect captures, repair overflow/painted contrast/control geometry and preserve reusable focused tests. The legacy Impeccable detector flags Fraunces as overused; it is retained deliberately for the new skill’s editorial pairing, judged in the rendered home rather than treated as an automatic font ban. Keep media outside git at `/var/www/backroadbum-pr-proof/storefront-redesign/`; temporary audit files are removed after retaining concise evidence. Upstream DinkusKit PRs remain Path A: their own visual system, never this merchant rebrand.

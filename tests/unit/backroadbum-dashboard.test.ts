@@ -2,6 +2,36 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('keeps the report redesign server-rendered and preserves native evidence disclosure', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('<DashboardPulse status={status} stale={stale} />');
+    expect(source.match(/<DashboardEvidence summary=/g)).toHaveLength(18);
+    const evidence = readFileSync('src/features/experiment-report/DashboardEvidence.astro', 'utf8');
+    expect(evidence).toContain('<details class="dashboard-evidence">');
+    expect(evidence).toContain('<slot />');
+    for (const file of ['DashboardReport', 'DashboardPulse', 'DashboardReviews', 'DashboardShowcase', 'DashboardEvidence']) {
+      expect(readFileSync(`src/features/experiment-report/${file}.astro`, 'utf8')).not.toMatch(/<script\b/);
+    }
+    const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
+    expect(pulse).toContain("stale ? 'Stale advisory'");
+    expect(pulse).toContain('not a payment');
+    expect(pulse).toContain('Aggregate counting is not wired yet');
+    const css = readFileSync('src/features/experiment-report/dashboard.css', 'utf8');
+    expect(css).toContain('font-variant-numeric:tabular-nums');
+    expect(css).toContain('var(--dashboard-title)');
+    expect(css).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+  });
+
+  it('links all six original surfaces to final Light, Dark and phone captures', () => {
+    const showcase = readFileSync('src/features/experiment-report/DashboardShowcase.astro', 'utf8');
+    const rows = [...showcase.matchAll(/\{ title: '[^']+', before: '[^']+', light: '[^']+', dark: '[^']+', mobile: '[^']+' \}/g)];
+    expect(rows).toHaveLength(6);
+    expect(showcase).toContain('not a new purchase');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    for (const head of ['40e95ea', '9123f4d', '92fbb24']) expect(reviews).toContain(head);
+    expect(reviews).toContain('source verification is not a release');
+  });
+
   it('separates saved-cart, variant and checkout-form proof from payment readiness and deployment claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Hosted checkout settings #124');
@@ -150,7 +180,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).toContain('not shared-deployed');
     expect(row).not.toContain('still running');
     expect(row).not.toContain('not pushed');
-    const currentReviews = source.match(/<section id="contributions"><h2>Open reviews<\/h2>.*?<\/section>/)?.[0];
+    const currentReviews = source.match(/<section id="contributions"><h2>Open reviews<\/h2>[\s\S]*?<\/section>/)?.[0];
     expect(currentReviews).toContain('PR #229');
     expect(currentReviews).toContain('580a054 paired with');
     expect(currentReviews).toContain('not to merge it alone');
