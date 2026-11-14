@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## Native cap fit and care · November14
+Long Way Cap now has four native specifications plus adjustment, cleaning and sun-protection guidance. The saved draft stayed private until native publication; its adult-fit label promises no measured size range or tested UPF rating. Original Commerce facts, image and summary remain unchanged; the source checklist records authorship, not a second runtime content authority.
+
 ## Catalog link names · November14
 The browser accessibility tree repeated each product title after its illustration text. Whole-card links now use their visible title as the name and current Commerce price/availability as the description, keeping descriptive images and the full native link target. This merchant refinement is verified with script on/off in Light/Dark at390/1440; it is not screen-reader device certification or a new Commerce contract.
 

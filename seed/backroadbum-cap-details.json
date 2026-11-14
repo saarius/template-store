@@ -1,0 +1,17 @@
+{
+  "slug": "long-way-cap",
+  "title": "Long Way Cap",
+  "tableHeading": "Cap details",
+  "rows": [
+    { "label": "Shape", "value": "Low-profile crown" },
+    { "label": "Fabric", "value": "Cotton canvas" },
+    { "label": "Adjustment", "value": "Adjustable adult fit; no measured size range" },
+    { "label": "Color", "value": "Dusty ochre" }
+  ],
+  "careHeading": "Fit & care",
+  "care": [
+    "Loosen the back adjustment before putting the cap on, then tighten it a little at a time. It should sit securely without pressing at your temples. Compare with a cap you already wear; an adult-size label is not a measurement.",
+    "Spot clean the canvas with cool water and a little mild soap. Reshape the crown and air dry away from direct heat. Do not machine dry.",
+    "A brim provides shade, not a protection rating. This design has no tested UPF claim; plan separate sun protection for time outside."
+  ]
+}

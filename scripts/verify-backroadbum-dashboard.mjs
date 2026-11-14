@@ -41,9 +41,10 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('One product, one clear name.');
-        await expect(page.locator('.dashboard-latest')).toContainText('Current Commerce price and availability remain the link’s description');
-        await expect(page.locator('.dashboard-latest')).toContainText('not a screen-reader device certification');
+        await expect(page.locator('.dashboard-latest')).toContainText('Fit guidance, authored in EmDash.');
+        await expect(page.locator('.dashboard-latest')).toContainText('The draft stayed private before publication');
+        await expect(page.locator('.dashboard-latest')).toContainText('no measured size range or tested UPF claim');
+        await expect(page.locator('.dashboard-latest a[href="/products/long-way-cap#product-details"]')).toBeVisible();
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
@@ -198,7 +199,7 @@ try {
         if (!(await jump.evaluate(el => el.open))) await jump.locator('summary').click();
         await page.getByRole('navigation', { name: 'Dashboard sections' }).getByRole('link', { name: 'Latest work', exact: true }).click();
         await page.waitForURL(url => url.hash === '#history');
-        await expect(page.locator('#history').getByRole('link', { name: 'Read the build history', exact: true })).toHaveAttribute('href', '/dashboard/history/');
+        await expect(page.locator('#history').getByRole('link', { name: /^read the build history$/i })).toHaveAttribute('href', '/dashboard/history/');
       } else if (view === 'history') {
         await expect(page.locator('.cycle-entry')).toHaveCount(historyTitles.length);
         expect(await page.locator('.cycle-entry h3').allTextContents()).toEqual(historyTitles);
