@@ -41,10 +41,10 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Take the note, not the navigation.');
-        await expect(page.locator('.dashboard-latest')).toContainText('fits two pages in Chromium');
-        await expect(page.locator('.dashboard-latest')).toContainText('CMS content are unchanged');
-        await expect(page.locator('.dashboard-latest a[href="/field-note-before-the-signal-drops"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('Restored—but not back on the shelf.');
+        await expect(page.locator('.dashboard-latest')).toContainText('without touching the live catalog');
+        await expect(page.locator('.dashboard-latest')).toContainText('not a deployed repair');
+        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/commerce/issues/276"]')).toBeVisible();
         await expect(page.locator('#history')).toContainText('an unavailable lookup leaves paid facts and printing intact');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('latest self-dogfood: TEST1009');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
@@ -53,6 +53,8 @@ try {
         await expect(page.locator('[data-redesign-showcase]')).toContainText('signed plugins, catalog facts and order records remain intact');
       }
       if (view === 'contributions') {
+        await expect(page.locator('#reports a[href="https://github.com/dinkuskit/commerce/issues/276"]')).toBeVisible();
+        await expect(page.locator('#reports')).toContainText('Open workflow report, not a repair');
         await expect(page.locator('#reports a[href="https://github.com/dinkuskit/commerce/issues/275"]')).toBeVisible();
         await expect(page.locator('#reports')).toContainText('Open capability request.');
         await expect(page.locator('#reports a[href="https://github.com/dinkuskit/template-store/pull/229#issuecomment-6874204021"]')).toBeVisible();
@@ -199,11 +201,13 @@ try {
         expect(await (await archive4Response).text()).toBe(steer4Text);
         await expect(page.locator('body')).toContainText('Full Redesign');
         await page.goBack();
+        // Back navigation may replace the document and its earlier scroll override.
+        await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; });
         const jump = page.locator('.dashboard-jump');
         if (!(await jump.evaluate(el => el.open))) await jump.locator('summary').click();
         await page.getByRole('navigation', { name: 'Dashboard sections' }).getByRole('link', { name: 'Latest work', exact: true }).click();
         await page.waitForURL(url => url.hash === '#history');
-        await expect(page.locator('#history').getByRole('link', { name: /^read the build history$/i })).toHaveAttribute('href', '/dashboard/history/');
+        await expect(page.locator('.dashboard-latest a[href="/dashboard/history/"]')).toBeVisible();
       } else if (view === 'history') {
         await expect(page.locator('.cycle-entry')).toHaveCount(historyTitles.length);
         expect(await page.locator('.cycle-entry h3').allTextContents()).toEqual(historyTitles);
@@ -311,11 +315,11 @@ try {
         await expect(contact).toContainText('exact-head GitHub desktop/phone/Registry/aggregate checks pass');
         await expect(contact).toContainText('Fresh review accepts the field-level proof with no before-merge item');
         await expect(page.locator('[data-activity-metrics]')).toHaveCount(0);
-        await page.locator('#contributions').scrollIntoViewIfNeeded();
+        await page.locator('#reports tbody tr').first().scrollIntoViewIfNeeded();
       }
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       for (const secret of ['sk_test_', 'whsec_', 'github_pat_', 'emdash_enc_v1_', '/var/lib/', 'session_file']) await expect(page.locator('main')).not.toContainText(secret);
-      await page.screenshot({ path: new URL(`${view}-${width}.png`, output).pathname });
+      await page.screenshot({ path: new URL(`${view}-${width}-${colorScheme}.png`, output).pathname });
       if (view !== 'overview') {
         await page.getByRole('navigation', { name: 'Return to the overview' }).getByRole('link').click();
         await page.waitForURL(url => /^\/dashboard\/?$/.test(url.pathname));

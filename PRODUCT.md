@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## Native product retirement and return · November14
+A disposable copy of the signed-plugin store exercised Archive, Restore and page republication without touching the live catalog. Restore deliberately leaves a Commerce draft while the CMS page remains live, with Save disabled and no Publish action; a native unpublish→publish workaround returned the same product and original two-unit cart on desktop and phone. Commerce276 requests an actionable next step while preserving the draft and page-publication contracts, not a deployed repair. All nine copied Orders and authored CMS content stayed intact, and live business hashes are unchanged.
+
 ## Field notes on paper · November14
 Printing the offline-planning note produced four A4 pages, with shopping links and the footer on the final two. Field notes now use a paper-only layout that retains the complete native article, its source address and compact store context without navigation or shopping panels; the same note fits two pages in Chromium. Native browser Print / Save as PDF works with scripts on or off, independently of appearance; screen reading, receipts, CMS records and commerce state are unchanged. Physical printers and other browser engines remain unqualified.
 
