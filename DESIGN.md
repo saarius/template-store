@@ -126,6 +126,9 @@ Tee and fleece size tables are native EmDash specification blocks, with measurin
 ## Product Add continuity
 The local product Add mutation is synchronous: do not transiently disable its button or programmatically move focus on success. Retain the native button focus cue through success, combined-line refusal and storage failure; only malformed quantity correction focuses the input. The onward View cart link remains success-only and next in keyboard order. A future asynchronous server-cart implementation needs its own honest pending state and focus qualification, not an assumption that this local strategy transfers unchanged.
 
+## Cart product-link continuity
+Cart and checkout keep each native product link attached while its name, destination and neighboring Commerce facts refresh. A tab return, quantity edit or catalog read must not replace an unchanged navigation target and drop keyboard focus to the document body; the next Tab still reaches Quantity. Changed prices and invalid drafts remain visible under the existing rules, with no focus restoration to a link that has legitimately disappeared and no new checkout authority.
+
 ## Saved-checkout status focus
 The asynchronous explicit status check keeps its native button focusable, with `aria-disabled` and `aria-busy` while the controller refuses reentry. A pending result preserves button focus for another keyboard check; a terminal result focuses the described status only if the disappearing button still owns focus. Automatic reads and shoppers who moved away never receive a forced focus change. The existing five-read limit keeps its explanation and a focusable unavailable control; it is not a new provider retry policy or server-receipt implementation.
 

@@ -307,17 +307,20 @@ function lineThumbnailMarkup(line: GuestCartView["lines"][number]): string {
   return `<img data-guest-cart-thumbnail-img src="${escapeText(line.thumbnail.src)}" alt="${escapeText(line.thumbnail.alt)}" width="160" height="120" loading="lazy" />`;
 }
 
+function lineFactsMarkup(line: GuestCartView["lines"][number]): string {
+  return `${line.sku ? `<p data-guest-cart-sku>SKU: ${escapeText(line.sku)}</p>` : ""}
+  ${priceMarkup(line)}
+  ${line.lineTotalText ? `<p data-guest-cart-line-total${invalidQuantities.has(line.id) ? " hidden" : ""}>Line total <strong>${escapeText(line.lineTotalText)}</strong></p>` : ""}
+  ${line.availabilityLabel ? `<p data-commerce-availability>${escapeText(line.availabilityLabel)}</p>` : ""}
+  ${line.reason ? `<p data-guest-cart-line-reason="${escapeText(line.reasonCode ?? "")}">${escapeText(line.reason)}</p>` : ""}`;
+}
+
 function lineCopyMarkup(line: GuestCartView["lines"][number]): string {
   const name = escapeText(line.name);
   const title = line.productPath
     ? `<a data-guest-cart-product-link href="${escapeText(line.productPath)}">${name}</a>`
     : name;
-  return `<h2>${title}</h2>
-  ${line.sku ? `<p data-guest-cart-sku>SKU: ${escapeText(line.sku)}</p>` : ""}
-  ${priceMarkup(line)}
-  ${line.lineTotalText ? `<p data-guest-cart-line-total${invalidQuantities.has(line.id) ? " hidden" : ""}>Line total <strong>${escapeText(line.lineTotalText)}</strong></p>` : ""}
-  ${line.availabilityLabel ? `<p data-commerce-availability>${escapeText(line.availabilityLabel)}</p>` : ""}
-  ${line.reason ? `<p data-guest-cart-line-reason="${escapeText(line.reasonCode ?? "")}">${escapeText(line.reason)}</p>` : ""}`;
+  return `<h2>${title}</h2><div data-guest-cart-line-facts>${lineFactsMarkup(line)}</div>`;
 }
 
 function lineMarkup(line: GuestCartView["lines"][number], current: GuestCartView): string {
@@ -354,7 +357,24 @@ function patchLine(article: HTMLElement, line: GuestCartView["lines"][number], c
     }
   }
   const copy = article.querySelector("[data-guest-cart-line-copy]");
-  if (copy instanceof HTMLElement) copy.innerHTML = lineCopyMarkup(line);
+  if (copy instanceof HTMLElement) {
+    const heading = copy.querySelector("h2");
+    const link = heading?.querySelector("[data-guest-cart-product-link]");
+    // Facts refresh on tab return and quantity edits. Keep the native product
+    // link attached so a keyboard shopper doesn't lose their place in the cart.
+    if (line.productPath && link instanceof HTMLAnchorElement) {
+      link.setAttribute("href", line.productPath);
+      if (link.textContent !== line.name) link.textContent = line.name;
+    } else if (heading instanceof HTMLElement) {
+      if (line.productPath) {
+        heading.innerHTML = `<a data-guest-cart-product-link href="${escapeText(line.productPath)}">${escapeText(line.name)}</a>`;
+      } else if (heading.textContent !== line.name || link) {
+        heading.textContent = line.name;
+      }
+    }
+    const facts = copy.querySelector("[data-guest-cart-line-facts]");
+    if (facts instanceof HTMLElement) facts.innerHTML = lineFactsMarkup(line);
+  }
   const input = article.querySelector("[data-guest-cart-qty]");
   const invalid = invalidQuantities.get(line.id);
   if (input instanceof HTMLInputElement) {
