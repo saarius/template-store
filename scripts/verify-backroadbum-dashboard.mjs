@@ -41,8 +41,9 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Add without losing your place.');
-        await expect(page.locator('.dashboard-latest a[href="/products/long-way-cap"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('A blank draft is not Remove.');
+        await expect(page.locator('.dashboard-latest')).toContainText('This candidate is not adopted');
+        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/template-store/pull/229#issuecomment-6874204021"]')).toBeVisible();
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
@@ -51,6 +52,8 @@ try {
       if (view === 'contributions') {
         await expect(page.locator('#reports a[href="https://github.com/dinkuskit/commerce/issues/275"]')).toBeVisible();
         await expect(page.locator('#reports')).toContainText('Open capability request.');
+        await expect(page.locator('#reports a[href="https://github.com/dinkuskit/template-store/pull/229#issuecomment-6874204021"]')).toBeVisible();
+        await expect(page.locator('#reports')).toContainText('no repair or merchant adoption is claimed');
         await expect(page.locator('#candidates .dashboard-evidence')).toHaveCount(18);
         await expect(page.locator('#candidates .dashboard-evidence-summary')).toHaveCount(18);
         for (const caption of await page.locator('caption').all()) {
