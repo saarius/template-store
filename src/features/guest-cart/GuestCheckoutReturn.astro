@@ -3,7 +3,7 @@ const { contactHref } = Astro.props;
 ---
 <section class="guest-checkout-return" data-guest-checkout-return aria-labelledby="guest-checkout-return-title">
   <h1 id="guest-checkout-return-title">Checkout status</h1>
-  <p data-guest-checkout-return-status role="status">This page has not checked your saved checkout yet. If this message remains, enable JavaScript and reload in the browser you checked out with. Keep that browser’s site data.</p>
+  <p id="guest-checkout-return-status" data-guest-checkout-return-status role="status" tabindex="-1">This page has not checked your saved checkout yet. If this message remains, enable JavaScript and reload in the browser you checked out with. Keep that browser’s site data.</p>
   <section class="guest-checkout-pending-review" data-guest-checkout-pending-review aria-labelledby="guest-checkout-pending-title" hidden>
     <h2 id="guest-checkout-pending-title">Original checkout</h2>
     <dl><div><dt>Amount sent to checkout</dt><dd data-guest-checkout-pending-amount></dd></div></dl>
@@ -60,7 +60,7 @@ const { contactHref } = Astro.props;
     <a class="guest-checkout-continue" href="/shop">Continue shopping</a>
     <a class="guest-checkout-account" data-guest-checkout-account href="/account">Shopper account</a>
   </div>
-  <button type="button" data-guest-checkout-status-retry hidden>Check status again</button>
+  <button type="button" data-guest-checkout-status-retry aria-describedby="guest-checkout-return-status" hidden>Check status again</button>
 </section>
 <script>
   import { hydrateGuestCheckoutReturn } from "./guest-cart-client.ts";

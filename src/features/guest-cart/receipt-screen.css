@@ -19,9 +19,13 @@
   body[data-receipt-page] .guest-checkout-destination__label{font-size:var(--text-sm);font-weight:400}
   body[data-receipt-page] .guest-checkout-destination__value{font-weight:500}
   body[data-receipt-page] .guest-checkout-fulfillment dl{font-variant-numeric:tabular-nums}
-  body[data-receipt-page] .guest-checkout-keep p{font-size:var(--text-sm);max-width:65ch}
+  body[data-receipt-page] .guest-checkout-keep p{font-size:var(--text-sm);max-width:50ch}
   body[data-receipt-page] .guest-checkout-return button{font-weight:600;border:1px solid var(--store-line);border-radius:var(--radius-control)}
   body[data-receipt-page] .guest-checkout-return button:hover{background:var(--store-surface-subtle)}
+  body[data-receipt-page] [data-guest-checkout-status-retry]{margin-top:var(--space-3)}
+  body[data-receipt-page] [data-guest-checkout-status-retry][aria-busy="true"]{cursor:progress}
+  body[data-receipt-page] [data-guest-checkout-status-retry][aria-disabled="true"]:not([aria-busy="true"]){cursor:not-allowed}
+  body[data-receipt-page] [data-guest-checkout-return-status]:focus-visible{outline:3px solid var(--color-ring);outline-offset:4px;border-radius:var(--radius-control)}
   body[data-receipt-page] .guest-checkout-continue,body[data-receipt-page] .guest-checkout-account{border-radius:var(--radius-control)}
   body[data-receipt-page] .guest-checkout-continue:hover{background:color-mix(in oklch,var(--store-accent) 88%,var(--store-ink))}
   body[data-receipt-page] .guest-checkout-pending-review{border:1px solid var(--color-border);border-radius:var(--radius-card);padding:var(--space-5);margin:var(--space-7) 0;background:var(--store-surface)}

@@ -682,7 +682,7 @@ describe("order confirmation receipt enrichment (garment thumbnails, variants, a
   it("starts with an unchecked status and actionable script guidance, not a confirmation or running check", () => {
     const markup = readFileSync("src/features/guest-cart/GuestCheckoutReturn.astro", "utf8");
     expect(markup).toContain('<h1 id="guest-checkout-return-title">Checkout status</h1>');
-    const initialStatus = markup.match(/<p data-guest-checkout-return-status role="status">([^<]+)<\/p>/)?.[1];
+    const initialStatus = markup.match(/<p\b[^>]*\bdata-guest-checkout-return-status\b[^>]*>([^<]+)<\/p>/)?.[1];
     expect(initialStatus).toContain("has not checked your saved checkout yet");
     expect(initialStatus).toContain("enable JavaScript and reload");
     expect(initialStatus).toContain("browser you checked out with");

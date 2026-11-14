@@ -41,10 +41,10 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('For the turns worth remembering.');
-        await expect(page.locator('.dashboard-latest')).toContainText('The draft stayed private');
-        await expect(page.locator('.dashboard-latest')).toContainText('The six existing products and eight Orders remain unchanged');
-        await expect(page.locator('.dashboard-latest a[href="/products/county-line-field-book"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('Keep your place while checking.');
+        await expect(page.locator('.dashboard-latest')).toContainText('the disappearing button still owns it');
+        await expect(page.locator('.dashboard-latest')).toContainText('browser interaction proof, not a new payment');
+        await expect(page.locator('.dashboard-latest a[href="/pr-proof/storefront-status-focus/after-pending-390-light.png"]')).toBeVisible();
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);

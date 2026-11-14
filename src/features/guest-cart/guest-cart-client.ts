@@ -44,6 +44,7 @@ import {
 import { pendingCheckoutAmount } from "./pending-review.js";
 import { clearCheckoutContactFeedback, setCheckoutContactFeedback, type CheckoutContactField } from "./contact-feedback.js";
 import { cartRemovalFocusId } from "./remove-focus.js";
+import { syncStatusRetryFeedback } from "./status-retry-feedback.js";
 import { clearAddQuantityFeedback, setAddQuantityFeedback } from "./add-quantity-feedback.js";
 import { canRetryCheckoutAvailability, checkoutAvailabilityFailure } from "./availability-retry.js";
 import {
@@ -1418,7 +1419,8 @@ export function hydrateGuestCheckoutReturn(): void {
   });
   const initialContact = root.querySelector("[data-guest-checkout-contact]");
   const retry = root.querySelector("[data-guest-checkout-retry]");
-  const statusRetry = root.querySelector("[data-guest-checkout-status-retry]");
+  const statusRetry = root.querySelector<HTMLButtonElement>("[data-guest-checkout-status-retry]");
+  let statusRetryVisible = false;
   const retention = readGuestCheckoutRetention(checkoutStorage());
   const storedCheckoutData = (() => {
     const saved = checkoutStorage();
@@ -1437,7 +1439,7 @@ export function hydrateGuestCheckoutReturn(): void {
     const title = root.querySelector("#guest-checkout-return-title");
     if (title instanceof HTMLElement) title.textContent = "We couldn't confirm your order";
     setMessage(failureMessage, false);
-    if (statusRetry instanceof HTMLButtonElement) statusRetry.hidden = true;
+    statusRetryVisible = false;
   };
   const setMessage = (message: string, error = false) => {
     if (!(status instanceof HTMLElement)) return;
@@ -1465,9 +1467,11 @@ export function hydrateGuestCheckoutReturn(): void {
   let checking = false;
   let statusChecks = 0;
   const updateRetryAvailability = () => {
-    if (statusRetry instanceof HTMLButtonElement) {
-      statusRetry.disabled = !canRetryGuestCheckoutStatus(statusChecks);
-    }
+    syncStatusRetryFeedback(statusRetry, status instanceof HTMLElement ? status : null, {
+      checking,
+      visible: statusRetryVisible,
+      limited: !canRetryGuestCheckoutStatus(statusChecks),
+    });
   };
   const finishCheck = () => {
     checking = false;
@@ -1475,13 +1479,9 @@ export function hydrateGuestCheckoutReturn(): void {
   };
   const checkStatus = async () => {
     if (checking) return;
-    if (!canRetryGuestCheckoutStatus(statusChecks)) {
-      setFailureState();
-      updateRetryAvailability();
-      return;
-    }
+    if (!canRetryGuestCheckoutStatus(statusChecks)) return;
     checking = true;
-    if (statusRetry instanceof HTMLButtonElement) statusRetry.disabled = true;
+    updateRetryAvailability();
     if (retry instanceof HTMLAnchorElement) retry.hidden = true;
     if (pendingReview instanceof HTMLElement) pendingReview.hidden = true;
     setMessage("Checking the saved checkout status.");
@@ -1533,7 +1533,7 @@ export function hydrateGuestCheckoutReturn(): void {
       }
       if (initialContact instanceof HTMLElement) initialContact.hidden = true;
       if (retry instanceof HTMLAnchorElement) retry.hidden = true;
-      if (statusRetry instanceof HTMLButtonElement) statusRetry.hidden = true;
+      statusRetryVisible = false;
       const settled = await settleGuestCheckoutCart(checkoutStorage(), result);
       session = loadSession();
       renderNav();
@@ -1563,16 +1563,14 @@ export function hydrateGuestCheckoutReturn(): void {
         ? "Checkout is still pending with Commerce. Check status again before retrying."
         : "Commerce has not confirmed a paid order. The original checkout remains protected.";
     setMessage(message, result.ok && result.checkout.state !== "pending");
-    if (statusRetry instanceof HTMLButtonElement) {
-      statusRetry.hidden = !(result.ok && result.checkout.state === "pending");
-    }
+    statusRetryVisible = result.ok && result.checkout.state === "pending";
     if (exhausted && result.ok && result.checkout.state === "pending") {
       setFailureState();
       setMessage(
         "Status checks are temporarily limited. Keep this browser’s site data and refresh later.",
         true,
       );
-      if (statusRetry instanceof HTMLButtonElement) statusRetry.hidden = false;
+      statusRetryVisible = true;
     }
     finishCheck();
   };
