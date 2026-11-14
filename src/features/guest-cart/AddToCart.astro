@@ -54,7 +54,7 @@ const qtyInputId = `guest-cart-add-qty-${product.id}`;
       >{singleSellable ? "Add to cart" : selectionRequired ? "Choose an option" : "Sold out"}</button>
     </div>
     <div class="guest-cart-add__feedback">
-      <p data-add-to-cart-status hidden role="status"></p>
+      <p id={`guest-cart-add-status-${product.id}`} data-add-to-cart-status hidden role="status"></p>
       <a href="/cart" data-add-to-cart-view hidden>View cart</a>
     </div>
   </div>
@@ -77,6 +77,8 @@ const qtyInputId = `guest-cart-add-qty-${product.id}`;
   .guest-cart-add__feedback{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 1rem}
   .guest-cart-add__feedback:has([data-add-to-cart-status][hidden]){display:none}
   .guest-cart-add p{margin:0;color:var(--store-muted)}
+  .guest-cart-add p[role="alert"]{color:var(--color-danger)}
+  .guest-cart-add__stepper:has(input[aria-invalid="true"]){border-color:var(--color-danger);outline:1px solid var(--color-danger);outline-offset:-1px}
   .guest-cart-add__feedback a{display:inline-flex;align-items:center;min-height:48px;color:var(--store-ink);font-weight:600;text-underline-offset:.2em}
   .guest-cart-add__feedback a[hidden]{display:none}
 </style>

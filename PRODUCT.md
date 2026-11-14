@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## Product quantity corrections · November14
+An invalid product quantity previously left an unassociated alert and focus on the document body. Rejected Add now marks and describes the quantity field, focuses it for correction and retains the typed draft; typing or a stepper clears only that correction, not storage failures. Valid additions and combined-line limits keep their existing cart rules, and no server-cart or signed-plugin contract changes.
+
 ## Phone merchant save focus · November14
 The phone Settings dismissal is now reproduced through an isolated installed EmDash product panel with click and keyboard Enter. Replacing the focused weight-form button emits a null-destination focus-leave event; Kumo closes the mobile sheet, while reopening reads the successful save and desktop retains its controls. The human-only EmDash ledger now carries versioned source evidence and synthetic before/after-save images; the owning fix and physical-phone reproduction remain for human review, with no live catalog edit or host patch.
 

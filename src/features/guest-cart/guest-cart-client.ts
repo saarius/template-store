@@ -44,6 +44,7 @@ import {
 import { pendingCheckoutAmount } from "./pending-review.js";
 import { clearCheckoutContactFeedback, setCheckoutContactFeedback, type CheckoutContactField } from "./contact-feedback.js";
 import { cartRemovalFocusId } from "./remove-focus.js";
+import { clearAddQuantityFeedback, setAddQuantityFeedback } from "./add-quantity-feedback.js";
 import { canRetryCheckoutAvailability, checkoutAvailabilityFailure } from "./availability-retry.js";
 import {
   SHOPPER_ORDERS_ENDPOINT,
@@ -799,6 +800,7 @@ function persistFailed(): boolean {
 }
 
 function setAddToCartStatus(container: Element | null | undefined, message: string, isError: boolean): void {
+  clearAddQuantityFeedback(container);
   // Only offer the onward path after a saved addition, never an unsaved cart.
   const viewCart = container?.querySelector("[data-add-to-cart-view]");
   if (viewCart instanceof HTMLElement) viewCart.hidden = isError;
@@ -900,27 +902,30 @@ export function hydrateGuestCartControls(): void {
       if (!(input instanceof HTMLInputElement) || input.disabled) return;
       const delta = button.getAttribute("data-add-to-cart-qty-step") === "-1" ? -1 : 1;
       input.value = String(stepGuestCartQuantityInput(input.value, delta, 1));
+      clearAddQuantityFeedback(container);
     });
   });
   document.querySelectorAll("[data-add-to-cart]").forEach((button) => {
     if (!(button instanceof HTMLButtonElement) || button.dataset.guestCartReady === "1") return;
+    const container = button.closest(".guest-cart-add") ?? button.parentElement;
+    const qtyInput = container?.querySelector("[data-add-to-cart-qty]");
+    qtyInput?.addEventListener("input", () => clearAddQuantityFeedback(container));
     button.addEventListener("click", () => {
-      const container = button.closest(".guest-cart-add") ?? button.parentElement;
       if (isSingleAddBlocked(button, container)) return;
       const id = button.getAttribute("data-add-to-cart");
       if (!isSafeGuestCartProductId(id)) return;
-      button.disabled = true;
       const qtyInput = container?.querySelector("[data-add-to-cart-qty]");
       let quantity = 1;
       if (qtyInput instanceof HTMLInputElement) {
         const parsed = parseGuestCartQuantityInput(qtyInput.value.trim());
         if (parsed === null) {
           setAddToCartStatus(container, "Quantity must be a whole number from 1 to 99.", true);
-          button.disabled = false;
+          setAddQuantityFeedback(container);
           return;
         }
         quantity = parsed;
       }
+      button.disabled = true;
       if (!persistFailed()) {
         session = loadSession();
       }
