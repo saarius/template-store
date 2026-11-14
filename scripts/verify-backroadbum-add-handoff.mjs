@@ -9,17 +9,21 @@ const results = [];
 try {
   for (const [width, colorScheme] of [[1440, 'light'], [1440, 'dark'], [768, 'light'], [390, 'light'], [390, 'dark'], [320, 'light']]) {
     const context = await browser.newContext({ viewport: { width, height: 1000 }, colorScheme, reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
-    const nonGetRequests = [];
+    const nonGetRequests = [], blockedPreparationRequests = [];
+    const isPreparation = path => /^\/_emdash\/api\/plugins\/[^/]+\/checkout\/guest\/prepare$/.test(path);
     await context.route('**/*', route => {
       if (route.request().method() === 'GET') return route.continue();
-      nonGetRequests.push(new URL(route.request().url()).pathname);
+      const path = new URL(route.request().url()).pathname;
+      // An admitted legacy cart auto-prepares on load. Refuse it before it
+      // reaches Commerce; this focused proof must create no capability.
+      (isPreparation(path) ? blockedPreparationRequests : nonGetRequests).push(path);
       return route.abort();
     });
     const page = await context.newPage();
     const errors = [], checkout = [];
     const saved = () => page.evaluate(() => ({ cart: localStorage.getItem('dinkus.guest-cart.v1'), checkout: localStorage.getItem('dinkus.guest-checkout.v1') }));
     page.on('pageerror', error => errors.push(error.message));
-    page.on('request', request => { if (/\/api\/checkout\//.test(request.url())) checkout.push(new URL(request.url()).pathname); });
+    page.on('request', request => { if (/\/api\/checkout\/|\/checkout\/guest\//.test(request.url())) checkout.push(new URL(request.url()).pathname); });
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await page.goto(base + '/products/long-way-cap')).status()).toBe(200);
     const add = page.getByRole('button', { name: 'Add to cart', exact: true });
@@ -121,10 +125,14 @@ try {
     await expect(view).toBeHidden();
     await fits();
     await page.screenshot({ path: new URL(`failed-save-${width}-${colorScheme}.png`, output).pathname, fullPage: true });
-    expect(errors).toEqual([]); expect(checkout).toEqual([]); expect(nonGetRequests).toEqual([]);
+    expect(errors).toEqual([]); expect(nonGetRequests).toEqual([]);
+    expect(checkout).toEqual(blockedPreparationRequests);
+    expect(checkout.every(isPreparation)).toBe(true);
+    expect((await saved()).checkout).toBeNull();
     results.push({ width, colorScheme, savedAddition: true, keyboardCartHandoff: true, cartQuantity: 7, removed: true,
       keyboardEnterAndSpaceRetainFocus: true, syntheticSubscriberReentryRefused: true, combinedQuantityRefusalRetainsFocusAndSavedCart: true,
-      storageRefusalRetainsFocusAndSavedCart: true, nonGetRequests: nonGetRequests.length,
+      storageRefusalRetainsFocusAndSavedCart: true, unexpectedNonGetRequests: nonGetRequests.length,
+      blockedCartPreparationRequests: blockedPreparationRequests.length, deliveredNonGetRequests: 0, retainedCheckout: null,
       invalidQuantityHasNoHandoff: true, correctedQuantityHasHandoff: true, failedSaveRetractsHandoff: true,
       quantityTargetsAtLeast48px: true, keyboardQuantityOrder: true, unclippedQuantityFocus: true, boundsUnchanged: true,
       noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout.length });
