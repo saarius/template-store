@@ -59,7 +59,7 @@ const { playgroundMode = false, merchantMode = false, emailSignInPaused = false,
 
       <form class="account-form account-verify-form" data-account-verify-form hidden novalidate>
         <label for="account-code">6-digit verification code</label>
-        <input id="account-code" data-account-code type="text" inputmode="numeric" pattern="\s*[0-9]{6}\s*" maxlength="32" autocomplete="one-time-code" aria-describedby="account-code-hint" required />
+        <input id="account-code" data-account-code type="text" inputmode="numeric" pattern="\s*[0-9]{6}\s*" autocomplete="one-time-code" aria-describedby="account-code-hint" required />
         <p id="account-code-hint">Paste the six-digit code from your email. Surrounding spaces are ignored.</p>
         <button type="submit" data-account-verify>Verify &amp; sign in</button>
       </form>

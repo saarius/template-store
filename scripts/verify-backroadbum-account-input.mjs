@@ -28,8 +28,15 @@ export async function verifyAccountInput(base = process.env.BACKROADBUM_ORIGIN |
       const code = page.locator('[data-account-code]'); await expect(code).toBeVisible();
       await code.fill('12'); await page.locator('[data-account-verify]').click();
       await expect(code).toHaveAttribute('aria-invalid', 'true'); expect(verifies).toBe(0);
+      for (const value of ['1234567', '123456' + ' '.repeat(40) + '7']) {
+        await code.fill(''); await code.focus();
+        await page.keyboard.insertText(value);
+        await expect(code).toHaveValue(value);
+        await page.locator('[data-account-verify]').click();
+        await expect(code).toHaveAttribute('aria-invalid', 'true'); expect(verifies).toBe(0);
+      }
       await code.fill(''); await code.focus();
-      // insertText follows the same native maxlength limit as a clipboard insertion.
+      // Browser insertion applies maxlength; this is not an OS clipboard test.
       await page.keyboard.insertText(' \t123456 ');
       await expect(code).toHaveValue(' \t123456 ');
       await expect(code).not.toHaveAttribute('aria-invalid', 'true');
@@ -41,7 +48,8 @@ export async function verifyAccountInput(base = process.env.BACKROADBUM_ORIGIN |
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       expect(starts).toBe(1); expect(unexpectedWrites).toBe(0);
       results.push({ width, colorScheme, syntheticOnly: true, mailSent: false, sessionCreated: false,
-        pastePreservedAndTrimmed: true, fieldCorrectionAssociated: true, proportionalCodeInput: true, unexpectedWrites });
+        pastePreservedAndTrimmed: true, overlongCodesRefusedWithoutTruncation: true,
+        fieldCorrectionAssociated: true, proportionalCodeInput: true, unexpectedWrites });
       await context.close();
     }
     return results;

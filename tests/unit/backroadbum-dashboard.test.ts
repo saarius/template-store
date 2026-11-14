@@ -12,12 +12,23 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(coverage).toContain('admin sign-in, hosted authorization and off-host recovery unverified');
     expect(source).toContain('An existing private archive now boots');
   });
+  it('qualifies the code-input PR without presenting intercepted calls as real account activity', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('Complete sign-in codes');
+    expect(source).toContain('https://github.com/dinkuskit/template-store/pull/230');
+    expect(source).toContain('no new email, purchase or fulfillment is performed');
+    expect(source).toContain('also reproduced on unchanged main');
+    const input = readFileSync('src/features/shopper-account/ShopperAccount.astro', 'utf8');
+    const code = input.match(/<input id="account-code"[^>]+>/)?.[0];
+    expect(code).toBeDefined();
+    expect(code).not.toContain('maxlength');
+  });
   it('reports the native seventh product without rewriting older catalog or recovery claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
-    expect(pulse).toContain('Seven product families, two collections and six field notes');
+    expect(pulse).toContain('Seven product families, two collections and seven field notes');
     expect(source).toContain('Seven EmDash-backed product families');
-    expect(source).toContain('For the turns worth remembering.');
+    expect(source).toContain('A $12 pocket notebook joins the gear shelf');
     expect(source).toContain('The six existing products and eight Orders remain unchanged');
     expect(source).toContain('href="/products/county-line-field-book"');
   });
@@ -62,7 +73,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(rows).toHaveLength(6);
     expect(showcase).toContain('not a new purchase');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
-    for (const head of ['40e95ea', '9123f4d', '92fbb24']) expect(reviews).toContain(head);
+    for (const head of ['40e95ea', '9123f4d', '92fbb24', '238c420']) expect(reviews).toContain(head);
     expect(reviews).toContain('source verification is not a release');
   });
 
@@ -249,6 +260,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-2-2026-11-11.txt',
       '/dashboard/instructions/steer-3-2026-11-12.txt',
       '/dashboard/instructions/steer-4-2026-11-13.txt',
+      '/dashboard/instructions/steer-5-2026-11-14.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');

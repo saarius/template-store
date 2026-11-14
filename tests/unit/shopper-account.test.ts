@@ -634,7 +634,7 @@ describe("shopper-account browser session and public routes", () => {
 
   it("retains whitespace-pasted PINs for the existing trim validation and explains the code field", () => {
     const source = readFileSync(resolve(root, "src/features/shopper-account/ShopperAccount.astro"), "utf8");
-    expect(source).toContain('inputmode="numeric" pattern="\\s*[0-9]{6}\\s*" maxlength="32"');
+    expect(source).toContain('inputmode="numeric" pattern="\\s*[0-9]{6}\\s*" autocomplete="one-time-code"');
     expect(source).toContain('aria-describedby="account-code-hint"');
     expect(source).toContain('id="account-code-hint"');
     expect(source).toContain('id="account-status"');
