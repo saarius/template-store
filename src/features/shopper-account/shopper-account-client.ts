@@ -318,6 +318,17 @@ export function hydrateShopperAccountPage(): void {
   const signOutButton = root.querySelector("[data-account-signout]");
   const profileForm = root.querySelector("[data-account-profile-form]");
   const clearProfileButton = root.querySelector("[data-account-profile-clear]");
+  const codeField = root.querySelector("[data-account-code]");
+  const markCodeInvalid = () => {
+    codeField?.setAttribute("aria-invalid", "true");
+    codeField?.setAttribute("aria-describedby", "account-code-hint account-status");
+  };
+  codeField?.addEventListener("input", () => {
+    if (!(codeField instanceof HTMLInputElement) || codeField.getAttribute("aria-invalid") !== "true") return;
+    codeField.removeAttribute("aria-invalid");
+    codeField.setAttribute("aria-describedby", "account-code-hint");
+    setAccountStatus(root, null);
+  });
 
   const existing = readStoredShopperSession();
   if (existing) {
@@ -392,6 +403,7 @@ export function hydrateShopperAccountPage(): void {
       const code = readFieldValue(root, "[data-account-code]");
       if (!/^\d{6}$/u.test(code)) {
         setAccountStatus(root, "Enter the 6-digit numeric code from your email.", true);
+        markCodeInvalid();
         return;
       }
       const optInBox = root.querySelector("[data-account-opt-in]");
@@ -419,6 +431,7 @@ export function hydrateShopperAccountPage(): void {
               ? res.body.error.message
               : "Invalid or expired verification code.";
           setAccountStatus(root, message, true);
+          if (isRecord(res.body?.error) && ["CODE_INVALID", "CODE_EXPIRED"].includes(String(res.body.error.code))) markCodeInvalid();
           return;
         }
         if (verifyForm instanceof HTMLElement) verifyForm.hidden = true;

@@ -63,7 +63,7 @@
   ["normal","An invented street can pass checkout but be refused by the sandbox carrier later. That refusal is not a failed payment: the merchant can correct the delivery address while the paid items and total stay unchanged."],
   ["normal","On Stripe’s test checkout, use card 4242 4242 4242 4242 with any future expiry date and any three-digit CVC. Never enter a real card. Return to the store after payment; the receipt appears only when Commerce has verified the payment with the provider."],
   ["h2","Keep your receipt"],
-  ["normal","Choose Your last checkout in the footer, or Open your last checkout below, using the browser you paid with. Only this browser’s latest checkout is kept; preserve its site data. The page address alone cannot recover an order. If payment is pending, check its status before starting again. Email sign-in is paused while the verified-inbox shopper flow is being tested; use the original browser for your receipt."],
+  ["normal","Choose Your last checkout in the footer, or Open your last checkout below, using the browser you paid with. Only this browser’s latest checkout is kept; preserve its site data. The page address alone cannot recover an order. If payment is pending, check its status before starting again. Email sign-in uses a verified-destination sandbox; arbitrary visitor addresses cannot receive codes. Guest checkout does not require an account."],
   ["h2","If checkout is busy"],
   ["normal","This small demo allows up to three payment-start requests per network address in each ten-minute window, with a separate budget for receipt checks. If you reach a limit, keep your cart and try again in a few minutes. A request limit is not a payment failure."],
   ["h2","After payment"],

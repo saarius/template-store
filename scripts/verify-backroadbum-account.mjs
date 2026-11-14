@@ -4,7 +4,7 @@ import { mkdirSync } from 'node:fs';
 import { chromium } from '@playwright/test';
 
 if (!process.argv.includes('--check')) {
-  console.log('No action. --check verifies the paused merchant sign-in and browser-bound receipt path; --capture saves ignored local screenshots.');
+  console.log('No action. --check reads the merchant sign-in state and browser-bound receipt path; it never submits a form. --capture saves ignored local screenshots.');
   process.exit(0);
 }
 const origin = process.env.BACKROADBUM_ORIGIN || 'https://backroadbum.com';
@@ -31,16 +31,20 @@ try {
       const page = await context.newPage();
       const response = await page.goto(origin + '/account', { waitUntil: 'domcontentloaded' });
       assert.equal(response.status(), 200);
-      await page.locator('[data-account-email-paused]').waitFor();
       assert.equal(await page.locator('h1').innerText(), 'Account');
       const sandbox = page.locator('[data-email-sandbox-notice]');
       assert.match(await sandbox.innerText(), /Cloudflare Free’s verified-destination sandbox/);
       assert.match(await sandbox.innerText(), /other visitor addresses cannot receive codes/);
       assert.match(await sandbox.innerText(), /saved receipts remain available to everyone/);
-      assert.equal(await page.locator('[data-account-start-form], [data-account-verify-form]').count(), 0);
-      const recovery = page.locator('[data-account-receipt-link]');
+      const paused = await page.locator('[data-account-email-paused]').count() === 1;
+      assert.equal(await page.locator('[data-account-start-form], [data-account-verify-form]').count(), paused ? 0 : 2);
+      const recovery = paused ? page.locator('[data-account-receipt-link]') : page.locator('[data-last-checkout-link]').first();
       assert.equal(await recovery.getAttribute('href'), '/checkout/success');
-      assert.match(await page.locator('[data-account-email-paused]').innerText(), /Only its latest checkout is saved/);
+      if (paused) assert.match(await page.locator('[data-account-email-paused]').innerText(), /Only its latest checkout is saved/);
+      else {
+        assert.equal(await page.locator('[data-account-code]').getAttribute('maxlength'), '32');
+        assert.equal(await page.getByRole('link', { name: 'Your account', exact: true }).getAttribute('href'), '/account');
+      }
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
       const box = await recovery.boundingBox();
       assert.ok(box.height >= 48);
@@ -64,12 +68,12 @@ try {
       }
       assert.equal(blockedWrites, 0);
       assert.equal(accountRequests, 0);
-      results.push({ width, javaScriptEnabled, pausedForm: true, keyboardReceiptPath: true,
+      results.push({ width, javaScriptEnabled, pausedForm: paused, keyboardReceiptPath: true,
         minimumTarget: true, noOverflow: true, accountRequests, blockedWrites });
       await context.close();
     }
   }
-  console.log(JSON.stringify({ checkedAt: new Date().toISOString(), surface: 'merchant account email pause', results }, null, 2));
+  console.log(JSON.stringify({ checkedAt: new Date().toISOString(), surface: 'merchant account sign-in and receipt path', results }, null, 2));
 } catch {
   console.error('Account verification failed; no browser state, response body or private configuration emitted.');
   process.exitCode = 1;

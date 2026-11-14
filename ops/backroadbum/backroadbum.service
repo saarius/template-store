@@ -9,12 +9,14 @@ Group=agent
 WorkingDirectory=/var/lib/trialrun/workspace/repos/template-store
 Environment=NODE_ENV=production
 EnvironmentFile=/etc/backroadbum/emdash.env
+EnvironmentFile=-/etc/backroadbum/email.env
 Environment=HOST=127.0.0.1
 Environment=PORT=4321
 Environment=EMDASH_SITE_URL=https://backroadbum.com
 Environment=BACKROADBUM_MERCHANT_PROFILE=1
 Environment=BACKROADBUM_HOSTED_REGISTRY=1
 Environment=BACKROADBUM_CHECKOUT_ENABLED=1
+Environment=BACKROADBUM_ACCOUNT_EMAIL_VERIFIED=1
 Environment=DINKUS_TEMPLATE_DB_URL=file:/var/lib/backroadbum/content.db
 Environment=DINKUS_TEMPLATE_UPLOADS_DIR=/var/lib/backroadbum/uploads
 Environment=PATH=/opt/node/bin:/usr/local/bin:/usr/bin:/bin

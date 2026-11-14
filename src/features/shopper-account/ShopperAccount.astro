@@ -2,15 +2,16 @@
 import EmailSandboxNotice from "./EmailSandboxNotice.astro";
 interface Props {
   playgroundMode?: boolean;
+  merchantMode?: boolean;
   /** Merchant-only pause until sign-in email delivery is verified. Existing sessions still load. */
   emailSignInPaused?: boolean;
   /** Set on a Playground PR preview, where Commerce refuses account calls. */
   previewUnavailableOrigin?: string;
 }
 
-const { playgroundMode = false, emailSignInPaused = false, previewUnavailableOrigin } = Astro.props;
+const { playgroundMode = false, merchantMode = false, emailSignInPaused = false, previewUnavailableOrigin } = Astro.props;
 ---
-<section class="shopper-account" aria-labelledby="shopper-account-title" data-shopper-account data-playground-mode={playgroundMode ? "true" : "false"} data-account-preview-unavailable={previewUnavailableOrigin ? "true" : "false"}>
+<section class="shopper-account" aria-labelledby="shopper-account-title" data-shopper-account data-merchant-account={merchantMode ? '' : undefined} data-playground-mode={playgroundMode ? "true" : "false"} data-account-preview-unavailable={previewUnavailableOrigin ? "true" : "false"}>
   <h1 id="shopper-account-title">Account</h1>
   {previewUnavailableOrigin ? (
   <div class="account-card account-card--stamp account-card--unavailable" data-account-preview-notice role="status">
@@ -22,7 +23,7 @@ const { playgroundMode = false, emailSignInPaused = false, previewUnavailableOri
   </div>
   ) : (
   <>
-  <p data-account-status role="status" hidden></p>
+  <p id="account-status" data-account-status role="status" hidden></p>
 
   <div class="account-signed-out" data-account-signed-out>
     {emailSignInPaused ? (
@@ -36,13 +37,14 @@ const { playgroundMode = false, emailSignInPaused = false, previewUnavailableOri
       </section>
     ) : (
     <div class="account-card account-card--stamp" data-account-stamp-card>
-      <div class="account-card__eyebrow">Verified Access · Tactile Stamp</div>
+      <div class="account-card__eyebrow">{merchantMode ? "Your Backroad Bum account" : "Verified Access · Tactile Stamp"}</div>
       <h2>{playgroundMode ? "Option 1: Verified Email Sign-In + Updates Opt-In" : "Sign in with a 6-digit email code"}</h2>
       <p>
         {playgroundMode
           ? "Enter your email address and check the updates box to receive a real 6-digit verification PIN. Verified opt-in emails are saved so we can share DinkusKit project milestones."
-          : "Enter the email address you use at checkout. We will send a one-time 6-digit verification code to view your orders and manage your default shipping address."}
+          : merchantMode ? "Use your checkout email to see your orders and save a shipping address. Only our verified sandbox mailbox can receive codes on this demo." : "Enter the email address you use at checkout. We will send a one-time 6-digit verification code to view your orders and manage your default shipping address."}
       </p>
+      <noscript><p>Sign-in needs JavaScript to request and verify an email code. Your last-checkout link remains in the footer.</p></noscript>
       <form class="account-form" data-account-start-form novalidate>
         <label for="account-email">Email address</label>
         <input id="account-email" data-account-email type="email" maxlength="254" autocomplete="email" required />
@@ -57,7 +59,8 @@ const { playgroundMode = false, emailSignInPaused = false, previewUnavailableOri
 
       <form class="account-form account-verify-form" data-account-verify-form hidden novalidate>
         <label for="account-code">6-digit verification code</label>
-        <input id="account-code" data-account-code type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required />
+        <input id="account-code" data-account-code type="text" inputmode="numeric" pattern="\s*[0-9]{6}\s*" maxlength="32" autocomplete="one-time-code" aria-describedby="account-code-hint" required />
+        <p id="account-code-hint">Paste the six-digit code from your email. Surrounding spaces are ignored.</p>
         <button type="submit" data-account-verify>Verify &amp; sign in</button>
       </form>
     </div>

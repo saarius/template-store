@@ -1,43 +1,36 @@
 # Shopper email setup
 
-## Verified · November 14, 2026
+## Verified and serving · November 14, 2026
 
-The deployed native `backroadbum-email-relay` plugin registers one exclusive `email:deliver` hook with `hooks.email-transport:register`. It is mounted only for this merchant’s hosted-Registry Node build, alongside the unchanged signed Commerce 0.8.0, Payments 0.5.0 and Ship 0.3.1. Relay URL/token/from are read from `process.env` **inside the delivery handler**, never plugin options or `import.meta.env`.
+The native `backroadbum-email-relay` plugin registers an exclusive `email:deliver` hook with `hooks.email-transport:register`, only for this merchant’s hosted-Registry Node build. It reads the provisioned URL/token/from from `process.env` inside delivery, never options or `import.meta.env`. Signed Commerce0.8.0 / Payments0.5.0 / Ship0.3.1 and hosted consents are unchanged.
 
-Native **Settings → Email** reports `available: true`, one selected provider and Send Test. A test message sent through that UI arrived through real MX into the provisioned inbox. A separate real Commerce OTP arrived there too: a live same-origin browser API journey passed wrong-PIN rejection, whitespace-pasted valid sign-in, an empty own-orders read, profile update/reload/clear and sign-out with subsequent session denial. Inbox messages were deleted, the original blank profile restored, and no code or session capability retained.
+Native Settings → Email reports available/selected transport; a native test message and actual Commerce OTP have arrived through real MX. **TEST1010** then bought one Field Book for $12 plus $5 shipping, using one preparation, one start and one Stripe TEST Pay submission. Real email and the actual Account form proved wrong-PIN rejection, whitespace-pasted sign-in, only the matching order among ten Orders, profile save/reload/clear, sign-out revocation and stale-browser session removal. Consumed inbox messages were deleted and the original blank profile restored; no OTP or shopper capability was retained.
 
-Evidence: workspace `evidence/2026-11-14-email-relay/{native-settings,native-delivery,shopper-api,native-guide}.json`. The guide’s one outdated delivery-unavailable sentence was corrected through the native CMS API and republished; its other content was retained. Account/Test store disclose Cloudflare Free’s verified-destination restriction.
+`/account` is now open with the Field Journal dual theme, proportional fields, associated code corrections and a footer link. The active presentation gate is `BACKROADBUM_ACCOUNT_EMAIL_VERIFIED=1` in the store’s `account-email.conf` systemd drop-in, not the execution controller. This was enabled after paid-order/API/preview proof and immediately qualified through the live UI. Guest 4242 checkout and browser-bound receipts remain independent; arbitrary visitor addresses still cannot receive codes on Cloudflare Free. This is not unrestricted email service or email-only receipt recovery for all visitors.
 
-## Qualification still needed
+Evidence: workspace `evidence/2026-11-14-shopper-account/{purchase,qualification-final,provider-rejection}.json`, browser checks, audits and `cycle.md`. The original UI report stops at its mistaken HTTP503 expectation; a separate targeted rejection check completes the evidence without another OTP or purchase. Signed Commerce represents this logical delivery error in HTTP200 `{success:true,data:{ok:false,error:{code:"EMAIL_UNAVAILABLE"}}}`; the form correctly displays a recoverable error. It does not reveal whether the destination owns an account. Two attempts to the reserved unverified `example.invalid` destination were rejected; no arbitrary person or owner Gmail was mailed.
 
-**The public sign-in form remains paused.** The test mailbox has no paid order, so the empty read is not matching-paid-order isolation proof. One deliberately guarded Stripe TEST purchase under the provisioned mailbox, positive own-order matching versus other guest orders, the actual public form’s wrong/paste/valid lifecycle, and responsive active-form auditing remain next. The account API already works behind Commerce’s origin/session checks; the pause is presentation, not a security boundary. Guest 4242 checkout and original-browser receipts remain independent and open.
+## Completed operation — do not replay
 
-Do not replay TEST1009 or historical payment drivers. Use a new explicit purchase guard and preserve all existing paid records. Reopen with `BACKROADBUM_ACCOUNT_EMAIL_VERIFIED=1` only after that remaining journey is qualified; the current API success alone does not change the switch. A future cycle may reassess the presentation pause with fresh evidence, but must keep the verified-destination limitation honest.
+Private `/etc/backroadbum/operator/shopper-email-test-order.json` records paid1010 and `accountVerifiedAt`; `shopper-email-test-browser.json` retains its original guest receipt authority, **not** a shopper login. Both are0600. No label was bought;1010 remains Processing. The one-off purchase and actual-UI drivers are kept outside git in the evidence directory, reject completed operation state, and are not routine tests. Never replay TEST1009,1010 or historical payment/label drivers. A future scenario needs its own explicit operation guard and pre-submission persistence; uncertainty means inspect the existing Session, not start again.
 
-## Operator commands · Node 24, primary `repos/template-store`
+## Safe operator checks · Node24, primary `repos/template-store`
 
 ```sh
-# Read-only after necessary staff authentication; no mail or shopper session.
-node scripts/inspect-backroadbum-email.mjs --check
-node scripts/verify-backroadbum-account.mjs --check
-
-# Explicit mail actions; no action without these flags. Do not run as routine health probes.
-node scripts/verify-backroadbum-email-delivery.mjs --send-native-test
-node scripts/verify-backroadbum-shopper-email.mjs --verify-real-email
+node scripts/inspect-backroadbum-email.mjs --check  # staff authentication, then read-only
+node scripts/verify-backroadbum-account.mjs --check # reads active/paused form and receipt navigation
+node scripts/verify-backroadbum-account-input.mjs --check # intercepted synthetic PIN fixture; NO mail/session
 ```
 
-The first mail command uses the native UI, overrides the recipient, and blocks non-read requests other than one exact test POST to `/_emdash/api/settings/email` with the verified mailbox. Installed EmDash 1.4.0’s source comment mentions `/email/test`, but the actual native action is POST `/email`. The second uses actual Commerce routes from the selected Registry runtime ID, not the package name; it sends one OTP, polls real inbound delivery, handles credentials only in memory, restores profile state, revokes its session and deletes consumed inbox mail. Both emit redacted summaries only. Initial driver path mistakes were local verification retries, not serving/provider failures.
+These are not independent mail monitors. Explicit `verify-backroadbum-email-delivery.mjs --send-native-test` and `verify-backroadbum-shopper-email.mjs --verify-real-email` are separate real-mail actions, default to no action and must not run routinely. The latter still reports matching-order qualification false by design; the completed1010 UI evidence above is the positive own-orders proof. Native Send Test actually posts to `/_emdash/api/settings/email`, despite installed EmDash1.4.0’s `/email/test` source comment. Account endpoints use the selected Registry runtime ID, not its package name.
 
-## Provider safety and limits
+## Safety and known limits
 
-- `/etc/backroadbum/email.env` is owner-provisioned and protected; do not print or change it. Only `BACKROADBUM_TEST_SHOPPER_EMAIL` (`shopper-test@backroadbum.com`) is approved for automated mail. **Never send to the owner’s personal Gmail.** The private relay token is not a shopper inbox credential and must never be exposed.
-- Cloudflare Free sends only to verified destinations. Arbitrary visitor addresses cannot receive OTPs; do not advertise unrestricted email login or publish an inbox. Provider health and HTTP send acceptance are not inbound-delivery proof.
-- The transport permits only the provisioned HTTPS origin, rejects redirects and invalid runtime configuration, uses a 15-second fetch deadline within a 20-second hook, never retries automatically, and throws generic errors without provider bodies, message contents or network causes. A timeout might already have delivered mail; inspect before explicitly resending.
-- Linode SMTP remains blocked. Do not build another provider or local service replica, enable console capture in production, change hosted consents or replace a signed plugin.
-- Provider-rejection behavior through signed Commerce still needs focused qualification without sending to arbitrary real addresses or weakening intentional enumeration safeguards. Mocked transport failures pass unit tests; that is not live Commerce/provider rejection proof.
+- Keep `/etc/backroadbum/email.env` protected and unchanged. Only `shopper-test@backroadbum.com` is approved for automated successful delivery; **never mail the owner’s personal Gmail**. The relay token and inbox contents must never be public. Health/send acceptance is not actual inbound-delivery proof.
+- Cloudflare Free delivers only to verified destinations. The transport permits only the provisioned HTTPS origin, rejects redirects/malformed runtime configuration, uses a15-second fetch within a20-second hook, does not retry and throws generic errors without provider bodies, message contents or network causes. A timeout may already have delivered mail; inspect before any explicit resend.
+- The real rejected reserved destination produced `EMAIL_UNAVAILABLE`, a visible error and a re-enabled Send button, not a session. No enumeration policy or plugin contract was changed. Avoid arbitrary real-address testing.
+- Bodyless `GET account/profile` still returns400/INVALID_PLUGIN_REQUEST in signed0.8.0, the known declaration bug fixed upstream by merged Commerce257. The UI’s orders-based profile read and valid POSTs work. Do not file it again or install an unsigned patch; future signed releases need separate qualification.
+- The former maxlength6 code control could truncate leading-space paste before the existing trim validation. The merchant now permits32 input characters, retains strict six-digit trimmed validation and associates code errors with the field. A potential upstream backport needs an unchanged-main reproduction, duplicate search and owning verification; no upstream issue/PR has been opened for it.
+- Signed-in contrast/control auditing uses a sanitized, script-free frozen DOM from the real authorized UI, plus current CSS; it does not establish interactive behavior by itself. The separate live real-session journey supplies that behavior. Never freeze localStorage, codes, tokens or private identities into public proof.
 
-## Known signed-release limitation
-
-Signed Commerce 0.8.0’s bodyless `GET account/profile` returns HTTP 400 `INVALID_PLUGIN_REQUEST`, independently confirmed after real sign-in. This is the declaration bug already fixed in merged [Commerce #257](https://github.com/dinkuskit/commerce/pull/257); do not file it again or install an unsigned patch. The starter UI reads its initial profile through `account/orders` and sends well-formed profile POSTs; both worked in the live API journey. A future signed release needs separate qualification.
-
-Historical missing-provider observations from November 13 remain in git and `evidence/2026-11-13-email-setup-{native,inspection}.json`; they no longer describe the serving transport. The original account pause was a store-configuration gap, not a hosted DinkusKit connection outage.
+Historical transport setup and missing-provider observations remain in git and `evidence/2026-11-14-email-relay/`, with November13 evidence linked there. Linode SMTP remains blocked; do not build another provider, local cloud-service replica, production console capture or unsigned Registry substitute.

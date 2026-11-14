@@ -14,6 +14,7 @@ import {
   resolvePlaygroundAccountSiteOrigin,
 } from "../features/shopper-account/playground-runtime.js";
 import "../features/store-shell/global.css";
+import "../features/shopper-account/account-screen.css";
 
 const profile = readStorefrontProfile();
 Astro.response.headers.set("Cache-Control", "no-store");
@@ -44,6 +45,7 @@ const previewUnavailable = isPlayground && isPlaygroundPreviewHost(Astro.url, pl
     <main id="main-content">
       <ShopperAccount
         playgroundMode={playgroundMode}
+        merchantMode={!isPlayground && process.env.BACKROADBUM_MERCHANT_PROFILE === '1'}
         emailSignInPaused={!isPlayground && isMerchantEmailSignInPaused()}
         previewUnavailableOrigin={previewUnavailable ? playgroundAccountOrigin : undefined}
       />

@@ -43,13 +43,13 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('A code that actually arrives.');
-        await expect(page.locator('.dashboard-latest')).toContainText('wrong-PIN rejection, pasted-PIN sign-in');
-        await expect(page.locator('.dashboard-latest')).toContainText('matching-order isolation and the public form journey are still unqualified');
+        await expect(page.locator('.dashboard-latest')).toContainText('One inbox. One order.');
+        await expect(page.locator('.dashboard-latest')).toContainText('excluding the nine earlier guest Orders');
+        await expect(page.locator('.dashboard-latest')).toContainText('paste-safe code field and clear verified-destination limits');
         await expect(page.locator('#history')).toContainText('original shopper cart capabilities preserved');
         await expect(page.locator('#history a[href="https://github.com/dinkuskit/template-store/pull/227#issuecomment-6881635674"]')).toHaveCount(1);
         await expect(page.locator('#history')).toContainText('an unavailable lookup leaves paid facts and printing intact');
-        await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('latest self-dogfood: TEST1009');
+        await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('Latest self-dogfood: TEST1010');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
@@ -155,8 +155,8 @@ try {
         await expect(mediaCheck).not.toContainText('/var/');
         await expect(page.locator('#history')).toContainText('a newer or changed archive cannot inherit an older passing result');
         const email = page.locator('.status-list > div').filter({ has: page.locator('dt').filter({ hasText: /^Email sign-in$/ }) });
-        await expect(email).toContainText('native EmDash test mail and real Commerce OTP arrived');
-        await expect(email).toContainText('Paused pending matching-order and form qualification');
+        await expect(email).toContainText('real email and the shopper form match TEST1010');
+        await expect(email).toContainText('Verified-destination sandbox open');
         await expect(email).toContainText('arbitrary visitor addresses cannot receive codes on Cloudflare Free');
         await expect(page.locator('#history')).toContainText('no installed or selected provider and no test-email action');
         const editorial = page.locator('.status-list > div').filter({ hasText: 'Editorial' });
