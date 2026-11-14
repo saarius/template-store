@@ -1,0 +1,16 @@
+# Hosted test-order dogfood
+
+## Completed Field Book run · November 14, 2026
+TEST1009 bought two County Line Field Books through the public shopper flow: $24 merchandise + $5 shipping = $29 in the same Stripe test Session. One Pay submission created one new canonical TEST order. Native Ship used the saved Camp small box and automatically calculated 5 oz: two illustrative 2 oz items plus the 1 oz empty box. One free Pitney Bowes USPS Ground Advantage sandbox label was purchased; its displayed $7.33 is a sandbox quote, not charged postage. Opening native Commerce Orders reconciled that label to Completed with matching USPS tracking, not delivered or physically shipped.
+
+The original eight Orders and all original cart/capability/payment-association rows remain unchanged. One new row was added to each of those checkout collections and Orders; numbering advanced once. A rolling readiness row and an internal `__kv` token also refreshed. Actual CMS products/categories/pages remained byte-identical. Evidence: `evidence/2026-11-14-merchant-dogfood/`; original source rows are private, not in git.
+
+## Recovery authority and no-replay guards
+Private `/etc/backroadbum/operator/field-book-test-order.json` is **completed** and records one payment/label submission, the canonical order ID, order number1009 and PDF hash. The paired `field-book-test-browser.json` retains that original capability; `field-book-test-label.pdf` is the existing sandbox PDF. All are0600. Do not rerun historical purchase or label drivers: inspect the existing receipt with `scripts/inspect-backroadbum-receipt.mjs --check --fulfillment --state-file=PATH`, or use `scripts/inspect-backroadbum-shipment.mjs --check --order=1009 --hosted --pdf`. Neither read command buys or resyncs anything.
+
+For any separate future merchant scenario, use a new explicitly scoped guard/browser, persist intent before a submission and retain its response/uncertainty instead of starting again. Require hosted TEST settings, a `checkout.stripe.com` `cs_test_` Session, Sandbox indication and the no-real-charge instructions before entering4242 or pressing Pay. A saved original test Session may be reopened without another prepare/start; never treat a selector timeout as evidence that a provider operation failed.
+
+## UI observations, not framework incidents
+Stripe now renders its payment-method chooser and inputs in a secure `js.stripe.com` embedded form; wait for that frame’s test-mode copy before selecting Card. The former main-document `#cardNumber` selector is obsolete for this Session. Ship’s Service control is a Block Kit custom combobox, not native `<option>` elements; native Orders uses separate “Inspect #1009 (TEST)” actions rather than table rows. Driver adaptations caused no duplicate payment or label; one quote was refreshed before the single buy.
+
+The signed guest receipt still exposes paid facts without canonical completion/tracking, matching existing Commerce275. TEST1009’s UUID fallback heading is not its native order number: join the retained paid-order ID to the canonical TEST record, never parse a leading digit from that heading. Receipt media remains a neutral “No image” placeholder in this run; published product art and native label PDF remain intact. Neither observed legacy omission is repaired or qualified as a new upstream regression here.

@@ -41,10 +41,11 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Keep your place while checking.');
-        await expect(page.locator('.dashboard-latest')).toContainText('the disappearing button still owns it');
-        await expect(page.locator('.dashboard-latest')).toContainText('browser interaction proof, not a new payment');
-        await expect(page.locator('.dashboard-latest a[href="/pr-proof/storefront-status-focus/after-pending-390-light.png"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('From the gear shelf to a paid receipt.');
+        await expect(page.locator('.dashboard-latest')).toContainText('TEST1009: $24 merchandise plus $5 shipping');
+        await expect(page.locator('.dashboard-latest')).toContainText('the eight earlier Orders remain unchanged');
+        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/commerce/issues/275"]')).toBeVisible();
+        await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('latest self-dogfood: TEST1009');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
