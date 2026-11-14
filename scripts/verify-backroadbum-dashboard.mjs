@@ -41,10 +41,10 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Fit guidance, authored in EmDash.');
-        await expect(page.locator('.dashboard-latest')).toContainText('The draft stayed private before publication');
-        await expect(page.locator('.dashboard-latest')).toContainText('no measured size range or tested UPF claim');
-        await expect(page.locator('.dashboard-latest a[href="/products/long-way-cap#product-details"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('A backup that can serve the catalog.');
+        await expect(page.locator('.dashboard-latest')).toContainText('outbound networking blocked');
+        await expect(page.locator('.dashboard-latest')).toContainText('eight Orders and all scoped business rows stay unchanged');
+        await expect(page.locator('.dashboard-latest')).toContainText('Admin sign-in, hosted authorization and off-host recovery remain unverified');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
@@ -136,8 +136,10 @@ try {
         await expect(page.locator('.status-list > div').filter({ hasText: 'Contact corrections' })).toContainText('validation and payment guards unchanged');
         const recovery = page.locator('.status-list > div').filter({ hasText: 'Recovery coverage' });
         await expect(recovery).toContainText('encrypted settings recovered in a separate local drill');
-        await expect(recovery).toContainText('ready media sizes/hashes only');
-        await expect(recovery).toContainText('full runtime, admin sign-in, hosted authorization and off-host recovery unverified');
+        await expect(recovery).toContainText('ready media sizes/hashes automatically');
+        await expect(recovery).toContainText('runtime drill served six pages');
+        await expect(recovery).toContainText('current deployed code/dependencies reused, not restored from backup');
+        await expect(recovery).toContainText('admin sign-in, hosted authorization and off-host recovery unverified');
         const mediaCheck = page.locator('[data-upload-recovery]');
         await expect(mediaCheck).toContainText(/9 ready media files match archived sizes and hashes · 15 upload files restored · checked/);
         await expect(mediaCheck).not.toContainText('Unavailable');

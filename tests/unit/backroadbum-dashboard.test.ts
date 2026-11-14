@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates opt-in archived runtime proof from unattended media checks and remaining recovery gaps', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const coverage = source.match(/<div><dt>Recovery coverage<\/dt>[\s\S]*?<\/div>/)?.[0];
+    expect(coverage).toContain('ready media sizes/hashes automatically');
+    expect(coverage).toContain('opt-in runtime drill');
+    expect(coverage).toContain('private network namespace');
+    expect(coverage).toContain('current deployed code/dependencies reused, not restored from backup');
+    expect(coverage).toContain('admin sign-in, hosted authorization and off-host recovery unverified');
+    expect(source).toContain('A backup that can serve the catalog.');
+  });
   it('separates verified original checkout release from unknown provider cause', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const current = source.match(/<div><dt>Unpaid recovery<\/dt>[\s\S]*?<\/div>/)?.[0];
