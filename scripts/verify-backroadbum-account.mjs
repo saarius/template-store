@@ -42,7 +42,7 @@ try {
       assert.equal(await recovery.getAttribute('href'), '/checkout/success');
       if (paused) assert.match(await page.locator('[data-account-email-paused]').innerText(), /Only its latest checkout is saved/);
       else {
-        assert.equal(await page.locator('[data-account-code]').getAttribute('maxlength'), '32');
+        assert.equal(await page.locator('[data-account-code]').getAttribute('maxlength'), null);
         assert.equal(await page.getByRole('link', { name: 'Your account', exact: true }).getAttribute('href'), '/account');
       }
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
