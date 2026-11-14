@@ -41,11 +41,11 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('From the gear shelf to a paid receipt.');
-        await expect(page.locator('.dashboard-latest')).toContainText('TEST1009: $24 merchandise plus $5 shipping');
-        await expect(page.locator('.dashboard-latest')).toContainText('the eight earlier Orders remain unchanged');
-        await expect(page.locator('.dashboard-latest')).toContainText('an unavailable lookup leaves paid facts and printing intact');
-        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/commerce/issues/275"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('A page from the road.');
+        await expect(page.locator('.dashboard-latest')).toContainText('All 17 blocks were saved and reloaded');
+        await expect(page.locator('.dashboard-latest')).toContainText('all nine Orders remain unchanged');
+        await expect(page.locator('.dashboard-latest a[href="/field-note-a-page-from-the-road"]')).toBeVisible();
+        await expect(page.locator('#history')).toContainText('an unavailable lookup leaves paid facts and printing intact');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('latest self-dogfood: TEST1009');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
@@ -152,8 +152,8 @@ try {
         await expect(email).toContainText('delivery remains unverified');
         await expect(page.locator('#history')).toContainText('no installed or selected provider and no test-email action');
         const editorial = page.locator('.status-list > div').filter({ hasText: 'Editorial' });
-        await expect(editorial).toContainText('Six EmDash field notes');
-        await expect(editorial.getByRole('link', { name: 'The reset after a road day', exact: true })).toHaveAttribute('href', '/field-note-after-a-road-day');
+        await expect(editorial).toContainText('Seven EmDash field notes');
+        await expect(editorial.getByRole('link', { name: 'A page from the road', exact: true })).toHaveAttribute('href', '/field-note-a-page-from-the-road');
         await expect(page.locator('#history')).toContainText('Its draft stayed off the public route, index and search until publication');
         await expect(page.locator('#history')).toContainText('four headings, four bullet items and two internal links');
         await recovery.scrollIntoViewIfNeeded();

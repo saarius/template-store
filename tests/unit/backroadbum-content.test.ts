@@ -94,6 +94,23 @@ describe('Backroad Bum source-authored merchant content', () => {
     expect(route).toContain('.product-variant:has(input:focus-visible)');
     expect(route).toContain('min-height:48px;min-width:64px');
   });
+  it('records notebook-note authorship without making the source a second runtime authority', () => {
+    const note = JSON.parse(readFileSync('seed/backroadbum-journal-note.json', 'utf8'));
+    expect(note.slug).toBe('field-note-a-page-from-the-road');
+    expect(note.sections).toHaveLength(17);
+    expect(note.sections.filter((block: any) => block.style === 'h2')).toHaveLength(4);
+    expect(note.sections.filter((block: any) => block.listItem === 'number')).toHaveLength(4);
+    expect(note.sections.filter((block: any) => block.style === 'blockquote')).toHaveLength(1);
+    expect(note.sections.map((block: any) => block.text).join(' ')).toContain('An invented entry');
+    expect(note.sections.filter((block: any) => block.link).map((block: any) => block.link.href)).toEqual([
+      '/products/county-line-field-book', '/field-note-before-the-signal-drops',
+    ]);
+    expect(JSON.stringify(note)).not.toMatch(/\$\d|field-tested|sk_test_|guaranteed/i);
+    const route = readFileSync('src/pages/[slug].astro', 'utf8');
+    expect(route).not.toContain('backroadbum-journal-note');
+    expect(route).toContain('.field-note .cms-page__body :global(blockquote){margin:var(--space-6) 0;');
+    expect(route).toContain('border-inline-start:3px solid var(--store-accent)');
+  });
   it('keeps field notes editable in EmDash Pages', () => {
     const notes = pages.filter((p: any) => p.slug.startsWith('field-note-'));
     expect(notes).toHaveLength(4);

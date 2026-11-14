@@ -1,0 +1,24 @@
+{
+  "slug": "field-note-a-page-from-the-road",
+  "title": "A page from the road",
+  "searchTerm": "notebook",
+  "sections": [
+    { "style": "normal", "text": "A notebook does not need a complete account of the day. A few lines can hold the part a photograph missed: the sound beside the picnic table, a small kindness, or the thing you would pack differently. Write while you are stopped, with the engine off and somewhere comfortable to sit." },
+    { "style": "h2", "text": "Start small enough to finish" },
+    { "style": "normal", "text": "Put the date at the top and name the place in a way that will mean something to you later. A town, a marked picnic area or a broad stretch of country is enough. Leave room for a sketch, but do not make a good drawing the price of getting started." },
+    { "style": "normal", "text": "Use the notebook you already have. If you are browsing our gear, the ", "link": { "text": "County Line Field Book", "href": "/products/county-line-field-book" }, "after": " is our pocket-notebook design. It is not waterproof; keep it dry rather than trusting the cover to protect a day's notes." },
+    { "style": "h2", "text": "Try four short lines" },
+    { "style": "normal", "text": "Give each prompt one line. There is no need to fill the page:" },
+    { "style": "normal", "listItem": "number", "text": "Where you stopped: a name or a simple description you will recognize." },
+    { "style": "normal", "listItem": "number", "text": "One detail: something you heard, smelled, noticed or laughed about." },
+    { "style": "normal", "listItem": "number", "text": "What made the stop work: a seat in the shade, an easy-to-reach lunch or enough time." },
+    { "style": "normal", "listItem": "number", "text": "One change for next time: a smaller bag, a spare spoon or an earlier start." },
+    { "style": "normal", "text": "An invented entry, just to show how little you need:" },
+    { "style": "blockquote", "text": "Saturday, at a marked picnic area. A spoon tapping the mug and wind in the trees. Lunch was packed at the top of the bag. Next time: bring a cloth for the table." },
+    { "style": "h2", "text": "Let the place keep a little privacy" },
+    { "style": "normal", "text": "A personal memory does not have to become a public recommendation. Before sharing a page or photograph, leave out other people's names, faces and vehicle details unless they have agreed. Do not turn a quiet wildlife spot or somebody's private gate into a set of directions." },
+    { "style": "h2", "text": "Read one page before the next outing" },
+    { "style": "normal", "text": "At home, let the notebook dry if it is damp and put it beside the things you use again. Next time, read the last entry and choose one useful change. The point is to notice more, not to produce a perfect record or another list of things to buy." },
+    { "style": "normal", "text": "Your notes are a memory aid, not a navigation plan. Use ", "link": { "text": "Before the signal drops", "href": "/field-note-before-the-signal-drops" }, "after": " for a separate check of maps, current road information and a simple way to change the day's plan." }
+  ]
+}

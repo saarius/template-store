@@ -96,6 +96,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
   .cms-reading .cms-page__body :global(p:first-child){font-family:var(--font-display);font-size:var(--text-xl);font-weight:500;line-height:1.5;color:var(--store-ink);margin-bottom:var(--space-7)}
   .cms-reading .cms-page__body :global(ol),.cms-reading .cms-page__body :global(ul){margin:0 0 1.5rem;padding-inline-start:1.6em}
   .cms-reading .cms-page__body :global(li + li){margin-top:.75rem}
+  .field-note .cms-page__body :global(blockquote){margin:var(--space-6) 0;padding:var(--space-4) var(--space-5);border-inline-start:3px solid var(--store-accent);background:var(--store-surface);color:var(--store-ink);font:inherit;overflow-wrap:anywhere}
   .cms-reading .cms-page__body :global(a){color:var(--store-ink);text-decoration:underline;text-underline-offset:.18em}
   .cms-reading .cms-page__body :global(a:hover){text-decoration-thickness:2px}
 </style>

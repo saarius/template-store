@@ -88,6 +88,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - A six-surface Before/After showcase links original1440px captures to final-phase Light/Dark desktop and390px phone captures. Media stays outside git. All five archived instruction versions, including Steer4, remain in date order and unchanged.
 - Dashboard components add no JavaScript. Navigation, disclosures, instructions and evidence work without scripting; only the existing shared appearance preference needs enhancement.
 
+## Journal examples
+Native field-note quotes use a body-type inset with zero inline margins, existing surface/ink tokens, a rust leading rule and16/24px inner padding. This preserves reading width on phones rather than inheriting40px browser margins on both sides; quotes are examples within the article, not oversized testimonials. Authored sample entries must be explicitly identified as invented nearby, never attributed to a real traveler or presented as a product field test. Headings, list items, links and quote text remain native CMS content; the source manuscript is only an authorship/test checklist.
+
 ## Hosted order reporting
 A dated TEST order is curated self-dogfood evidence, never visitor volume or customer-sales telemetry. Field Book checkout reports frozen merchandise/shipping totals separately from sandbox postage and illustrative package weights; canonical completion and hosted tracking are not inserted into an unqualified guest receipt. Keep operator guards, Session URLs, contacts and label PDFs private; reporting uses existing dashboard disclosures and adds no public order lookup.
 
@@ -118,7 +121,7 @@ A rejected explicit Add associates its existing alert with Quantity via a stable
 The public EmDash ledger links two synthetic phone captures showing a successful weight save dismissing the Settings sheet. They are before/after an interaction, not before/after a repair; the original EmDash/Kumo visual system is retained. Inspect `aria-hidden`, inertness and viewport geometry when testing a translated drawer: a CSS-visible offscreen element is not a usable open control.
 
 ## Protected runtime and completed phases
-Visual authorization is broad; business authority is not. Preserve signed Commerce0.8.0 / Payments0.5.0 / Ship0.3.1, hosted consents, test-only admission, authoritative prices/availability, distinct selected members, guest cart storage, pending checkout protection, retained receipt recovery/printing, every Order, native mug media/specs and all six field notes. No CMS publication, replacement payment, shipment resync, credential exposure or /proof runtime change is part of the rebrand.
+Visual authorization is broad; business authority is not. Preserve signed Commerce0.8.0 / Payments0.5.0 / Ship0.3.1, hosted consents, test-only admission, authoritative prices/availability, distinct selected members, guest cart storage, pending checkout protection, retained receipt recovery/printing, every Order, native mug media/specs and all published field notes. No CMS publication, replacement payment, shipment resync, credential exposure or /proof runtime change is part of the rebrand.
 
 1. **Phase 1 — live:** baseline captures, tokens/fonts, appearance, shell and home.
 2. **Phase 2 — live:** shop/collection/PDP/search hierarchy, native gallery/spec/care and variant controls; Regular/Sale comparison only when the signed projection actually supplies both.

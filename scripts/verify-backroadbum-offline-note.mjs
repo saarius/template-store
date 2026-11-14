@@ -10,12 +10,16 @@ const listKinds = [...new Set(source.sections.filter(block => block.listItem).ma
 if (listKinds.length !== 1 || !['number', 'bullet'].includes(listKinds[0])) throw Error('Expected one native list kind');
 const listTag = listKinds[0] === 'bullet' ? 'ul' : 'ol';
 const base = process.env.STORE_URL || 'https://backroadbum.com';
+// A private built preview can serve public canonical URLs without impersonating
+// the public origin or changing the store's configured URL.
+const canonicalOrigin = process.env.STORE_CANONICAL_ORIGIN || base;
 const output = new URL(`../runs/backroadbum/${customSource ? source.slug : 'offline-note'}/`, import.meta.url);
 await mkdir(output, { recursive: true });
 const fullText = block => block.text + (block.link ? block.link.text + block.after : '');
 const headings = source.sections.filter(block => block.style === 'h2').map(fullText);
 const items = source.sections.filter(block => block.listItem).map(fullText);
 const paragraphs = source.sections.filter(block => block.style === 'normal' && !block.listItem).map(fullText);
+const quotes = source.sections.filter(block => block.style === 'blockquote').map(fullText);
 const links = source.sections.filter(block => block.link).map(block => block.link);
 const results = [];
 const browser = await chromium.launch({ headless: true });
@@ -39,7 +43,7 @@ try {
       await discovery.click();
       await expect(page).toHaveURL(base + '/' + source.slug);
       await expect(page.locator('h1')).toHaveText(source.title);
-      await expect(page.locator('link[rel=canonical]')).toHaveAttribute('href', base + '/' + source.slug);
+      await expect(page.locator('link[rel=canonical]')).toHaveAttribute('href', canonicalOrigin + '/' + source.slug);
       await expect(page.locator('meta[name=description]')).toHaveAttribute('content', source.sections[0].text);
       const body = page.locator('[data-cms-page-body]');
       await expect(body.locator('h2')).toHaveText(headings);
@@ -48,6 +52,18 @@ try {
       const itemGap = await body.locator(`${listTag} > li`).nth(1).evaluate(e => parseFloat(getComputedStyle(e).marginTop));
       expect(itemGap).toBeGreaterThanOrEqual(12);
       await expect(body.locator(':scope > p')).toHaveText(paragraphs);
+      await expect(body.locator('blockquote')).toHaveText(quotes);
+      for (const quote of await body.locator('blockquote').all()) {
+        const geometry = await quote.evaluate(element => {
+          const parent = element.closest('[data-cms-page-body]');
+          const style = getComputedStyle(element);
+          return { width: element.getBoundingClientRect().width, bodyWidth: parent.getBoundingClientRect().width,
+            padding: parseFloat(style.paddingInlineStart), font: style.fontFamily, bodyFont: getComputedStyle(parent).fontFamily };
+        });
+        expect(geometry.width).toBeGreaterThanOrEqual(geometry.bodyWidth * .9);
+        expect(geometry.padding).toBeGreaterThanOrEqual(16);
+        expect(geometry.font).toBe(geometry.bodyFont);
+      }
       await expect(body.getByRole('link')).toHaveCount(links.length);
       for (const link of links) {
         const anchor = body.getByRole('link', { name: link.text, exact: true });
@@ -82,7 +98,7 @@ try {
       expect(writes).toEqual([]); expect(checkoutRequests).toEqual([]); expect(errors).toEqual([]);
       results.push({ width, javaScriptEnabled, sourceBlocks: source.sections.length, headings: headings.length,
         orderedItems: listKinds[0] === 'number' ? items.length : 0, bulletItems: listKinds[0] === 'bullet' ? items.length : 0,
-        inlineLinks: links.length, sameTabKeyboardLinks: true, sourceTextExact: true,
+        quotes: quotes.length, inlineLinks: links.length, sameTabKeyboardLinks: true, sourceTextExact: true,
         indexAndSearchDiscovery: true, separatedListItems: true, brandedUnderlinedLinks: true, focusRing: true,
         noOverflow: true, writes: 0, checkoutRequests: 0, browserErrors: 0 });
     } finally { await context.close(); }
