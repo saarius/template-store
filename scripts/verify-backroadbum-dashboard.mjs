@@ -43,10 +43,10 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Restored—but not back on the shelf.');
-        await expect(page.locator('.dashboard-latest')).toContainText('without touching the live catalog');
-        await expect(page.locator('.dashboard-latest')).toContainText('not a deployed repair');
-        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/commerce/issues/276"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('A feed, with nothing on the shelf.');
+        await expect(page.locator('.dashboard-latest')).toContainText('original shopper cart capabilities preserved');
+        await expect(page.locator('.dashboard-latest')).toContainText('no marketing channel was enabled');
+        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/template-store/pull/227#issuecomment-6881635674"]')).toBeVisible();
         await expect(page.locator('#history')).toContainText('an unavailable lookup leaves paid facts and printing intact');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('latest self-dogfood: TEST1009');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
@@ -55,6 +55,8 @@ try {
         await expect(page.locator('[data-redesign-showcase]')).toContainText('signed plugins, catalog facts and order records remain intact');
       }
       if (view === 'contributions') {
+        await expect(page.locator('#reports a[href="https://github.com/dinkuskit/template-store/pull/227#issuecomment-6881635674"]')).toBeVisible();
+        await expect(page.locator('#reports')).toContainText('Observed consequence of an explicit open decision, not a new defect or repair.');
         await expect(page.locator('#reports a[href="https://github.com/dinkuskit/commerce/issues/276"]')).toBeVisible();
         await expect(page.locator('#reports')).toContainText('Open workflow report, not a repair');
         await expect(page.locator('#reports a[href="https://github.com/dinkuskit/commerce/issues/275"]')).toBeVisible();

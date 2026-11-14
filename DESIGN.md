@@ -94,6 +94,9 @@ The browser’s Print / Save as PDF command gets a field-note-only paper layout;
 ## Journal examples
 Native field-note quotes use a body-type inset with zero inline margins, existing surface/ink tokens, a rust leading rule and16/24px inner padding. This preserves reading width on phones rather than inheriting40px browser margins on both sides; quotes are examples within the article, not oversized testimonials. Authored sample entries must be explicitly identified as invented nearby, never attributed to a real traveler or presented as a product field test. Headings, list items, links and quote text remain native CMS content; the source manuscript is only an authorship/test checklist.
 
+## Catalog discovery reporting
+A healthy empty agent feed is not a populated catalog success or a broken storefront. Keep the actual Google/Meta channel-eligibility consequence distinct from the store-level catalog switch and from synthetic populated Worker tests; link the existing upstream follow-up rather than declaring a new regression. A downstream sync preserves this entire theme and the legacy browser capability keys; it does not authorize external channel enrollment, a server-cart cutover or shared-service deployment.
+
 ## Merchant workflow reporting
 Keep installed interaction proof separate from a repair comparison: the product-restore captures show the same signed plugin before and after an explicit native unpublish→publish workaround, not a new implementation. Dashboard reporting must say the experiment used a disposable copy and that Restore→Draft remains the accepted contract. Redact contact text, retain the original EmDash/Block Kit visual system and link the owning workflow report; do not imply that a live CMS summary alone proves Commerce sellability or that historical order records are visitor metrics.
 
