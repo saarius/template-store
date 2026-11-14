@@ -1,0 +1,21 @@
+{
+  "slug": "last-light-fleece",
+  "summary": "A pullover for the hour between packing dinner away and deciding to stay outside a little longer. A relaxed unisex fit in clay brown; choose your size below.",
+  "heading": "Fit & care",
+  "paragraphs": [
+    "Demo design: brushed cotton-blend fleece with a relaxed unisex cut. A comfort layer, not technical weather protection. Wash cool; air dry.",
+    "Lay a pullover you like flat without stretching it. Measure across the chest just below the sleeves, then from the high shoulder beside the collar to the hem. Compare garment measurements, not body measurements.",
+    "These are illustrative dimensions for this demo design, not measurements of a manufactured sample. Chest width is measured flat, not all the way around."
+  ],
+  "tableHeading": "Fleece measurements in inches",
+  "rows": [
+    { "label": "M", "value": "22 chest width · 27 length" },
+    { "label": "L", "value": "24 chest width · 28 length" },
+    { "label": "XL", "value": "26 chest width · 29 length" }
+  ],
+  "variants": [
+    { "label": "M", "sku": "BRB-FLEECE-M", "regularMinor": "6800", "stockStatus": "in-stock" },
+    { "label": "L", "sku": "BRB-FLEECE-L", "regularMinor": "6800", "stockStatus": "in-stock" },
+    { "label": "XL", "sku": "BRB-FLEECE-XL", "regularMinor": "6800", "stockStatus": "on-backorder" }
+  ]
+}

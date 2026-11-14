@@ -70,6 +70,22 @@ describe('Backroad Bum source-authored merchant content', () => {
     expect(route).toContain('{details && <section id="product-details" tabindex="-1"');
     expect(route.match(/id="product-details"/g)).toHaveLength(1);
   });
+  it('records fleece authoring intent without turning fit copy into commerce authority', () => {
+    const fit = JSON.parse(readFileSync('seed/backroadbum-fleece-fit.json', 'utf8'));
+    expect(fit.slug).toBe('last-light-fleece');
+    expect(fit.rows.map((row: { label: string }) => row.label)).toEqual(['M', 'L', 'XL']);
+    expect(fit.tableHeading).toContain('inches');
+    expect(fit.paragraphs.join(' ')).toContain('not measurements of a manufactured sample');
+    expect(fit.paragraphs.join(' ')).toContain('Compare garment measurements, not body measurements');
+    expect(fit.paragraphs.join(' ')).toContain('not technical weather protection');
+    expect(JSON.stringify([fit.summary, fit.paragraphs, fit.rows])).not.toMatch(/\$|in.stock|on.backorder|ships? (in|by)|guaranteed|sk_test_/i);
+    expect(fit.variants[0]).toEqual({ label: 'M', sku: 'BRB-FLEECE-M', regularMinor: '6800', stockStatus: 'in-stock' });
+    expect(new Set(fit.variants.map((variant: { sku: string }) => variant.sku)).size).toBe(3);
+    expect(fit.variants.at(-1).stockStatus).toBe('on-backorder');
+    const route = readFileSync('src/pages/products/[id].astro', 'utf8');
+    expect(route).not.toContain('backroadbum-fleece-fit');
+    expect(readFileSync('scripts/verify-backroadbum-fleece.mjs', 'utf8')).toContain('catalog/public/item?itemId=');
+  });
   it('keeps selected-pill decoration out of the accessible option name', () => {
     const route = readFileSync('src/pages/products/[id].astro', 'utf8');
     expect(route).toContain('<span class="product-variant__check" aria-hidden="true">✓</span>');
