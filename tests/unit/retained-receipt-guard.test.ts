@@ -1,4 +1,6 @@
 import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { receiptBrowserState, receiptRequestAllowed, receiptOrigin, receiptStatusPath, nativeReceiptStatusPath, retainedCheckoutKey } from "../../scripts/lib/backroadbum-retained-receipt.mjs";
 
@@ -36,6 +38,13 @@ describe("read-only retained receipt verification", () => {
   });
   it.each([null, {}, { origins: [] }, { origins: [{ origin: receiptOrigin, localStorage: [] }] }])("refuses absent retained state with a generic error", state => {
     expect(() => receiptBrowserState(state)).toThrow("Retained receipt state unavailable");
+  });
+  it("does not read private state or launch a browser for a media check without --check", () => {
+    const script = fileURLToPath(new URL("../../scripts/verify-backroadbum-receipt-media.mjs", import.meta.url));
+    const output = execFileSync(process.execPath, [script, "--state-file=/nonexistent/private-state.json"], { encoding: "utf8", timeout: 10_000 });
+    expect(output).toMatch(/^No action\./u);
+    expect(output).toContain("all use catalog fallback");
+    expect(output).toContain("Never prepares, pays, buys a label or saves browser state");
   });
   it("keeps print verification independent of ready-checkout helpers and legacy receipt extras", () => {
     const source = readFileSync(new URL("../../scripts/verify-backroadbum-receipt-print.mjs", import.meta.url), "utf8");

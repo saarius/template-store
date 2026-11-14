@@ -44,6 +44,7 @@ try {
         await expect(page.locator('.dashboard-latest')).toContainText('From the gear shelf to a paid receipt.');
         await expect(page.locator('.dashboard-latest')).toContainText('TEST1009: $24 merchandise plus $5 shipping');
         await expect(page.locator('.dashboard-latest')).toContainText('the eight earlier Orders remain unchanged');
+        await expect(page.locator('.dashboard-latest')).toContainText('an unavailable lookup leaves paid facts and printing intact');
         await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/commerce/issues/275"]')).toBeVisible();
         await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('latest self-dogfood: TEST1009');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
