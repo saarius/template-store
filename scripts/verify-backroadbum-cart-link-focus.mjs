@@ -97,7 +97,7 @@ try {
       }
       expect(errors).toEqual([]);
       // Blocked prepare attempts are expected; no start/mail/account mutation may even be attempted.
-      expect(writes.every(path => /\/api\/checkout\/prepare$/.test(path))).toBe(true);
+      expect(writes.every(path => /^\/_emdash\/api\/plugins\/[^/]+\/checkout\/guest\/prepare$/.test(path))).toBe(true);
     } finally { await context.close(); }
   }
 } finally { await browser.close(); }
