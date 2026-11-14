@@ -94,6 +94,9 @@ The browser’s Print / Save as PDF command gets a field-note-only paper layout;
 ## Journal examples
 Native field-note quotes use a body-type inset with zero inline margins, existing surface/ink tokens, a rust leading rule and16/24px inner padding. This preserves reading width on phones rather than inheriting40px browser margins on both sides; quotes are examples within the article, not oversized testimonials. Authored sample entries must be explicitly identified as invented nearby, never attributed to a real traveler or presented as a product field test. Headings, list items, links and quote text remain native CMS content; the source manuscript is only an authorship/test checklist.
 
+## Verified-inbox email
+Account and Test store share a quiet, token-based explanation of Cloudflare Free’s verified-destination sandbox, separate from the native guide and primary receipt action. State that other visitor addresses cannot receive codes, without exposing the inbox or suggesting that public guest checkout needs an account. The public form remains paused pending matching-order and active-form qualification; native test delivery and the real OTP API lifecycle are dated evidence, not unrestricted account availability or an independent mail monitor. Keep codes, addresses other than the designated public test mailbox, provider bodies and session capabilities out of reporting.
+
 ## Catalog discovery reporting
 A healthy empty agent feed is not a populated catalog success or a broken storefront. Keep the actual Google/Meta channel-eligibility consequence distinct from the store-level catalog switch and from synthetic populated Worker tests; link the existing upstream follow-up rather than declaring a new regression. A downstream sync preserves this entire theme and the legacy browser capability keys; it does not authorize external channel enrollment, a server-cart cutover or shared-service deployment.
 

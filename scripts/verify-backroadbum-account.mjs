@@ -7,7 +7,7 @@ if (!process.argv.includes('--check')) {
   console.log('No action. --check verifies the paused merchant sign-in and browser-bound receipt path; --capture saves ignored local screenshots.');
   process.exit(0);
 }
-const origin = 'https://backroadbum.com';
+const origin = process.env.BACKROADBUM_ORIGIN || 'https://backroadbum.com';
 const captures = process.argv.includes('--capture');
 const results = [];
 let browser;
@@ -33,6 +33,10 @@ try {
       assert.equal(response.status(), 200);
       await page.locator('[data-account-email-paused]').waitFor();
       assert.equal(await page.locator('h1').innerText(), 'Account');
+      const sandbox = page.locator('[data-email-sandbox-notice]');
+      assert.match(await sandbox.innerText(), /Cloudflare Free’s verified-destination sandbox/);
+      assert.match(await sandbox.innerText(), /other visitor addresses cannot receive codes/);
+      assert.match(await sandbox.innerText(), /saved receipts remain available to everyone/);
       assert.equal(await page.locator('[data-account-start-form], [data-account-verify-form]').count(), 0);
       const recovery = page.locator('[data-account-receipt-link]');
       assert.equal(await recovery.getAttribute('href'), '/checkout/success');

@@ -127,6 +127,11 @@ export default defineConfig({
           version: "1.0.0",
           entrypoint: productUrlEntry,
         },
+        ...(hostedRegistry && !isCloudflare ? [{
+          id: "backroadbum-email-relay",
+          version: "1.0.0",
+          entrypoint: fileURLToPath(new URL("./src/features/email-relay-plugin/index.ts", import.meta.url)),
+        }] : []),
       ],
     }),
   ],

@@ -28,6 +28,8 @@ try {
       await fits();
       if (slug === 'test-store') {
         await expect(body).toContainText('4242 4242 4242 4242');
+        await expect(page.locator('[data-email-sandbox-notice]')).toContainText('other visitor addresses cannot receive codes');
+        await expect(body).toContainText('verified-inbox shopper flow is being tested');
         const actions = page.getByRole('navigation', { name: 'Ready to try it?', exact: true });
         const shop = actions.getByRole('link', { name: 'Browse the gear', exact: true });
         const receipt = actions.getByRole('link', { name: 'Open your last checkout', exact: true });
@@ -76,6 +78,7 @@ try {
       .toEqual(source.find(item => item.slug === slug).sections);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
+  await expect(page.locator('[data-email-sandbox-notice]')).toContainText('Cloudflare Free’s verified-destination sandbox');
   const actions = page.getByRole('navigation', { name: 'Ready to try it?', exact: true });
   await expect(actions.getByRole('link', { name: 'Open your last checkout', exact: true })).toHaveAttribute('href', '/checkout/success');
   await actions.getByRole('link', { name: 'Browse the gear', exact: true }).click();
