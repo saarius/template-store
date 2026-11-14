@@ -71,7 +71,9 @@ try {
         await expect(source).toBeHidden();
         await expect(page.locator('.store-header')).toBeVisible();
         await expect(page.locator('.field-note-footer')).toBeVisible();
-        expect(await body.evaluate(e => getComputedStyle(e).color)).toBe(screenColor);
+        // Returning to screen can briefly serialize an interpolated oklab color.
+        // Wait for the existing appearance transition, not a fixed sleep.
+        await expect.poll(() => body.evaluate(e => getComputedStyle(e).color)).toBe(screenColor);
         expect(normalize(await body.innerText())).toBe(article);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
         results.push({ slug, colorScheme, javaScriptEnabled, pages, preservedBlocks: blocks.length, fullNativeText: true, sourceAndDemoContext: true, shellAndShoppingRemoved: true, screenRestored: true, ...geometry });
