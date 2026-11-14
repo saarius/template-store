@@ -166,6 +166,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-1-2026-11-10.txt',
       '/dashboard/instructions/steer-2-2026-11-11.txt',
       '/dashboard/instructions/steer-3-2026-11-12.txt',
+      '/dashboard/instructions/steer-4-2026-11-13.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');
@@ -178,6 +179,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(mediaSteer).toContain('Owner Steer 3 — November 12, 2026');
     expect(mediaSteer).toContain('Before (unchanged `main`) and After (PR head)');
     expect(mediaSteer).toContain('@clawsweeper re-review');
+    const designSteer = readFileSync('public' + archivePaths[4], 'utf8');
+    expect(designSteer).toContain('Owner Steer 4 — November 13, 2026');
+    expect(designSteer).toContain('ui-design');
+    expect(designSteer).toContain('System / Light / Dark');
+    expect(designSteer).toContain('Phased Rollout');
   });
 
   it.each([

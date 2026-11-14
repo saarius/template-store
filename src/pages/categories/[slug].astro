@@ -32,8 +32,9 @@ const checkoutAvailable = Boolean(await acquireGuestCheckoutAdmission({ runtime:
 </BackroadPage>
 <style>
 .missing-collection{width:min(70rem,calc(100% - 2rem));margin-inline:auto}
-.collection-intro{margin-bottom:1.5rem;min-height:12rem}
-.collection-intro nav{display:flex;flex-wrap:wrap;gap:.75rem;color:var(--store-muted);margin-bottom:1.5rem}
-.collection-intro nav a{color:inherit;text-underline-offset:.2em}
-.collection-intro h1{margin-top:0}
+.collection-intro{width:min(80rem,calc(100% - 2.5rem));margin-bottom:0;min-height:12rem}
+.collection-intro nav{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;color:var(--store-muted);font-size:var(--text-sm);margin-bottom:var(--space-5)}
+.collection-intro nav a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-underline-offset:.2em}
+.collection-intro h1{margin-top:0;max-width:20ch}
+.collection-intro .lead{max-width:54ch;margin-bottom:0}
 </style>

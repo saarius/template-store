@@ -25,6 +25,7 @@ if (results.state === 'unavailable') Astro.response.status = 503;
 ---
 <BackroadPage title={results.query ? `Search: ${results.query}` : 'Search'} description="Find Backroad Bum gear, collections and field notes.">
   <section class="brb-page search-page" data-search-page>
+    <p class="search-kicker">Gear · Collections · Field notes</p>
     <h1>Search Backroad Bum</h1>
     <p class="lead">Find a piece of gear, a slower weekend read or a collection for the road.</p>
     <form method="get" action="/search" role="search" aria-label="Search Backroad Bum" data-search-form>
@@ -63,31 +64,38 @@ if (results.state === 'unavailable') Astro.response.status = 503;
   </section>
 </BackroadPage>
 <style>
-  .search-page{max-width:54rem;min-height:55vh}
-  .search-page .lead{margin-bottom:2rem}
+  .search-page{max-width:56rem;min-height:55vh}
+  .search-kicker{font-size:var(--text-sm);color:var(--store-muted);margin:0 0 var(--space-3)}
+  .search-page h1{font-size:var(--app-title)}
+  .search-page .lead{font-size:1rem;margin-bottom:var(--space-7)}
   .search-page a{color:inherit}
   form{max-width:48rem}
   label{display:block;font-weight:600;margin-bottom:.5rem}
   .search-controls{display:flex;gap:.75rem;align-items:stretch}
-  input{min-width:0;flex:1;padding:.75rem 1rem;min-height:48px;border:1px solid var(--store-muted);border-radius:var(--store-radius-card);background:var(--store-surface);color:var(--store-ink);font:inherit;caret-color:var(--store-ink)}
+  input{min-width:0;flex:1;padding:.75rem 1rem;min-height:48px;border:1px solid var(--store-ink-border);border-radius:var(--radius-control);background:var(--store-surface);color:var(--store-ink);font:inherit}
   input::placeholder{color:var(--store-muted);opacity:1}
-  button{padding:.7rem 1.25rem;min-height:48px;border:0;border-radius:var(--store-radius-card);background:var(--brb-yellow);color:var(--store-ink);font:inherit;font-weight:600;cursor:pointer}
-  button:hover{background:#eac04b}
+  input:hover{border-color:var(--store-accent)}
+  input:user-invalid{border-color:var(--color-danger)}
+  button{padding:.7rem 1.5rem;min-height:48px;border:0;border-radius:var(--radius-control);background:var(--store-accent);color:var(--store-accent-ink);font:inherit;font-weight:600;cursor:pointer}
+  button:hover{background:color-mix(in oklch,var(--store-accent) 88%,var(--store-ink))}
   .search-help,.search-summary{color:var(--store-muted)}
   .search-help{max-width:65ch;margin:.75rem 0 0}
-  .search-message,.search-matches{margin-top:2.5rem;border-top:1px solid var(--store-line);padding-top:2rem}
-  .search-page .search-message h2,.search-page .search-matches>h2{margin:0 0 .75rem;overflow-wrap:anywhere}
+  .search-message,.search-matches{margin-top:var(--space-8);border-top:1px solid var(--color-border);padding-top:var(--space-7)}
+  .search-page .search-message h2,.search-page .search-matches>h2{font-size:var(--text-xl);margin:0 0 var(--space-3);overflow-wrap:anywhere}
   .search-message p,.search-matches p{max-width:65ch}
   .search-ideas,.search-browse{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem}
   .search-ideas{margin-top:1.25rem}
-  .search-ideas a,.search-browse a{padding:.5rem 0}
-  .search-browse{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--store-line)}
-  .search-group{margin-top:2rem}
-  .search-group h3{font-size:1.65rem;line-height:1.15;margin:0 0 .5rem}
-  .search-group ul{list-style:none;margin:0;padding:0}
-  .search-group li{padding:1rem 0;border-bottom:1px solid var(--store-line)}
-  .search-group li>a{font-weight:600;overflow-wrap:anywhere}
-  .search-group li p{margin:.5rem 0 0;color:var(--store-muted);overflow-wrap:anywhere}
-  mark{background:var(--brb-yellow);color:var(--store-ink)}
+  .search-ideas a,.search-browse a{display:inline-flex;align-items:center;min-height:44px;padding:.5rem 0}
+  .search-ideas a{padding:.5rem 1rem;border:1px solid var(--store-ink-border);border-radius:var(--radius-control);background:var(--store-surface);text-decoration:none}
+  .search-ideas a:hover{background:var(--store-surface-subtle)}
+  .search-browse{margin-top:var(--space-8);padding-top:var(--space-4);border-top:1px solid var(--color-border)}
+  .search-group{margin-top:var(--space-7)}
+  .search-group h3{font-family:var(--font-sans);font-size:var(--text-sm);font-weight:600;line-height:1.4;margin:0 0 var(--space-4);color:var(--store-muted)}
+  .search-group ul{list-style:none;margin:0;padding:0;display:grid;gap:var(--space-4)}
+  .search-group li{position:relative;padding:var(--space-5);border:1px solid var(--color-border);border-radius:var(--radius-card);background:var(--store-surface)}
+  .search-group li:hover{border-color:var(--store-ink-border)}
+  .search-group li>a{display:inline-flex;align-items:center;min-height:44px;font-family:var(--font-display);font-size:var(--text-lg);font-weight:500;overflow-wrap:anywhere}
+  .search-group li p{margin:var(--space-2) 0 0;color:var(--store-muted);overflow-wrap:anywhere}
+  mark{background:var(--color-primary-subtle);color:var(--store-ink)}
   @media(max-width:30rem){.search-controls{flex-direction:column}.search-controls button{align-self:flex-start}}
 </style>

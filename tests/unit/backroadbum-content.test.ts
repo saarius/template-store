@@ -70,6 +70,14 @@ describe('Backroad Bum source-authored merchant content', () => {
     expect(route).toContain('{details && <section id="product-details" tabindex="-1"');
     expect(route.match(/id="product-details"/g)).toHaveLength(1);
   });
+  it('keeps selected-pill decoration out of the accessible option name', () => {
+    const route = readFileSync('src/pages/products/[id].astro', 'utf8');
+    expect(route).toContain('<span class="product-variant__check" aria-hidden="true">✓</span>');
+    expect(route).toContain('data-variant-choice data-variant-option={option.label}');
+    expect(route).not.toMatch(/::before\{content:['"]✓/);
+    expect(route).toContain('.product-variant:has(input:focus-visible)');
+    expect(route).toContain('min-height:48px;min-width:64px');
+  });
   it('keeps field notes editable in EmDash Pages', () => {
     const notes = pages.filter((p: any) => p.slug.startsWith('field-note-'));
     expect(notes).toHaveLength(4);

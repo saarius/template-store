@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## Field Journal phase2 · November14
+The gear shelf, collection filters, product inspection and search now use the new visual system rather than inheriting its tokens alone. Product pages put native galleries beside the buying decision, with distinct specification/care sections and keyboard-friendly selected-size pills; all Commerce and no-JavaScript contracts remain intact. Regular/Sale comparison is shown only when supplied by the signed projection, never reconstructed from seed prices. Phases3–4 remain for transactional/editorial surfaces and the dashboard.
+
 ## Owner Steer1 · November10
 Hosted dinkuskit.com, payments.dinkuskit.com and ship.dinkuskit.com with unmodified Registry plugins are the target customer journey. Stop expanding local issuer/service overlays; preserve the serving store during migration, then retire redundant transports after hosted verification or a concrete blocker. Prioritize the #211 cart PR; unrelated full-matrix baseline timeouts belong in CI, not an indefinite submission gate.
 

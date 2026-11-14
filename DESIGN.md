@@ -64,11 +64,19 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - All six products continue through the signed Commerce catalog. Cards gain tonal surfaces and quieter body facts; no indexed or seeded price becomes shopping authority.
 - A final 1.618:1 reading invitation leads to Field Notes with distinct serif rhythm. No extra carousel, fake testimonials, newsletter collection or duplicated shopping flow.
 
+## Shop, collections, product and search · Phase 2
+- Shop and collection containers align to the shell's 80rem / 20px gutters. The introduction separates its lead from a quiet illustrated-design note; 48px collection filters mark the current route with both underline and rust border.
+- Catalog cards use flush 4:3 native image stages, 24px body padding and a two/three-column responsive grid (one column on phones). No colored bloom or hover recoloring touches the product art. Names lead, followed by tabular Commerce prices and quiet availability; a whole-card link keeps one destination and no nested shopping control.
+- The desktop PDP is **1.618fr : 1fr**, top aligned at 60rem, with a quieter product heading than the home hero. The native no-JavaScript gallery retains the original image order, crops and eager/lazy hints. Native specification rows and care disclosures sit under a distinct Details & care heading; no CMS copy is duplicated in theme data.
+- Variant pills have 48px targets, a 2px selected border and an `aria-hidden` checkmark; sold-out choices remain inspectable and visibly struck through. Native radio arrows, focus rings, original no-JavaScript GET fallback, stale-selection notice and exact Commerce member matching remain unchanged. Decorative marks must never become part of a radio's accessible name.
+- Search follows the webapp title scale rather than a marketing hero. One rust action submits an ordinary GET form; grouped results retain native destinations, published previews and actual highlights without adding indexed prices. Surface cards separate result groups from form guidance.
+- Regular/Sale comparisons render only when the signed projection supplies both. The current signed0.8.0 projection returns the effective amount alone for the bandana, so no struck-through seed or indexed Regular amount is invented. This is a data-contract limitation, not a styling decision.
+
 ## Protected runtime and remaining phases
 Visual authorization is broad; business authority is not. Preserve signed Commerce0.8.0 / Payments0.5.0 / Ship0.3.1, hosted consents, test-only admission, authoritative prices/availability, distinct selected members, guest cart storage, pending checkout protection, retained receipt recovery/printing, every Order, native mug media/specs and all six field notes. No CMS publication, replacement payment, shipment resync, credential exposure or /proof runtime change is part of the rebrand.
 
-1. **Phase 1:** baseline captures, tokens/fonts, appearance, shell and home.
-2. **Phase 2:** shop/collection/PDP/search hierarchy, gallery/spec/care and variant controls; Regular/Sale comparison only when the signed projection actually supplies both.
+1. **Phase 1 — live:** baseline captures, tokens/fonts, appearance, shell and home.
+2. **Phase 2 — live:** shop/collection/PDP/search hierarchy, native gallery/spec/care and variant controls; Regular/Sale comparison only when the signed projection actually supplies both.
 3. **Phase 3:** cart/checkout/receipt, guides and magazine-grade editorial; proportional forms, field-level correction and print-safe receipts.
 4. **Phase 4:** dashboard metric cards and contribution tables on the 1.125 scale; preserve every history article and ledger, publish the full Before/After showcase.
 

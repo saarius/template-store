@@ -15,8 +15,16 @@ const { groups, paths } = shopCollections(await hydrateProductCollectionMembersh
 const checkoutAvailable = Boolean(await acquireGuestCheckoutAdmission({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => null));
 ---
 <BackroadPage title="Shop all gear">
-  <header class="brb-page shop-intro"><h1>Pack a little possibility.</h1><p class="lead">The coffee stop. The last stretch of gravel. The evening you stay out for. A few everyday goods to take along.</p><p>Product images are illustrations of our demo designs.</p></header>
+  <header class="brb-page shop-intro"><p class="shop-intro__kicker">The gear shelf</p><h1>Pack a little possibility.</h1><div class="shop-intro__deck"><p class="lead">The coffee stop. The last stretch of gravel. The evening you stay out for. A few everyday goods to take along.</p><p class="shop-intro__note">Illustrated designs. Everyday essentials.<br />Choose a collection, or see it all below.</p></div></header>
   <CollectionNav collections={groups} total={products.length} unavailable={unavailable} />
   <CommerceCatalog products={products} productPaths={paths} unavailable={unavailable} checkoutAvailable={checkoutAvailable} heading="All gear" />
 </BackroadPage>
-<style>.shop-intro{margin-bottom:1.5rem}.shop-intro>p:last-child{font-size:.85rem;color:var(--store-muted)}</style>
+<style>
+.shop-intro{width:min(80rem,calc(100% - 2.5rem));margin-bottom:0}
+.shop-intro__kicker{font-size:var(--text-sm);color:var(--store-muted);margin:0 0 var(--space-4)}
+.shop-intro h1{max-width:16ch}
+.shop-intro__deck{display:grid;gap:var(--space-5)}
+.shop-intro__deck p{margin:0}
+.shop-intro__note{font-size:var(--text-sm);color:var(--store-muted)}
+@media(min-width:60rem){.shop-intro__deck{grid-template-columns:minmax(0,1.618fr) minmax(0,1fr);align-items:end;gap:var(--space-8)}.shop-intro__note{justify-self:end}}
+</style>

@@ -94,18 +94,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
 .brb-story-link:hover h2{text-decoration:underline}
 .brb-story-link h2{margin:0 0 var(--space-2)}
 .catalog-guidance{display:none}
-/* Compatibility styling for the existing signed-catalog surfaces until phase 2. */
-.shop-catalog .shop-grid .shop-card{box-shadow:none;transform:none;border:1px solid var(--color-border);background:var(--color-surface);border-radius:var(--radius-card)}
-.shop-catalog .shop-grid .shop-card:hover{box-shadow:none;transform:none;border-color:var(--color-border-strong)}
-.shop-catalog .shop-grid .shop-card__body{padding:var(--space-5)}
-.shop-catalog .shop-grid .shop-card h3{font-size:var(--text-xl);font-weight:500;margin-bottom:var(--space-3)}
-.shop-catalog .shop-grid .shop-card .price{font-family:var(--font-sans);font-size:1rem}
-.shop-catalog .shop-grid .shop-card .availability{font-size:var(--text-sm);font-weight:400}
-.shop-card__facts [data-regular-price],.shop-card__facts [data-sale-price],.product-detail__price [data-regular-price]{font-family:var(--font-sans)}
-.shop-catalog .commerce-product-media .product-media__pigment-wash{display:none}
-.shop-catalog .commerce-product-media{background:var(--color-surface-muted)}
-.product-page .product-detail .product-detail__visual{border:1px solid var(--color-border);box-shadow:none;border-radius:var(--radius-card);background:var(--color-surface-muted)}
-.product-page .product-detail h1{font-size:var(--text-display);font-weight:500}
-.product-page .product-detail .product-detail__price{font-family:var(--font-sans)}
-.product-page .product-detail .product-detail__identifier{font-family:var(--font-sans);font-size:var(--text-sm);color:var(--color-text-muted)}
+/* Merchant product stages stay faithful to the native media: no pigment overlay or recoloring. */
+.shop-catalog .commerce-product-media,.product-page .commerce-product-media{background:var(--color-surface-muted);border:0}
+.shop-catalog .product-media__pigment-wash,.product-page .product-media__pigment-wash{display:none}
+.shop-catalog .commerce-product-media img,.product-page .commerce-product-media img{transition:none;transform:none;filter:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

@@ -1,7 +1,7 @@
 // Public discovery proof. Default is read-only; --cart adds/removes ONE cap, never starts checkout.
 import { chromium, expect } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
-const base = 'https://backroadbum.com';
+const base = process.env.BACKROADBUM_ORIGIN || 'https://backroadbum.com';
 const output = new URL('../runs/backroadbum/search/', import.meta.url);
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch();

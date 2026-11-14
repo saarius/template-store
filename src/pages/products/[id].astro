@@ -211,7 +211,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
     {variantJsonLd && <script type="application/json" data-variant-product-jsonld set:html={jsonLdScript(variantJsonLd)} />}
   </head>
   <body data-storefront-profile={profile}>
-    <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(checkoutAvailable)} role="status">{storeBannerText(checkoutAvailable)}</div>
+    <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(checkoutAvailable)} role="status">{storeBannerText(checkoutAvailable)} <a href="/test-store">How to try it</a></div>
     <StoreHeader profile={profile} />
     <main id="main-content" class="product-page">
     <nav class="browse-breadcrumb" aria-label="Breadcrumb"><a href="/shop">Shop</a><span aria-hidden="true">/</span>{category && <><a href={categoryPath(category.slug)}>{category.name}</a><span aria-hidden="true">/</span></>}<span aria-current="page">{noLongerAvailable ? "No longer available" : productName ?? "Not found"}</span></nav>
@@ -237,7 +237,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
                 <input type="radio" name={`variant-option-${index}`} value={value} checked={value === selectedValue(option.label)}
                   data-variant-choice data-variant-option={option.label}
                   data-variant-sold-out={String(initialPicker.soldOut[option.label]?.[value] ?? true)} />
-                <span>{value}</span><span class="product-variant__sold-out"> (sold out)</span>
+                <span class="product-variant__check" aria-hidden="true">✓</span><span class="product-variant__value">{value}</span><span class="product-variant__sold-out"> (sold out)</span>
               </label>)}
             </fieldset>)}
             {variantMembers.length > 0 && <>
@@ -261,7 +261,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
             {lookupUnavailable ? <p class="product-detail__notice" role="status">Product availability is temporarily unavailable. Please try again.</p> : sandboxCheckout ? <p class="product-detail__notice" data-sandbox-checkout-available>Test-mode checkout. No real charges.</p> : linkedProduct && profile !== "shipping" ? <p class="product-detail__notice" data-checkout-unavailable>{offersCart ? "Demo product. Checkout is unavailable." : "Demo product. Cart and checkout are unavailable."}</p> : linkedProduct ? (purchasable ? null : <p class="product-detail__notice" data-not-purchasable>{checkoutAvailable ? "This product can't be bought right now." : "Checkout is unavailable right now, so this product can't be bought."}</p>) : item.availabilitySource === "preview" || !demonstrations ? <p class="product-detail__notice">This is an editorial preview. It is not purchasable.</p> : <p class="product-detail__notice">Availability is shown for this local integration proof. Purchasing is not available here.</p>}
           </div>
         </article>
-        {details && <section id="product-details" tabindex="-1" class="product-details" data-product-details aria-label="Product details"><Blocks value={details} components={productDetailComponents} fallback={UnknownBlock} /></section>}
+        {details && <section id="product-details" tabindex="-1" class="product-details" data-product-details aria-label="Product details"><header class="product-details__heading"><p>A closer look</p><h2>Details & care</h2></header><div class="product-details__grid"><Blocks value={details} components={productDetailComponents} fallback={UnknownBlock} /></div></section>}
         {linkedProduct && !lookupUnavailable && Astro.response.status === 200 && <RelatedGear productId={linkedProduct.id}
           entries={products.entries} categories={categoryEntries.entries} checkoutAvailable={checkoutAvailable} />}
       </>) : <MissingPageContent title="Product not found" description="This product is not published or does not exist. Search the store or browse the current gear below." />}
@@ -333,42 +333,59 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
 </script>
 <style>
   .product-page > :global(.missing-page){padding-top:0}
-  .product-page{width:min(70rem,calc(100% - 2rem));margin:0 auto;min-height:65vh}
-  .browse-breadcrumb{display:flex;flex-wrap:wrap;gap:.7rem;padding:2rem 0;color:var(--store-muted)}
-  .browse-breadcrumb a{color:inherit;text-underline-offset:.2em}
-  .product-detail{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(1.5rem,5vw,5rem);align-items:center;margin:1rem 0 5rem}
+  .product-page{width:min(80rem,calc(100% - 2.5rem));margin:0 auto;min-height:65vh}
+  .browse-breadcrumb{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .75rem;padding:var(--space-5) 0;color:var(--store-muted);font-size:var(--text-sm)}
+  .browse-breadcrumb a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-underline-offset:.2em}
+  .product-detail{display:grid;grid-template-columns:1fr;gap:var(--space-7);align-items:start;margin:var(--space-4) 0 var(--space-8)}
   /* The frame also sits inside ProductGallery, which this page's scope does not reach. */
-  .product-detail :global(.product-detail__visual){min-width:0;aspect-ratio:4/3;overflow:hidden;border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:#e9e8df;box-shadow:4px 4px 0 var(--store-shadow)}
-  .product-detail :global(.product-detail__visual--hoodie){background:#dce2df}.product-detail :global(.product-detail__visual--cap){background:#e6ddd1}.product-detail :global(.product-detail__visual--beanie){background:#e2e1d6}
+  .product-detail :global(.product-detail__visual){min-width:0;aspect-ratio:4/3;overflow:hidden;border:1px solid var(--color-border);border-radius:var(--radius-card);background:var(--store-surface-subtle)}
   .product-detail :global(.product-detail__visual img){display:block;width:100%;height:100%;object-fit:cover}
   .product-detail__body{min-width:0;overflow-wrap:anywhere}
-  h1{font-size:clamp(2.5rem,6vw,5.5rem);line-height:1;letter-spacing:-.05em;margin:.4rem 0 1.5rem}
-  .product-detail__description{font-size:clamp(1.05rem,2vw,1.3rem);line-height:1.6}
-  .product-detail__summary{font-size:clamp(1.05rem,2vw,1.2rem);line-height:1.6}
+  h1{font-size:clamp(2rem,1.3rem + 2vw,3.33rem);font-weight:500;line-height:1.12;letter-spacing:-.03em;margin:0 0 var(--space-5)}
+  .product-detail__description,.product-detail__summary{font-size:var(--text-lg);line-height:1.618}
+  .product-detail__summary :global(p:first-child){margin-top:0}
+  .product-detail__identifier{font-family:var(--font-sans);font-size:var(--text-sm);color:var(--store-muted);margin:var(--space-2) 0}
   .product-detail__summary :global(a){color:inherit;text-underline-offset:.2em}
   .product-detail__no-image{display:grid;place-items:center;height:100%;margin:0;color:var(--store-muted);letter-spacing:.04em}
-  .product-details{display:grid;gap:1rem;max-width:48rem;margin:-2rem 0 5rem}
-  .product-details :global(.product-section){border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:var(--store-surface);padding:0 1.2rem}
-  .product-details :global(.product-section summary){padding:1rem 0;font-weight:800;font-size:1.15rem;cursor:pointer}
-  .product-details :global(.product-section__body){padding-bottom:1rem;line-height:1.6}
-  .product-details :global(.product-specs h2){font-size:1.15rem;margin:0 0 .5rem}
-  .product-details :global(.product-specs dl){display:grid;margin:0;border-top:1px solid var(--store-line)}
-  .product-details :global(.product-specs dl > div){display:grid;grid-template-columns:minmax(8rem,1fr) 2fr;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--store-line)}
-  .product-details :global(.product-specs dt){font-weight:800}
-  .product-details :global(.product-specs dd){margin:0}
-  .product-detail__price{display:flex;gap:.7rem;align-items:baseline;font-size:1.5rem}.product-detail__price[hidden]{display:none}.product-detail__price s{color:var(--store-muted)}
-  .product-detail__status{font-size:1.25rem;font-weight:800;margin:2rem 0 .5rem}
-  .product-detail__notice{line-height:1.5;color:var(--store-muted)}
-  .product-variants{display:none;flex-wrap:wrap;gap:.5rem;border:0;padding:0;margin:1rem 0}.product-variants[data-variant-picker-ready]{display:flex}.product-variants legend{font-weight:800;margin-bottom:.5rem}
+  .product-details{margin:0 0 var(--space-9);padding-top:var(--space-7);border-top:1px solid var(--color-border)}
+  .product-details__heading{margin-bottom:var(--space-7)}
+  .product-details__heading p{font-size:var(--text-sm);color:var(--store-muted);margin:0 0 var(--space-2)}
+  .product-details__heading h2{font-size:var(--text-3xl);line-height:1.2;margin:0}
+  .product-details__grid{display:grid;gap:var(--space-7);align-items:start}
+  .product-details :global(.product-section){border:1px solid var(--color-border);border-radius:var(--radius-card);background:var(--store-surface);padding:0 var(--space-5)}
+  .product-details :global(.product-section summary){min-height:48px;padding:var(--space-4) 0;font-weight:600;font-size:1rem;cursor:pointer}
+  .product-details :global(.product-section summary:hover){color:var(--store-accent)}
+  .product-details :global(.product-section__body){padding-bottom:var(--space-5);line-height:1.618}
+  .product-details :global(.product-specs h2){font-family:var(--font-sans);font-size:1rem;font-weight:600;margin:0 0 var(--space-4)}
+  .product-details :global(.product-specs dl){display:grid;margin:0;border-top:1px solid var(--color-border);font-variant-numeric:tabular-nums}
+  .product-details :global(.product-specs dl > div){display:grid;grid-template-columns:minmax(6rem,1fr) minmax(0,1.618fr);gap:var(--space-4);padding:var(--space-4) 0;border-bottom:1px solid var(--color-border)}
+  .product-details :global(.product-specs dt){font-weight:600}
+  .product-details :global(.product-specs dd){margin:0;overflow-wrap:anywhere}
+  .product-detail__price{display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:baseline;font-family:var(--font-sans);font-size:var(--text-xl);margin:var(--space-5) 0}
+  .product-detail__price[hidden]{display:none}.product-detail__price s{color:var(--store-muted);font-size:1rem}
+  .product-detail__status{font-size:var(--text-sm);font-weight:600;margin:var(--space-5) 0 var(--space-2)}
+  .product-detail__notice{font-size:var(--text-sm);line-height:1.618;color:var(--store-muted)}
+  .product-detail :global(.guest-cart-add){padding-top:var(--space-5);border-top:1px solid var(--color-border)}
+  .product-detail :global(.guest-cart-add button){font-weight:600;border-radius:var(--radius-control);min-height:48px}
+  .product-detail :global(.guest-cart-add button:not(:disabled):hover){filter:brightness(.93)}
+  .product-detail :global(.guest-cart-add button.guest-cart-add__step){border-radius:0}
+  @media(min-width:60rem){.product-detail{grid-template-columns:minmax(0,1.618fr) minmax(0,1fr);gap:var(--space-8);margin-bottom:var(--space-9)}.product-details__grid{grid-template-columns:minmax(0,1.618fr) minmax(0,1fr);gap:var(--space-8)}}
+  .product-variants{display:none;flex-wrap:wrap;gap:var(--space-2);border:0;padding:0;margin:var(--space-5) 0}.product-variants[data-variant-picker-ready]{display:flex}.product-variants legend{font-size:var(--text-sm);font-weight:600;margin-bottom:var(--space-2)}
   .product-options-fallback{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;margin:1rem 0}
   .product-options-fallback label{flex-basis:100%;font-weight:600}
   .product-options-fallback p{flex-basis:100%;margin:0;color:var(--store-muted)}
-  .product-options-fallback select{min-width:0;max-width:100%;min-height:48px;padding:.5rem;color:inherit;background:var(--store-surface);border:1px solid var(--store-line);border-radius:var(--store-radius-card);font:inherit}
-  .product-options-fallback button{min-height:48px;padding:.7rem 1rem;border:0;border-radius:var(--store-radius-card);background:var(--brb-yellow);color:var(--store-ink);font:inherit;font-weight:600;cursor:pointer}
-  .product-variant{display:inline-flex;gap:.35rem;align-items:center;padding:.45rem .8rem;border:1.5px solid var(--store-ink-border);border-radius:.4rem;background:var(--store-surface);box-shadow:2px 2px 0 var(--store-shadow);cursor:pointer}
+  .product-options-fallback select{min-width:0;width:14rem;max-width:100%;min-height:48px;padding:.5rem;color:inherit;background:var(--store-surface);border:1px solid var(--store-line);border-radius:var(--radius-control);font:inherit}
+  .product-options-fallback button{min-height:48px;padding:.7rem 1rem;border:0;border-radius:var(--radius-control);background:var(--store-accent);color:var(--store-accent-ink);font:inherit;font-weight:600;cursor:pointer}
+  .product-variant{position:relative;display:inline-flex;gap:var(--space-2);justify-content:center;align-items:center;min-height:48px;min-width:64px;padding:.6rem 1rem;border:1px solid var(--store-ink-border);border-radius:var(--radius-control);background:var(--store-surface);cursor:pointer;transition:background .18s ease}
+  .product-variant input{position:absolute;width:1px;height:1px;opacity:0}
+  .product-variant:hover{background:var(--store-surface-subtle)}
+  .product-variant:has(input:checked){background:var(--color-primary-subtle);border:2px solid var(--store-accent);padding:calc(.6rem - 1px) calc(1rem - 1px);font-weight:700}
+  .product-variant__check{display:none;font-size:.875rem}
+  .product-variant:has(input:checked) .product-variant__check{display:inline}
+  .product-variant:has(input:focus-visible){outline:3px solid var(--store-focus-ring);outline-offset:4px}
+  .product-variant:active{border-color:var(--store-accent)}
   .product-variant__sold-out{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
   .product-variant:has(input[data-variant-sold-out="true"]){color:var(--store-muted);box-shadow:none}
-  .product-variant:has(input[data-variant-sold-out="true"]) span:first-of-type{text-decoration:line-through}
+  .product-variant:has(input[data-variant-sold-out="true"]) .product-variant__value{text-decoration:line-through}
   .product-variant:has(input[data-variant-sold-out="false"]) .product-variant__sold-out{display:none}
-  @media(max-width:40rem){.product-detail{grid-template-columns:1fr;gap:1.5rem}}
 </style>

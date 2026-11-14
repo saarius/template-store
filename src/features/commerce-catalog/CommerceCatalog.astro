@@ -21,7 +21,7 @@ const { products, unavailable = false, productPaths = new Map(), checkoutAvailab
 const notice = catalogNoticeText({ unavailable, productCount: products.length, checkoutAvailable });
 ---
 <section class:list={["shop-catalog", { "shop-catalog--contained": contained }]} aria-labelledby="commerce-catalog" data-commerce-catalog>
-  <h2 id="commerce-catalog">{heading}</h2>
+  <header class="shop-catalog__heading"><h2 id="commerce-catalog">{heading}</h2>{!unavailable && products.length > 0 && <p>{products.length} {products.length === 1 ? 'good' : 'goods'} for the road</p>}</header>
   {unavailable ? <p role="alert">The product catalog is temporarily unavailable. Please try again shortly.</p> : products.length === 0 ? <p data-commerce-empty>{emptyMessage}</p> : <div class="shop-grid">
     {products.map(product => {
       const href = productPaths.get(product.id);
@@ -45,6 +45,25 @@ const notice = catalogNoticeText({ unavailable, productCount: products.length, c
   {notice && <p class="notice">{notice}</p>}
 </section>
 <style>
-.shop-catalog.shop-catalog--contained{width:100%;margin:1.5rem 0 4rem}.shop-catalog.shop-catalog--contained h2{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.025em}
-.shop-catalog{width:min(70rem,calc(100% - 2rem));margin:3rem auto}.shop-catalog h2{font-size:clamp(2.5rem,5vw,4.5rem);letter-spacing:-.05em;margin:0 0 1.5rem}.shop-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1.25rem}.shop-card{display:flex;min-width:0;overflow:hidden;overflow-wrap:anywhere;flex-direction:column;border:1.5px solid var(--store-ink-border);border-radius:var(--store-radius-card);background:var(--store-surface);box-shadow:4px 4px 0 var(--store-shadow);transition:transform .28s cubic-bezier(.22,1,.36,1),box-shadow .28s cubic-bezier(.22,1,.36,1),border-color .28s ease}.shop-card:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--store-accent);border-color:var(--store-accent)}.shop-card--link{text-decoration:none;color:inherit}.shop-card--link:hover h3,.shop-card--link:focus-visible h3{text-decoration:underline;text-decoration-color:var(--store-accent)}.shop-card--link:focus-visible{outline:3px solid var(--store-focus-ring);outline-offset:2px}.shop-card__body{display:flex;flex:1;flex-direction:column;padding:1.25rem 1.35rem 1.35rem}.shop-card h3{font-size:1.35rem;line-height:1.15;margin:0 0 1rem}.shop-card__facts{display:flex;align-items:baseline;justify-content:space-between;gap:.75rem;flex-wrap:wrap}.shop-card .price{display:flex;gap:.65rem;flex-wrap:wrap;margin:0;font-size:1.25rem}.shop-card .availability{margin:0;color:var(--store-muted);font-weight:700}.shop-card .guest-cart-add{margin-top:auto;padding-top:1rem}a{color:inherit;text-underline-offset:.2em}s,.notice{color:var(--store-muted)}.notice{line-height:1.5}@media(prefers-reduced-motion:reduce){.shop-card,.shop-card:hover{transition:none;transform:none}}@media(max-width:45rem){.shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:34rem){.shop-grid{grid-template-columns:1fr}.shop-card__facts{align-items:flex-start;flex-direction:column;gap:.35rem}}
+  .shop-catalog{width:min(80rem,calc(100% - 2.5rem));margin:var(--space-7) auto var(--space-9)}
+  .shop-catalog.shop-catalog--contained{width:100%;margin:var(--space-6) 0 var(--space-8)}
+  .shop-catalog__heading{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-2) var(--space-5);margin-bottom:var(--space-5)}
+  .shop-catalog h2{font-size:var(--text-3xl);line-height:1.2;letter-spacing:-.025em;margin:0}
+  .shop-catalog__heading p{font-size:var(--text-sm);color:var(--store-muted);margin:0;font-variant-numeric:tabular-nums}
+  .shop-grid{display:grid;grid-template-columns:1fr;gap:var(--space-7) var(--space-5)}
+  .shop-card{display:flex;min-width:0;overflow:hidden;overflow-wrap:anywhere;flex-direction:column;border:1px solid var(--color-border);border-radius:var(--radius-card);background:var(--store-surface);transition:border-color .18s ease,background .18s ease}
+  .shop-card--link{text-decoration:none;color:inherit}
+  .shop-card--link:hover{border-color:var(--store-ink-border);background:var(--store-surface-subtle)}
+  .shop-card--link:hover h3,.shop-card--link:focus-visible h3{text-decoration:underline;text-decoration-color:var(--store-accent);text-underline-offset:.2em}
+  .shop-card--link:active{border-color:var(--store-accent)}
+  .shop-card--link:focus-visible{outline:3px solid var(--store-focus-ring);outline-offset:4px}
+  .shop-card__body{display:flex;flex:1;flex-direction:column;padding:var(--space-5)}
+  .shop-card h3{font-size:var(--text-xl);font-weight:500;line-height:1.25;margin:0 0 var(--space-3)}
+  .shop-card__facts{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-2) var(--space-4);margin-top:auto}
+  .shop-card .price{display:flex;gap:var(--space-2);flex-wrap:wrap;margin:0;font-family:var(--font-sans);font-size:1rem}
+  .shop-card .availability{margin:0;color:var(--store-muted);font-size:var(--text-sm)}
+  .shop-card :global(.guest-cart-add){margin-top:auto;padding-top:var(--space-4)}
+  s,.notice{color:var(--store-muted)}.notice{line-height:1.618}
+  @media(min-width:38rem){.shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(min-width:64rem){.shop-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style>
