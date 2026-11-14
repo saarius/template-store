@@ -49,6 +49,11 @@ try {
       if (view === 'contributions') {
         await expect(page.locator('#candidates .dashboard-evidence')).toHaveCount(18);
         await expect(page.locator('#candidates .dashboard-evidence-summary')).toHaveCount(18);
+        for (const caption of await page.locator('caption').all()) {
+          const rect = await caption.boundingBox();
+          expect(rect.width).toBeGreaterThanOrEqual(300);
+          expect(rect.height).toBeLessThan(120);
+        }
       }
       // Native keyboard disclosure works with scripting disabled. Retain all earlier evidence assertions below.
       for (const details of await disclosures.all()) {

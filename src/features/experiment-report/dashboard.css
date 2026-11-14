@@ -101,6 +101,7 @@
 @media(max-width:39.99rem){
   .dashboard table,.dashboard tbody,.dashboard tr,.dashboard td{display:block;width:100%}
   .dashboard table{table-layout:auto}
+  .dashboard caption{display:block;width:100%;box-sizing:border-box}
   /* Keep the real table and headers in the accessibility tree; rows become visual cards. */
   .dashboard thead{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden}
   .dashboard tbody tr{margin-bottom:1.5rem;border:1px solid var(--color-border);border-radius:var(--radius-card);overflow:hidden}
