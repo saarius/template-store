@@ -67,6 +67,10 @@ try {
         await expect(page.locator('.cycle-entry')).toHaveCount(0);
         await expect(page.locator('table')).toHaveCount(0);
         await expect(page.locator('[data-activity-metrics] dt')).toHaveCount(15);
+        const released = page.locator('.status-list > div').filter({ hasText: 'Unpaid recovery' });
+        await expect(released).toContainText('now return released-retry');
+        await expect(released).toContainText('provider objects and exact deployed source remain unverified');
+        await expect(released).not.toContainText('still pending');
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
         await expect(page.locator('#history')).toContainText('Current Before/After captures for reviewed UI PRs are publicly hosted outside git');

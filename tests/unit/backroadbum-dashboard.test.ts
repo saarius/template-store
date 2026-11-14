@@ -2,6 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates verified original checkout release from unknown provider cause', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const current = source.match(/<div><dt>Unpaid recovery<\/dt>[\s\S]*?<\/div>/)?.[0];
+    expect(current).toContain('now return released-retry');
+    expect(current).toContain('durably record expired-unpaid');
+    expect(current).toContain('without a replacement start');
+    expect(current).toContain('provider objects and exact deployed source remain unverified');
+    expect(current).not.toContain('still pending');
+    const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
+    expect(pulse).toContain('original expired attempts now release');
+    expect(source).toContain('a scoped404 is not proof of absence');
+    expect(source).toContain('Four actual-store browser checks');
+  });
+
   it('keeps the report redesign server-rendered and preserves native evidence disclosure', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('<DashboardPulse status={status} stale={stale} />');

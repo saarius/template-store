@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## Original checkout recovery · November14
+The original $79, $76 and $73 hosted attempts now return released-retry and durably record expired-unpaid. Real shopper checks preserve the original capability, attempt and saved cart while reaching enabled checkout review after explicit status checks; no successor checkout or payment is created. Payments118 now carries that recovery evidence, without claiming the exact hosted revision or these Sessions’ PaymentIntent states. The separate local Stripe credential cannot retrieve the hosted connected-account Sessions, so404 is not treated as proof of absence; server-cart adoption and shopper email remain separate.
+
 ## Field Journal phase4 · November14
 All four design phases now share one System/Light/Dark visual system. The dashboard distinguishes sampled operations from deployed facts, pending reviews and historical proof; compact branch summaries disclose the complete original evidence notes without scripting. A six-surface comparison links the original store to final Light/Dark desktop and phone captures. All135 earlier cycle articles, source ledger notes and five owner-instruction archives remain intact; this is presentation work, not a new payment, migration or release.
 
