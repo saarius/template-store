@@ -196,7 +196,7 @@ try {
         if (!(await jump.evaluate(el => el.open))) await jump.locator('summary').click();
         await page.getByRole('navigation', { name: 'Dashboard sections' }).getByRole('link', { name: 'Latest work', exact: true }).click();
         await page.waitForURL(url => url.hash === '#history');
-        await expect(page.locator('#history').getByRole('link', { name: 'read the build history', exact: true })).toHaveAttribute('href', '/dashboard/history/');
+        await expect(page.locator('#history').getByRole('link', { name: 'Read the build history', exact: true })).toHaveAttribute('href', '/dashboard/history/');
       } else if (view === 'history') {
         await expect(page.locator('.cycle-entry')).toHaveCount(historyTitles.length);
         expect(await page.locator('.cycle-entry h3').allTextContents()).toEqual(historyTitles);
