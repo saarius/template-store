@@ -25,12 +25,14 @@ const notice = catalogNoticeText({ unavailable, productCount: products.length, c
   {unavailable ? <p role="alert">The product catalog is temporarily unavailable. Please try again shortly.</p> : products.length === 0 ? <p data-commerce-empty>{emptyMessage}</p> : <div class="shop-grid">
     {products.map(product => {
       const href = productPaths.get(product.id);
+      // Names and descriptions stay local even if a product appears in two shelves.
+      const cardId = `commerce-card-${crypto.randomUUID()}`;
       const availability = catalogCardAvailability(product);
       const body = <>
       <ProductMedia image={product.image} productId={product.id} fallbackSrc={demoPlaceholderImage(product.sku, href?.split("/").pop())} fallbackAlt={`${product.name} placeholder image`} />
       <div class="shop-card__body">
-        <h3>{product.name}</h3>
-        <div class="shop-card__facts">
+        <h3 id={href ? `${cardId}-title` : undefined}>{product.name}</h3>
+        <div class="shop-card__facts" id={href ? `${cardId}-facts` : undefined}>
           <p class="price">{product.price.saleText ? <><s data-regular-price>{product.price.regularText}</s><strong data-sale-price>{product.price.saleText}</strong></> : <strong data-regular-price>{product.price.regularText}</strong>}</p>
           <p class="availability" data-commerce-availability={availability.status}>{availability.label}</p>
         </div>
@@ -38,7 +40,7 @@ const notice = catalogNoticeText({ unavailable, productCount: products.length, c
       </div></>;
       // A linked card is one whole link; buying happens on the product page.
       return href
-        ? <a class="shop-card shop-card--link" href={href} data-commerce-product={product.id} data-product-link>{body}</a>
+        ? <a class="shop-card shop-card--link" href={href} aria-labelledby={`${cardId}-title`} aria-describedby={`${cardId}-facts`} data-commerce-product={product.id} data-product-link>{body}</a>
         : <article class="shop-card" data-commerce-product={product.id}>{body}</article>;
     })}
   </div>}

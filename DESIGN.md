@@ -88,6 +88,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - A six-surface Before/After showcase links original1440px captures to final-phase Light/Dark desktop and390px phone captures. Media stays outside git. All five archived instruction versions, including Steer4, remain in date order and unchanged.
 - Dashboard components add no JavaScript. Navigation, disclosures, instructions and evidence work without scripting; only the existing shared appearance preference needs enhancement.
 
+## Catalog link semantics
+Whole-card shopping links take their accessible name from the visible Commerce product heading and their description from the visible current price/availability group. Keep the authored illustration alt text intact; do not hide images or buying facts to shorten a link name. Scope heading/facts IDs to each rendered card rather than the product identity, so separate shelves cannot share an association. The whole card stays one native keyboard link with the existing focus treatment; unlinked cards retain their own Add controls.
+
 ## Native fit guidance
 Tee and fleece size tables are native EmDash specification blocks, with measuring instructions nearby and illustrative dimensions explicitly distinguished from manufactured samples. Signed Commerce alone supplies selected-size price and availability; the buyable XL fleece backorder must not imply a dispatch date. Browser-only cart proof refuses legacy preparation attempts and must not be described as checkout qualification.
 

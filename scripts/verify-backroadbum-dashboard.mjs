@@ -41,9 +41,9 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('A blank draft is not Remove.');
-        await expect(page.locator('.dashboard-latest')).toContainText('This candidate is not adopted');
-        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/template-store/pull/229#issuecomment-6874204021"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('One product, one clear name.');
+        await expect(page.locator('.dashboard-latest')).toContainText('Current Commerce price and availability remain the link’s description');
+        await expect(page.locator('.dashboard-latest')).toContainText('not a screen-reader device certification');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
@@ -80,6 +80,8 @@ try {
         await expect(released).not.toContainText('still pending');
         const collections = page.locator('.status-list > div').filter({ hasText: 'Collection discovery' });
         await expect(collections).toContainText('unused starter Tees, Hats and Hoodies retained as private drafts');
+        await expect(page.locator('#history')).toContainText('This candidate is not adopted');
+        await expect(page.locator('#history a[href="https://github.com/dinkuskit/template-store/pull/229#issuecomment-6874204021"]')).toBeVisible();
         await expect(page.locator('#history')).toContainText('Current Before/After captures for reviewed UI PRs are publicly hosted outside git');
         await expect(page.locator('#history')).toContainText('Selected metadata #214');
         await expect(page.locator('#history')).toContainText('owner approved the legacy no-Offer contract');
