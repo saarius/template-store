@@ -56,6 +56,37 @@ describe("guest checkout delivery contact", () => {
     });
   });
 
+  it.each([
+    ["name", "delivery-name", "Enter the delivery recipient name to continue."],
+    ["line1", "delivery-line1", "Enter the delivery address line 1 to continue."],
+    ["city", "delivery-city", "Enter the delivery city to continue."],
+    ["postal-code", "delivery-postal-code", "Enter the delivery postal code to continue."],
+    ["country", "delivery-country", "Choose a delivery country to continue."],
+  ])("locates blank delivery %s with its field-specific correction", (name, field, error) => {
+    expect(readCheckoutContact(contactForm({ region: "NY", [name]: "" }), true)).toEqual({
+      contact: null, error, field,
+    });
+  });
+
+  it.each([
+    ["name", "billing-name", "Enter the billing name to continue."],
+    ["line1", "billing-line1", "Enter the billing address line 1 to continue."],
+    ["city", "billing-city", "Enter the billing city to continue."],
+    ["postal-code", "billing-postal-code", "Enter the billing postal code to continue."],
+    ["country", "billing-country", "Choose a billing country to continue."],
+  ])("locates blank billing %s with its field-specific correction", (name, field, error) => {
+    const billing = { "billing-name": "Bill Payer", "billing-line1": "9 Billing Way", "billing-city": "Toronto", "billing-postal-code": "M5V 1A1", "billing-country": "CA" };
+    expect(readCheckoutContact(contactForm({ region: "NY", ...billing, [`billing-${name}`]: "" }, false), true)).toEqual({
+      contact: null, error, field,
+    });
+  });
+
+  it("preserves email priority and country validation locations", () => {
+    expect(readCheckoutContact(contactForm({ email: "" }), true)).toEqual({ contact: null, error: "Enter your email address to continue.", field: "email" });
+    expect(readCheckoutContact(contactForm({ email: "not-an-email" }), true)).toEqual({ contact: null, error: "Enter a valid email address to continue.", field: "email" });
+    expect(readCheckoutContact(contactForm({ country: "USA" }), true)).toEqual({ contact: null, error: "Choose a country this store ships to.", field: "delivery-country" });
+  });
+
   it("forwards a filled US region without taking over Commerce's geographic validation", () => {
     expect(readCheckoutContact(contactForm({ region: " NY " }), true)).toEqual({
       contact: { email: "shopper@example.test", delivery: delivered, billing: delivered },

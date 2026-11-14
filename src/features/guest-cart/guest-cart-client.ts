@@ -385,7 +385,8 @@ function reconcileLines(container: HTMLElement, current: GuestCartView): void {
     }
     if (article instanceof HTMLElement) {
       patchLine(article, line, current);
-      // Moving an already correctly placed row drops focus while typing.
+      // Refreshing facts must not detach an already correctly placed row and
+      // drop focus from its quantity field when the shopper returns.
       if (container.children[index] !== article) container.insertBefore(article, container.children[index] ?? null);
     }
   }
