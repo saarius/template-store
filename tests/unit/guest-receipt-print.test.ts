@@ -10,6 +10,9 @@ class Element {
   querySelector(selector: string) { return this.children.get(selector) ?? null; }
   addEventListener(event: string, listener: () => void) { this.listeners.set(event, listener); }
   setAttribute() {}
+  removeAttribute() {}
+  get ownerDocument() { return document; }
+  focus() { (document as unknown as { activeElement: Element }).activeElement = this; }
 }
 class Button extends Element { disabled = false; }
 class Anchor extends Element {}
@@ -31,7 +34,7 @@ function setup(saved: string | null, response: unknown) {
   vi.stubGlobal("HTMLElement", Element);
   vi.stubGlobal("HTMLButtonElement", Button);
   vi.stubGlobal("HTMLAnchorElement", Anchor);
-  vi.stubGlobal("document", { querySelector: (selector: string) => selector === "[data-guest-checkout-return]" ? root : null, querySelectorAll: () => [] });
+  vi.stubGlobal("document", { activeElement: null, querySelector: (selector: string) => selector === "[data-guest-checkout-return]" ? root : null, querySelectorAll: () => [] });
   vi.stubGlobal("localStorage", { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value) });
   const printCall = vi.fn();
   const fetchCall = vi.fn(async () => Response.json(response));

@@ -19,6 +19,7 @@ import { legacyPortableTextComponents } from "../features/store-shell/portable-t
 import { STORE_TITLE, readStorefrontProfile } from "../features/store-shell/index.js";
 import { canonicalUrl } from "../features/store-shell/structured-data.js";
 import "../features/store-shell/global.css";
+import "../features/store-shell/field-note-print.css";
 import { storeBannerText } from '../features/store-shell/checkout-copy.js';
 import { acquireGuestCheckoutAdmission } from '../features/guest-cart/checkout-admission.js';
 const checkoutAvailable = Boolean(await acquireGuestCheckoutAdmission({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => null));
@@ -51,7 +52,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
     {!entry && <meta name="robots" content="noindex" />}
     <title>{title} | {STORE_TITLE}</title>
   </head>
-  <body data-storefront-profile={profile}>
+  <body data-storefront-profile={profile} data-field-note-page={note ? '' : undefined}>
     <div class="store-demo-banner" role="status">{storeBannerText(checkoutAvailable)} <a href="/test-store">How to try it</a></div>
     <StoreHeader profile={profile} />
     <main id="main-content" class:list={["cms-page", { "field-note": Boolean(note), "cms-reading": Boolean(note) || testGuide, "cms-page--missing": !entry }]} data-cms-page={entry ? slug : undefined}>
@@ -68,7 +69,10 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
               <PortableText value={content} components={legacyPortableTextComponents} />
             </div>
           )}
-          {note && <FieldNoteFooter notes={relatedNotes} />}
+          {note && <>
+            <p class="field-note__print-source">Backroad Bum · Field journal<br />DEMO / TEST STORE — No real charges or shipments.<br /><span>{canonical}</span></p>
+            <FieldNoteFooter notes={relatedNotes} />
+          </>}
           {testGuide && <TestStoreActions />}
         </>
       ) : (

@@ -88,6 +88,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - A six-surface Before/After showcase links original1440px captures to final-phase Light/Dark desktop and390px phone captures. Media stays outside git. All five archived instruction versions, including Steer4, remain in date order and unchanged.
 - Dashboard components add no JavaScript. Navigation, disclosures, instructions and evidence work without scripting; only the existing shared appearance preference needs enhancement.
 
+## Field notes on paper
+The browser’s Print / Save as PDF command gets a field-note-only paper layout; there is no new script or print button. Keep Fraunces/DM Sans at readable print sizes (24pt title, 14pt section headings, 11pt body / 1.5), a 68ch measure and16mm page margins. Use black ink on white paper independently of appearance, keep headings with their following text and avoid splitting individual list items or example quotes. Hide navigation, related reading/shopping and the footer, but retain the complete native article, a compact demo context and the canonical source address; do not append browser capabilities or query strings. All rules require the field-note body marker, so receipts and other CMS pages keep their own print behavior. Chromium A4 PDF is verification, not a claim about physical printers or every browser.
+
 ## Journal examples
 Native field-note quotes use a body-type inset with zero inline margins, existing surface/ink tokens, a rust leading rule and16/24px inner padding. This preserves reading width on phones rather than inheriting40px browser margins on both sides; quotes are examples within the article, not oversized testimonials. Authored sample entries must be explicitly identified as invented nearby, never attributed to a real traveler or presented as a product field test. Headings, list items, links and quote text remain native CMS content; the source manuscript is only an authorship/test checklist.
 

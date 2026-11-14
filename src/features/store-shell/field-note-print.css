@@ -1,0 +1,94 @@
+/* Native browser Print / Save as PDF. Scoped away from receipts and other CMS pages.
+   Both main classes deliberately outweigh Astro's two scoped reading selectors. */
+.field-note__print-source { display: none; }
+
+@media print {
+  @page field-note { size: auto; margin: 16mm; }
+  html:has(> body[data-field-note-page]) { background: #fff; color-scheme: light; }
+
+  body[data-field-note-page] {
+    page: field-note;
+    color-scheme: light;
+    --store-ink: #111;
+    --store-muted: #333;
+    --store-surface: #fff;
+    --store-accent: #555;
+    background: #fff;
+    color: #111;
+  }
+
+  body[data-field-note-page] .store-demo-banner,
+  body[data-field-note-page] .skip-link,
+  body[data-field-note-page] .store-header,
+  body[data-field-note-page] [data-store-footer],
+  body[data-field-note-page] .field-note__back,
+  body[data-field-note-page] .field-note-footer { display: none; }
+
+  body[data-field-note-page] main.field-note {
+    width: auto;
+    max-width: 68ch;
+    min-height: 0;
+    margin: 0 auto;
+    font-size: 11pt;
+  }
+  body[data-field-note-page] main.field-note .field-note__kicker {
+    margin: 0 0 8pt;
+    color: #333;
+    font-size: 9pt;
+  }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__title {
+    max-width: none;
+    margin: 0 0 16pt;
+    font-size: 24pt;
+    line-height: 1.15;
+    break-after: avoid;
+  }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body {
+    max-width: none;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body p {
+    margin-bottom: 10pt;
+    orphans: 3;
+    widows: 3;
+  }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body p:first-child {
+    font-size: 13pt;
+    line-height: 1.4;
+    margin-bottom: 16pt;
+  }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body h2 {
+    margin-top: 20pt;
+    margin-bottom: 8pt;
+    font-size: 14pt;
+    line-height: 1.25;
+    break-after: avoid;
+  }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body ol,
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body ul { margin-bottom: 10pt; }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body li {
+    break-inside: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body li + li { margin-top: 6pt; }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body blockquote {
+    padding: 8pt 12pt;
+    margin: 12pt 0;
+    background: #fff;
+    border-color: #555;
+    break-inside: avoid;
+  }
+  body[data-field-note-page] main.field-note.cms-reading .cms-page__body a { color: #111; }
+  body[data-field-note-page] main.field-note .field-note__print-source {
+    display: block;
+    margin: 20pt 0 0;
+    padding-top: 8pt;
+    border-top: 1px solid #555;
+    color: #333;
+    font: 9pt / 1.5 var(--font-sans);
+    overflow-wrap: anywhere;
+    break-inside: avoid;
+  }
+}

@@ -41,10 +41,10 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('A page from the road.');
-        await expect(page.locator('.dashboard-latest')).toContainText('All 17 blocks were saved and reloaded');
-        await expect(page.locator('.dashboard-latest')).toContainText('all nine Orders remain unchanged');
-        await expect(page.locator('.dashboard-latest a[href="/field-note-a-page-from-the-road"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('Take the note, not the navigation.');
+        await expect(page.locator('.dashboard-latest')).toContainText('fits two pages in Chromium');
+        await expect(page.locator('.dashboard-latest')).toContainText('CMS content are unchanged');
+        await expect(page.locator('.dashboard-latest a[href="/field-note-before-the-signal-drops"]')).toBeVisible();
         await expect(page.locator('#history')).toContainText('an unavailable lookup leaves paid facts and printing intact');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('latest self-dogfood: TEST1009');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
