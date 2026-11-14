@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## County Line Field Book · November14
+A $12 pocket notebook is the seventh native product family, with original winding-road artwork, four design specifications and a separate care disclosure. It was created through EmDash and Commerce’s native first-save form; its draft stayed off the public product, catalog, shop, collection and search surfaces until publication. Road day’s native reference order now puts it before the backordered tote, with the original six products, six field notes and eight Orders unchanged. Published CMS content and Commerce facts remain authoritative; the source manuscript records authorship, and design dimensions/weight are illustrative rather than measured samples.
+
 ## Isolated runtime recovery · November14
 An existing private archive now boots the current deployed code in a disposable mount/network namespace, without live private configuration or outbound connectivity. Six pages, the installed Commerce catalog and archived media serve while eight Orders, all plugin storage and scoped CMS rows remain unchanged. This local opt-in rehearsal reuses host code/dependencies; admin sign-in, current hosted authorization and off-host recovery remain unverified, with no commerce action replayed.
 

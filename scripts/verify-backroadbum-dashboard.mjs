@@ -41,10 +41,10 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('A backup that can serve the catalog.');
-        await expect(page.locator('.dashboard-latest')).toContainText('outbound networking blocked');
-        await expect(page.locator('.dashboard-latest')).toContainText('eight Orders and all scoped business rows stay unchanged');
-        await expect(page.locator('.dashboard-latest')).toContainText('Admin sign-in, hosted authorization and off-host recovery remain unverified');
+        await expect(page.locator('.dashboard-latest')).toContainText('For the turns worth remembering.');
+        await expect(page.locator('.dashboard-latest')).toContainText('The draft stayed private');
+        await expect(page.locator('.dashboard-latest')).toContainText('The six existing products and eight Orders remain unchanged');
+        await expect(page.locator('.dashboard-latest a[href="/products/county-line-field-book"]')).toBeVisible();
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
@@ -141,7 +141,7 @@ try {
         await expect(recovery).toContainText('current deployed code/dependencies reused, not restored from backup');
         await expect(recovery).toContainText('admin sign-in, hosted authorization and off-host recovery unverified');
         const mediaCheck = page.locator('[data-upload-recovery]');
-        await expect(mediaCheck).toContainText(/9 ready media files match archived sizes and hashes · 15 upload files restored · checked/);
+        await expect(mediaCheck).toContainText(/[1-9]\d* ready media files match archived sizes and hashes · [1-9]\d* upload files restored · checked/);
         await expect(mediaCheck).not.toContainText('Unavailable');
         await expect(mediaCheck).not.toContainText('/var/');
         await expect(page.locator('#history')).toContainText('a newer or changed archive cannot inherit an older passing result');

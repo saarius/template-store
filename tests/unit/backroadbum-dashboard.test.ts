@@ -10,8 +10,18 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(coverage).toContain('private network namespace');
     expect(coverage).toContain('current deployed code/dependencies reused, not restored from backup');
     expect(coverage).toContain('admin sign-in, hosted authorization and off-host recovery unverified');
-    expect(source).toContain('A backup that can serve the catalog.');
+    expect(source).toContain('An existing private archive now boots');
   });
+  it('reports the native seventh product without rewriting older catalog or recovery claims', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
+    expect(pulse).toContain('Seven product families, two collections and six field notes');
+    expect(source).toContain('Seven EmDash-backed product families');
+    expect(source).toContain('For the turns worth remembering.');
+    expect(source).toContain('The six existing products and eight Orders remain unchanged');
+    expect(source).toContain('href="/products/county-line-field-book"');
+  });
+
   it('separates verified original checkout release from unknown provider cause', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const current = source.match(/<div><dt>Unpaid recovery<\/dt>[\s\S]*?<\/div>/)?.[0];

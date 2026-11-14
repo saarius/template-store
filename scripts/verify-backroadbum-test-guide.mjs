@@ -45,7 +45,7 @@ try {
         await page.goto(base + '/test-store');
         await page.getByRole('navigation', { name: 'Ready to try it?', exact: true }).getByRole('link', { name: 'Browse the gear', exact: true }).click();
         await expect(page).toHaveURL(base + '/shop');
-        await expect(page.locator('[data-commerce-product]')).toHaveCount(6);
+        await expect(page.locator('[data-commerce-product]')).toHaveCount(7);
       } else {
         await expect(page.locator('[data-policy-recovery] a')).toHaveAttribute('href', '/checkout/success');
         await expect(page.locator('.test-store-actions')).toHaveCount(0);

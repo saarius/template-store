@@ -61,7 +61,7 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 ## Home
 - Native EmDash headline, deck and CTA destinations remain authoritative and unchanged. The existing landscape is eager/high-priority, with honest authored alt text and no fabricated place name.
 - Two published nonempty collections use tactile, bounded text cards. Their copy and membership still come from EmDash; a failed catalog read cannot invent an empty collection list or copied prices.
-- All six products continue through the signed Commerce catalog. Cards gain tonal surfaces and quieter body facts; no indexed or seeded price becomes shopping authority.
+- All published product families continue through the signed Commerce catalog. Cards gain tonal surfaces and quieter body facts; no indexed or seeded price becomes shopping authority.
 - A final 1.618:1 reading invitation leads to Field Notes with distinct serif rhythm. No extra carousel, fake testimonials, newsletter collection or duplicated shopping flow.
 
 ## Shop, collections, product and search · Phase 2
@@ -93,6 +93,9 @@ Keep automatic latest-archive media checks separate from the dated opt-in runtim
 
 ## Catalog link semantics
 Whole-card shopping links take their accessible name from the visible Commerce product heading and their description from the visible current price/availability group. Keep the authored illustration alt text intact; do not hide images or buying facts to shorten a link name. Scope heading/facts IDs to each rendered card rather than the product identity, so separate shelves cannot share an association. The whole card stays one native keyboard link with the existing focus treatment; unlinked cards retain their own Add controls.
+
+## Notebook design
+County Line Field Book adds an original vector illustration in the existing 4:3 media stage: kraft/mineral neutrals, a rust spine and a winding-road cover, not a product photograph. Native EmDash specification rows lead; the secondary care disclosure starts closed and remains keyboard-operable without scripting. Authored design dimensions are explicitly illustrative, and the source checklist is not runtime product or price data. Road day keeps the in-stock notebook ahead of the backordered tote through published native reference order.
 
 ## Native fit guidance
 Cap specifications precede its native Fit & care disclosure, using the existing two-column detail grid and phone stack. Adjustment instructions distinguish an adult-fit label from a measured range, and the care copy makes no tested UPF claim; its source checklist is verification input, never runtime content or commerce authority.

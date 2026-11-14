@@ -19,7 +19,7 @@ try {
     });
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await page.goto(base + '/shop')).status()).toBe(200);
-    await expect(page.locator('[data-commerce-product][data-product-link]')).toHaveCount(6);
+    await expect(page.locator('[data-commerce-product][data-product-link]')).toHaveCount(7);
     const tee = page.locator('[data-product-link][href="/products/wrong-turn-tee"]');
     await expect(tee).toHaveCount(1);
     await expect(tee.locator('[data-commerce-availability]')).toHaveText('In stock');

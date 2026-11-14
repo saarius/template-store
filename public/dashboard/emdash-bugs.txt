@@ -22,6 +22,7 @@ Updated November 14, 2026. No EmDash upstream issue, PR or comment has been open
 - Reproduce: start another WorkerdSandboxRunner while live workerd already occupies127.0.0.1:18788 in the same network namespace. The fixture failed binding that address.
 - Root cause: each runner instance initializes its first plugin port to18788; no automatic cross-process allocation was observed.
 - Workaround: disposable test in a separate network namespace, with explicit cleanup. No live port/service changes. This fixture collision does NOT diagnose item2, already reproduced in isolation.
+- Follow-up November14: a parallel catalog-preview service on the same network namespace again failed `bind(): Address already in use`, then reached the runner’s10-second startup timeout/crash budget. The live store remained healthy; only the disposable preview was affected. Restarting that preview with `PrivateNetwork=yes`, and running its browser checks inside the same namespace, restores fast native catalog reads without changing live listeners or patching EmDash. This reconfirms the existing collision, not a new CMS defect or serving outage. Evidence: `evidence/2026-11-14-field-book/`, including sanitized runner output and isolated-stage checks.
 - Evidence: workspace evidence/2026-11-10-ship-sender-cycle.md; installed sandbox-workerd runner source. Human review should confirm whether a supported port-selection API exists before filing.
 
 ## 4. Deployment shutdown and private encryption prerequisites

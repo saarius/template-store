@@ -18,7 +18,7 @@ try {
     page.on('response', r => { if (r.status() >= 500) errors.push(`${r.status()} ${new URL(r.url()).pathname}`); });
     await page.goto(base);
     await expect(page.locator('h1')).toHaveText('Take the long way back.');
-    await expect(page.locator('[data-commerce-product]')).toHaveCount(6);
+    await expect(page.locator('[data-commerce-product]')).toHaveCount(7);
     await expect.poll(() => page.locator('[data-commerce-product] img').evaluateAll(imgs => imgs.every(img => img.complete && img.naturalWidth > 0))).toBe(true);
     await page.locator('img').evaluateAll(async imgs => {
       for (const img of imgs) img.loading = 'eager';

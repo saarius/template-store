@@ -10,9 +10,11 @@ export async function verifyProductDetails(sourceName = 'backroadbum-cap-details
       typeof source.tableHeading !== 'string' || typeof source.careHeading !== 'string' ||
       !Array.isArray(source.rows) || !source.rows.length ||
       !source.rows.every(row => typeof row.label === 'string' && typeof row.value === 'string') ||
-      !careParagraphs.length || !careParagraphs.every(text => typeof text === 'string' && text.length > 0)) {
+      !careParagraphs.length || !careParagraphs.every(text => typeof text === 'string' && text.length > 0) ||
+      (source.careOpenByDefault !== undefined && typeof source.careOpenByDefault !== 'boolean')) {
     throw Error('Product-details checklist is incomplete.');
   }
+  const careOpenByDefault = source.careOpenByDefault ?? true;
   const { chromium, expect } = await import('@playwright/test');
   const base = process.env.BACKROADBUM_ORIGIN || 'https://backroadbum.com';
   const output = new URL(`../runs/backroadbum/product-details-${source.slug}/`, import.meta.url);
@@ -59,15 +61,15 @@ export async function verifyProductDetails(sourceName = 'backroadbum-cap-details
         expect(await specs.locator('dd').allTextContents()).toEqual(source.rows.map(row => row.value));
         const care = details.locator('details').filter({ has: page.locator('summary', { hasText: source.careHeading }) });
         await expect(care).toHaveCount(1);
-        await expect(care).toHaveAttribute('open', '');
+        await expect(care).toHaveJSProperty('open', careOpenByDefault);
         await expect(care.locator('summary')).toHaveText(source.careHeading);
         expect(await care.locator('.product-section__body p').allTextContents()).toEqual(careParagraphs);
         // Care is native HTML; Enter works with JavaScript disabled too.
         const intent = JSON.stringify({ version: 1, lines: [{ id, quantity: 2 }] });
         await page.evaluate(raw => localStorage.setItem('dinkus.guest-cart.v1', raw), intent);
         await care.locator('summary').focus(); await expect(care.locator('summary')).toBeFocused();
-        await page.keyboard.press('Enter'); await expect(care).not.toHaveAttribute('open');
-        await page.keyboard.press('Enter'); await expect(care).toHaveAttribute('open', '');
+        await page.keyboard.press('Enter'); await expect(care).toHaveJSProperty('open', !careOpenByDefault);
+        await page.keyboard.press('Enter'); await expect(care).toHaveJSProperty('open', careOpenByDefault);
         expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1'))).toBe(intent);
         expect(await page.evaluate(() => localStorage.getItem('dinkus.guest-checkout.v1'))).toBeNull();
         expect(await page.locator('[data-product-jsonld]').textContent()).toBe(metadata);

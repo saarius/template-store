@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { readFile, rm, writeFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 import { verifyProductDetails } from '../../scripts/verify-backroadbum-product-details.mjs';
 
@@ -16,6 +17,17 @@ describe('read-only native product-details verifier', () => {
     expect(result.status).toBe(1);
     expect(result.stdout).toBe('');
     expect(result.stderr).toContain('Only --check');
+  });
+
+  it('rejects a string care state before launching a browser', async () => {
+    const source = JSON.parse(await readFile(new URL('../../seed/backroadbum-field-book.json', import.meta.url), 'utf8'));
+    const fixture = new URL('../../seed/backroadbum-invalid-care-state.json', import.meta.url);
+    await writeFile(fixture, JSON.stringify({ ...source, careOpenByDefault: 'false' }), { flag: 'wx' });
+    try {
+      await expect(verifyProductDetails('backroadbum-invalid-care-state.json')).rejects.toThrow('Product-details checklist is incomplete.');
+    } finally {
+      await rm(fixture);
+    }
   });
 
   it('refuses paths outside a source checklist and incomplete non-product manuscripts', async () => {

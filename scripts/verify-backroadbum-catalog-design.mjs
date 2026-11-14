@@ -21,14 +21,14 @@ try {
       const page = await context.newPage(); page.on('pageerror', error => errors.push(error.name));
       const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.goto(base + '/shop');
-      await expect(page.locator('[data-product-link]')).toHaveCount(6);
+      await expect(page.locator('[data-product-link]')).toHaveCount(7);
       const firstCard = page.locator('[data-product-link]').first();
       await firstCard.hover();
       expect(await firstCard.locator('img').evaluate(node => ({
         filter: getComputedStyle(node).filter, transform: getComputedStyle(node).transform,
       }))).toEqual({ filter: 'none', transform: 'none' });
       const collectionNav = page.getByRole('navigation', { name: 'Shop collections' });
-      await expect(collectionNav.getByRole('link', { name: 'All gear (6)', exact: true })).toHaveAttribute('aria-current', 'page');
+      await expect(collectionNav.getByRole('link', { name: 'All gear (7)', exact: true })).toHaveAttribute('aria-current', 'page');
       for (const link of await collectionNav.getByRole('link').all()) {
         const box = await link.boundingBox(); expect(box.width).toBeGreaterThanOrEqual(44); expect(box.height).toBeGreaterThanOrEqual(44);
       }

@@ -45,7 +45,7 @@ try {
         await page.screenshot({ path: new URL(`article-${width}.png`, output).pathname, fullPage: true });
         await page.locator('.field-note-shop a').click();
         await expect(page).toHaveURL(base + '/shop');
-        await expect(page.locator('[data-commerce-product]')).toHaveCount(6);
+        await expect(page.locator('[data-commerce-product]')).toHaveCount(7);
       }
       await page.goto(base + note.href);
       await page.locator('.field-note__back').click();

@@ -1,0 +1,26 @@
+{
+  "name": "County Line Field Book",
+  "title": "County Line Field Book",
+  "slug": "county-line-field-book",
+  "sku": "BRB-BOOK-ONE",
+  "regular": "12.00",
+  "stockStatus": "in-stock",
+  "weightOz": "2",
+  "description": "A pocket notebook for campsite sketches, turn-offs worth remembering and one line before heading home.",
+  "summary": "Some turns are worth a second visit. Keep the small details on paper: a creek crossing, a good lunch stop, the name of the road you meant to remember.",
+  "tableHeading": "Notebook design",
+  "rows": [
+    { "label": "Format", "value": "4 × 6 in pocket notebook" },
+    { "label": "Pages", "value": "64 plain pages / 32 leaves" },
+    { "label": "Cover", "value": "Kraft-colored softcover with a winding-road illustration" },
+    { "label": "Design notes", "value": "Illustrative specifications, not measurements from a manufactured sample" }
+  ],
+  "careHeading": "On paper, on the road",
+  "careOpenByDefault": false,
+  "care": [
+    "Plain pages leave room for a sketch, a list or a few lines. Add the date and road name before the small details fade; check access rules before sharing a stop with someone else.",
+    "Keep the notebook dry and carry it in a pouch when the weather turns. It is not a waterproof notebook or a substitute for a map. Let damp pages air dry open, away from direct heat."
+  ],
+  "imageAlt": "County Line Field Book — original illustration of a kraft-colored pocket notebook with a winding road on the cover",
+  "authorship": "Initial merchant manuscript only. Published EmDash copy and Commerce facts remain the runtime authority. The 2 oz shipping input is illustrative, not a weighed item or packed shipment."
+}

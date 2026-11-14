@@ -24,7 +24,7 @@ try {
     page.on('pageerror', error => errors.push(error.message));
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await page.goto(base + '/shop')).status()).toBe(200);
-    await expect(page.locator('[data-commerce-product][data-product-link]')).toHaveCount(6);
+    await expect(page.locator('[data-commerce-product][data-product-link]')).toHaveCount(7);
     const card = page.locator('[data-product-link][href="/products/switchback-bandana"]');
     await expect(card).toContainText('Switchback Bandana');
     const id = await card.getAttribute('data-commerce-product');
