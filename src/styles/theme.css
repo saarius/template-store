@@ -97,5 +97,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
 /* Merchant product stages stay faithful to the native media: no pigment overlay or recoloring. */
 .shop-catalog .commerce-product-media,.product-page .commerce-product-media{background:var(--color-surface-muted);border:0}
 .shop-catalog .product-media__pigment-wash,.product-page .product-media__pigment-wash{display:none}
-.shop-catalog .commerce-product-media img,.product-page .commerce-product-media img{transition:none;transform:none;filter:none}
+body .shop-catalog .shop-grid .shop-card .commerce-product-media img,
+body .shop-catalog .shop-grid .shop-card:hover .commerce-product-media img,
+body .product-page .product-detail .product-detail__visual .commerce-product-media img,
+body .product-page .product-detail .product-detail__visual:hover .commerce-product-media img{transition:none;transform:none;filter:none}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}

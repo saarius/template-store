@@ -9,7 +9,7 @@ const results = [];
 try {
   for (const width of [390, 1440]) for (const colorScheme of ['light', 'dark']) {
     const context = await browser.newContext({ viewport: { width, height: 1000 }, colorScheme,
-      reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
+      reducedMotion: 'no-preference', userAgent: 'BackroadBum-SelfCheck/1.0' });
     const writes = [], errors = [], checkout = [];
     await context.route('**/*', route => {
       const request = route.request();
@@ -22,6 +22,11 @@ try {
       const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       await page.goto(base + '/shop');
       await expect(page.locator('[data-product-link]')).toHaveCount(6);
+      const firstCard = page.locator('[data-product-link]').first();
+      await firstCard.hover();
+      expect(await firstCard.locator('img').evaluate(node => ({
+        filter: getComputedStyle(node).filter, transform: getComputedStyle(node).transform,
+      }))).toEqual({ filter: 'none', transform: 'none' });
       const collectionNav = page.getByRole('navigation', { name: 'Shop collections' });
       await expect(collectionNav.getByRole('link', { name: 'All gear (6)', exact: true })).toHaveAttribute('aria-current', 'page');
       for (const link of await collectionNav.getByRole('link').all()) {
@@ -59,6 +64,10 @@ try {
       }
       await page.goto(base + '/products/creekside-camp-mug');
       await expect(page.getByRole('region', { name: 'Product pictures', exact: true }).locator('img')).toHaveCount(3);
+      await page.locator('[data-product-stage-visual]').hover();
+      expect(await page.locator('[data-product-stage-visual] img').evaluate(node => ({
+        filter: getComputedStyle(node).filter, transform: getComputedStyle(node).transform,
+      }))).toEqual({ filter: 'none', transform: 'none' });
       await expect(page.locator('[data-product-details]')).toContainText('Details & care');
       await expect(page.locator('[data-product-details] dt')).toHaveCount(3);
       await page.locator('[data-product-details]').scrollIntoViewIfNeeded();
@@ -74,7 +83,7 @@ try {
       expect(writes).toEqual([]); expect(errors).toEqual([]); expect(checkout).toEqual([]);
       results.push({ width, colorScheme, collectionFilters: true, accessiblePillNames: true, nativeRadioArrows: true,
         exactSelectedMember: true, soldOutRefused: true, nativeMugDetails: true, searchGet: true,
-        noOverflow: true, noSavedIntent: true, writes: 0, checkoutRequests: 0, browserErrors: 0 });
+        noOverflow: true, noSavedIntent: true, nativeColorOnHover: true, writes: 0, checkoutRequests: 0, browserErrors: 0 });
     } finally { await context.close(); }
     const plain = await browser.newContext({ viewport: { width, height: 1000 }, colorScheme,
       javaScriptEnabled: false, userAgent: 'BackroadBum-SelfCheck/1.0' });
