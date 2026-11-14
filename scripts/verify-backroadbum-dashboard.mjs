@@ -43,16 +43,16 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('One inbox. One order.');
-        await expect(page.locator('.dashboard-latest')).toContainText('excluding the nine earlier guest Orders');
-        await expect(page.locator('.dashboard-latest')).toContainText('paste-safe code field and clear verified-destination limits');
+        await expect(page.locator('.dashboard-latest')).toContainText('Small controls. A firmer footing.');
+        await expect(page.locator('.dashboard-latest')).toContainText('not a visual change to our already-sized Field Journal shell');
+        await expect(page.locator('.dashboard-latest')).toContainText('no catalog, account, payment or shipping action changes');
         await expect(page.locator('#history')).toContainText('original shopper cart capabilities preserved');
         await expect(page.locator('#history a[href="https://github.com/dinkuskit/template-store/pull/227#issuecomment-6881635674"]')).toHaveCount(1);
         await expect(page.locator('#history')).toContainText('an unavailable lookup leaves paid facts and printing intact');
         await expect(page.locator('.status-list > div').filter({ hasText: 'Hosted test checkout' })).toContainText('Latest self-dogfood: TEST1010');
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
-        await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);
+        await expect(page.locator('[data-open-reviews] li')).toHaveCount(6);
         await expect(page.locator('[data-redesign-showcase]')).toContainText('signed plugins, catalog facts and order records remain intact');
       }
       if (view === 'contributions') {

@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates generic shell proof from the custom merchant shell and business actions', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('https://github.com/dinkuskit/template-store/pull/232');
+    expect(source).toContain('not a visual change to our already-sized Field Journal shell');
+    expect(source).toContain('no catalog, account, payment or shipping action changes');
+    expect(source).toContain('the separate inherited policy eyebrow finding');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(reviews).toContain('aa13a38');
+    expect(reviews).toContain("review.state ?? 'Open · checks passing'");
+  });
   it('separates opt-in archived runtime proof from unattended media checks and remaining recovery gaps', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const coverage = source.match(/<div><dt>Recovery coverage<\/dt>[\s\S]*?<\/div>/)?.[0];
