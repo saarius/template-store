@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## Owner Steer 5 · November14
+New instructions arrived at16:49UTC after the merchant-rehearsal deployment: next are a strictly downstream upstream/main sync and real-catalog feed/local Worker dogfooding, followed by the provisioned HTTPS relay's verified-inbox shopper journey. The relay's anonymous health check passes, but the serving agent feed is404 and native email transport/delivery/account verification are not implemented. Keep current signed plugins and the Field Journal design; do not install Inventory or treat health as email-delivery proof.
+
 ## Native product retirement and return · November14
 A disposable copy of the signed-plugin store exercised Archive, Restore and page republication without touching the live catalog. Restore deliberately leaves a Commerce draft while the CMS page remains live, with Save disabled and no Publish action; a native unpublish→publish workaround returned the same product and original two-unit cart on desktop and phone. Commerce276 requests an actionable next step while preserving the draft and page-publication contracts, not a deployed repair. All nine copied Orders and authored CMS content stayed intact, and live business hashes are unchanged.
 

@@ -10,6 +10,8 @@ const steer3Path = '/dashboard/instructions/steer-3-2026-11-12.txt';
 const steer3Text = await readFile(new URL('../public' + steer3Path, import.meta.url), 'utf8');
 const steer4Path = '/dashboard/instructions/steer-4-2026-11-13.txt';
 const steer4Text = await readFile(new URL('../public' + steer4Path, import.meta.url), 'utf8');
+const steer5Path = '/dashboard/instructions/steer-5-2026-11-14.txt';
+const steer5Text = await readFile(new URL('../public' + steer5Path, import.meta.url), 'utf8');
 const base = process.env.STORE_URL || 'https://backroadbum.com';
 const output = new URL('../runs/backroadbum/dashboard/', import.meta.url);
 await mkdir(output, { recursive: true });
@@ -150,8 +152,8 @@ try {
         await expect(mediaCheck).not.toContainText('/var/');
         await expect(page.locator('#history')).toContainText('a newer or changed archive cannot inherit an older passing result');
         const email = page.locator('.status-list > div').filter({ has: page.locator('dt').filter({ hasText: /^Email sign-in$/ }) });
-        await expect(email).toContainText('no email provider on November 13');
-        await expect(email).toContainText('delivery remains unverified');
+        await expect(email).toContainText('HTTPS relay provisioned November 14');
+        await expect(email).toContainText('native transport registration and delivery remain unverified');
         await expect(page.locator('#history')).toContainText('no installed or selected provider and no test-email action');
         const editorial = page.locator('.status-list > div').filter({ hasText: 'Editorial' });
         await expect(editorial).toContainText('Seven EmDash field notes');
@@ -175,7 +177,7 @@ try {
         await expect(page.getByRole('link', { name: 'Original · captured November 9, 2026', exact: true })).toHaveAttribute('href', '/dashboard/instructions/original-2026-11-09.txt');
         await expect(page.getByRole('link', { name: 'Steer 1 · November 10, 2026', exact: true })).toHaveAttribute('href', '/dashboard/instructions/steer-1-2026-11-10.txt');
         expect(await page.locator('#instructions a').allTextContents()).toEqual([
-          'Original · captured November 9, 2026', 'Steer 1 · November 10, 2026', 'Steer 2 · November 11, 2026', 'Steer 3 · November 12, 2026', 'Steer 4 · November 13, 2026',
+          'Original · captured November 9, 2026', 'Steer 1 · November 10, 2026', 'Steer 2 · November 11, 2026', 'Steer 3 · November 12, 2026', 'Steer 4 · November 13, 2026', 'Steer 5 · November 14, 2026',
         ]);
         const steer2 = page.getByRole('link', { name: 'Steer 2 · November 11, 2026', exact: true });
         await expect(steer2).toHaveAttribute('href', steer2Path);
@@ -200,6 +202,15 @@ try {
         await steer4.click();
         expect(await (await archive4Response).text()).toBe(steer4Text);
         await expect(page.locator('body')).toContainText('Full Redesign');
+        await page.goBack();
+        const steer5 = page.getByRole('link', { name: 'Steer 5 · November 14, 2026', exact: true });
+        await expect(steer5).toHaveAttribute('href', steer5Path);
+        const archive5Response = page.waitForResponse(response => new URL(response.url()).pathname === steer5Path);
+        await steer5.click();
+        expect(await (await archive5Response).text()).toBe(steer5Text);
+        await expect(page.locator('body')).toContainText('Cross-Store Agent Catalog');
+        await expect(page.locator('body')).toContainText('[owner account email redacted]');
+        await expect(page.locator('body')).not.toContainText(/@gmail\.com/i);
         await page.goBack();
         // Back navigation may replace the document and its earlier scroll override.
         await page.evaluate(() => { document.documentElement.style.scrollBehavior = 'auto'; });
@@ -328,7 +339,7 @@ try {
     }
     expect(sizes.overview).toBeLessThan(sizes.history);
     expect(writes).toEqual([]);
-    results.push({ width, colorScheme, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 18, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 5, steer2ArchiveExact: true, steer3ArchiveExact: true, steer4ArchiveExact: true, nativeKeyboardDisclosures: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
+    results.push({ width, colorScheme, javaScriptEnabled: false, views: 3, archiveEntries: historyTitles.length, candidateRows: 18, currentNavigation: true, noOverflow: true, privateFieldsAbsent: true, instructionVersions: 6, steer2ArchiveExact: true, steer3ArchiveExact: true, steer4ArchiveExact: true, steer5ArchiveExact: true, nativeKeyboardDisclosures: true, boundedReadinessHistory: true, writes: 0, bytes: sizes });
     await context.close();
   }
   for (const width of [390, 1440]) {
