@@ -273,7 +273,13 @@ describe("guest cart quantity mutation", () => {
       }
     }
     class MockButton extends MockElement {
-      disabled = false;
+      private isDisabled = false;
+      readonly disabledWrites: boolean[] = [];
+      get disabled() { return this.isDisabled; }
+      set disabled(value: boolean) {
+        this.disabledWrites.push(value);
+        this.isDisabled = value;
+      }
     }
 
     const store = memoryStorage();
@@ -314,6 +320,7 @@ describe("guest cart quantity mutation", () => {
     vi.stubGlobal("HTMLInputElement", MockInput);
     vi.stubGlobal("HTMLButtonElement", MockButton);
     vi.stubGlobal("CSS", { escape: (v: string) => v });
+    const addedEvent = vi.fn(() => true);
     vi.stubGlobal("document", {
       querySelectorAll(selector: string) {
         if (selector === "[data-guest-cart-nav]") return [navLink];
@@ -321,9 +328,7 @@ describe("guest cart quantity mutation", () => {
         if (selector === "[data-add-to-cart]") return [addButton];
         return [];
       },
-      dispatchEvent() {
-        return true;
-      },
+      dispatchEvent: addedEvent,
     });
 
     try {
@@ -335,8 +340,14 @@ describe("guest cart quantity mutation", () => {
       stepUp.click();
       stepUp.click();
       expect(qtyInput.value).toBe("3");
+      // A synchronous cart-update subscriber must not reenter the same Add.
+      addedEvent.mockImplementationOnce(() => { addButton.click(); return true; });
       addButton.click();
+      expect(addedEvent).toHaveBeenCalledOnce();
       expect(status.textContent).toBe("Added to cart.");
+      // This mutation is synchronous. Disabling a focused native button drops
+      // browser focus, even if it is re-enabled before the handler returns.
+      expect(addButton.disabledWrites).toEqual([]);
       expect(status.getAttribute("role")).toBe("status");
       expect(viewCart.hidden).toBe(false);
       expect(loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent.lines).toEqual([
@@ -384,6 +395,16 @@ describe("guest cart quantity mutation", () => {
       ]);
 
       expect(navBadge.textContent).toBe("6");
+      addButton.disabledWrites.length = 0; // Ignore the intentional sold-out gate above.
+      addButton.setAttribute("data-add-to-cart-sellable", "true");
+      addButton.setAttribute("data-add-to-cart", "hoodie-small-indigo");
+      qtyInput.value = "97";
+      const beforeLimit = loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent;
+      addButton.click();
+      expect(status.getAttribute("role")).toBe("alert");
+      expect(viewCart.hidden).toBe(true);
+      expect(loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent).toEqual(beforeLimit);
+      expect(addButton.disabledWrites).toEqual([]);
 
       // A later failed save must retract the saved-cart handoff.
       addButton.setAttribute("data-add-to-cart-sellable", "true");
@@ -396,6 +417,7 @@ describe("guest cart quantity mutation", () => {
         expect(status.textContent).not.toBe("Added to cart.");
         expect(viewCart.hidden).toBe(true);
         expect(loadGuestCartIntent(GUEST_CART_STORAGE_KEY, store).intent).toEqual(saved);
+        expect(addButton.disabledWrites).toEqual([]);
       } finally {
         write.mockRestore();
       }

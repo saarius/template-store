@@ -4,6 +4,9 @@
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 
+## Product Add keyboard continuity · November14
+A successful product Add briefly disabled its synchronous local-save button, dropping keyboard focus to the document body. Keeping that button enabled retains native focus for success, combined-line refusal and storage failure; malformed quantities still focus their correction field. Enter/Space can be repeated without refocusing and Tab continues to View cart, with no change to the saved-intent or checkout protocol.
+
 ## Product quantity corrections · November14
 An invalid product quantity previously left an unassociated alert and focus on the document body. Rejected Add now marks and describes the quantity field, focuses it for correction and retains the typed draft; typing or a stepper clears only that correction, not storage failures. Valid additions and combined-line limits keep their existing cart rules, and no server-cart or signed-plugin contract changes.
 

@@ -91,6 +91,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 ## Native fit guidance
 Tee and fleece size tables are native EmDash specification blocks, with measuring instructions nearby and illustrative dimensions explicitly distinguished from manufactured samples. Signed Commerce alone supplies selected-size price and availability; the buyable XL fleece backorder must not imply a dispatch date. Browser-only cart proof refuses legacy preparation attempts and must not be described as checkout qualification.
 
+## Product Add continuity
+The local product Add mutation is synchronous: do not transiently disable its button or programmatically move focus on success. Retain the native button focus cue through success, combined-line refusal and storage failure; only malformed quantity correction focuses the input. The onward View cart link remains success-only and next in keyboard order. A future asynchronous server-cart implementation needs its own honest pending state and focus qualification, not an assumption that this local strategy transfers unchanged.
+
 ## Product quantity feedback
 A rejected explicit Add associates its existing alert with Quantity via a stable ID and `aria-describedby`, marks `aria-invalid` and focuses the retained input. The stepper outline and alert use the established danger token, not a new palette; editing or stepping clears only the quantity correction without moving focus. Storage refusals and combined-cart-line limits remain separate, and success-only View cart never appears for a failed save.
 

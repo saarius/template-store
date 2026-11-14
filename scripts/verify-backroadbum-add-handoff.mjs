@@ -7,10 +7,17 @@ await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const results = [];
 try {
-  for (const width of [1440, 768, 390, 320]) {
-    const context = await browser.newContext({ viewport: { width, height: 1000 }, reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
+  for (const [width, colorScheme] of [[1440, 'light'], [1440, 'dark'], [768, 'light'], [390, 'light'], [390, 'dark'], [320, 'light']]) {
+    const context = await browser.newContext({ viewport: { width, height: 1000 }, colorScheme, reducedMotion: 'reduce', userAgent: 'BackroadBum-SelfCheck/1.0' });
+    const nonGetRequests = [];
+    await context.route('**/*', route => {
+      if (route.request().method() === 'GET') return route.continue();
+      nonGetRequests.push(new URL(route.request().url()).pathname);
+      return route.abort();
+    });
     const page = await context.newPage();
     const errors = [], checkout = [];
+    const saved = () => page.evaluate(() => ({ cart: localStorage.getItem('dinkus.guest-cart.v1'), checkout: localStorage.getItem('dinkus.guest-checkout.v1') }));
     page.on('pageerror', error => errors.push(error.message));
     page.on('request', request => { if (/\/api\/checkout\//.test(request.url())) checkout.push(new URL(request.url()).pathname); });
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
@@ -36,34 +43,63 @@ try {
       expect(await control.evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
       expect(await stepper.evaluate(el => getComputedStyle(el).overflow)).toBe('visible');
       if (process.argv.includes('--capture')) {
-        await page.locator('.guest-cart-add').screenshot({ path: new URL(`${name}-focus-${width}.png`, output).pathname });
+        await page.locator('.guest-cart-add').screenshot({ path: new URL(`${name}-focus-${width}-${colorScheme}.png`, output).pathname });
       }
     }
     await quantity.fill('99'); await increase.click(); await expect(quantity).toHaveValue('99');
     await quantity.fill('1');
     await increase.click();
     await expect(page.locator('[data-add-to-cart-qty]')).toHaveValue('2');
-    await add.click();
+    // Synthetic subscriber tests the former disabled-state reentry protection
+    // without substituting catalog facts or cart persistence.
+    await page.evaluate(() => document.addEventListener('guest-cart-updated', () => {
+      document.querySelector('[data-add-to-cart]').click();
+    }, { once: true }));
+    await add.focus(); await page.keyboard.press('Enter');
+    await expect(add).toBeFocused();
     await expect(status).toHaveText('Added to cart.');
+    const selectedId = await add.getAttribute('data-add-to-cart');
+    const expectSavedQuantity = async value => {
+      const state = await saved();
+      expect(JSON.parse(state.cart).lines).toEqual([{ id: selectedId, quantity: value }]);
+      expect(state.checkout).toBeNull();
+    };
+    await expectSavedQuantity(2);
+    // A second keyboard activation works without first restoring lost focus.
+    await page.keyboard.press('Space'); await expect(add).toBeFocused(); await expectSavedQuantity(4);
+    await page.keyboard.press('Enter'); await expect(add).toBeFocused(); await expectSavedQuantity(6);
+    const beforeLimit = await saved();
+    await quantity.fill('94'); await add.focus(); await page.keyboard.press('Enter');
+    await expect(add).toBeFocused();
+    await expect(status).toHaveAttribute('role', 'alert');
+    await expect(view).toBeHidden();
+    expect(await saved()).toEqual(beforeLimit);
+    await quantity.fill('1'); await add.focus(); await page.keyboard.press('Enter');
+    await expect(add).toBeFocused(); await expectSavedQuantity(7);
+    expect(await add.evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
+    if (process.argv.includes('--capture')) {
+      await page.locator('.guest-cart-add').screenshot({ path: new URL(`add-focus-${width}-${colorScheme}.png`, output).pathname });
+    }
     await expect(status).toHaveAttribute('role', 'status');
     await expect(view).toBeVisible();
     await expect(view).toHaveAttribute('href', '/cart');
     await expect(view).toHaveAccessibleName('View cart');
-    await add.focus(); await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
     await expect(view).toBeFocused();
     expect(await view.evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
     expect(await view.evaluate(el => el.getBoundingClientRect().height)).toBeGreaterThanOrEqual(48);
     await page.evaluate(() => document.fonts.ready); await fits();
-    await page.screenshot({ path: new URL(`after-${width}.png`, output).pathname, fullPage: true });
+    await page.screenshot({ path: new URL(`after-${width}-${colorScheme}.png`, output).pathname, fullPage: true });
     await view.press('Enter');
     await expect(page).toHaveURL(base + '/cart');
     await expect(page.locator('[data-guest-cart-line]')).toHaveCount(1);
-    await expect(page.locator('[data-guest-cart-qty]')).toHaveValue('2');
+    await expect(page.locator('[data-guest-cart-qty]')).toHaveValue('7');
     await page.locator('[data-guest-cart-remove]').click();
     await expect(page.locator('[data-guest-cart-line]')).toHaveCount(0);
 
     await page.goto(base + '/products/long-way-cap');
     await page.locator('[data-add-to-cart-qty]').fill('0'); await add.click();
+    await expect(quantity).toBeFocused();
     await expect(status).toHaveAttribute('role', 'alert');
     await expect(view).toBeHidden();
     await page.locator('[data-add-to-cart-qty]').fill('1'); await add.click();
@@ -76,14 +112,19 @@ try {
         return original.call(this, key, value);
       };
     });
-    await add.click();
+    const beforeFailure = await saved();
+    await add.focus(); await page.keyboard.press('Enter');
+    await expect(add).toBeFocused();
+    expect(await saved()).toEqual(beforeFailure);
     await expect(status).toHaveAttribute('role', 'alert');
     await expect(status).toContainText('Leave or reload this page');
     await expect(view).toBeHidden();
     await fits();
-    await page.screenshot({ path: new URL(`failed-save-${width}.png`, output).pathname, fullPage: true });
-    expect(errors).toEqual([]); expect(checkout).toEqual([]);
-    results.push({ width, savedAddition: true, keyboardCartHandoff: true, cartQuantity: 2, removed: true,
+    await page.screenshot({ path: new URL(`failed-save-${width}-${colorScheme}.png`, output).pathname, fullPage: true });
+    expect(errors).toEqual([]); expect(checkout).toEqual([]); expect(nonGetRequests).toEqual([]);
+    results.push({ width, colorScheme, savedAddition: true, keyboardCartHandoff: true, cartQuantity: 7, removed: true,
+      keyboardEnterAndSpaceRetainFocus: true, syntheticSubscriberReentryRefused: true, combinedQuantityRefusalRetainsFocusAndSavedCart: true,
+      storageRefusalRetainsFocusAndSavedCart: true, nonGetRequests: nonGetRequests.length,
       invalidQuantityHasNoHandoff: true, correctedQuantityHasHandoff: true, failedSaveRetractsHandoff: true,
       quantityTargetsAtLeast48px: true, keyboardQuantityOrder: true, unclippedQuantityFocus: true, boundsUnchanged: true,
       noOverflow: true, browserErrors: errors.length, checkoutRequests: checkout.length });

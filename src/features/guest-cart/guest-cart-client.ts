@@ -910,8 +910,9 @@ export function hydrateGuestCartControls(): void {
     const container = button.closest(".guest-cart-add") ?? button.parentElement;
     const qtyInput = container?.querySelector("[data-add-to-cart-qty]");
     qtyInput?.addEventListener("input", () => clearAddQuantityFeedback(container));
+    let adding = false;
     button.addEventListener("click", () => {
-      if (isSingleAddBlocked(button, container)) return;
+      if (adding || isSingleAddBlocked(button, container)) return;
       const id = button.getAttribute("data-add-to-cart");
       if (!isSafeGuestCartProductId(id)) return;
       const qtyInput = container?.querySelector("[data-add-to-cart-qty]");
@@ -925,12 +926,17 @@ export function hydrateGuestCartControls(): void {
         }
         quantity = parsed;
       }
-      button.disabled = true;
-      if (!persistFailed()) {
-        session = loadSession();
+      // Intent validation and local persistence finish in this event task.
+      // Guard reentry without disabling the button and losing native focus.
+      adding = true;
+      try {
+        if (!persistFailed()) {
+          session = loadSession();
+        }
+        commitAddToCartMutation(container, addGuestCartLine(session.intent, id, quantity));
+      } finally {
+        adding = false;
       }
-      commitAddToCartMutation(container, addGuestCartLine(session.intent, id, quantity));
-      button.disabled = false;
     });
     button.dataset.guestCartReady = "1";
   });

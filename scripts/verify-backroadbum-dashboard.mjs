@@ -41,8 +41,8 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Quantity errors, tied to the field.');
-        await expect(page.locator('.dashboard-latest a[href="/products/creekside-camp-mug"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest')).toContainText('Add without losing your place.');
+        await expect(page.locator('.dashboard-latest a[href="/products/long-way-cap"]')).toBeVisible();
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(3);

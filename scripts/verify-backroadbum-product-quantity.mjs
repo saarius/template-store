@@ -96,6 +96,7 @@ try {
         await expect(increase).toBeFocused();
         await expect(feedback).toBeHidden();
         await input.fill('2'); await add.click();
+        await expect(add).toBeFocused();
         await expect(feedback).toHaveText('Added to cart.');
         await expect(feedback).toHaveAttribute('role', 'status');
         await expect(onward).toBeVisible();
@@ -106,6 +107,7 @@ try {
         await expect(feedback).toHaveText('Added to cart.');
         // A combined-line limit refusal is not a malformed field value.
         await input.fill('98'); await add.click();
+        await expect(add).toBeFocused();
         await expect(feedback).toHaveAttribute('role', 'alert');
         await expect(feedback).not.toHaveText('Added to cart.');
         await expect(input).not.toHaveAttribute('aria-invalid');
