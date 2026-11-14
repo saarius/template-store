@@ -57,7 +57,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
     <main id="main-content" class:list={["cms-page", { "field-note": Boolean(note), "cms-reading": Boolean(note) || testGuide, "cms-page--missing": !entry }]} data-cms-page={entry ? slug : undefined}>
       {entry ? (
         <>
-          {note && <a class="field-note__back" href="/field-notes">Back to field notes</a>}
+          {note && <><a class="field-note__back" href="/field-notes">Back to field notes</a><p class="field-note__kicker">From the field journal</p></>}
           {layout.length === 0 && <h1 class="cms-page__title">{title}</h1>}
           {layout.length > 0 ? (
             <div class="cms-composition" data-cms-composition data-layout="blocks">
@@ -86,12 +86,14 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
   .cms-page__body{max-width:44rem}
   .cms-page__body :global(h2){margin:1.5rem 0 .5rem;font-size:1.3rem;letter-spacing:-.02em}
   .cms-page__body :global(p){margin:0 0 1rem;color:var(--store-ink)}
-  .cms-reading{max-width:52rem}
-  .field-note__back{display:inline-block;margin-bottom:1.5rem;padding:.5rem 0;color:var(--store-ink);text-underline-offset:.2em}
-  .cms-reading .cms-page__title{max-width:20ch;text-wrap:balance}
-  .cms-reading .cms-page__body{font-size:1.0625rem;max-width:68ch}
-  .cms-reading .cms-page__body :global(h2){margin-top:2.25rem;margin-bottom:.65rem;font-size:1.65rem;line-height:1.2}
-  .cms-reading .cms-page__body :global(p:first-child){font-size:1.15rem;color:var(--store-muted);margin-bottom:2rem}
+  .cms-reading{width:min(48rem,calc(100% - 2.5rem));margin:var(--space-8) auto var(--space-9)}
+  .field-note__back{display:inline-flex;align-items:center;min-height:44px;margin-bottom:var(--space-7);color:var(--store-ink);text-underline-offset:.2em}
+  .field-note__kicker{font-size:var(--text-sm);color:var(--store-muted);margin:0 0 var(--space-4)}
+  .cms-reading .cms-page__title{font-size:var(--editorial-title);line-height:1.15;margin-bottom:var(--space-7);max-width:20ch;text-wrap:balance}
+  .cms-reading .cms-page__body{font-size:clamp(1.0625rem,1rem + .2vw,1.125rem);max-width:65ch;line-height:1.75}
+  .cms-reading .cms-page__body :global(p){max-width:65ch;margin-bottom:var(--space-5)}
+  .cms-reading .cms-page__body :global(h2){margin-top:var(--space-8);margin-bottom:var(--space-4);font-size:var(--text-xl);line-height:1.25}
+  .cms-reading .cms-page__body :global(p:first-child){font-family:var(--font-display);font-size:var(--text-xl);font-weight:500;line-height:1.5;color:var(--store-ink);margin-bottom:var(--space-7)}
   .cms-reading .cms-page__body :global(ol),.cms-reading .cms-page__body :global(ul){margin:0 0 1.5rem;padding-inline-start:1.6em}
   .cms-reading .cms-page__body :global(li + li){margin-top:.75rem}
   .cms-reading .cms-page__body :global(a){color:var(--store-ink);text-decoration:underline;text-underline-offset:.18em}

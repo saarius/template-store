@@ -9,6 +9,7 @@ import { isCheckoutEnabled, SANDBOX_SESSION_NOTICE, showsSandboxCheckoutNotice }
 import { isDemoCatalogProfile } from "../../features/playground/demo-products.js";
 import "../../features/store-shell/global.css";
 import "../../features/guest-cart/receipt-print.css";
+import "../../features/guest-cart/receipt-screen.css";
 
 const profile = readStorefrontProfile();
 const settings = await getSiteSettings().catch(() => ({}));
@@ -45,7 +46,7 @@ const sandboxCheckout = showsSandboxCheckoutNotice({ profile, isPlayground, isDe
     <title>Order confirmation | {STORE_TITLE}</title>
   </head>
   <body data-storefront-profile={profile} data-receipt-page>
-    <div class="store-demo-banner" data-store-demo-banner role="status">Demo checkout &mdash; No real payments or fulfillment.</div>
+    <div class="store-demo-banner" data-store-demo-banner role="status">DEMO / TEST STORE — No real charges or shipments. <a href="/test-store">How to try it</a></div>
     <StoreHeader profile={profile} />
     <main id="main-content">
       <div class="receipt-print-only receipt-print-header">

@@ -1,7 +1,7 @@
 // Public, read-only guide checks. Fresh browser state; never start a checkout or use a receipt capability.
 import { chromium, expect } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-const base = 'https://backroadbum.com';
+const base = process.env.BACKROADBUM_ORIGIN || 'https://backroadbum.com';
 const source = JSON.parse(await readFile(new URL('../seed/backroadbum-pages.json', import.meta.url), 'utf8'));
 const output = new URL('../runs/backroadbum/test-guide/', import.meta.url);
 await mkdir(output, { recursive: true });

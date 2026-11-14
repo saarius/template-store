@@ -6,9 +6,12 @@ const intro = (text: string) => ({ _type: 'block', style: 'normal', children: [{
 describe('EmDash field-note navigation', () => {
   it('names each whole-row link from its published heading without hiding its excerpt', () => {
     const source = readFileSync('src/pages/field-notes.astro', 'utf8');
-    expect(source).toContain('aria-labelledby={`${note.slug}-title`}><h2 id={`${note.slug}-title`}>{note.title}</h2>');
+    expect(source).toContain('aria-labelledby={`${note.slug}-title`}');
+    expect(source).toContain('<h2 id={`${note.slug}-title`}>{note.title}</h2>');
     expect(source).toContain('{note.excerpt && <p>{note.excerpt}</p>}');
-    expect(source).not.toContain('aria-hidden');
+    // Only the decorative ordinal is hidden, never the published title or excerpt.
+    expect(source.match(/aria-hidden=/g)).toHaveLength(1);
+    expect(source).toContain('class="field-number" aria-hidden="true"');
     expect(source).not.toContain('tabindex');
   });
   it('uses published CMS titles and prose, without seed text or commerce facts', () => {
