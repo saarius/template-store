@@ -12,6 +12,13 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(coverage).toContain('admin sign-in, hosted authorization and off-host recovery unverified');
     expect(source).toContain('An existing private archive now boots');
   });
+  it('separates starter contrast repair from adaptive merchant surfaces and real account activity', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(source).toContain('https://github.com/dinkuskit/template-store/pull/231');
+    expect(source).toContain('No real email, profile or order changes are involved');
+    expect(source).toContain('shared starter header/footer findings remain separate');
+    expect(source).toContain('merchant-only inherited scheme');
+  });
   it('qualifies the code-input PR without presenting intercepted calls as real account activity', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('Complete sign-in codes');
@@ -73,7 +80,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(rows).toHaveLength(6);
     expect(showcase).toContain('not a new purchase');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
-    for (const head of ['40e95ea', '9123f4d', '92fbb24', '238c420']) expect(reviews).toContain(head);
+    for (const head of ['40e95ea', '9123f4d', '92fbb24', '238c420', '267de74']) expect(reviews).toContain(head);
     expect(reviews).toContain('source verification is not a release');
   });
 

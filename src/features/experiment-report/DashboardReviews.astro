@@ -1,12 +1,13 @@
 ---
 const reviews = [
+  { repo: 'Template Store', number: 231, head: '267de74', href: 'https://github.com/dinkuskit/template-store/pull/231', title: 'Readable chalk Account cards', copy: 'Dark-mode text disappeared on fixed-light cards and fields. A local surface scheme restores readable form, status and populated order/profile text without changing the surrounding theme or account protocol.' },
   { repo: 'Template Store', number: 230, head: '238c420', href: 'https://github.com/dinkuskit/template-store/pull/230', title: 'Complete sign-in codes', copy: 'Pasted whitespace dropped the last digit; overlong input silently became a different code. The focused repair keeps the entire value for existing validation, with intercepted input proof and no new email or sessions.' },
   { repo: 'Template Store', number: 214, head: '40e95ea', href: 'https://github.com/dinkuskit/template-store/pull/214', title: 'Selected-member metadata', copy: 'A selected tee size borrowed the default size’s identity. The theme now omits unknown member identifiers; the PR also documents the approved legacy no-Offer fallback.' },
   { repo: 'Template Store', number: 222, head: '9123f4d', href: 'https://github.com/dinkuskit/template-store/pull/222', title: 'Pictures without gallery scripts', copy: 'Native thumbnail buttons were inert without JavaScript. The owner-requested rework renders every approved picture, with a desktop grid and phone scroll-snap strip.' },
   { repo: 'DinkusKit', number: 124, head: '92fbb24', href: 'https://github.com/dinkuskit/dinkuskit/pull/124', title: 'Independent store settings', copy: 'Hosted setup mixed plugins, shipping and payments in one crowded card. Native tabs and separate saves preserve the hosted site’s own tokens and forms.' },
 ];
 ---
-<p class="small">Checked November 14, 2026. All four source heads retain green owning checks and await maintainer action. Their public Before/After proof is in each PR; source verification is not a release.</p>
+<p class="small">Checked November 14, 2026. All five source heads retain green owning checks and await maintainer action. Their public Before/After proof is in each PR; source verification is not a release.</p>
 <ul class="dashboard-reviews" data-open-reviews>{reviews.map(review => <li>
   <p class="dashboard-kicker">{review.repo} · #{review.number} · {review.head}</p>
   <h3><a href={review.href}>{review.title}</a></h3>
