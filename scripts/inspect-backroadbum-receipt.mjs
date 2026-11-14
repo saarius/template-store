@@ -1,14 +1,19 @@
 // Inspect one retained guest checkout without opening new-checkout admission.
 // No prepare/start, payment submission, operator dispatcher or saved-state writes.
 import assert from 'node:assert/strict';
+import { DatabaseSync } from 'node:sqlite';
+import { readFileSync } from 'node:fs';
+import { summarizeGuestFulfillment } from './lib/backroadbum-guest-fulfillment.mjs';
 import { boundedResponseJson } from './lib/bounded-response-json.mjs';
 import { openRetainedReceipt, nativeReceiptStatusPath as nativePath, receiptStatusPath as statusPath, retainedCheckoutKey as key } from './lib/backroadbum-retained-receipt.mjs';
 
 if (!process.argv.includes('--check')) {
-  console.log('No action. --check inspects a retained public receipt; --native also diagnoses the signed status response. --state-file=PATH selects private browser state.');
+  console.log('No action. --check inspects a retained public receipt; --native also diagnoses the signed status response. --fulfillment adds a read-only canonical TEST order comparison (implies --native). --state-file=PATH selects private browser state.');
   process.exit(0);
 }
 const origin = 'https://backroadbum.com';
+const fulfillment = process.argv.includes('--fulfillment');
+const native = fulfillment || process.argv.includes('--native');
 const path = process.argv.find(arg => arg.startsWith('--state-file='))?.slice('--state-file='.length) ?? '/etc/backroadbum/public-shopper-browser.json';
 const report = { checkedAt: new Date().toISOString(), surface: 'public retained guest checkout', responses: [], blockedRequests: 0 };
 const safeCode = value => typeof value === 'string' && /^[A-Z_]{1,80}$/u.test(value) ? value : null;
@@ -23,7 +28,8 @@ let browser;
 const progress = stage => { if (process.env.BACKROADBUM_VERIFY_PROGRESS === '1') console.error(stage); };
 try {
   progress('opening');
-  const shopper = await openRetainedReceipt({ statePath: path, native: process.argv.includes('--native') });
+  const beforeFile = readFileSync(path);
+  const shopper = await openRetainedReceipt({ statePath: path, native });
   browser = shopper.browser;
   const page = shopper.page;
   progress('browser-ready');
@@ -46,10 +52,12 @@ try {
   progress('status-read');
   report.receiptVisible = await page.locator('[data-guest-checkout-order]').isVisible();
   report.printVisible = await page.locator('[data-guest-checkout-print]').isVisible();
-  if (process.argv.includes('--native')) {
-    // Read with the same capability in the same browser origin. Never return the body/identifiers to the operator log.
+  if (native) {
+    // Read with the same capability in the same browser origin. Never log bodies
+    // or identifiers. The explicit operator-only comparison uses the paid order
+    // ID internally to join its canonical TEST record, not as shopper authority.
     progress('native-read');
-    const result = await page.evaluate(async ({ key, nativePath }) => {
+    const result = await page.evaluate(async ({ key, nativePath, fulfillment }) => {
       const saved = JSON.parse(localStorage.getItem(key));
       const response = await fetch(nativePath, { method: 'POST', cache: 'no-store', headers: {
         'content-type': 'application/json', 'x-commerce-guest-capability': saved.capability,
@@ -57,15 +65,32 @@ try {
       let body;
       try { body = await response.json(); } catch { return { http: response.status }; }
       const value = body?.success === true ? body.data : body;
+      const order = value?.checkout?.order;
       return { http: response.status, body: { success: body?.success, ok: value?.ok,
         error: { code: value?.error?.code }, checkout: { state: value?.checkout?.state,
-          order: Boolean(value?.checkout?.order) } } };
-    }, { key, nativePath });
+          order: Boolean(order) } }, ...(fulfillment ? { comparison: {
+            paid: value?.ok === true && value?.checkout?.state === 'paid',
+            orderId: typeof order?.orderId === 'string' ? order.orderId : null,
+            fulfillmentPresent: Boolean(order?.fulfillment ?? value?.checkout?.fulfillment),
+            completionPresent: Boolean(order?.completed),
+            statusPresent: typeof order?.status === 'string',
+          } } : {}) };
+    }, { key, nativePath, fulfillment });
     // The evaluate result is deliberately reduced before crossing the browser boundary.
     report.native = summarize(result.http, result.body?.success === true ? { ...result.body, data: result.body } : result.body);
+    if (fulfillment) {
+      const db = new DatabaseSync('/var/lib/backroadbum/content.db', { readOnly: true });
+      try {
+        const records = db.prepare("SELECT data FROM _plugin_storage WHERE collection='orders'").all().map(row => JSON.parse(row.data));
+        report.fulfillment = summarizeGuestFulfillment(result.comparison, records);
+        report.fulfillment.receiptFulfillmentVisible = await page.locator('[data-guest-checkout-fulfillment]').isVisible();
+      } finally { db.close(); }
+    }
   }
   report.retentionUnchanged = await page.evaluate(({ key, retained }) => localStorage.getItem(key) === retained, { key, retained });
   report.noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
+  report.privateStateFileUnchanged = beforeFile.equals(readFileSync(path));
+  assert.equal(report.privateStateFileUnchanged, true);
   report.blockedRequests = shopper.blockedRequests();
   assert.equal(report.blockedRequests, 0);
   assert.equal(report.noOverflow, true);
