@@ -10,7 +10,12 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('bd68be4');
     expect(reviews).toContain('already entered guest drafts are not cleared');
     expect(reviews).toContain('no account, order or payment write is involved');
-    expect(reviews).toContain('generic upstream branch and its qualification remain separate');
+    expect(reviews).toContain('https://github.com/dinkuskit/template-store/pull/237');
+    expect(reviews).toContain('5a2980e');
+    expect(reviews).toContain('CI and review are pending');
+    expect(reviews).toContain('pending server-cart #229 retains the same prefill boundary');
+    expect(report).toContain('Starter checkout default isolation');
+    expect(report).toContain('no live account, payment or business record changes were made');
     expect(report).toContain('Previous dispatch · Runner qualification');
   });
   it('distinguishes the runner preflight repair from the unresolved historical collision', () => {
