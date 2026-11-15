@@ -4,7 +4,7 @@ import { defineConfig } from '@playwright/test';
 // blocked. No credentials, live OTP, profile, purchase or fulfillment operation.
 export default defineConfig({
   testDir: 'tests/e2e',
-  testMatch: ['backroadbum-account-contrast.spec.ts', 'shopper-session-tabs.spec.ts', 'shopper-session-recovery.spec.ts', 'checkout-shopper-prefill.spec.ts', 'shopper-profile-feedback.spec.ts'],
+  testMatch: ['backroadbum-account-contrast.spec.ts', 'backroadbum-product-details-navigation.spec.ts', 'shopper-session-tabs.spec.ts', 'shopper-session-recovery.spec.ts', 'checkout-shopper-prefill.spec.ts', 'shopper-profile-feedback.spec.ts'],
   workers: 1,
   retries: 0,
   timeout: 45_000,

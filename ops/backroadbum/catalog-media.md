@@ -1,5 +1,10 @@
 # Native product content and pictures
 
+## Details navigation · November 15
+Buying panels without a used native summary link now receive a Details & care shortcut; the tee keeps its authored measurement wording without a duplicate. The return link targets the product heading, and both directions use native fragments with scripts on or off. No summary, details block, media or Commerce field was edited; evidence: `evidence/2026-11-15-product-details-navigation/`.
+
+From `repos/template-store`, run `pnpm exec playwright test --config=playwright.backroadbum.config.ts tests/e2e/backroadbum-product-details-navigation.spec.ts` for eight read-only desktop/phone Light/Dark script-on/off checks. Set `BACKROADBUM_ORIGIN` only for an isolated candidate. The spec covers fleece, multi-picture mug and tee, preserving selected sizes (including sold-out XL), quantity drafts, metadata and synthetic cart intent; every non-read request is refused.
+
 ## Bandana details · November 15
 Switchback Bandana now has four native specification rows for cotton, 22 × 22-inch design size, contour artwork and the yellow corner, with a separate use/care disclosure. `seed/backroadbum-bandana-details.json` records authorship, not runtime content or Commerce facts; the $14 effective amount, in-stock state, gallery, summary and metadata remain unchanged. The saved draft stayed private before native publication, and all ten Orders plus unrelated CMS/catalog rows are preserved; evidence: `evidence/2026-11-15-merchant-discovery/`.
 

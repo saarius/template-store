@@ -23,6 +23,7 @@ import { demoPlaceholderImage } from "../../features/playground/demo-products.js
 import { variantPickerView, NO_OFFER_JSON_LD_KEY, type VariantPickerMember } from "../../features/store-shell/variant-picker.js";
 import { productSelection } from "../../features/store-shell/product-selection.js";
 import { productIdentifiers } from "../../features/store-shell/product-identifiers.js";
+import { summaryLinksToDetails } from "../../features/store-shell/product-details-link.js";
 import { STORE_TITLE, categoryPath, loadStorefrontRouteContext, productPath } from "../../features/store-shell/index.js";
 import { hydrateProductCollectionMembership, productPageOffersCart, readProductEntries } from "../../features/store-shell/product-routes.js";
 import { leftCommerceCatalog } from "../../features/store-shell/merch-catalog.js";
@@ -223,8 +224,9 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
               </div>
             )}
           <div class="product-detail__body">
-            <h1>{productName}</h1>
+            <h1 id="product-title" tabindex="-1">{productName}</h1>
             {summary ? <div class="product-detail__summary" data-product-summary><PortableText value={summary} components={legacyPortableTextComponents} /></div> : <p class="product-detail__description">{item.description}</p>}
+            {details && !summaryLinksToDetails(summary) && <a class="product-details-link" href="#product-details">Details &amp; care <span aria-hidden="true">↓</span></a>}
             {identifiers && <p class="product-detail__identifier" data-product-sku={identifiers.sku ?? ""} hidden={!identifiers.sku}>SKU {identifiers.sku}</p>}
             {identifiers?.gtin && <p class="product-detail__identifier" data-product-gtin={identifiers.gtin}>GTIN {identifiers.gtin}</p>}
             {identifiers?.mpn && <p class="product-detail__identifier" data-product-mpn={identifiers.mpn}>MPN {identifiers.mpn}</p>}
@@ -261,7 +263,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
             {lookupUnavailable ? <p class="product-detail__notice" role="status">Product availability is temporarily unavailable. Please try again.</p> : sandboxCheckout ? <p class="product-detail__notice" data-sandbox-checkout-available>Test-mode checkout. No real charges.</p> : linkedProduct && profile !== "shipping" ? <p class="product-detail__notice" data-checkout-unavailable>{offersCart ? "Demo product. Checkout is unavailable." : "Demo product. Cart and checkout are unavailable."}</p> : linkedProduct ? (purchasable ? null : <p class="product-detail__notice" data-not-purchasable>{checkoutAvailable ? "This product can't be bought right now." : "Checkout is unavailable right now, so this product can't be bought."}</p>) : item.availabilitySource === "preview" || !demonstrations ? <p class="product-detail__notice">This is an editorial preview. It is not purchasable.</p> : <p class="product-detail__notice">Availability is shown for this local integration proof. Purchasing is not available here.</p>}
           </div>
         </article>
-        {details && <section id="product-details" tabindex="-1" class="product-details" data-product-details aria-label="Product details"><header class="product-details__heading"><p>A closer look</p><h2>Details & care</h2></header><div class="product-details__grid"><Blocks value={details} components={productDetailComponents} fallback={UnknownBlock} /></div></section>}
+        {details && <section id="product-details" tabindex="-1" class="product-details" data-product-details aria-label="Product details"><header class="product-details__heading"><p>A closer look</p><h2>Details & care</h2></header><div class="product-details__grid"><Blocks value={details} components={productDetailComponents} fallback={UnknownBlock} /></div><a class="product-details-link product-details-link--return" href="#product-title">Back to product options <span aria-hidden="true">↑</span></a></section>}
         {linkedProduct && !lookupUnavailable && Astro.response.status === 200 && <RelatedGear productId={linkedProduct.id}
           entries={products.entries} categories={categoryEntries.entries} checkoutAvailable={checkoutAvailable} />}
       </>) : <MissingPageContent title="Product not found" description="This product is not published or does not exist. Search the store or browse the current gear below." />}
@@ -346,6 +348,11 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
   .product-detail__summary :global(p:first-child){margin-top:0}
   .product-detail__identifier{font-family:var(--font-sans);font-size:var(--text-sm);color:var(--store-muted);margin:var(--space-2) 0}
   .product-detail__summary :global(a){color:inherit;text-underline-offset:.2em}
+  .product-details-link,.product-detail__summary :global(a[href="#product-details"]){display:inline-flex;align-items:center;gap:var(--space-2);min-height:44px;color:var(--store-ink);text-underline-offset:.2em;font-size:1rem}
+  .product-details-link:hover,.product-detail__summary :global(a[href="#product-details"]:hover){color:var(--store-accent)}
+  .product-details-link:active,.product-detail__summary :global(a[href="#product-details"]:active){text-decoration-thickness:2px}
+  .product-details-link--return{margin-top:var(--space-7)}
+  #product-title,#product-details{scroll-margin-top:var(--space-5)}
   .product-detail__no-image{display:grid;place-items:center;height:100%;margin:0;color:var(--store-muted);letter-spacing:.04em}
   .product-details{margin:0 0 var(--space-9);padding-top:var(--space-7);border-top:1px solid var(--color-border)}
   .product-details__heading{margin-bottom:var(--space-7)}
