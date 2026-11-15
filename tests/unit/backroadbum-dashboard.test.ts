@@ -15,8 +15,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('https://github.com/dinkuskit/template-store/pull/239');
     expect(reviews).toContain('ab22702');
     expect(reviews).toContain('22 targeted browser passes');
-    expect(reviews).toContain('current-head CI and review are pending');
+    expect(reviews).toContain('exact-head desktop, phone, Registry, Playground and aggregate CI passed at 12:09 UTC');
+    expect(reviews).toContain('Review was requested after completion');
     expect(reviews).toContain('test racing the previous synthetic save response');
+    expect(report).toContain('A small fix. The whole matrix.');
+    expect(report).toContain('Previous dispatch · Starter address corrections');
     expect(reviews).toContain('not a new signed-plugin release');
   });
   it('keeps native tote content separate from Commerce facts and untested sample claims', () => {
