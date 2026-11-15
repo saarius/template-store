@@ -10,6 +10,9 @@ The strictly downstream upstream/main sync and live JSON agent feed are complete
 ## Upstream follow-through · November15
 Template214/222/230/231/232 and DinkusKit124 are now merged upstream, with public Before/After proof retained and their clean, pushed worktrees retired. Sign-in-code230 passed fresh exact-head review after CI; a one-way downstream merge from starter6340dcb preserves both Account feature-map paths, the merchant PIN hint/width and conservative selected-size metadata. The dashboard distinguishes these acceptances from signed-plugin or hosted deployment and preserves all earlier history bodies; catalog qualification remains separate.
 
+## Native tote details · November15
+The Glovebox Field Tote now separates its original canvas, 16 × 15-inch body, open top and handles into native EmDash specifications, with a separate packing/care disclosure. Draft privacy, native reload/publication and eight script-on/off desktop/phone Light/Dark reads preserve its $32 backorder state, artwork, metadata and browser intent; all ten Orders and unrelated products/pages stay unchanged. Dimensions remain illustrative, not measured samples or a tested carrying-load rating, and no waterproof or dispatch promise is added.
+
 ## Checkout profile defaults · November15
 An intercepted desktop/phone checkout journey showed an old profile response filling blank shipping fields after another tab stored a newer shopper session. The optional prefill now rechecks the requesting capability after body decoding, preserving typed fields and focus while ignoring old-session defaults. This is a narrow merchant client safeguard, not a signed-plugin change or a rule that clears existing guest drafts when Account changes; generic upstream qualification remains separate.
 

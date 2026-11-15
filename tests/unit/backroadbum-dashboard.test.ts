@@ -2,6 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('keeps native tote content separate from Commerce facts and untested sample claims', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('Native tote details');
+    expect(report).toContain('The small things, together.');
+    expect(report).toContain('href="/products/glovebox-field-tote"');
+    expect(report).toContain('saved draft stayed private until native publication');
+    expect(report).toContain('dimensions are illustrative, not a measured sample');
+    expect(report).toContain('Commerce still supplies $32 and backorder availability');
+    expect(report).toContain('all ten Orders and unrelated CMS/catalog rows unchanged');
+    expect(report).toContain('Previous dispatch · Checkout defaults');
+  });
   it('separates obsolete checkout defaults from existing guest drafts and real account writes', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -12,7 +23,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('no account, order or payment write is involved');
     expect(reviews).toContain('https://github.com/dinkuskit/template-store/pull/237');
     expect(reviews).toContain('5a2980e');
-    expect(reviews).toContain('CI and review are pending');
+    expect(reviews).toContain('aggregate CI passed at 09:40 UTC');
+    expect(reviews).toContain('review was requested after completion');
     expect(reviews).toContain('pending server-cart #229 retains the same prefill boundary');
     expect(report).toContain('Starter checkout default isolation');
     expect(report).toContain('no live account, payment or business record changes were made');
