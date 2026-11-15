@@ -13,6 +13,9 @@ Template214/222/230/231/232 and DinkusKit124 are now merged upstream, with publi
 ## Account address corrections · November15
 An incomplete saved-address form left the shopper on Save with its correction above the viewport. Rejected Save now focuses and describes the first missing field; its own edits clear only that correction, retaining typed values and other field guidance. Blank address, phone-only saves, Clear and shared-session isolation keep the existing contracts; synthetic reads and saves prove presentation without another email, account or purchase operation.
 
+## Downstream search fixture · November15
+A one-way merge adopts upstream mainf36abc1’s test-only replacement of a retired catalog archive action with price clearing. A private network-isolated copy of the installed signed store confirms that its published Field Book disappears from shop and search when unpriced and returns at $12, with copied Orders and published CMS rows unchanged; no live product is edited. The full merchant Astro check now passes across506files with0errors/0warnings and one existing deprecation hint, qualifying the merchant source beyond the earlier generic-only check. This is fixture adoption and local eligibility proof, not a signed-plugin upgrade or a complete generic header-browser rerun.
+
 ## Product details navigation · November15
 The fleece buying panel had no direct route to its native measurements and care, and the details section had no return to the options. Product pages now provide a native keyboard/no-script round trip, retaining the tee’s authored measurement link rather than duplicating it. Selected sizes, quantity drafts, Commerce facts and metadata stay unchanged; no CMS or transaction operation is part of this refinement. The dashboard’s current checkout summary now reflects TEST1010’s already-verified completion.
 

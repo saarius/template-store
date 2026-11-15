@@ -1,5 +1,10 @@
 # Native product retirement and return
 
+## Search fixture downstream sync · November 15
+Upstream mainf36abc1’s search fixture clears Regular/Sale pricing instead of calling the retired catalog-archive operation; the strictly downstream merchant merge is b7a9ffb. A private network-isolated copy of signed Commerce0.8.0 independently exercised native Field Book price clearing and restoration: the page stayed published while shop, rendered search and the search API hid the unpriced product and later restored it at $12. The live catalog was not edited, and this is not a new archive/restore qualification or a signed upgrade; evidence is in `evidence/2026-11-15-search-fixture-sync/`.
+
+The one-off clone drivers are historical evidence, not commands to replay. Native Block Kit reads themselves use POST, Save remains enabled after success, and its action endpoint is not necessarily under `/plugins/`; inspect persisted state before retrying any timeout. Only one clear and one reprice were submitted, with read-only completion after incorrect test assumptions; no action guard was reset.
+
 ## Verified scope · November 14, 2026
 A disposable copy of Backroad Bum's actual EmDash1.4.0 / signed Registry Commerce0.8.0 install exercised Archive, Restore and page republishing through native controls. The live catalog was never archived or republished; the theme, cart and checkout contracts are unchanged. Evidence: `evidence/2026-11-14-product-lifecycle/`; [Commerce276](https://github.com/dinkuskit/commerce/issues/276) owns the missing post-Restore publishing guidance, not an accepted repair. This is cached installed-plugin proof, not a fresh signature/download or provider qualification.
 

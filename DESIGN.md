@@ -124,6 +124,9 @@ The November15 merge of starter6340dcb keeps the merchant’s PIN hint and conse
 ## Generic shell qualification
 The retained starter CSS now gives its search, appearance and chevron controls a44px floor, restores input focus and deepens only small-label accent fills. Backroad Bum uses its own48px header/footer controls; generic Before/After captures in Template232 are upstream-starter proof, not a merchant rebrand or a new checkout qualification. Preserve that distinction in reporting and later downstream syncs.
 
+## Search eligibility reporting
+A published CMS product page and a shoppable Commerce product are different states. Report the isolated native price-clear/reprice qualification as a copy-store eligibility check, not live merchant action or a changed public catalog; the signed plugin remains authoritative. The downstream test-fixture merge changes no screen design, and the full merchant typecheck is not a substitute for the generic starter’s unrun header browser matrix.
+
 ## Catalog discovery reporting
 A healthy empty agent feed is not a populated catalog success or a broken storefront. Keep the actual Google/Meta channel-eligibility consequence distinct from the store-level catalog switch and from synthetic populated Worker tests; link the existing upstream follow-up rather than declaring a new regression. A downstream sync preserves this entire theme and the legacy browser capability keys; it does not authorize external channel enrollment, a server-cart cutover or shared-service deployment.
 
