@@ -354,6 +354,10 @@ const { playgroundMode = false, merchantMode = false, emailSignInPaused = false,
     background: #ffffff;
     font: inherit;
   }
+  .shopper-account:not([data-merchant-account]) #account-code {
+    width: min(100%, 14rem);
+    font-variant-numeric: tabular-nums;
+  }
   .shopper-account button {
     width: fit-content;
     max-width: 100%;
