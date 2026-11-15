@@ -1,6 +1,6 @@
 # Qualifying a future server-cart upgrade
 
-The serving store still uses signed Commerce 0.8.0 and its existing browser-bound recovery. Template #229 and Commerce #272 are a breaking, paired candidate, not an installed release. Do not adopt either alone or discard the original pending browsers. A merchant-only recovery adapter is now source-qualified below, but **not enabled**.
+The serving store still uses signed Commerce 0.8.0 and its existing browser-bound recovery. As observed November15, Template #229 is merged in upstream/main167d736, pinning Commerce0.9.0-beta.1; Commerce #272 is also merged. Those source acceptances do not upgrade this store: the paired server-cart migration, actual Registry artifact and retained browsers still need coordinated qualification. Do not merge that new template runtime into the signed0.8.0 store alone or discard original browser capabilities. A merchant-only recovery adapter is source-qualified below, but **not enabled**. Preserve PR237’s late-profile prefill guard when integrating the rewritten checkout.
 
 ## Disposable compatibility check
 

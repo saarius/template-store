@@ -14,6 +14,16 @@ export function fieldNote(entry: PageEntry | null | undefined): FieldNote | null
   return { slug: entry.id, title, excerpt };
 }
 
+/** Continue in the index's stable slug order, then wrap once. The caller supplies
+ * published-only entries; this is a reading sequence, not relevance or chronology.
+ */
+export function nextFieldNotes(entries: readonly PageEntry[], currentSlug: string): FieldNote[] {
+  const notes = fieldNotes(entries);
+  const current = notes.findIndex(note => note.slug === currentSlug);
+  if (current < 0) return notes.slice(0, 2);
+  return [...notes.slice(current + 1), ...notes.slice(0, current)].slice(0, 2);
+}
+
 export function fieldNotes(entries: readonly PageEntry[]): FieldNote[] {
   return entries.flatMap(entry => {
     const note = fieldNote(entry);

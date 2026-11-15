@@ -13,6 +13,9 @@ Template214/222/230/231/232 and DinkusKit124 are now merged upstream, with publi
 ## Account address corrections · November15
 An incomplete saved-address form left the shopper on Save with its correction above the viewport. Rejected Save now focuses and describes the first missing field; its own edits clear only that correction, retaining typed values and other field guidance. Blank address, phone-only saves, Clear and shared-session isolation keep the existing contracts; synthetic reads and saves prove presentation without another email, account or purchase operation.
 
+## Journal continuation · November15
+Every field-note footer used to offer the same first two notes, leaving later stories out of onward discovery. The existing native links now continue through the published index and wrap at the end; keyboard/script-on/off journeys reach every note without changing article content, gear links or commerce state. The order is a browsing sequence, not a claimed timeline or recommendation ranking. DinkusKit130’s unchanged-head complete CI retry is now green, while the newly merged Template229/Commerce beta remains a separately qualified future cutover rather than an automatic downstream merge.
+
 ## Downstream search fixture · November15
 A one-way merge adopts upstream mainf36abc1’s test-only replacement of a retired catalog archive action with price clearing. A private network-isolated copy of the installed signed store confirms that its published Field Book disappears from shop and search when unpriced and returns at $12, with copied Orders and published CMS rows unchanged; no live product is edited. The full merchant Astro check now passes across506files with0errors/0warnings and one existing deprecation hint, qualifying the merchant source beyond the earlier generic-only check. This is fixture adoption and local eligibility proof, not a signed-plugin upgrade or a complete generic header-browser rerun.
 

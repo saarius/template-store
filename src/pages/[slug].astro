@@ -8,7 +8,7 @@ import { getEmDashEntry, getEmDashCollection, type PortableTextBlock } from "emd
 import FieldNoteFooter from "../features/store-shell/FieldNoteFooter.astro";
 import MissingPageContent from "../features/store-shell/MissingPageContent.astro";
 import TestStoreActions from "../features/store-shell/TestStoreActions.astro";
-import { fieldNote, fieldNotes } from "../features/store-shell/field-notes.js";
+import { fieldNote, nextFieldNotes } from "../features/store-shell/field-notes.js";
 import { Blocks, PortableText, type BlockValue } from "emdash/ui";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
 import ThemeHead from "../features/store-shell/ThemeHead.astro";
@@ -34,9 +34,9 @@ const title = data?.title?.trim() || "Page not found";
 const profile = readStorefrontProfile();
 const note = layout.length === 0 ? fieldNote(entry) : null;
 const testGuide = Boolean(entry && slug === "test-store" && layout.length === 0);
-// Related reading is optional; a failed collection read must not hide the article.
+// Continue through the published journal; an optional read must not hide the article.
 const relatedNotes = note ? await getEmDashCollection<"pages", Record<string, unknown>>("pages", { status: "published" })
-  .then(({ entries }) => fieldNotes(entries).filter(item => item.slug !== note.slug).slice(0, 2))
+  .then(({ entries }) => nextFieldNotes(entries, note.slug))
   .catch(() => []) : [];
 if (!entry) Astro.response.status = 404;
 const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null;

@@ -27,16 +27,16 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('all ten Orders and unrelated CMS/catalog rows are unchanged');
     expect(report).toContain('original gallery and $14 in-stock Commerce facts retained');
   });
-  it('keeps the catalog CI retry blocker separate from targeted local success', () => {
+  it('updates catalog CI success without erasing historical failures or claiming a runner diagnosis', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('Verified locally. Still blocked in CI.');
     expect(report).toContain('Previous dispatch · Account review handoff');
     expect(report).toContain('CI still cancelled rather than green');
-    expect(reviews).toContain('all nine syscall-traced runner tests passed at 12:50 UTC');
-    expect(reviews).toContain('repository-admin-rights error');
-    expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/pull/130#issuecomment-6894605258');
-    expect(reviews).toContain('not a diagnosis, a full-suite rerun or a green CI claim');
+    expect(reviews).toContain('nine local syscall-traced runner tests');
+    expect(reviews).toContain('complete Website checks retry now passes');
+    expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/actions/runs/43665891596');
+    expect(reviews).toContain('do not diagnose that historical socket');
   });
   it('distinguishes merchant profile corrections from generic qualification and real account writes', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
@@ -132,9 +132,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('a665a86');
     expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/pull/130');
     expect(reviews).toContain('37 owning local verification stages pass across serial runs');
-    expect(reviews).toContain('maintainer-triggered CI retry passed the catalog gates again');
-    expect(reviews).toContain('CI is not green');
-    expect(reviews).toContain('runner/port-lifecycle investigation and review remain pending');
+    expect(reviews).toContain('complete Website checks retry now passes');
+    expect(reviews).toContain('on unchanged head d0b72c8');
+    expect(reviews).toContain('review is requested after completion');
+    expect(reviews).toContain('Earlier attempts stopped at passkey verification');
     expect(reviews).toContain('no shared catalog is deployed');
     expect(reviews).toContain('source verification is not a release or shared-service deployment');
     expect(report).toContain('Six repairs accepted. One-way adoption.');
