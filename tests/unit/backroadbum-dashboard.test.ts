@@ -2,6 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates obsolete checkout defaults from existing guest drafts and real account writes', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('Fresh defaults. No old address.');
+    expect(reviews).toContain('https://github.com/dinkuskit/template-store/issues/236');
+    expect(reviews).toContain('bd68be4');
+    expect(reviews).toContain('already entered guest drafts are not cleared');
+    expect(reviews).toContain('no account, order or payment write is involved');
+    expect(reviews).toContain('generic upstream branch and its qualification remain separate');
+    expect(report).toContain('Previous dispatch · Runner qualification');
+  });
   it('distinguishes the runner preflight repair from the unresolved historical collision', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -10,8 +21,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('One small fix. The full gate.');
     expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/pull/133');
     expect(reviews).toContain('All 38 owning stages pass across serial runs');
-    expect(reviews).toContain('No single clean verify run is claimed');
-    expect(reviews).toContain('CI and review remain pending');
+    expect(reviews).toContain('No single clean local verify run is claimed');
+    expect(reviews).toContain('full exact-head GitHub CI passed at 07:33 UTC');
     expect(reviews).toContain('shared-store socket failure reproduces on unchanged main');
     expect(report).toContain('Previous dispatch · Runner reliability');
     expect(report).toContain('Previous dispatch · Shared client repair');

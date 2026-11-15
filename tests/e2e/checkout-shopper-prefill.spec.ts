@@ -70,13 +70,13 @@ for (const scheme of ["light", "dark"] as const) {
           else localStorage.setItem(key, JSON.stringify(current));
         }, { key: SHOPPER_SESSION_STORAGE_KEY, current, change });
         await page.bringToFront();
-        await email.fill("current-draft@example.test");
+        await email.fill("current@example.test");
         await page.locator("[data-guest-cart-delivery-name]").fill("Current checkout draft");
         const name = page.locator("[data-guest-cart-delivery-name]");
         await name.focus(); release(); await expect.poll(() => delivered).toBe(true);
         // Observe body decoding and its consumer continuation, not just headers.
         await expect(page.locator("html")).toHaveAttribute("data-prefill-decoded", "true");
-        await expect(email).toHaveValue("current-draft@example.test");
+        await expect(email).toHaveValue("current@example.test");
         await expect(name).toHaveValue("Current checkout draft"); await expect(name).toBeFocused();
         await expect(page.locator("[data-guest-cart-delivery-line1]")).toHaveValue(change === "same-session" ? profile.delivery.line1 : "");
         await expect(page.locator("[data-guest-cart-delivery-city]")).toHaveValue(change === "same-session" ? profile.delivery.city : "");
