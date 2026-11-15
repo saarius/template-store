@@ -2,6 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('keeps the catalog CI retry blocker separate from targeted local success', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('Verified locally. Still blocked in CI.');
+    expect(report).toContain('Previous dispatch · Account review handoff');
+    expect(report).toContain('CI still cancelled rather than green');
+    expect(reviews).toContain('all nine syscall-traced runner tests passed at 12:50 UTC');
+    expect(reviews).toContain('repository-admin-rights error');
+    expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/pull/130#issuecomment-6894605258');
+    expect(reviews).toContain('not a diagnosis, a full-suite rerun or a green CI claim');
+  });
   it('distinguishes merchant profile corrections from generic qualification and real account writes', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
