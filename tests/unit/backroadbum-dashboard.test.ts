@@ -2,6 +2,19 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates disposable earlier-checkout recovery from original live browsers and signed cutover', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('A new cart. Your earlier receipt.');
+    expect(report).toContain('Previous dispatch · Field Journal cart preparation');
+    expect(report).toContain('only this report is deployed');
+    expect(report).toContain('actual 0.8.0-kernel disposable purchases');
+    expect(reviews).toContain('merchant preparation d64e2d1');
+    expect(reviews).toContain('not an upstream proposal or deployment');
+    expect(reviews).toContain('111 focused units');
+    expect(reviews).toContain('does not qualify the real ten Orders');
+    expect(reviews).toContain('/pr-proof/retained-receipt-prep/paid-390-dark.png');
+  });
   it('keeps Field Journal cart preparation visibly off live', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('Same journal. A new cart underneath.');
@@ -28,7 +41,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('source-built staging with synthetic Payments');
     expect(report).toContain('not a signed upgrade or a live checkout');
     expect(report).toContain('development-server suite failed during fixture setup');
-    expect(report).toContain('original-browser handoff, the complete regression matrix and signed merchant artifact qualification remain unfinished');
+    expect(report).toContain('original live browsers, the complete regression matrix and signed merchant artifact qualification remain unfinished');
   });
   it('separates populated JSON proof from native controls and incomplete Google/Meta exports', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
