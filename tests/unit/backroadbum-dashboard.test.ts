@@ -8,6 +8,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('Eleven members. Five feed rows.');
     expect(report).toContain('Previous dispatch · Earlier-checkout recovery');
     expect(report).toContain('data-feed-member-report');
+    expect(report).toContain('<article class="cycle-entry" data-feed-member-history>');
+    expect(report).toContain('<h3>November 15, 2026 · Earlier-checkout recovery</h3>');
     expect(report).toContain('https://github.com/dinkuskit/commerce/issues/281');
     expect(report).toContain('Open bug report, not an implemented repair');
     expect(report).toContain('supplying a family price still loses four sizes');
