@@ -43,7 +43,7 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Five repairs accepted. Proof kept open.');
+        await expect(page.locator('.dashboard-latest')).toContainText('Six repairs accepted. One-way adoption.');
         await expect(page.locator('.dashboard-latest')).toContainText('signed store plugins and hosted deployments are unchanged');
         await expect(page.locator('.dashboard-latest')).toContainText('no new catalog PR or shared deployment is claimed');
         await expect(page.locator('#history')).toContainText('Small controls. A firmer footing.');
@@ -56,7 +56,7 @@ try {
         await expect(page.locator('[data-dashboard-pulse] > div')).toHaveCount(4);
         await expect(page.locator('[data-dashboard-pulse]')).toContainText('not a payment');
         await expect(page.locator('[data-open-reviews] li')).toHaveCount(6);
-        await expect(page.locator('[data-open-reviews] li').filter({ hasText: 'Merged November 15' })).toHaveCount(5);
+        await expect(page.locator('[data-open-reviews] li').filter({ hasText: 'Merged November 15' })).toHaveCount(6);
         await expect(page.locator('#contributions')).toContainText('no upstream PR is open');
         await expect(page.locator('[data-redesign-showcase]')).toContainText('signed plugins, catalog facts and order records remain intact');
       }

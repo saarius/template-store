@@ -5,11 +5,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('separates accepted upstream source from deployments and the unfinished catalog gate', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
-    expect((reviews.match(/state: 'Merged November 15'/g) ?? []).length).toBe(5);
+    expect((reviews.match(/state: 'Merged November 15'/g) ?? []).length).toBe(6);
     expect(reviews).toContain('a665a86');
     expect(reviews).toContain('no upstream PR is open');
     expect(reviews).toContain('source verification is not a release or shared-service deployment');
-    expect(report).toContain('Five repairs accepted. Proof kept open.');
+    expect(report).toContain('Six repairs accepted. One-way adoption.');
     expect(report).toContain('both Account feature-map paths');
     expect(report).toContain('explicitly synthetic local feed');
   });
