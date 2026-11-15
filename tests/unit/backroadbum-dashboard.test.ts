@@ -2,12 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
-  it('separates accepted upstream source from deployments and the unfinished catalog gate', () => {
+  it('separates accepted source and the locally qualified catalog proposal from deployments', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect((reviews.match(/state: 'Merged November 15'/g) ?? []).length).toBe(6);
     expect(reviews).toContain('a665a86');
-    expect(reviews).toContain('no upstream PR is open');
+    expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/pull/130');
+    expect(reviews).toContain('37 owning local verification stages pass across serial runs');
+    expect(reviews).toContain('CI and review are pending');
+    expect(reviews).toContain('no shared catalog is deployed');
     expect(reviews).toContain('source verification is not a release or shared-service deployment');
     expect(report).toContain('Six repairs accepted. One-way adoption.');
     expect(report).toContain('both Account feature-map paths');
