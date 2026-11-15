@@ -2,6 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates the native feed control candidate from live release and serializer readiness', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('One product. One feed choice.');
+    expect(report).toContain('Previous dispatch · Isolated server-cart qualification');
+    expect(reviews).toContain('https://github.com/dinkuskit/commerce/pull/280');
+    expect(reviews).toContain('fork 42f0e8a');
+    expect(reviews).toContain('minimal mount, not the full CMS editor');
+    expect(reviews).toContain('XML/CSV option-member serialization is outside this fix');
+    expect(reviews).toContain('signed live plugin is unchanged');
+  });
   it('separates source-built beta staging from signed upgrades and live purchases', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('New cart. Old purchases intact.');
@@ -20,7 +31,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('https://github.com/dinkuskit/commerce/issues/279');
     expect(reviews).toContain('documented, preview-fenced Commerce API');
     expect(reviews).toContain('real HTTPS reads');
-    expect(reviews).toContain('no UI repair, signed release or external enrollment is claimed');
+    expect(reviews).toContain('no signed UI repair or external enrollment is claimed');
     expect(reviews).toContain('Website checks passed at 18:36 UTC');
   });
   it('reports the catalog main merge separately from the prior green head and shared deployment', () => {
