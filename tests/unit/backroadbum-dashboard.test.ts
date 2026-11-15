@@ -13,9 +13,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('A visible next step, upstream.');
     expect(report).toContain('Previous dispatch · Account corrections');
     expect(reviews).toContain('https://github.com/dinkuskit/template-store/pull/239');
-    expect(reviews).toContain('f67424c');
+    expect(reviews).toContain('ab22702');
     expect(reviews).toContain('22 targeted browser passes');
-    expect(reviews).toContain('CI and review are pending');
+    expect(reviews).toContain('current-head CI and review are pending');
+    expect(reviews).toContain('test racing the previous synthetic save response');
     expect(reviews).toContain('not a new signed-plugin release');
   });
   it('keeps native tote content separate from Commerce facts and untested sample claims', () => {
