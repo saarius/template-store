@@ -45,7 +45,7 @@ try {
       if (view === 'overview') {
         await expect(page.locator('.dashboard-latest')).toContainText('Six repairs accepted. One-way adoption.');
         await expect(page.locator('.dashboard-latest')).toContainText('signed store plugins and hosted deployments are unchanged');
-        await expect(page.locator('.dashboard-latest')).toContainText('CI and review remain pending');
+        await expect(page.locator('.dashboard-latest')).toContainText('a maintainer retry is needed');
         await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/dinkuskit/pull/130"]')).toHaveCount(1);
         await expect(page.locator('#history')).toContainText('Small controls. A firmer footing.');
         await expect(page.locator('#history')).toContainText('not a visual change to our already-sized Field Journal shell');

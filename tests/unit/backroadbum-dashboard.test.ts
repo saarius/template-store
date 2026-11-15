@@ -9,7 +9,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('a665a86');
     expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/pull/130');
     expect(reviews).toContain('37 owning local verification stages pass across serial runs');
-    expect(reviews).toContain('CI and review are pending');
+    expect(reviews).toContain('repository admin rights are required to rerun it');
+    expect(reviews).toContain('A maintainer retry and review remain pending');
     expect(reviews).toContain('no shared catalog is deployed');
     expect(reviews).toContain('source verification is not a release or shared-service deployment');
     expect(report).toContain('Six repairs accepted. One-way adoption.');
