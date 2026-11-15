@@ -7,7 +7,8 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { proveRetainedReceipt } from './lib/retained-receipt-proof.mjs';
 import { createRequire } from "node:module";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
@@ -125,7 +126,8 @@ export async function qualify({ old, candidate }) {
       }
       const cart = (await carts.query()).items.find(({ data }) => data.attempts.some((attempt) => attempt.attemptId === before.checkout.attemptId));
       assert.deepEqual(Object.keys(cart.data), ["attempts"], "Old kernel, not a hand-written old shape");
-      scenarios.push({ state, synth, runtime, headers, before: before.checkout, id: cart.id });
+      scenarios.push({ state, synth, runtime, headers, before: before.checkout, id: cart.id,
+        retention: { capabilityId: prepared.capabilityId, capability: prepared.capability.capability, attemptId: before.checkout.attemptId } });
     }
     // Current catalog price is not the frozen purchase price. No code reads a real merchant catalog.
     const price = await storage.catalogPrices.get("legacy-hat");
@@ -141,6 +143,9 @@ export async function qualify({ old, candidate }) {
     writeFileSync(join(site, "src/pages/api/checkout/status.ts"),
       `export { POST, prerender } from ${JSON.stringify(join(merchant, "src/pages/api/checkout/status.ts"))};\n`);
     writeFileSync(join(site, "src/pages/index.astro"), "<h1>Disposable recovery qualification</h1>");
+    mkdirSync(join(site, 'src/pages/checkout'), { recursive: true });
+    symlinkSync(join(merchant, 'public'), join(site, 'public'), 'dir');
+    writeFileSync(join(site, 'src/pages/checkout/retained.astro'), `---\nimport Page from ${JSON.stringify(join(merchant, 'src/pages/checkout/retained.astro'))};\nAstro.response.headers.set('Cache-Control','no-store');\n---\n<Page />`);
     writeFileSync(join(site, "astro.config.mjs"), `
 import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
@@ -246,7 +251,8 @@ export default defineConfig({ output:'server', adapter:node({mode:'standalone'})
         merchantWrapperHTTP: wrapped.response.status, wrapperSameAttempt: true,
         wrapperPaidReceiptTotalPreserved: scenario.state === "paid" ? true : null, wrapperRefusesMutationAndOtherAttempt: true });
     }
-    assert.equal(hash(business()), baseline, "Installed inspection must not rewrite old carts or Orders");
+    const browser = await proveRetainedReceipt({ merchant, origin, scenarios, artifacts: process.env.BACKROADBUM_QUALIFICATION_ARTIFACTS });
+    assert.equal(hash(business()), baseline, "Installed inspection and browser handoff must not rewrite old carts or Orders");
     const status = await post("status", scenarios[0].headers["x-commerce-guest-capability"]);
     assert.ok([401, 404].includes(status.response.status), "Removed Registry status route cannot return shopper status");
     await stop(server); server = null;
@@ -273,7 +279,7 @@ export default defineConfig({ output:'server', adapter:node({mode:'standalone'})
       candidatePluginSHA256: createHash("sha256").update(readFileSync(join(candidate, "dist/sandbox/plugin.mjs"))).digest("hex"),
       scope: "Actual 0.8.0 kernel writes; candidate installed Registry and actual merchant wrapper reads without Payments; candidate kernel replay with synthetic Payments. Frozen facts, not whole-response equivalence",
       installed, legacyStatusHTTP: status.response.status, defaultWrapperHTTP: beforeWrapper.response.status,
-      installedBusinessUnchanged: true, kernel, canonicalOrders: 2,
+      installedBusinessUnchanged: true, browser, kernel, canonicalOrders: 2,
       liveDataUsed: false, hostedPaymentsProven: false, signedUpgradeProven: false };
   } finally {
     await stop(server);

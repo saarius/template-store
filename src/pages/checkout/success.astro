@@ -59,11 +59,14 @@ if (result.kind === "not-paid") return Astro.redirect(result.redirect, 303);
       </div>
       {sandboxCheckout && <p class="store-sandbox-notice" role="note" data-sandbox-checkout-return>Test mode checkout. {SANDBOX_SESSION_NOTICE}</p>}
       <GuestCheckoutReturn result={result} contactHref={contactHref} />
+      {process.env.BACKROADBUM_MERCHANT_PROFILE === '1' && <p class="earlier-checkout-link"><a href="/checkout/retained">Looking for a checkout from before our cart update?</a></p>}
     </main>
     <StoreFooter profile={profile} />
   </body>
 </html>
 
 <style>
+  .earlier-checkout-link{width:min(56rem,calc(100% - 2.5rem));margin:var(--space-5) auto}.earlier-checkout-link a{display:inline-flex;align-items:center;min-height:48px}
+  @media print{.earlier-checkout-link{display:none}}
   .store-sandbox-notice{width:min(70rem,calc(100% - 2rem));margin:1.5rem auto 0;padding:.9rem 1rem;border:1px solid var(--store-line);border-radius:.65rem;background:var(--store-surface);line-height:1.5}
 </style>

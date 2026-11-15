@@ -1,0 +1,58 @@
+---
+import StoreHeader from '../../features/store-shell/StoreHeader.astro';
+import StoreFooter from '../../features/store-shell/StoreFooter.astro';
+import ThemeHead from '../../features/store-shell/ThemeHead.astro';
+import { STORE_TITLE, readStorefrontProfile } from '../../features/store-shell/index.js';
+import '../../features/store-shell/global.css';
+import '../../features/guest-cart/receipt-screen.css';
+import '../../features/guest-cart/receipt-print.css';
+
+// Downstream merchant migration UX, not a second template checkout protocol.
+if (process.env.BACKROADBUM_MERCHANT_PROFILE !== '1' ||
+    (Astro.locals as { __playgroundDb?: unknown }).__playgroundDb ||
+    readStorefrontProfile() === 'proof') return new Response('Not found', { status: 404 });
+if (!['GET', 'HEAD'].includes(Astro.request.method)) return new Response('Method not allowed', { status: 405, headers: { Allow: 'GET, HEAD', 'Cache-Control': 'no-store' } });
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+const profile = readStorefrontProfile();
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <ThemeHead />
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Earlier checkout | {STORE_TITLE}</title>
+  </head>
+  <body data-storefront-profile={profile} data-receipt-page>
+    <div class="store-demo-banner" role="status">DEMO / TEST STORE — No real charges or shipments. <a href="/test-store">How to try it</a></div>
+    <StoreHeader profile={profile} />
+    <main id="main-content">
+      <div class="receipt-print-only receipt-print-header"><p>{STORE_TITLE} · backroadbum.com</p><p>Demo / test store — no real charges or physical shipments.</p></div>
+      <section class="guest-checkout-return" data-retained-receipt aria-labelledby="retained-title">
+        <h1 id="retained-title">Your earlier checkout</h1>
+        <div class="retained-intro">
+          <p>Checked out before our cart update? Read the checkout saved in this browser without changing your current cart.</p>
+          <p data-retained-status role="status" aria-live="polite">Use the same browser you originally checked out with. This check will not open a new payment.</p>
+          <button type="button" data-retained-check hidden>Check earlier checkout</button>
+          <noscript><p>Reading a checkout saved in this browser needs JavaScript. You can still use your confirmation email or <a href="/account">shopper account</a>.</p></noscript>
+        </div>
+        <div class="guest-checkout-receipt" data-retained-order data-guest-checkout-order hidden></div>
+        <div class="guest-checkout-actions"><a class="guest-checkout-continue" href="/cart">Your current cart</a><a class="guest-checkout-account" href="/account">Shopper account</a></div>
+        <p class="retained-help">Need a hand? <a href="/shipping">Contact &amp; shipping help</a>.</p>
+      </section>
+    </main>
+    <StoreFooter profile={profile} />
+  </body>
+</html>
+<script>
+  import { hydrateRetainedReceipt } from '../../features/guest-cart/retained-receipt.js';
+  hydrateRetainedReceipt();
+</script>
+<style>
+.retained-intro{max-width:60ch}.retained-intro p{margin:0 0 var(--space-4)}
+.retained-intro button{min-height:48px;min-width:14rem;padding:.65rem 1rem;max-width:100%;background:var(--store-surface);color:var(--store-ink);font:inherit;cursor:pointer}
+.retained-intro button:active{background:var(--store-surface-subtle)}.retained-intro button:disabled{cursor:progress;opacity:.7}
+.retained-help{margin-top:var(--space-5)}.retained-help a{display:inline-flex;align-items:center;min-height:48px}
+@media print{.retained-intro,.retained-help{display:none!important}}
+</style>

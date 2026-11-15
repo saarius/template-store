@@ -679,18 +679,25 @@ describe("order confirmation receipt enrichment (garment thumbnails, variants, a
     );
   });
 
-  it("starts with an unchecked status and actionable script guidance, not a confirmation or running check", () => {
+  it("renders the server-authorized result without hydrating the removed inline-lines checkout client", () => {
     const markup = readFileSync("src/features/guest-cart/GuestCheckoutReturn.astro", "utf8");
-    expect(markup).toContain('<h1 id="guest-checkout-return-title">Checkout status</h1>');
-    const initialStatus = markup.match(/<p\b[^>]*\bdata-guest-checkout-return-status\b[^>]*>([^<]+)<\/p>/)?.[1];
-    expect(initialStatus).toContain("has not checked your saved checkout yet");
-    expect(initialStatus).toContain("enable JavaScript and reload");
-    expect(initialStatus).toContain("browser you checked out with");
-    expect(initialStatus).toContain("Keep that browser’s site data");
-    expect(initialStatus).not.toContain("Checking the saved checkout status");
+    expect(markup).toContain('result.kind === "paid" ? result.order : null');
+    expect(markup).toContain('<h1 id="guest-checkout-return-title">{title}</h1>');
+    expect(markup).toContain('data-guest-checkout-return-state={result.kind}');
+    expect(markup).not.toContain('hydrateGuestCheckoutReturn');
+    expect(markup).not.toContain('<script');
   });
 
-  it("preserves all FEATURE_MAP selectors, destination summary, and shopper account link in GuestCheckoutReturn.astro", () => {
+  it("keeps earlier browser recovery explicit and gives no-script guidance rather than claiming a check ran", () => {
+    const markup = readFileSync("src/pages/checkout/retained.astro", "utf8");
+    expect(markup).toContain('data-retained-check hidden');
+    expect(markup).toContain('This check will not open a new payment.');
+    expect(markup).toContain('needs JavaScript.');
+    expect(markup).toContain('readStorefrontProfile() === \'proof\'');
+    expect(markup).toContain("process.env.BACKROADBUM_MERCHANT_PROFILE !== '1'");
+  });
+
+  it("preserves the server receipt selectors, destination summary, and shopper account link", () => {
     const markup = readFileSync("src/features/guest-cart/GuestCheckoutReturn.astro", "utf8");
     for (const token of [
       "data-guest-checkout-return",
@@ -707,7 +714,8 @@ describe("order confirmation receipt enrichment (garment thumbnails, variants, a
       "data-guest-checkout-address",
       "data-guest-checkout-shipping-method",
       "data-guest-checkout-contact",
-      "data-guest-checkout-retry",
+      // The removed payment-resume link was owned by the old inline-lines client;
+      // server returns use an explicit status refresh, never a replacement start.
       "data-guest-checkout-status-retry",
       'class="guest-checkout-continue"',
       'data-guest-checkout-account href="/account"',

@@ -485,7 +485,7 @@ export function parseGuestCheckoutWireResult(body: unknown): GuestCheckoutWireRe
 }
 
 export function readGuestCheckoutRetention(
-  storage: GuestCheckoutRetentionStorage | null,
+  storage: Pick<GuestCheckoutRetentionStorage, "getItem"> | null,
 ): GuestCheckoutRetention | null {
   if (!storage) return null;
   try {
