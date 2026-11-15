@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates populated JSON proof from native controls and incomplete Google/Meta exports', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('A real feed. Two rough edges.');
+    expect(report).toContain('Previous dispatch · Catalog review main sync');
+    expect(report).toContain('Google XML and Meta CSV still export only the five simple products');
+    expect(reviews).toContain('https://github.com/dinkuskit/commerce/issues/279');
+    expect(reviews).toContain('documented, preview-fenced Commerce API');
+    expect(reviews).toContain('real HTTPS reads');
+    expect(reviews).toContain('no UI repair, signed release or external enrollment is claimed');
+    expect(reviews).toContain('Website checks passed at 18:36 UTC');
+  });
   it('reports the catalog main merge separately from the prior green head and shared deployment', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

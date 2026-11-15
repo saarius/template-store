@@ -133,6 +133,9 @@ A published CMS product page and a shoppable Commerce product are different stat
 ## Catalog discovery reporting
 A healthy empty agent feed is not a populated catalog success or a broken storefront. Keep the actual Google/Meta channel-eligibility consequence distinct from the store-level catalog switch and from synthetic populated Worker tests; link the existing upstream follow-up rather than declaring a new regression. A downstream sync preserves this entire theme and the legacy browser capability keys; it does not authorize external channel enrollment, a server-cart cutover or shared-service deployment.
 
+## Populated feed reporting
+Keep the existing Field Journal reporting tokens, disclosure rhythm and plain native links. Separate the actual seven-family/eleven-member JSON export and real HTTPS Worker proof from the five-row Google/Meta limitation, missing native option-product switches and fenced API workaround; never turn partial export or a bug report into a readiness/repair claim. Installed-panel captures crop to the native Commerce section and stay outside git; public proof compares product shapes in the same signed release, not fabricated Before/After repair states.
+
 ## Exact catalog lookup reporting
 An empty product returned for a filtered exact size is not a useful availability answer. Report the compiled Worker’s exact-input correction separately from storefront availability, channel eligibility and shared deployment: public tee facts can supply a local synthetic feed without authorizing remote catalog enrollment. API-only Before/After HTTP output belongs directly in the PR body; do not fabricate screenshots or imply that the live empty feed exports those variants.
 
