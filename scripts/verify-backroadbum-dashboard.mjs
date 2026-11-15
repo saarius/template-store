@@ -43,10 +43,12 @@ try {
       const disclosures = page.locator('main details');
       expect(await disclosures.evaluateAll(nodes => nodes.every(el => !el.open))).toBe(true);
       if (view === 'overview') {
-        await expect(page.locator('.dashboard-latest')).toContainText('Six repairs accepted. One-way adoption.');
-        await expect(page.locator('.dashboard-latest')).toContainText('signed store plugins and hosted deployments are unchanged');
-        await expect(page.locator('.dashboard-latest')).toContainText('a maintainer retry is needed');
-        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/dinkuskit/pull/130"]')).toHaveCount(1);
+        await expect(page.locator('.dashboard-latest')).toContainText('One displayed shopper. One session.');
+        await expect(page.locator('.dashboard-latest')).toContainText('checks again before actions and after delayed responses');
+        await expect(page.locator('.dashboard-latest')).toContainText('a generic upstream PR remains separate');
+        await expect(page.locator('.dashboard-latest a[href="https://github.com/dinkuskit/template-store/issues/234"]')).toHaveCount(1);
+        await expect(page.locator('#history')).toContainText('Six repairs accepted. One-way adoption.');
+        await expect(page.locator('#history')).toContainText('a maintainer retry is needed');
         await expect(page.locator('#history')).toContainText('Small controls. A firmer footing.');
         await expect(page.locator('#history')).toContainText('not a visual change to our already-sized Field Journal shell');
         await expect(page.locator('#history')).toContainText('no catalog, account, payment or shipping action changes');

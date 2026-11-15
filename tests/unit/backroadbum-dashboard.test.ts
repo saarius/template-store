@@ -2,6 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates intercepted Account continuity proof from real writes and upstream qualification', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('https://github.com/dinkuskit/template-store/issues/234');
+    expect(report).toContain('One displayed shopper. One session.');
+    expect(report).toContain('not an upstream PR or backend authorization change');
+    expect(report).toContain('without real account writes');
+    expect(report).toContain('generic main/head proof and full owning verification remain prerequisites');
+    expect(report).toContain('Previous dispatch · Downstream adoption');
+  });
   it('separates accepted source and the locally qualified catalog proposal from deployments', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
