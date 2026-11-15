@@ -4,6 +4,7 @@ import {
   SHOPPER_ORDERS_ENDPOINT,
   SHOPPER_PROFILE_ENDPOINT,
   SHOPPER_SESSION_HEADER,
+  SHOPPER_SESSION_STORAGE_KEY,
   SHOPPER_SIGN_IN_START_ENDPOINT,
   SHOPPER_SIGN_IN_VERIFY_ENDPOINT,
   SHOPPER_SIGN_OUT_ENDPOINT,
@@ -268,13 +269,16 @@ function recoverDeniedSession(
 async function loadSignedInDashboard(
   root: Element,
   session: StoredShopperSession,
+  isCurrent: () => boolean,
+  onDenied: () => void,
 ): Promise<boolean> {
   const headers = {
     accept: "application/json",
     [SHOPPER_SESSION_HEADER]: session.sessionToken,
   };
   const ordersRes = await fetchAccountEndpoint(SHOPPER_ORDERS_ENDPOINT, { method: "GET", headers });
-  if (recoverDeniedSession(root, session, ordersRes)) return false;
+  if (!isCurrent()) return false;
+  if (recoverDeniedSession(root, session, ordersRes)) { onDenied(); return false; }
   if (
     ordersRes.status !== 200 ||
     !ordersRes.body ||
@@ -300,6 +304,7 @@ async function loadSignedInDashboard(
     ? (ordersRes.body.orders as ShopperOrderItem[])
     : [];
   const snapshots = await fetchOrderCatalogSnapshots(rawOrders);
+  if (!isCurrent()) return false;
   showSignedInState(root, true, profile.email);
   populateProfileForm(root, profile);
   renderOrders(root, rawOrders, snapshots);
@@ -330,16 +335,71 @@ export function hydrateShopperAccountPage(): void {
     setAccountStatus(root, null);
   });
 
-  const existing = readStoredShopperSession();
-  if (existing) {
-    void loadSignedInDashboard(root, existing).catch(() => {
-      setAccountStatus(root, "Could not load your shopper profile right now. Please try again.", true);
+  let observedSession = readStoredShopperSession();
+  let displayedSession: StoredShopperSession | null = null;
+  let generation = 0;
+  const sameSession = (a: StoredShopperSession | null, b: StoredShopperSession | null) =>
+    a?.sessionToken === b?.sessionToken;
+  const clearPrivateView = () => {
+    displayedSession = null;
+    populateProfileForm(root, { email: "", phone: null, delivery: null });
+    renderOrders(root, []);
+    setFieldValue(root, "[data-account-email]", "");
+    setFieldValue(root, "[data-account-code]", "");
+    if (verifyForm instanceof HTMLElement) verifyForm.hidden = true;
+    showSignedInState(root, false);
+  };
+  const reconcileSession = () => {
+    const stored = readStoredShopperSession();
+    if (sameSession(stored, observedSession)) return;
+    observedSession = stored;
+    generation += 1;
+    clearPrivateView();
+    setAccountStatus(root, stored
+      ? "Your shopper account changed in another tab. Reload this page before editing your profile."
+      : "Your shopper session ended. Sign in again.", true);
+  };
+  // Check persistent state as well as storage events: an event may still be
+  // queued when a click or an older network response arrives.
+  const lease = () => {
+    reconcileSession();
+    const started = generation;
+    return () => { reconcileSession(); return generation === started; };
+  };
+  const settleDeniedSession = () => {
+    if (readStoredShopperSession()) return;
+    observedSession = null;
+    generation += 1;
+    clearPrivateView();
+    setAccountStatus(root, "Your session has expired. Sign in again.", true);
+  };
+  const editableSession = () => {
+    reconcileSession();
+    if (displayedSession && sameSession(displayedSession, observedSession)) return displayedSession;
+    return null;
+  };
+  window.addEventListener("storage", event => {
+    if (event.key === SHOPPER_SESSION_STORAGE_KEY || event.key === null) reconcileSession();
+  });
+  window.addEventListener("focus", reconcileSession);
+  window.addEventListener("pageshow", reconcileSession);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") reconcileSession();
+  });
+  if (observedSession) {
+    const existing = observedSession;
+    const isCurrent = lease();
+    void loadSignedInDashboard(root, existing, isCurrent, settleDeniedSession).then(loaded => {
+      if (loaded && isCurrent()) displayedSession = existing;
+    }).catch(() => {
+      if (isCurrent()) setAccountStatus(root, "Could not load your shopper profile right now. Please try again.", true);
     });
   }
 
   startForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     void (async () => {
+      const isCurrent = lease();
       const email = readFieldValue(root, "[data-account-email]");
       if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(email)) {
         setAccountStatus(root, "Enter a valid email address to continue.", true);
@@ -367,6 +427,7 @@ export function hydrateShopperAccountPage(): void {
             ...(isPlaygroundMode ? { optInUpdates: optedIn } : {}),
           }),
         });
+        if (!isCurrent()) return;
         if (res.status !== 200 || !res.body || res.body.ok !== true) {
           const message =
             isRecord(res.body?.error) && typeof res.body.error.message === "string"
@@ -389,7 +450,7 @@ export function hydrateShopperAccountPage(): void {
           false,
         );
       } catch {
-        setAccountStatus(root, "Could not reach the store account service.", true);
+        if (isCurrent()) setAccountStatus(root, "Could not reach the store account service.", true);
       } finally {
         if (startBtn instanceof HTMLButtonElement) startBtn.disabled = false;
       }
@@ -399,6 +460,7 @@ export function hydrateShopperAccountPage(): void {
   verifyForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     void (async () => {
+      const isCurrent = lease();
       const email = readFieldValue(root, "[data-account-email]");
       const code = readFieldValue(root, "[data-account-code]");
       if (!/^\d{6}$/u.test(code)) {
@@ -421,6 +483,7 @@ export function hydrateShopperAccountPage(): void {
             ...(isPlaygroundMode ? { optInUpdates: optedIn } : {}),
           }),
         });
+        if (!isCurrent()) return;
         const stored =
           res.status === 200 && res.body && res.body.ok === true
             ? parseVerifiedSessionFromBody(res.body, email)
@@ -437,12 +500,15 @@ export function hydrateShopperAccountPage(): void {
         if (verifyForm instanceof HTMLElement) verifyForm.hidden = true;
         // Kept only once its profile loads, so a failed or thrown load never
         // leaves a session that shows the same error on every visit.
-        if (!(await loadSignedInDashboard(root, stored))) return;
+        if (!(await loadSignedInDashboard(root, stored, isCurrent, settleDeniedSession))) return;
         saveStoredShopperSession(stored);
+        generation += 1;
+        observedSession = readStoredShopperSession();
+        displayedSession = stored;
         setAccountStatus(root, null);
         announceSignedIn(root);
       } catch {
-        setAccountStatus(root, "Could not verify your code right now.", true);
+        if (isCurrent()) setAccountStatus(root, "Could not verify your code right now.", true);
       } finally {
         if (verifyBtn instanceof HTMLButtonElement) verifyBtn.disabled = false;
       }
@@ -451,6 +517,7 @@ export function hydrateShopperAccountPage(): void {
 
   demoButton?.addEventListener("click", () => {
     void (async () => {
+      const isCurrent = lease();
       if (demoButton instanceof HTMLButtonElement) demoButton.disabled = true;
       setAccountStatus(root, "Starting instant demo shopper session...");
       try {
@@ -459,6 +526,7 @@ export function hydrateShopperAccountPage(): void {
           headers: { "content-type": "application/json", accept: "application/json" },
           body: JSON.stringify({}),
         });
+        if (!isCurrent()) return;
         const stored =
           res.status === 200 && res.body && res.body.ok === true
             ? parseVerifiedSessionFromBody(res.body, "shopper@example.com")
@@ -467,8 +535,11 @@ export function hydrateShopperAccountPage(): void {
           setAccountStatus(root, "Could not start the demo shopper session.", true);
           return;
         }
-        if (!(await loadSignedInDashboard(root, stored))) return;
+        if (!(await loadSignedInDashboard(root, stored, isCurrent, settleDeniedSession))) return;
         saveStoredShopperSession(stored);
+        generation += 1;
+        observedSession = readStoredShopperSession();
+        displayedSession = stored;
         setAccountStatus(
           root,
           "Demo account: no PIN required and no email recorded.",
@@ -476,7 +547,7 @@ export function hydrateShopperAccountPage(): void {
         );
         announceSignedIn(root);
       } catch {
-        setAccountStatus(root, "Could not start the demo shopper session.", true);
+        if (isCurrent()) setAccountStatus(root, "Could not start the demo shopper session.", true);
       } finally {
         if (demoButton instanceof HTMLButtonElement) demoButton.disabled = false;
       }
@@ -486,12 +557,9 @@ export function hydrateShopperAccountPage(): void {
   profileForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     void (async () => {
-      const session = readStoredShopperSession();
-      if (!session) {
-        showSignedInState(root, false);
-        setAccountStatus(root, "Your session has expired. Sign in again.", true);
-        return;
-      }
+      const session = editableSession();
+      if (!session) return;
+      const isCurrent = lease();
       const phone = readFieldValue(root, "[data-account-profile-phone]");
       const name = readFieldValue(root, "[data-account-profile-name]");
       const line1 = readFieldValue(root, "[data-account-profile-line1]");
@@ -535,7 +603,8 @@ export function hydrateShopperAccountPage(): void {
             delivery,
           }),
         });
-        if (recoverDeniedSession(root, session, res)) return;
+        if (!isCurrent()) return;
+        if (recoverDeniedSession(root, session, res)) { settleDeniedSession(); return; }
         if (res.status !== 200 || !res.body || res.body.ok !== true || !isRecord(res.body.profile)) {
           const message =
             isRecord(res.body?.error) && typeof res.body.error.message === "string"
@@ -554,7 +623,7 @@ export function hydrateShopperAccountPage(): void {
         });
         setAccountStatus(root, "Saved your default shipping address and contact details.", false);
       } catch {
-        setAccountStatus(root, "Could not save your shipping profile right now.", true);
+        if (isCurrent()) setAccountStatus(root, "Could not save your shipping profile right now.", true);
       } finally {
         if (saveBtn instanceof HTMLButtonElement) saveBtn.disabled = false;
       }
@@ -563,12 +632,9 @@ export function hydrateShopperAccountPage(): void {
 
   clearProfileButton?.addEventListener("click", () => {
     void (async () => {
-      const session = readStoredShopperSession();
-      if (!session) {
-        showSignedInState(root, false);
-        setAccountStatus(root, "Your session has expired. Sign in again.", true);
-        return;
-      }
+      const session = editableSession();
+      if (!session) return;
+      const isCurrent = lease();
       if (clearProfileButton instanceof HTMLButtonElement) clearProfileButton.disabled = true;
       try {
         const res = await fetchAccountEndpoint(SHOPPER_PROFILE_ENDPOINT, {
@@ -580,7 +646,8 @@ export function hydrateShopperAccountPage(): void {
           },
           body: JSON.stringify({ phone: null, delivery: null }),
         });
-        if (recoverDeniedSession(root, session, res)) return;
+        if (!isCurrent()) return;
+        if (recoverDeniedSession(root, session, res)) { settleDeniedSession(); return; }
         if (res.status === 200 && res.body && res.body.ok === true) {
           populateProfileForm(root, { email: session.email, phone: null, delivery: null });
           setAccountStatus(root, "Cleared your saved shipping address and phone number.", false);
@@ -588,7 +655,7 @@ export function hydrateShopperAccountPage(): void {
           setAccountStatus(root, "Could not clear your shipping profile right now. Please try again.", true);
         }
       } catch {
-        setAccountStatus(root, "Could not clear your shipping profile right now. Please try again.", true);
+        if (isCurrent()) setAccountStatus(root, "Could not clear your shipping profile right now. Please try again.", true);
       } finally {
         if (clearProfileButton instanceof HTMLButtonElement) clearProfileButton.disabled = false;
       }
@@ -597,8 +664,11 @@ export function hydrateShopperAccountPage(): void {
 
   signOutButton?.addEventListener("click", () => {
     void (async () => {
-      const session = readStoredShopperSession();
-      if (session) {
+      const session = editableSession();
+      if (!session) return;
+      const isCurrent = lease();
+      if (signOutButton instanceof HTMLButtonElement) signOutButton.disabled = true;
+      try {
         await fetchAccountEndpoint(SHOPPER_SIGN_OUT_ENDPOINT, {
           method: "POST",
           headers: {
@@ -608,10 +678,15 @@ export function hydrateShopperAccountPage(): void {
           },
           body: JSON.stringify({}),
         }).catch(() => null);
+        if (!isCurrent()) return;
+        clearStoredShopperSession();
+        observedSession = null;
+        generation += 1;
+        clearPrivateView();
+        setAccountStatus(root, "Signed out of your shopper account.", false);
+      } finally {
+        if (signOutButton instanceof HTMLButtonElement) signOutButton.disabled = false;
       }
-      clearStoredShopperSession();
-      showSignedInState(root, false);
-      setAccountStatus(root, "Signed out of your shopper account.", false);
     })();
   });
 }
