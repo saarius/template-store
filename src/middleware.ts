@@ -10,8 +10,7 @@ import {
   validatePublicSearchQuery,
 } from "./features/security/public-boundary.js";
 import { acquireGuestCheckoutAdmission, canDispatchInstalledGuestCheckout } from "./features/guest-cart/checkout-admission.js";
-import { GUEST_CHECKOUT_STATUS_ENDPOINT } from "./features/guest-cart/checkout-protocol.js";
-import { merchantCheckoutClosed, merchantCheckoutPath, merchantCheckoutStatusPath } from "./features/guest-cart/merchant-policy.js";
+import { merchantCheckoutClosed, merchantCheckoutPath, merchantCheckoutStatusPath, merchantServerCartMutationPath } from "./features/guest-cart/merchant-policy.js";
 import {
    ensurePlaygroundDemoCatalog,
 } from "./features/playground/demo-commerce-seed.js";
@@ -60,7 +59,7 @@ let demoProfileSeeded = false;
 
 
 const NATIVE_GUEST_CHECKOUT_POST_PATH =
-  /^\/_emdash\/api\/plugins\/dinkus-commerce\/checkout\/guest\/(prepare|start|status)$/;
+  /^\/_emdash\/api\/plugins\/dinkus-commerce\/checkout\/guest\/(prepare|cart|start)$/;
 const NATIVE_SHOPPER_ACCOUNT_PATH =
   /^\/_emdash\/api\/plugins\/dinkus-commerce\/account\/(sign-in\/start|sign-in\/verify|sign-out|orders|profile)$/;
 const SHOPPER_ACCOUNT_ROUTE_PATH = new RegExp(
@@ -99,12 +98,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
   // Keep receipt recovery behind normal request/capability checks even while
   // the independent merchant gate refuses all new checkout entry.
-  if (merchantCheckoutClosed() && pathForms.some(path => merchantCheckoutPath(path) && !merchantCheckoutStatusPath(path))) {
+  const serverCartMutation = context.request.method === 'POST' && pathForms.some(merchantServerCartMutationPath);
+  if (merchantCheckoutClosed() && (serverCartMutation || pathForms.some(path => merchantCheckoutPath(path) && !merchantCheckoutStatusPath(path)))) {
     const response = Response.json({ error: "Checkout is unavailable right now." }, { status: 503, headers: { "Cache-Control": "no-store" } });
     applySecurityHeaders(response.headers);
     return response;
   }
   if (process.env.BACKROADBUM_MERCHANT_PROFILE === '1') {
+    if (serverCartMutation) {
+      const { admitMerchantServerCart } = await import('./features/guest-cart/merchant-admission.js');
+      const refused = await admitMerchantServerCart(context.request, context.url.pathname);
+      if (refused) { applySecurityHeaders(refused.headers); return refused; }
+    }
     const checkoutPath = pathForms.find(merchantCheckoutPath);
     if (checkoutPath) {
       const { admitMerchantCheckout } = await import('./features/guest-cart/merchant-admission.js');
@@ -155,8 +160,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     ((context.locals as { __playgroundEnv?: Record<string, unknown> }).__playgroundEnv ??
       process.env) as Record<string, unknown>;
   (globalThis as { __dinkusPlaygroundEnv?: Record<string, unknown> }).__dinkusPlaygroundEnv = playgroundEnv;
-  // Resolve (and publish on locals) the persistent binding store once, so the
-  // /api/checkout/status route authorizes against the same store start wrote.
+  // Resolve (and publish on locals) the persistent binding store once, so a cart read authorizes against
+  // the same store start wrote.
   const playgroundBindings = isPlayground ? playgroundCheckoutBindingsFor(context.locals) : undefined;
 
   // Publishing a product page puts its Commerce product on sale. Every store, the playground included, runs
@@ -180,7 +185,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   async function checkoutRouteAdmitted(): Promise<boolean> {
     const installed = { runtime: context.locals.emdash, request: context.request };
     // Readiness is advisory for new checkout entry. An existing capability must
-    // still reach Commerce's current start/status checks when the advisory is stale.
+    // still reach Commerce's current cart and start checks when the advisory is stale.
     return pathForms.some((path) => path.endsWith("/prepare"))
       ? Boolean(await acquireGuestCheckoutAdmission(installed))
       : canDispatchInstalledGuestCheckout(installed);
@@ -195,20 +200,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (guarded) {
       applySecurityHeaders(guarded.headers);
       return guarded;
-    }
-    if (checkoutKind === "status" && isPlayground && playgroundCheckoutConfigured(playgroundEnv)) {
-      const statusAttemptId = await readStatusAttemptId(context.request);
-      if (statusAttemptId === TOO_LARGE) {
-        const refused = checkoutJsonError(413, "Checkout request is too large.");
-        applySecurityHeaders(refused.headers);
-        return refused;
-      }
-      const sessionId = context.cookies.get("emdash_playground")?.value ?? "";
-      if (statusAttemptId !== null && !(await playgroundAttemptBelongsToVisitor(statusAttemptId, sessionId, playgroundBindings, playgroundEnv))) {
-        const refused = checkoutJsonError(403, "Checkout visitor session is not authorized.");
-        applySecurityHeaders(refused.headers);
-        return refused;
-      }
     }
   }
 
@@ -291,7 +282,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const sessionId = context.cookies.get("emdash_playground")?.value ?? "";
     const response = await withCheckoutVisitor(clientIp ?? "", sessionId, async () => {
       const commerceResponse = await next();
-      if (checkoutKind === "status") {
+      // A cart read is also the status check: a paid order shows only to the visitor who paid.
+      if (checkoutKind === "cart") {
         return authorizePlaygroundStatusResponse(commerceResponse, sessionId, playgroundBindings, playgroundEnv);
       }
       return commerceResponse;
@@ -304,27 +296,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const refused = checkoutJsonError(503, "Playground checkout is unavailable.");
     applySecurityHeaders(refused.headers);
     return refused;
-  }
-
-  // Status recovery (/api/checkout/status) dispatches in-process to the visitor's
-  // Commerce; give its Payments lookup the same visitor context.
-  if (isPlayground && context.url.pathname === GUEST_CHECKOUT_STATUS_ENDPOINT &&
-      playgroundCheckoutConfigured(playgroundEnv)) {
-    const sessionId = context.cookies.get("emdash_playground")?.value ?? "";
-    const statusAttemptId = await readStatusAttemptId(context.request);
-    if (statusAttemptId === TOO_LARGE) {
-      const refused = checkoutJsonError(413, "Checkout request is too large.");
-      applySecurityHeaders(refused.headers);
-      return refused;
-    }
-    if (statusAttemptId !== null && !(await playgroundAttemptBelongsToVisitor(statusAttemptId, sessionId, playgroundBindings, playgroundEnv))) {
-      const refused = checkoutJsonError(403, "Checkout visitor session is not authorized.");
-      applySecurityHeaders(refused.headers);
-      return refused;
-    }
-    const response = await withCheckoutVisitor(visitorIp(context.request) ?? "", sessionId, () => next(), playgroundBindings);
-    applySecurityHeaders(response.headers);
-    return response;
   }
 
   // The playground wraps the visitor's Commerce account routes with its updates opt-in, sign-in limiter and
@@ -495,18 +466,6 @@ async function boundedCheckoutBody(request: Request): Promise<string | null | ty
     offset += chunk.byteLength;
   }
   return new TextDecoder().decode(bytes);
-}
-
-async function readStatusAttemptId(request: Request): Promise<string | null | typeof TOO_LARGE> {
-  const raw = await boundedCheckoutBody(request);
-  if (raw === TOO_LARGE) return TOO_LARGE;
-  if (raw === null || raw === "") return null;
-  try {
-    const body = JSON.parse(raw) as { attemptId?: unknown };
-    return typeof body.attemptId === "string" && body.attemptId.length > 0 ? body.attemptId : null;
-  } catch {
-    return null;
-  }
 }
 
 type PublicPluginResult = {

@@ -268,9 +268,11 @@ function parseContact(value: unknown, fallbackDelivery?: GuestCheckoutDelivery):
   const email = boundedText(value.email, 254);
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(email)) return undefined;
   const delivery = parseDelivery(value.delivery ?? value.shippingAddress) ?? fallbackDelivery;
+  const billing = parseDelivery(value.billing);
   return {
     email,
     ...(delivery ? { delivery } : {}),
+    ...(billing ? { billing } : {}),
   };
 }
 
@@ -340,9 +342,12 @@ function projectCheckout(value: unknown): GuestCheckoutProjection | null {
       (typeof rawOrder.email === "string" ? parseContact({ email: rawOrder.email }, orderDelivery) : undefined) ??
       topContact;
     const orderShippingMethod = boundedText(rawOrder.shippingMethod, 160) ?? topShippingMethod;
-    const fulfillment = parseGuestOrderFulfillment(rawOrder.fulfillment);
+    // Preserve retained receipts' wrapper shape while accepting Commerce 0.9's native Orders projection.
+    const completed = isObject(rawOrder.completed) ? rawOrder.completed : {};
+    const fulfillment = parseGuestOrderFulfillment(rawOrder.fulfillment) ?? parseGuestOrderFulfillment({
+      status: rawOrder.status, completedAt: completed.at, carrier: completed.carrier, tracking: completed.tracking,
+    });
     order = {
-      ...(fulfillment ? { fulfillment } : {}),
       orderId: value.order.orderId,
       receiptId: value.order.receiptId,
       ...(Number.isSafeInteger(rawOrder.number) && (rawOrder.number as number) > 0 ? { number: rawOrder.number as number } : {}),
@@ -352,6 +357,7 @@ function projectCheckout(value: unknown): GuestCheckoutProjection | null {
       ...(orderContact ? { contact: orderContact } : {}),
       ...(orderDelivery && !orderContact?.delivery ? { delivery: orderDelivery } : {}),
       ...(orderShippingMethod ? { shippingMethod: orderShippingMethod } : {}),
+      ...(fulfillment ? { fulfillment } : {}),
     };
   }
   if (value.state === "paid" && !order) return null;

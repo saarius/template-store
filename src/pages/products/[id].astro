@@ -108,7 +108,11 @@ const checkoutEnabled = playgroundCheckoutConfigured(playgroundEnvOf(Astro.local
 const offersCart = productPageOffersCart({ profile, isPlayground, isDemo, checkoutEnabled });
 const sandboxCheckout = showsSandboxCheckoutNotice({ profile, isPlayground, isDemo, checkoutEnabled });
 const variants = linkedProduct?.variants ?? [];
-const selection = productSelection(variants, Astro.url.searchParams);
+// Accept retained ?item links as well as the server-cart's canonical ?variant address.
+const selectionParams = new URLSearchParams(Astro.url.searchParams);
+if (!selectionParams.has('item') && selectionParams.has('variant')) selectionParams.set('item', selectionParams.get('variant')!);
+const selection = productSelection(variants, selectionParams);
+const addFormId = 'product-add-to-cart';
 const selectedVariant = selection.member;
 const identifiers = linkedProduct ? productIdentifiers(linkedProduct, selectedVariant) : null;
 // One picker per option (Color, then Size), like Shopify or WooCommerce
@@ -233,10 +237,10 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
             {linkedProduct?.brand && <p class="product-detail__identifier" data-product-brand={linkedProduct.brand}>Brand {linkedProduct.brand}</p>}
             {linkedProduct && <p class="product-detail__price" data-product-price hidden={selection.stale}>{linkedProduct.price.saleText ? <><s data-regular-price>{linkedProduct.price.regularText}</s> <strong data-sale-price>{linkedProduct.price.saleText}</strong></> : <strong data-regular-price data-variant-price>{selectedVariant?.priceText ?? linkedProduct.price.regularText}</strong>}</p>}
             {selection.stale && <p class="product-detail__notice" data-product-selection-notice role="status">That saved option is no longer available. Choose from the options below before adding to your cart.</p>}
-            {variantOptions.map((option, index) => <fieldset class="product-variants" data-product-variants data-variant-option={option.label}>
+            {variantOptions.map((option) => <fieldset class="product-variants" data-product-variants data-variant-option={option.label}>
               <legend>{option.label}</legend>
               {option.values.map((value) => <label class="product-variant">
-                <input type="radio" name={`variant-option-${index}`} value={value} checked={value === selectedValue(option.label)}
+                <input type="radio" name={`options[${option.label}]`} form={addFormId} value={value} checked={value === selectedValue(option.label)}
                   data-variant-choice data-variant-option={option.label}
                   data-variant-sold-out={String(initialPicker.soldOut[option.label]?.[value] ?? true)} />
                 <span class="product-variant__check" aria-hidden="true">✓</span><span class="product-variant__value">{value}</span><span class="product-variant__sold-out"> (sold out)</span>
@@ -247,7 +251,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
               <noscript>
                 <form method="get" action={productCanonical} class="product-options-fallback" data-product-options-fallback>
                   <label for="product-option">View a product option</label>
-                  <p>Load an option to see its current price and availability. Saving items to your cart needs JavaScript.</p>
+                  <p>Load an option to see its current price and availability. Add to cart works without JavaScript.</p>
                   <select id="product-option" name="item" required>
                     <option value="" disabled selected={!selectedVariant}>Choose an option</option>
                     {variantMembers.map(member => <option value={member.id} selected={member.id === selectedVariant?.id}>{Object.entries(member.values).map(([label, value]) => `${label}: ${value}`).join(' / ')}</option>)}
@@ -259,7 +263,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
             {managed && <p class="product-detail__price" data-product-price><strong data-regular-price>{managed.price.regularText}</strong></p>}
             {unmanaged && <p class="product-detail__price" data-product-price>{unmanaged.price.saleText ? <><s data-regular-price>{unmanaged.price.regularText}</s> <strong data-sale-price>{unmanaged.price.saleText}</strong></> : <strong data-regular-price>{unmanaged.price.regularText}</strong>}</p>}
             <p class="product-detail__status" data-product-status data-availability-status={linkedStatus ?? unmanaged?.storefront.status}>{status}</p>
-            {cartProduct && offersCart && <AddToCart product={cartProduct} variants={variants} selectionRequired={selection.stale} />}
+            {cartProduct && offersCart && <AddToCart product={cartProduct} variants={variants} productId={linkedProduct?.id} formId={addFormId} />}
             {lookupUnavailable ? <p class="product-detail__notice" role="status">Product availability is temporarily unavailable. Please try again.</p> : sandboxCheckout ? <p class="product-detail__notice" data-sandbox-checkout-available>Test-mode checkout. No real charges.</p> : linkedProduct && profile !== "shipping" ? <p class="product-detail__notice" data-checkout-unavailable>{offersCart ? "Demo product. Checkout is unavailable." : "Demo product. Cart and checkout are unavailable."}</p> : linkedProduct ? (purchasable ? null : <p class="product-detail__notice" data-not-purchasable>{checkoutAvailable ? "This product can't be bought right now." : "Checkout is unavailable right now, so this product can't be bought."}</p>) : item.availabilitySource === "preview" || !demonstrations ? <p class="product-detail__notice">This is an editorial preview. It is not purchasable.</p> : <p class="product-detail__notice">Availability is shown for this local integration proof. Purchasing is not available here.</p>}
           </div>
         </article>

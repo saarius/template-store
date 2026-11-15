@@ -16,6 +16,11 @@ export function merchantCheckoutStatusPath(path: string): boolean {
     path === '/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/status';
 }
 
+/** The server dispatches these forms in-process; native API middleware never sees that call. */
+export function merchantServerCartMutationPath(path: string): boolean {
+  return path === '/checkout' || /^\/cart\/(add|change|update)(\.js)?$/.test(path);
+}
+
 export function merchantCheckoutPath(path: string): boolean {
   return merchantCheckoutStatusPath(path) ||
     /^\/_emdash\/api\/plugins\/r_gshdrqaldna3r7sn\/checkout\/guest\/(prepare|start|status|cart|readiness)$/.test(path);

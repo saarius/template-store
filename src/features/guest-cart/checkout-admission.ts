@@ -3,8 +3,8 @@ import { merchantCheckoutClosed } from "./merchant-policy.js";
 
 export const SUPPORTED_GUEST_CHECKOUT_ROUTES = [
   "checkout/guest/prepare",
+  "checkout/guest/cart",
   "checkout/guest/start",
-  "checkout/guest/status",
 ] as const;
 
 export const CHECKOUT_READINESS_SCHEMA =
