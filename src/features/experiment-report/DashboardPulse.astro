@@ -1,5 +1,6 @@
 ---
-interface Props { status: any; stale: boolean }
+import type { DashboardTelemetry } from './telemetry';
+interface Props { status: DashboardTelemetry | null; stale: boolean }
 const { status, stale } = Astro.props;
 const value = (n: unknown, suffix = '') => typeof n === 'number' && Number.isFinite(n) ? `${new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(n)}${suffix}` : 'Unavailable';
 const ready = status?.checkoutProbe?.outcome === 'ready-advisory';

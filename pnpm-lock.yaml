@@ -42,6 +42,9 @@ importers:
       '@astrojs/check':
         specifier: 0.9.9
         version: 0.9.9(@emnapi/runtime@1.11.3)(prettier@3.9.9)(typescript@6.0.3)
+      '@astrojs/compiler-rs':
+        specifier: 0.3.2
+        version: 0.3.2(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)
       '@emdash-cms/auth':
         specifier: 1.4.0
         version: 1.4.0(astro@7.1.3(@emnapi/core@1.11.3)(@emnapi/runtime@1.11.3)(@types/node@26.1.1)(rollup@4.63.5)(yaml@2.9.0))(kysely@0.29.5)

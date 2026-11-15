@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
+import { explicitAnyCount } from "./source-type-audit.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const featureMap = readFileSync(resolve(root, "FEATURE_MAP.md"), "utf8");
@@ -140,8 +141,12 @@ for (const path of sourceFiles(resolve(root, "src"))) {
   if (/from\s+["']@dinkuskit\/(?:blocks|commerce|inventory)\/src\//u.test(source)) {
     failures.push(`${path} imports a Dinkus package internal`);
   }
-  if (/\bany\b/u.test(source)) {
-    failures.push(`${path} contains an explicit any`);
+  try {
+    if (explicitAnyCount(source, path) > 0) {
+      failures.push(`${path} contains an explicit any`);
+    }
+  } catch (error) {
+    failures.push(error.message);
   }
 }
 
