@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates upstream Account qualification from the baseline admin failure and live business writes', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('https://github.com/dinkuskit/template-store/pull/235');
+    expect(report).toContain('From store finding to starter fix.');
+    expect(report).toContain('Previous dispatch · Account continuity');
+    expect(reviews).toContain('afe02f4');
+    expect(reviews).toContain('74 focused browser cases');
+    expect(reviews).toContain('failure also reproduces on unchanged main');
+    expect(report).toContain('No account, order, catalog or plugin changes were made');
+    expect(reviews).toContain('not a new signed plugin');
+  });
   it('separates intercepted Account continuity proof from real writes and upstream qualification', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('https://github.com/dinkuskit/template-store/issues/234');
@@ -18,8 +30,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('a665a86');
     expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/pull/130');
     expect(reviews).toContain('37 owning local verification stages pass across serial runs');
-    expect(reviews).toContain('repository admin rights are required to rerun it');
-    expect(reviews).toContain('A maintainer retry and review remain pending');
+    expect(reviews).toContain('maintainer-triggered CI retry passed the catalog gates again');
+    expect(reviews).toContain('CI is not green');
+    expect(reviews).toContain('runner/port-lifecycle investigation and review remain pending');
     expect(reviews).toContain('no shared catalog is deployed');
     expect(reviews).toContain('source verification is not a release or shared-service deployment');
     expect(report).toContain('Six repairs accepted. One-way adoption.');
