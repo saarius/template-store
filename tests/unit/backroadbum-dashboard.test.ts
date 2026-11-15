@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes the compiled feed-member report from the native control candidate', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('Eleven members. Five feed rows.');
+    expect(report).toContain('Previous dispatch · Earlier-checkout recovery');
+    expect(report).toContain('data-feed-member-report');
+    expect(report).toContain('https://github.com/dinkuskit/commerce/issues/281');
+    expect(report).toContain('Open bug report, not an implemented repair');
+    expect(report).toContain('supplying a family price still loses four sizes');
+    expect(report).toContain('separately from feed-control PR #280');
+    expect(reviews).toContain('unchanged compiled main');
+  });
   it('separates disposable earlier-checkout recovery from original live browsers and signed cutover', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
