@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes merchant profile corrections from generic qualification and real account writes', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('Find the field. Keep the draft.');
+    expect(report).toContain('Previous dispatch · Tote details');
+    expect(reviews).toContain('https://github.com/dinkuskit/template-store/issues/238');
+    expect(reviews).toContain('83ec0a8');
+    expect(reviews).toContain('not real authentication or profile changes');
+    expect(reviews).toContain('generic starter PR and its full owning gates remain separate');
+  });
   it('keeps native tote content separate from Commerce facts and untested sample claims', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('Native tote details');
