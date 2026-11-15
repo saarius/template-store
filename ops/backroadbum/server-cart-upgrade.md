@@ -2,6 +2,14 @@
 
 The serving store still uses signed Commerce 0.8.0 and its existing browser-bound recovery. As observed November15, Template #229 is merged in upstream/main167d736, pinning Commerce0.9.0-beta.1; Commerce #272 is also merged. Those source acceptances do not upgrade this store: the paired server-cart migration, actual Registry artifact and retained browsers still need coordinated qualification. Do not merge that new template runtime into the signed0.8.0 store alone or discard original browser capabilities. A merchant-only recovery adapter is source-qualified below, but **not enabled**. Preserve PR237’s late-profile prefill guard when integrating the rewritten checkout.
 
+## Owner Steer 6 release gates · November 15
+
+Registry discovery and GitHub tags checked November 15, 18:06 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
+
+Stage A is now explicitly authorized in an isolated worktree/database/port using the newest beta and matching upstream server-cart template. Qualify JS-off forms, enhanced cart, frozen/expired edges, tracking thank-you views, WebMCP and retained 0.8.0 capabilities; then prepare the Field Journal integration branch without deploying it. Preserve the shopper-session/prefill/validation safeguards from Template235/237/239.
+
+Stage B is pre-authorized only when a non-beta 0.9.x release is listed under the **same stable Registry id**. Take a verified DB/uploads/release/environment snapshot with rollback steps, upgrade that installed plugin in place through admin, and deploy the qualified paired theme during the same window. Verify ten prior Orders, retained receipts, feeds and account isolation before one guarded TEST1011 purchase. Persist a private 0600 completion guard and never replay it. These are owner gates, not a claim that Stage A or B has completed.
+
 ## Disposable compatibility check
 
 Build exact Commerce v0.8.0 and the chosen server-cart commit in separate clean source checkouts on Node24, with their own dependencies. From this template checkout:

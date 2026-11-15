@@ -2,6 +2,25 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports the catalog main merge separately from the prior green head and shared deployment', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('Current main. Same small fix.');
+    expect(report).toContain('Previous dispatch · Reading continuity');
+    expect(reviews).toContain('fork f4f2cbd');
+    expect(reviews).toContain('All 38 owning stages pass across serial runs');
+    expect(reviews).toContain('not qualification of this merge');
+    expect(reviews).toContain('no shared service is deployed');
+  });
+  it('archives Steer 6 without claiming feed activation or a live beta upgrade', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const instructions = readFileSync('public/dashboard/instructions/steer-6-2026-11-15.txt', 'utf8');
+    expect(report).toContain('without external enrollment');
+    expect(report).toContain('Neither track is claimed complete.');
+    expect(instructions).toContain('Owner Steer 6 — November 15, 2026');
+    expect(instructions).toContain('Never** switch live');
+    expect(instructions).toContain('TEST1011');
+  });
   it('distinguishes completed own-orders proof from a new checkout or guest fulfillment fix', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('Paid, fulfilled, back in Account.');
@@ -418,6 +437,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-3-2026-11-12.txt',
       '/dashboard/instructions/steer-4-2026-11-13.txt',
       '/dashboard/instructions/steer-5-2026-11-14.txt',
+      '/dashboard/instructions/steer-6-2026-11-15.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');
