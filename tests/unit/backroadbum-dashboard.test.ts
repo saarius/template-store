@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes the runner preflight repair from the unresolved historical collision', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('A bound port is not a free port.');
+    expect(report).toContain('https://github.com/dinkuskit/dinkuskit/issues/132');
+    expect(reviews).toContain('No full pass or PR submission is claimed.');
+    expect(report).toContain('Previous dispatch · Shared client repair');
+    expect(report).toContain('failure shape, not the historical CI socket owner');
+    expect(reviews).toContain('3db2787');
+    expect(reviews).toContain('source-only test helper, not deployed commerce code');
+    expect(reviews).toContain('later bind race remain unresolved');
+  });
   it('separates upstream Account qualification from the baseline admin failure and live business writes', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
