@@ -20,7 +20,10 @@ describe('Backroad Bum source-authored merchant content', () => {
     expect(content).toContain('Try a test purchase');
     expect(content).toContain('Your last checkout in the footer');
     expect(content).toContain('Only this browser’s latest checkout');
-    expect(content).toContain('Email sign-in is paused because delivery is unavailable');
+    expect(content).toContain('Email sign-in uses a verified-destination sandbox');
+    expect(content).toContain('arbitrary visitor addresses cannot receive codes');
+    expect(content).toContain('Guest checkout does not require an account');
+    expect(content).not.toContain('Email sign-in is paused');
     expect(content).toContain('hosted DinkusKit Ship');
     expect(content).toContain('not a fulfillment timeline or tracking');
     expect(content).toContain('separate merchant step');

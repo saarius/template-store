@@ -96,8 +96,12 @@ describe("A2 — Pigment Drift product illustrations & living hero/card ink-wash
       resolve("src/features/commerce-catalog/CommerceCatalog.astro"),
       "utf8",
     );
-    expect(commerceCatalog).toContain(".shop-card:hover");
-    expect(commerceCatalog).toContain("prefers-reduced-motion");
+    expect(commerceCatalog).toContain(".shop-card--link:hover");
+    expect(commerceCatalog).toContain(".shop-card--link:focus-visible");
+    // Merchant cards use the shared reduced-motion rule, not a second local one.
+    const theme = readFileSync(resolve("src/styles/theme.css"), "utf8");
+    expect(theme).toContain("@media(prefers-reduced-motion:reduce)");
+    expect(theme).toContain("transition-duration:.01ms!important");
 
     const merchCatalog = readFileSync(
       resolve("src/features/store-shell/MerchCatalog.astro"),
@@ -110,8 +114,8 @@ describe("A2 — Pigment Drift product illustrations & living hero/card ink-wash
       resolve("src/features/store-shell/StoreFooter.astro"),
       "utf8",
     );
-    expect(storeFooter).toContain('var(--store-vault-bg)');
-    expect(storeFooter).toContain('BACKROAD BUM');
+    expect(storeFooter).toContain('var(--color-surface)');
+    expect(storeFooter).toContain('Backroad Bum');
     expect(storeFooter).not.toContain("<animate");
 
     const productDetail = readFileSync(
