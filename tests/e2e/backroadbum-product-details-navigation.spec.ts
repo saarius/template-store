@@ -27,8 +27,11 @@ for (const colorScheme of ['light', 'dark'] as const) for (const javaScriptEnabl
             const xl = members.find((member: { id: string; values: { Size: string } }) => member.values.Size === 'XL');
             await page.getByLabel('View a product option', { exact: true }).selectOption(xl.id);
             await page.getByRole('button', { name: 'View option', exact: true }).click();
+            await page.waitForURL(url => url.searchParams.get('item') === xl.id, { waitUntil: 'domcontentloaded' });
+            await expect(page.getByLabel('View a product option', { exact: true })).toHaveValue(xl.id);
           }
         }
+        await expect(page.locator('[data-product-price], [data-product-status]')).toHaveCount(2);
         await page.evaluate(() => localStorage.setItem('dinkus.guest-cart.v1', JSON.stringify({ version: 1,
           lines: [{ id: 'details-navigation-fixture', quantity: 2 }] })));
         const selection = new URL(page.url()).search;
