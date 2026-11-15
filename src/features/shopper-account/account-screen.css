@@ -18,7 +18,9 @@ body .shopper-account[data-merchant-account] .account-card p{line-height:1.618;m
 body .shopper-account[data-merchant-account] .account-card__eyebrow{padding:0;margin-bottom:var(--space-3);background:none;color:var(--color-text-muted);font-size:var(--text-sm);font-weight:600;letter-spacing:0;text-transform:none}
 body .shopper-account[data-merchant-account] .account-form{gap:var(--space-2);margin-top:var(--space-5)}
 body .shopper-account[data-merchant-account] .account-form label{font-weight:600}
-body .shopper-account[data-merchant-account] .account-form input + label{margin-top:var(--space-4)}
+body .shopper-account[data-merchant-account] .account-form input + label,
+body .shopper-account[data-merchant-account] .account-form [data-account-profile-error] + label{margin-top:var(--space-4)}
+body .shopper-account[data-merchant-account] .account-form [data-account-profile-error]{margin:0;color:var(--color-danger);font-size:var(--text-sm)}
 body .shopper-account[data-merchant-account] .account-form input:not([type="checkbox"]),
 body .shopper-account[data-merchant-account] .account-form select{
   width:min(100%,22rem);min-height:48px;padding:.65rem .8rem;border:1px solid var(--color-border-strong);
