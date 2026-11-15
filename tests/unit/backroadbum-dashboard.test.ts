@@ -2,6 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates accepted upstream source from deployments and the unfinished catalog gate', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect((reviews.match(/state: 'Merged November 15'/g) ?? []).length).toBe(5);
+    expect(reviews).toContain('a665a86');
+    expect(reviews).toContain('no upstream PR is open');
+    expect(reviews).toContain('source verification is not a release or shared-service deployment');
+    expect(report).toContain('Five repairs accepted. Proof kept open.');
+    expect(report).toContain('both Account feature-map paths');
+    expect(report).toContain('explicitly synthetic local feed');
+  });
   it('separates generic shell proof from the custom merchant shell and business actions', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('https://github.com/dinkuskit/template-store/pull/232');
@@ -90,7 +101,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(rows).toHaveLength(6);
     expect(showcase).toContain('not a new purchase');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
-    for (const head of ['40e95ea', '9123f4d', '92fbb24', '238c420', '267de74']) expect(reviews).toContain(head);
+    for (const head of ['40e95ea', '9123f4d', '92fbb24', 'a665a86', '267de74']) expect(reviews).toContain(head);
     expect(reviews).toContain('source verification is not a release');
   });
 
@@ -260,7 +271,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(row).toContain('not shared-deployed');
     expect(row).not.toContain('still running');
     expect(row).not.toContain('not pushed');
-    const currentReviews = source.match(/<section id="contributions"><h2>Open reviews<\/h2>[\s\S]*?<\/section>/)?.[0];
+    const currentReviews = source.match(/<section id="contributions"><h2>Reviews &amp; accepted fixes<\/h2>[\s\S]*?<\/section>/)?.[0];
     expect(currentReviews).toContain('PR #229');
     expect(currentReviews).toContain('580a054 paired with');
     expect(currentReviews).toContain('not to merge it alone');
