@@ -66,7 +66,8 @@ try {
     const ownerPage = await admin.context.newPage();
     await ownerPage.goto(url.href);
     await ownerPage.getByRole('heading', { name: `Order #${number} TEST`, exact: true }).waitFor();
-    await ownerPage.getByRole('heading', { name: 'Labels', exact: true }).waitFor();
+    // The hosted page has no Labels section until its first label exists.
+    if (report.nativePrintReady) await ownerPage.getByRole('heading', { name: 'Labels', exact: true }).waitFor();
     const ownerText = await ownerPage.locator('main').innerText();
     report.hosted = {
       signedInOwnerPageReached: true,

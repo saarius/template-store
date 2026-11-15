@@ -1,5 +1,10 @@
 # Shopper email setup
 
+## Completed-order follow-up · November 15, 2026
+Existing TEST1010 now has one free USPS sandbox label and canonical Completed state, reconciled through native Commerce Orders. One fresh real-email sign-in showed only1010, its frozen $17 total and carrier/tracking matching native/hosted Ship in Light/Dark at390/1440; the nine other Orders were excluded. No new checkout or profile write was made; the session was revoked and inbox cleared. The original guest receipt still lacks fulfillment under known Commerce275, not a new regression.
+
+Private `/etc/backroadbum/operator/shopper-completion1010.json` is **completed** with `accountVerifiedAt`; its private preimage and existing label PDF are paired beside it. Do not replay the one-off label/email drivers. Read-only `inspect-backroadbum-shipment.mjs --check --order=1010 --hosted --pdf` rechecks the same label; the original shopper-email purchase guard/browser remain unchanged. Evidence: `evidence/2026-11-15-shopper-completion/`.
+
 ## Verified and serving · November 14, 2026
 
 The native `backroadbum-email-relay` plugin registers an exclusive `email:deliver` hook with `hooks.email-transport:register`, only for this merchant’s hosted-Registry Node build. It reads the provisioned URL/token/from from `process.env` inside delivery, never options or `import.meta.env`. Signed Commerce0.8.0 / Payments0.5.0 / Ship0.3.1 and hosted consents are unchanged.
@@ -27,7 +32,7 @@ An intercepted phone/desktop task reproduced incomplete-address Save leaving foc
 
 ## Completed operation — do not replay
 
-Private `/etc/backroadbum/operator/shopper-email-test-order.json` records paid1010 and `accountVerifiedAt`; `shopper-email-test-browser.json` retains its original guest receipt authority, **not** a shopper login. Both are0600. No label was bought;1010 remains Processing. The one-off purchase and actual-UI drivers are kept outside git in the evidence directory, reject completed operation state, and are not routine tests. Never replay TEST1009,1010 or historical payment/label drivers. A future scenario needs its own explicit operation guard and pre-submission persistence; uncertainty means inspect the existing Session, not start again.
+Private `/etc/backroadbum/operator/shopper-email-test-order.json` records paid1010 and `accountVerifiedAt`; `shopper-email-test-browser.json` retains its original guest receipt authority, **not** a shopper login. Both are0600. At the original qualification no label was bought and1010 was Processing; the November15 follow-up above completes the same order without a new payment. The one-off purchase and actual-UI drivers are kept outside git in the evidence directory, reject completed operation state, and are not routine tests. Never replay TEST1009,1010 or historical payment/label drivers. A future scenario needs its own explicit operation guard and pre-submission persistence; uncertainty means inspect the existing Session, not start again.
 
 ## Safe operator checks · Node24, primary `repos/template-store`
 

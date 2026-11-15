@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { mkdtempSync, readFileSync, writeFileSync, statSync, readdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync, statSync, readdirSync, rmSync, chmodSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { writeHostedStorageState } from '../../scripts/lib/hosted-browser-state.mjs';
@@ -18,6 +18,37 @@ describe('operator hosted state preservation',()=>{
   ])('refuses an unrelated or missing owner session without touching the prior state',state=>{
     const {path,dir}=fixture();expect(()=>writeHostedStorageState(state,path,100)).toThrow('existing file left unchanged');
     expect(readFileSync(path,'utf8')).toBe('original');expect(readdirSync(dir)).toEqual(['state.json']);
+  });
+  it.skipIf(process.getuid?.() === 0)('refreshes an existing private file when its parent forbids creating siblings', () => {
+    const { path, dir } = fixture();
+    writeFileSync(path, 'old state'.repeat(200));
+    const state = { cookies: [cookie], origins: [] };
+    chmodSync(dir, 0o500);
+    try {
+      writeHostedStorageState(state, path, 100);
+      expect(JSON.parse(readFileSync(path, 'utf8'))).toEqual(state);
+      expect(statSync(path).mode & 0o777).toBe(0o600);
+      expect(statSync(dir).mode & 0o777).toBe(0o500);
+      expect(readdirSync(dir)).toEqual(['state.json']);
+      expect(() => writeHostedStorageState({ cookies: [] }, path, 100)).toThrow();
+      expect(JSON.parse(readFileSync(path, 'utf8'))).toEqual(state);
+    } finally { chmodSync(dir, 0o700); }
+  });
+  it.skipIf(process.getuid?.() === 0)('refuses a non-private fallback target without changing its contents', () => {
+    const { path, dir } = fixture();
+    chmodSync(path, 0o644); chmodSync(dir, 0o500);
+    try {
+      expect(() => writeHostedStorageState({ cookies: [cookie] }, path, 100)).toThrow('owned private regular file');
+      expect(readFileSync(path, 'utf8')).toBe('original');
+    } finally { chmodSync(dir, 0o700); }
+  });
+  it.skipIf(process.getuid?.() === 0)('never follows a symlink in the in-place fallback', () => {
+    const { path, dir } = fixture(); const link = join(dir, 'link.json'); symlinkSync(path, link);
+    chmodSync(dir, 0o500);
+    try {
+      expect(() => writeHostedStorageState({ cookies: [cookie] }, link, 100)).toThrow();
+      expect(readFileSync(path, 'utf8')).toBe('original');
+    } finally { chmodSync(dir, 0o700); }
   });
   it.each(['dinkuskit.com','.dinkuskit.com'])('atomically saves a qualifying %s session privately',domain=>{
     const {path,dir}=fixture();const state={cookies:[{...cookie,domain}],origins:[]};

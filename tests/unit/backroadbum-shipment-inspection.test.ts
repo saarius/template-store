@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { shipmentInspectionRequestAllowed as allowed } from '../../scripts/lib/backroadbum-shipment-inspection.mjs';
 
 const native = 'https://backroadbum.com/_emdash/api/plugins/r_ehdlg5cxkb3ffqvr/admin';
 describe('read-only operator shipment inspection', () => {
+  it('requires hosted label history only when native Ship already has a print link', () => {
+    const source = readFileSync('scripts/inspect-backroadbum-shipment.mjs', 'utf8');
+    expect(source).toContain("if (report.nativePrintReady) await ownerPage.getByRole('heading', { name: 'Labels', exact: true }).waitFor();");
+  });
   it('admits native page reads and opening an existing order, including wrapped input', () => {
     expect(allowed(native, 'POST', { type: 'page_load', page: 'shipping' })).toBe(true);
     expect(allowed(native, 'POST', { type: 'block_action', action_id: 'open', value: 'existing-test-order' })).toBe(true);

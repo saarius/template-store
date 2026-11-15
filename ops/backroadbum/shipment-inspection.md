@@ -10,6 +10,11 @@ Without `--check`, nothing runs. The order must already exist in the store’s r
 
 Request admission allows native page-load/open interactions and merchant authentication, but rejects quote, purchase, cancel, connect, checkout and hosted write requests. No new label, order, payment, manual completion, settings save or browser receipt capability is created. Output excludes addresses, tracking references, private responses and authentication state; unavailable inspection fails without a purchase retry.
 
+## Pending orders and protected hosted state · November 15
+The same read command also handles an admitted TEST order before its first label: hosted Ship has no Labels section yet, so inspection does not wait for one unless native Ship has a print link. TEST1010 passed both pre-label and post-label inspection without quote/buy/cancel requests; after its separately guarded label purchase, native/hosted tracking and the existing PDF match. Evidence: `evidence/2026-11-15-shopper-completion/`.
+
+The hosted-state helper prefers atomic replacement. When the protected parent directory refuses sibling creation, it refreshes only the existing agent-owned0600 regular file in place, matching the owner-prescribed Playwright storage-state flow; it refuses missing/unsafe targets and symlinks and never changes parent permissions. This fallback is **not atomic** against process interruption. Invalid/missing owner sessions still leave the file untouched; no automatic sign-in or session recovery is added.
+
 ## Compare the guest receipt with the same canonical order
 
 ```sh

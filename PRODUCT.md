@@ -13,6 +13,9 @@ Template214/222/230/231/232 and DinkusKit124 are now merged upstream, with publi
 ## Account address corrections · November15
 An incomplete saved-address form left the shopper on Save with its correction above the viewport. Rejected Save now focuses and describes the first missing field; its own edits clear only that correction, retaining typed values and other field guidance. Blank address, phone-only saves, Clear and shared-session isolation keep the existing contracts; synthetic reads and saves prove presentation without another email, account or purchase operation.
 
+## Completed-order Account proof · November15
+Existing TEST1010 now has one free USPS sandbox label and canonical Completed state, with its original one-book $17 paid snapshot unchanged. A fresh real-email sign-in showed only1010 and matching carrier/tracking in Light/Dark at390/1440, then was revoked and its inbox cleared; the nine other Orders, profile and original checkout authorities remain intact. This qualifies signed own-orders fulfillment without another payment or profile save; guest receipt fulfillment remains the separate known Commerce275 gap. Operator inspection now handles pending orders without a Labels section and refreshes the existing private hosted-state file when its protected parent forbids sibling creation, without weakening permissions.
+
 ## Collection reading · November15
 Road day now offers a route from its product shelf to two published field notes already linking its notebook and tote. The reading shelf derives its titles, bounded opening prose and relationships from native published pages and current collection membership; it adds no manual recommendation list or commerce facts. It is optional when reading data fails, absent without a real match, and usable by keyboard with scripts on or off; catalog, CMS and transaction records remain unchanged.
 

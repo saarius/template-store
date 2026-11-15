@@ -130,6 +130,9 @@ An empty product returned for a filtered exact size is not a useful availability
 ## Merchant workflow reporting
 Keep installed interaction proof separate from a repair comparison: the product-restore captures show the same signed plugin before and after an explicit native unpublish→publish workaround, not a new implementation. Dashboard reporting must say the experiment used a disposable copy and that Restore→Draft remains the accepted contract. Redact contact text, retain the original EmDash/Block Kit visual system and link the owning workflow report; do not imply that a live CMS summary alone proves Commerce sellability or that historical order records are visitor metrics.
 
+## Completed Account reporting
+Report signed own-orders completion separately from guest receipt visibility. Existing TEST1010's native/hosted tracking and real-email Account read match after one sandbox label; keep the $17 frozen payment, illustrative3oz package input and free label distinct. Account's existing wrapping identifier/status controls need no new visual idiom, and public reporting must never embed the live session, contact details, tracking reference or label PDF; use fixed qualification flags and the existing dashboard disclosure.
+
 ## Hosted order reporting
 A dated TEST order is curated self-dogfood evidence, never visitor volume or customer-sales telemetry. Field Book checkout reports frozen merchandise/shipping totals separately from sandbox postage and illustrative package weights; canonical completion and hosted tracking are not inserted into an unqualified guest receipt. Keep operator guards, Session URLs, contacts and label PDFs private; reporting uses existing dashboard disclosures and adds no public order lookup.
 

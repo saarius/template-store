@@ -2,6 +2,14 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes completed own-orders proof from a new checkout or guest fulfillment fix', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('Paid, fulfilled, back in Account.');
+    expect(report).toContain('Previous dispatch · Collection reading');
+    expect(report).toContain('no new checkout, signed-plugin change or upstream submission was made');
+    expect(report).toContain('https://github.com/dinkuskit/commerce/issues/275');
+    expect(report).toContain('guest receipt fulfillment remains');
+  });
   it('reports published collection reading without claiming a commerce or content write', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('From the shelf to the story.');

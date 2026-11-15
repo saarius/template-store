@@ -1,5 +1,10 @@
 # Hosted test-order dogfood
 
+## Existing verified-inbox order completed · November 15, 2026
+TEST1010's original one-book $17 paid snapshot now has one free USPS Ground Advantage sandbox label. Native Ship calculated3oz from the illustrative2oz item plus saved1oz box; native Orders reconciled it to Completed/revision2, retaining its paid snapshot and the nine other Orders. One fresh real-email Account session showed only1010 with matching canonical carrier/tracking in four phone/desktop Light/Dark reads, then was revoked and its inbox cleared; profile and all original cart/payment authorities stayed unchanged.
+
+`/etc/backroadbum/operator/shopper-completion1010.json` is completed with `accountVerifiedAt`; its label PDF is65103bytes, SHA256`6f25164abb47bc20497a4761940d3f9d502b6b5b2c0668b63de4de0de4683982`. Native/hosted reinspection reads the identical PDF without another buy. The older shopper-email purchase guard/browser were not replaced, no new checkout or profile save was made, and guest fulfillment remains absent under Commerce275. Evidence: `evidence/2026-11-15-shopper-completion/`; do not replay label/email drivers.
+
 ## Completed Field Book run · November 14, 2026
 TEST1009 bought two County Line Field Books through the public shopper flow: $24 merchandise + $5 shipping = $29 in the same Stripe test Session. One Pay submission created one new canonical TEST order. Native Ship used the saved Camp small box and automatically calculated 5 oz: two illustrative 2 oz items plus the 1 oz empty box. One free Pitney Bowes USPS Ground Advantage sandbox label was purchased; its displayed $7.33 is a sandbox quote, not charged postage. Opening native Commerce Orders reconciled that label to Completed with matching USPS tracking, not delivered or physically shipped.
 
