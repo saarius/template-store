@@ -2,6 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates source-built beta staging from signed upgrades and live purchases', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('New cart. Old purchases intact.');
+    expect(report).toContain('Previous dispatch · Populated catalog feeds');
+    expect(report).toContain('source-built staging with synthetic Payments');
+    expect(report).toContain('not a signed upgrade or a live checkout');
+    expect(report).toContain('development-server suite failed during fixture setup');
+    expect(report).toContain('original-browser handoff and signed artifact qualification remain unfinished');
+  });
   it('separates populated JSON proof from native controls and incomplete Google/Meta exports', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
