@@ -227,7 +227,7 @@ try {
         if (!(await jump.evaluate(el => el.open))) await jump.locator('summary').click();
         await page.getByRole('navigation', { name: 'Dashboard sections' }).getByRole('link', { name: 'Latest work', exact: true }).click();
         await page.waitForURL(url => url.hash === '#history');
-        await expect(page.locator('.dashboard-latest a[href="/dashboard/history/"]')).toBeVisible();
+        await expect(page.locator('.dashboard-latest a[href="/dashboard/contributions/"]')).toBeVisible();
       } else if (view === 'history') {
         await expect(page.locator('.cycle-entry')).toHaveCount(historyTitles.length);
         expect(await page.locator('.cycle-entry h3').allTextContents()).toEqual(historyTitles);
