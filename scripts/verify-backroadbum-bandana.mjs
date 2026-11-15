@@ -47,7 +47,9 @@ try {
     await expect(page.locator('[data-product-price]')).toHaveText(price);
     await expect(page.locator('[data-product-status]')).toHaveText('In stock');
     await expect(page.locator('[data-product-sku]')).toHaveText('SKU BRB-BANDANA');
-    await expect(page.locator('[data-product-details]')).toContainText('22 × 22 in cotton bandana');
+    const specs = page.locator('[data-product-details]').getByRole('region', { name: 'Bandana design details', exact: true });
+    await expect(specs).toBeVisible();
+    expect(await specs.locator('dd').allTextContents()).toEqual(['Cotton', '22 × 22 inches', 'Cream contour lines on blue', 'Yellow BRB corner']);
     await expect(page.locator('[data-product-details]')).toContainText('decorative, not a map');
     const image = page.locator('.product-detail__visual img').first();
     await expect(image).toHaveAttribute('alt', 'Switchback Bandana — blue contour-pattern illustrated design');

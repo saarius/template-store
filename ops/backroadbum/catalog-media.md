@@ -1,5 +1,10 @@
 # Native product content and pictures
 
+## Bandana details · November 15
+Switchback Bandana now has four native specification rows for cotton, 22 × 22-inch design size, contour artwork and the yellow corner, with a separate use/care disclosure. `seed/backroadbum-bandana-details.json` records authorship, not runtime content or Commerce facts; the $14 effective amount, in-stock state, gallery, summary and metadata remain unchanged. The saved draft stayed private before native publication, and all ten Orders plus unrelated CMS/catalog rows are preserved; evidence: `evidence/2026-11-15-merchant-discovery/`.
+
+Run `node scripts/verify-backroadbum-product-details.mjs --check --source=backroadbum-bandana-details.json` for eight read-only desktop/phone Light/Dark script-on/off checks. `/etc/backroadbum/operator/bandana-details.json` is already `native-published`; never replay the historical draft/publication drivers or restore its private preimage wholesale. The dimensions are illustrative, the pattern is not a map, and no protective performance rating is claimed.
+
 ## Tote details · November 15
 Glovebox Field Tote now has four native specification rows and a separate packing/care disclosure. `seed/backroadbum-tote-details.json` is an authorship checklist, not runtime content or Commerce authority; the original summary, artwork, $32 backorder facts and dimensions remain unchanged. The native draft was reloaded and checked private before publication, with Orders and unrelated CMS/catalog rows preserved; evidence is in `evidence/2026-11-15-shopper-navigation/`.
 

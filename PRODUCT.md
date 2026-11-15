@@ -13,6 +13,9 @@ Template214/222/230/231/232 and DinkusKit124 are now merged upstream, with publi
 ## Account address corrections · November15
 An incomplete saved-address form left the shopper on Save with its correction above the viewport. Rejected Save now focuses and describes the first missing field; its own edits clear only that correction, retaining typed values and other field guidance. Blank address, phone-only saves, Clear and shared-session isolation keep the existing contracts; synthetic reads and saves prove presentation without another email, account or purchase operation.
 
+## Native bandana details · November15
+Switchback Bandana now separates its original cotton, 22 × 22-inch size, contour artwork and yellow corner into native specifications, with pocket/tote use and cool-wash care in a separate disclosure. The saved draft stayed private until native publication; eight script-on/off desktop/phone Light/Dark reads preserve its $14 Commerce amount, in-stock state, summary, gallery and metadata without a checkout request. Dimensions remain illustrative, the pattern is decorative rather than navigational, and no protective performance rating is claimed; all ten Orders and unrelated CMS/catalog rows stay unchanged.
+
 ## Native tote details · November15
 The Glovebox Field Tote now separates its original canvas, 16 × 15-inch body, open top and handles into native EmDash specifications, with a separate packing/care disclosure. Draft privacy, native reload/publication and eight script-on/off desktop/phone Light/Dark reads preserve its $32 backorder state, artwork, metadata and browser intent; all ten Orders and unrelated products/pages stay unchanged. Dimensions remain illustrative, not measured samples or a tested carrying-load rating, and no waterproof or dispatch promise is added.
 

@@ -94,6 +94,9 @@ The browser’s Print / Save as PDF command gets a field-note-only paper layout;
 ## Account profile corrections
 A rejected explicit Save points to the first missing address field in form order, with a concise inline correction and associated invalid state. Focus and an immediate non-animated scroll keep the field and correction visible; typing clears only that field’s correction, retains unrelated description tokens and never jumps elsewhere. Use existing alert ink and merchant spacing tokens, preserving blank-address/phone-only behavior and clearing stale corrections with successful profile replacement or session changes.
 
+## Bandana specifications & care
+Keep the existing Field Journal specification/disclosure pair: four short rows for the bandana’s design facts, followed by native, keyboard-operable use/care text. Retain original gallery and summary; the checklist is authorship evidence, never runtime content or pricing. Keep illustration dimensions and the decorative-not-a-map boundary explicit without presenting physical test or protection claims; preserve the same reading hierarchy with scripts on/off in both themes.
+
 ## Tote specifications & care
 Use the existing native specification/disclosure pair rather than a new card idiom: the tote’s four design facts occupy the wider desktop column, packing/care the narrower column, stacking on phones. Preserve the original dimensions and explicitly distinguish illustration dimensions from measured samples or load ratings; Commerce alone owns the $32 backorder state. The native disclosure remains keyboard-operable without JavaScript, in both themes, with browser intent and metadata unchanged.
 

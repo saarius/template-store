@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports native bandana content without inventing commerce or tested-sample claims', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('Small square. Clearer details.');
+    expect(report).toContain('Previous dispatch · Catalog CI follow-up');
+    expect(report).toContain('Native bandana details');
+    expect(report).toContain('href="/products/switchback-bandana"');
+    expect(report).toContain('no protective performance rating is claimed');
+    expect(report).toContain('all ten Orders and unrelated CMS/catalog rows are unchanged');
+    expect(report).toContain('original gallery and $14 in-stock Commerce facts retained');
+  });
   it('keeps the catalog CI retry blocker separate from targeted local success', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
