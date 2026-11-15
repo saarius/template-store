@@ -1,0 +1,25 @@
+---
+import type { FieldNote } from './field-notes.js';
+interface Props { notes: readonly FieldNote[] }
+const { notes } = Astro.props;
+---
+{notes.length > 0 && <section class="collection-reading" aria-labelledby="collection-reading-title" data-collection-reading>
+  <header><p class="reading-kicker">The field journal</p><h2 id="collection-reading-title">From the field notes</h2><p>Notes featuring gear from this collection.</p><a href="/field-notes">All field notes <span aria-hidden="true">&rarr;</span></a></header>
+  <ul>{notes.map(note => <li><a href={`/${note.slug}`} aria-labelledby={`collection-${note.slug}-title`}><h3 id={`collection-${note.slug}-title`}>{note.title}</h3>{note.excerpt && <p>{note.excerpt}</p>}<span class="reading-action" aria-hidden="true">Read the note &rarr;</span></a></li>)}</ul>
+</section>}
+<style>
+.collection-reading{width:min(80rem,calc(100% - 2.5rem));margin:0 auto var(--space-9);padding-top:var(--space-8);border-top:1px solid var(--color-border);display:grid;gap:var(--space-7)}
+.reading-kicker{font-size:var(--text-sm);color:var(--store-muted);margin:0 0 var(--space-3)}
+.collection-reading h2{font-size:var(--text-2xl);line-height:1.2;margin:0 0 var(--space-4)}
+.collection-reading header>p:not(.reading-kicker){max-width:35ch;margin:0 0 var(--space-4);color:var(--store-muted)}
+.collection-reading header>a{display:inline-flex;align-items:center;gap:.5rem;min-height:44px;color:inherit;text-underline-offset:.2em}
+.collection-reading ul{list-style:none;padding:0;margin:0;display:grid;gap:var(--space-5)}
+.collection-reading li{min-width:0}
+.collection-reading li>a{display:block;height:100%;box-sizing:border-box;padding:var(--space-5);border:1px solid var(--color-border);border-radius:var(--radius-panel);background:var(--store-surface);color:inherit;text-decoration:none}
+.collection-reading li>a:hover{border-color:var(--store-ink-border)}
+.collection-reading li>a:active{background:var(--store-surface-subtle)}
+.collection-reading h3{font-size:var(--text-xl);line-height:1.25;margin:0 0 var(--space-3)}
+.collection-reading li p{max-width:54ch;margin:0 0 var(--space-5);color:var(--store-muted)}
+.reading-action{font-size:var(--text-sm);font-weight:600;text-decoration:underline;text-underline-offset:.2em}
+@media(min-width:60rem){.collection-reading{grid-template-columns:minmax(0,1fr) minmax(0,1.618fr);gap:var(--space-8)}}
+</style>

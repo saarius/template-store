@@ -94,6 +94,9 @@ The browser’s Print / Save as PDF command gets a field-note-only paper layout;
 ## Account profile corrections
 A rejected explicit Save points to the first missing address field in form order, with a concise inline correction and associated invalid state. Focus and an immediate non-animated scroll keep the field and correction visible; typing clears only that field’s correction, retains unrelated description tokens and never jumps elsewhere. Use existing alert ink and merchant spacing tokens, preserving blank-address/phone-only behavior and clearing stale corrections with successful profile replacement or session changes.
 
+## Collection reading
+Place optional reading after the complete product shelf, never between a collection introduction and its gear. Use the existing 1:1.618 intro/reading split on desktop and a simple phone stack, with native title-named whole-card links, 220-character opening previews, 44px minimum targets and the same surface/ink/focus tokens. At most two stable-slug-order published notes qualify through an actual used native link to a current collection product; unused link definitions, product-name guesses and external URLs do not establish a relationship. Skip this secondary shelf in CMS preview/edit mode or on read failure rather than breaking shopping or exposing drafts; no second tag list or recommendation catalog is introduced.
+
 ## Bandana specifications & care
 Keep the existing Field Journal specification/disclosure pair: four short rows for the bandana’s design facts, followed by native, keyboard-operable use/care text. Retain original gallery and summary; the checklist is authorship evidence, never runtime content or pricing. Keep illustration dimensions and the decorative-not-a-map boundary explicit without presenting physical test or protection claims; preserve the same reading hierarchy with scripts on/off in both themes.
 

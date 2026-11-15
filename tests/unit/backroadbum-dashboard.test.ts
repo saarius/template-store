@@ -2,6 +2,13 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports published collection reading without claiming a commerce or content write', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('From the shelf to the story.');
+    expect(report).toContain('Previous dispatch · Bandana details');
+    expect(report).toContain('actual rendered product links');
+    expect(report).toContain('no CMS, catalog, account, order or payment write is involved');
+  });
   it('reports native bandana content without inventing commerce or tested-sample claims', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('Small square. Clearer details.');

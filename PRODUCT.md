@@ -13,6 +13,9 @@ Template214/222/230/231/232 and DinkusKit124 are now merged upstream, with publi
 ## Account address corrections · November15
 An incomplete saved-address form left the shopper on Save with its correction above the viewport. Rejected Save now focuses and describes the first missing field; its own edits clear only that correction, retaining typed values and other field guidance. Blank address, phone-only saves, Clear and shared-session isolation keep the existing contracts; synthetic reads and saves prove presentation without another email, account or purchase operation.
 
+## Collection reading · November15
+Road day now offers a route from its product shelf to two published field notes already linking its notebook and tote. The reading shelf derives its titles, bounded opening prose and relationships from native published pages and current collection membership; it adds no manual recommendation list or commerce facts. It is optional when reading data fails, absent without a real match, and usable by keyboard with scripts on or off; catalog, CMS and transaction records remain unchanged.
+
 ## Native bandana details · November15
 Switchback Bandana now separates its original cotton, 22 × 22-inch size, contour artwork and yellow corner into native specifications, with pocket/tote use and cool-wash care in a separate disclosure. The saved draft stayed private until native publication; eight script-on/off desktop/phone Light/Dark reads preserve its $14 Commerce amount, in-stock state, summary, gallery and metadata without a checkout request. Dimensions remain illustrative, the pattern is decorative rather than navigational, and no protective performance rating is claimed; all ten Orders and unrelated CMS/catalog rows stay unchanged.
 
