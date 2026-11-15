@@ -2,6 +2,14 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('keeps Field Journal cart preparation visibly off live', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('Same journal. A new cart underneath.');
+    expect(report).toContain('backroadbum/server-cart-prep');
+    expect(report).toContain('Original-browser receipt handoff, the signed stable upgrade and the complete regression matrix remain unqualified');
+    expect(report).toContain('not a hosted purchase');
+    expect(report).toContain('Previous dispatch · Native feed control repair');
+  });
   it('separates the native feed control candidate from live release and serializer readiness', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -20,7 +28,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('source-built staging with synthetic Payments');
     expect(report).toContain('not a signed upgrade or a live checkout');
     expect(report).toContain('development-server suite failed during fixture setup');
-    expect(report).toContain('original-browser handoff and signed artifact qualification remain unfinished');
+    expect(report).toContain('original-browser handoff, the complete regression matrix and signed merchant artifact qualification remain unfinished');
   });
   it('separates populated JSON proof from native controls and incomplete Google/Meta exports', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');

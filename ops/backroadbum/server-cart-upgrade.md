@@ -4,13 +4,21 @@ The serving store still uses signed Commerce 0.8.0 and its existing browser-boun
 
 ## Owner Steer 6 release gates · November 15
 
-Registry discovery and GitHub tags checked November 15, 19:57 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
+Registry discovery and GitHub tags rechecked November 15, 22:15 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
 
 Stage A is explicitly authorized in an isolated worktree/database/port using the newest beta and matching upstream server-cart template. Qualify JS-off forms, enhanced cart, frozen/expired edges, tracking thank-you views, WebMCP and retained 0.8.0 capabilities; then prepare the Field Journal integration branch without deploying it. Preserve the shopper-session/prefill/validation safeguards from Template235/237/239.
 
 Stage B is pre-authorized only when a non-beta 0.9.x release is listed under the **same stable Registry id**. Take a verified DB/uploads/release/environment snapshot with rollback steps, upgrade that installed plugin in place through admin, and deploy the qualified paired theme during the same window. Verify ten prior Orders, retained receipts, feeds and account isolation before one guarded TEST1011 purchase. Persist a private 0600 completion guard and never replay it. These are owner gates, not a claim that Stage A or B has completed.
 
-## Stage A observed · November 15, 20:00 UTC
+## Field Journal staging · November 15, 22:15 UTC
+
+`saarius/template-store:backroadbum/server-cart-prep` **8f4be9a** now merges main167d736 downstream onto merchant7df906f, pins source beta2 and carries proposed240's four source changes. The four real server-cart components retain Field Journal tokens/fonts, proportional fields, summary-first phone layout and print CSS. Checkout reuses the PR237 session-safe prefill helper;235/239 Account code is retained. Outer form admission now protects in-process cart/checkout dispatch with the merchant pause, origin/peer, size and durable rate gates. Billing and native `status`/`completed.at` survive the merchant parser.
+
+Full Astro check518files and75 focused units pass;46 overlapping shopper cases pass separately. The compiled playground Worker passes the owning41-case HTTP proof, four1440/390 Light/plain and Dark/enhanced browser contexts, and official four-view cart/checkout/receipt audits. The scoped audit excludes playground-only tour/EmDash toolbar; unfiltered reports retain its22/20px buttons. Synthetic Payments, generic products and source artifacts only—not the real signed merchant catalog, original-browser handoff, full regression matrix or hosted purchase. Early heap/merge/driver failures remain disclosed in `evidence/2026-11-15-field-journal-cart-prep/`; public checkout staging captures are under `/pr-proof/server-cart-prep/`.
+
+**Still blocked:** cookie-based success cannot yet recover an old localStorage capability. Keeping the existing read-only API adapter does not implement that receipt UX. Beta fixture receipts expose opaque order IDs/missing media and are not qualification of TEST1001–1010 numbering/badges/artwork. Legacy browser/source-shape tests still need deliberate integration or retirement; no full-matrix pass is claimed. Preparation is off live, not cutover-ready. Details: branch `docs/implementation/backroadbum-server-cart-prep.md`.
+
+## Earlier Stage A observed · November 15, 20:00 UTC
 
 Source qualification now uses Commerce beta2 tag `b460433` and proposed Template240 head `2b780af` (still open), not the older beta1 pin on template main. The unchanged-source recovery check runs first; then Commerce's owning `stamp-beta-version` command stamps the build to0.9.0-beta.2 for the isolated template runtime. Both built Registry bundles pass size admission. Neither is claimed to be the signed published artifact.
 

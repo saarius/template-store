@@ -83,4 +83,11 @@ Updated November 15, 2026. No EmDash upstream issue, PR or comment has been open
 - Workaround: use desktop native controls or keyboard navigation; no host CSS override or CMS patch was made. Commerce280 restores missing option-product switches independently, not these shared dimensions. Initial blank audit captures were invalid; only the subsequently inspected populated audit is evidence.
 - Evidence: `evidence/2026-11-15-feed-controls-fix/{ui-audit-rendered.json,native-feed-card.html,panel-browser-qualified.log}` and public Commerce280 Before/After images. No EmDash upstream contact; human review should reproduce in the complete editor before reporting.
 
+## 11. Playground toolbar buttons have small hit areas
+- Versions: EmDash1.4.0 / @emdash-cms/cloudflare1.4.0, Node24.22.2, built playground Worker and Chromium. Observed November15 in isolated Field Journal server-cart staging, not on the anonymous live store.
+- Reproduce: audit a populated `/cart`, `/checkout` or paid `/checkout/success` at390/1440 Light/Dark with the native playground toolbar visible. Two buttons measure22×22px and20×20px; four-view audits report the same geometry across all three routes.
+- Root cause/scope: `@emdash-cms/cloudflare/src/db/playground-toolbar.ts` owns `#emdash-playground-toolbar`, independently of merchant cart CSS. This is a measured host hitbox observation, not a physical-phone test, live merchant regression or established contract violation.
+- Workaround: preserve the unfiltered report, then exclude only the host toolbar and separate tour from the merchant-specific audit. Those scoped reports have zero findings; no host CSS repair or EmDash contact was made.
+- Evidence: `evidence/2026-11-15-field-journal-cart-prep/unfiltered-audits/`, final `audit-{cart,checkout,receipt}.json` (Markdown reports), `browser-report.json` and inspected `reviewed/` captures. Human review should confirm the full playground interaction before reporting.
+
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.
