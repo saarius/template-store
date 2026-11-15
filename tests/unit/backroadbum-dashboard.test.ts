@@ -7,7 +7,13 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('A bound port is not a free port.');
     expect(report).toContain('https://github.com/dinkuskit/dinkuskit/issues/132');
-    expect(reviews).toContain('No full pass or PR submission is claimed.');
+    expect(report).toContain('One small fix. The full gate.');
+    expect(reviews).toContain('https://github.com/dinkuskit/dinkuskit/pull/133');
+    expect(reviews).toContain('All 38 owning stages pass across serial runs');
+    expect(reviews).toContain('No single clean verify run is claimed');
+    expect(reviews).toContain('CI and review remain pending');
+    expect(reviews).toContain('shared-store socket failure reproduces on unchanged main');
+    expect(report).toContain('Previous dispatch · Runner reliability');
     expect(report).toContain('Previous dispatch · Shared client repair');
     expect(report).toContain('failure shape, not the historical CI socket owner');
     expect(reviews).toContain('3db2787');
