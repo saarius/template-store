@@ -4,6 +4,13 @@ import { describe, expect, it } from 'vitest';
 // The rendered consumer test supplies contrast/interaction proof; these checks
 // keep the generic chalk repair from freezing adaptive merchant surfaces Light.
 describe('merchant and starter Account surface schemes', () => {
+  it('keeps the upstream PIN width from overriding the merchant control', () => {
+    const source = readFileSync('src/features/shopper-account/ShopperAccount.astro', 'utf8');
+    expect(source).toContain('.shopper-account:not([data-merchant-account]) #account-code {');
+    const css = readFileSync('src/features/shopper-account/account-screen.css', 'utf8');
+    expect(css).toContain('input:is([data-account-code],[data-account-profile-postal-code]){width:min(100%,10rem)');
+  });
+
   it('retains the fixed-chalk starter contract', () => {
     const source = readFileSync('src/features/shopper-account/ShopperAccount.astro', 'utf8');
     const stamp = source.match(/\.account-card--stamp \{[\s\S]*?\}/)?.[0];
