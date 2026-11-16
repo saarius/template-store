@@ -4,11 +4,15 @@ The serving store still uses signed Commerce 0.8.0 and its existing browser-boun
 
 ## Owner Steer 6 release gates · November 15
 
-Registry discovery and GitHub tags rechecked November 16, 06:58 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
+Registry discovery and GitHub tags rechecked November 16, 07:24 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
 
 Stage A is explicitly authorized in an isolated worktree/database/port using the newest beta and matching upstream server-cart template. Qualify JS-off forms, enhanced cart, frozen/expired edges, tracking thank-you views, WebMCP and retained 0.8.0 capabilities; then prepare the Field Journal integration branch without deploying it. Preserve the shopper-session/prefill/validation safeguards from Template235/237/239.
 
 Stage B is pre-authorized only when a non-beta 0.9.x release is listed under the **same stable Registry id**. Take a verified DB/uploads/release/environment snapshot with rollback steps, upgrade that installed plugin in place through admin, and deploy the qualified paired theme during the same window. Verify ten prior Orders, retained receipts, feeds and account isolation before one guarded TEST1011 purchase. Persist a private 0600 completion guard and never replay it. These are owner gates, not a claim that Stage A or B has completed.
+
+## Bounded qualification teardown · November 16, 07:35 UTC
+
+Preparation `dfeb50d` repairs the operator checker's subprocess cleanup: each server/auditor uses a unique transient `backroadbum-qualification-*.scope`, preserving the caller's isolated namespaces and explicitly scrubbed unprivileged payload. The previous group stop reproducibly returned while a detached root listener stayed open; the new scope closes it in about2.3seconds, including TERM-ignoring descendants after their parent exits. Sixteen targeted process/driver checks pass, including the actual nested-sudo/private-mount command and immediate cancellation; `systemctl list-units 'backroadbum-qualification-*.scope' --all` is empty afterward. No production/controller service is targeted and no full commerce/browser rehearsal is repeated. Evidence: `evidence/2026-11-16-qualification-cleanup/`; run the opt-in integration tests from `tests/backroad-qualification-process.test.mjs` before changing lifecycle code.
 
 ## Whole prepared storefront on the installed beta · November 16, 06:49 UTC
 

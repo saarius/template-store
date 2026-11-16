@@ -2,6 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('labels bounded qualification teardown as operator-only, not another checkout qualification', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-qualification-cleanup');
+    expect(report).toContain('data-qualification-cleanup-history');
+    expect(report).toContain('Previous dispatch · Installed beta, complete theme');
+    expect(report).toContain('https://github.com/saarius/template-store/commit/dfeb50d');
+    expect(report).toContain('operator-tool repair, not another commerce qualification');
+    expect(report).toContain('only reporting ships here, and Commerce stays on stable 0.8.0');
+  });
   it('separates the Registry-installed whole storefront from stable in-place upgrade and hosted payment', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
