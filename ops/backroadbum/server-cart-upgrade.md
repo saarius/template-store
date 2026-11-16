@@ -4,11 +4,19 @@ The serving store still uses signed Commerce 0.8.0 and its existing browser-boun
 
 ## Owner Steer 6 release gates · November 15
 
-Registry discovery and GitHub tags rechecked November 16, 03:59 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
+Registry discovery and GitHub tags rechecked November 16, 05:15 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
 
 Stage A is explicitly authorized in an isolated worktree/database/port using the newest beta and matching upstream server-cart template. Qualify JS-off forms, enhanced cart, frozen/expired edges, tracking thank-you views, WebMCP and retained 0.8.0 capabilities; then prepare the Field Journal integration branch without deploying it. Preserve the shopper-session/prefill/validation safeguards from Template235/237/239.
 
 Stage B is pre-authorized only when a non-beta 0.9.x release is listed under the **same stable Registry id**. Take a verified DB/uploads/release/environment snapshot with rollback steps, upgrade that installed plugin in place through admin, and deploy the qualified paired theme during the same window. Verify ten prior Orders, retained receipts, feeds and account isolation before one guarded TEST1011 purchase. Persist a private 0600 completion guard and never replay it. These are owner gates, not a claim that Stage A or B has completed.
+
+## Full-source merchant HTTPS rehearsal · November 16, 05:18 UTC
+
+Preparation **7465e73** extends the existing command with explicit `--storefront`. Keep the same loopback-only network namespace/private443 setup below. The mode compiles all merchant source routes and middleware, copies only published CMS content/metadata plus five public options, and mounts the source beta2 sandbox over selected Commerce rows in disposable SQLite. Author/revision links are removed from these public read copies; users, private settings, hosted consents and Payments are absent. The runtime additionally uses private mount overlays for `/var/lib/backroadbum` and `/etc/backroadbum`, asserts serving DB/Stripe files are hidden, then drops root. The real limiter's hardcoded paths therefore use only a disposable database/key, retained across local server restarts. No host mount, network or sysctl changes survive.
+
+Actual1440 Light/JS-off and390 Dark/enhanced mug forms pass add/change/reload, $18 unit/$54 subtotal, Secure/HttpOnly/SameSite=Lax cookie, foreign-origin/browser isolation and blank-quantity preservation. Home, Shop, mug, Field Notes, dashboard, Account and seven-family feed are sampled; checkout correctly stays unavailable without Payments. Durable429/Retry-After survives restart; pausing cart/checkout returns503 while original TEST1010 still recovers. Eight original-state receipt journeys repeat through this full-source runtime. Original rows/files are unchanged; only new local carts/capabilities are added. Eight driver guards, thirteen candidate tests and twelve painted cart/checkout/receipt Light/Dark390/1440 audits pass, with inspected captures under `/pr-proof/merchant-storefront-https/`.
+
+Evidence: `evidence/2026-11-16-storefront-https/qualification.json`, `browser-proof/`, and `*-tests-final.log`. This is not a signed plugin-manager installation, applied upgrade, full production configuration clone, complete regression matrix or hosted payment. It closes the local full-source HTTPS pause/rate gap, not the signed stable/paired deploy gate. No TEST1011 attempt. The script is inert without `--check`; the root mount wrapper is used only in the explicitly selected storefront scope.
 
 ## Original saved-state sandbox recovery · November 16, 04:28 UTC
 

@@ -2,6 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes full-source HTTPS qualification from signed installation and hosted payment', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-storefront-https');
+    expect(report).toContain('data-storefront-https-history');
+    expect(report).toContain('Previous dispatch · Original saved receipts');
+    expect(report).toContain('Real forms. A private proving ground.');
+    expect(reviews).toContain('data-storefront-https-review');
+    expect(reviews).toContain('7465e73');
+    expect(reviews).toContain('not production configuration or a signed installation');
+    expect(reviews).toContain('no Payments/hosted consents are copied');
+    expect(report).toContain('/pr-proof/merchant-storefront-https/cart-desktop-light.jpg');
+    expect(report).toContain('signed stable remains 0.8.0');
+  });
   it('labels original saved-state sandbox journeys separately from a signed migration', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
