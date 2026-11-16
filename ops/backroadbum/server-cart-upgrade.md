@@ -1,5 +1,13 @@
 # Qualifying a future server-cart upgrade
 
+## Prepared regression inventory · November 16, 20:14 UTC
+
+Off-live preparation **3d1b690** aligns remaining obsolete checkout/admission assertions with the server-cart protocol, preserves the product-name check despite its heading attributes, and adds a real rendered-summary/native-control contract. All **129 unit files / 1235 tests**, **120 workflow tests (two optional skips)**, **10 presentation cases** and the full546-file Astro check pass on the repository-pinned Node24.22.0. A temporary hidden order summary fails exactly the new rendered case; the checkout component is restored byte-for-byte. Feature/text audits and the beta2 Registry build also pass. Evidence: `evidence/2026-11-16-cart-regression-inventory/`.
+
+Use `vitest run --maxWorkers=1` and `node --test --test-concurrency=1 tests/workflows/*.test.mjs` after normal source/plugin preparation; bounded, default-output runs complete here in about136/102seconds. The first baseline had eight failures: seven stale assertions plus an accidentally shared0.8 playground manifest. Workflow fixture failures came from running24.22.2 against its exact24.22.0 artifact pin and a symlink bypassing the owning `.js`→`.ts` resolution hook. Correct preparation and the existing pinned binary resolve those without weakening toolchain/namespace checks; these are not serving incidents or new framework defects.
+
+This closes the prepared **unit/workflow** inventory, not the complete browser matrix, signed same-ID migration, production paired regression or hosted purchase. No runtime changes or new upstream report; stable discovery still lists0.8.0/beta2, so StageB and TEST1011 remain untouched.
+
 ## Native presentation coverage · November 16, 19:34 UTC
 
 Off-live preparation **1f5bbd0** adds `pnpm test:presentation`: nine actual Astro-container checkout/receipt render cases, included in quick/full verification with no EmDash integration or permitted fetches. The two obsolete journey assertions now retain only CSS/route boundaries; rendered coverage owns dynamic field identities, autocomplete/countries, error association, safely retained values, digital/frozen forms and paid/non-paid print guidance. Temporary broken autocomplete/description association and non-paid print hints fail the expected cases; both components are restored byte-for-byte, nine render cases/38 focused units and full546-file typecheck pass. Evidence: `evidence/2026-11-16-native-cart-contracts/`; no runtime, browser/print, installed-backend, migration or hosted-purchase qualification is added, and an all-unit baseline timed out without a complete report.

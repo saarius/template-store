@@ -2,6 +2,19 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates the completed unit/workflow inventory from browser and upgrade qualifications', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-cart-regression');
+    expect(report).toContain('data-cart-regression-history');
+    expect(report).toContain('Previous dispatch · Native checkout coverage');
+    expect(report).toContain('all 1,235 unit tests, 120 workflow tests and ten rendered-component checks');
+    expect(report).toContain('not the complete browser matrix, signed upgrade or hosted purchase');
+    expect(reviews).toContain('data-cart-regression-review');
+    expect(reviews).toContain('two optional skips');
+    expect(reviews).toContain('pinned Node24.22.0');
+    expect(reviews).toContain('no new source or review request was sent upstream');
+  });
   it('labels native component tests as off-live synthetic coverage, not another runtime journey', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
