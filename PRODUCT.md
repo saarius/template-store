@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Search by product option · November16
+A real “tee XL” search returned nothing, so an empty native result now checks exact public option values on published, Commerce-visible products. The result keeps each concrete member’s own availability and selected-item link: tee XL is sold out, fleece XL is backordered. Native content results, ranking and previews stay first; no fuzzy matching, SKU promise, indexed price, stock alias or new catalog authority is introduced.
+
 ## The two-minute departure · November16
 The eighth Field Note gives a four-point walk-round and practical dirty-kit/waste guidance without a product pitch or an environmental performance claim. All17blocks are authored and published through native EmDash controls, with draft privacy, exact reload, script-on/off discovery, onward reading and print-media checks; the manuscript is authorship evidence, never runtime content authority.
 

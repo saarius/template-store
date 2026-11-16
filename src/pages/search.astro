@@ -1,13 +1,25 @@
 ---
 import { getEmDashCollection, getRequestContext, search } from 'emdash';
 import BackroadPage from '../features/store-shell/BackroadPage.astro';
-import { loadVisibleStorefrontProductSlugs } from '../features/store-shell/search-visibility.js';
+import { loadSearchProductCatalog } from '../features/store-shell/search-visibility.js';
+import { findSearchOptionMatches } from '../features/store-shell/variant-search.js';
+import { availabilityLabels } from '../features/commerce-catalog/index.js';
 import { loadStoreSearch, type StoreSearchHit } from '../features/store-shell/store-search.js';
 import { fieldNotes } from '../features/store-shell/field-notes.js';
 
+// Share one fresh signed projection if filtering and the empty-index fallback both need it.
+let catalog: ReturnType<typeof loadSearchProductCatalog> | undefined;
+const productCatalog = () => catalog ??= loadSearchProductCatalog(
+  { runtime: Astro.locals.emdash, request: Astro.request }, process.env, { throwOnUnavailable: true },
+);
 const results = await loadStoreSearch(Astro.url.searchParams.get('q') ?? '', {
   search: async query => (await search(query, { collections: ['products', 'categories', 'pages'], status: 'published', limit: 20 })).items as StoreSearchHit[] ?? [],
-  visibleProducts: () => loadVisibleStorefrontProductSlugs({ runtime: Astro.locals.emdash, request: Astro.request }, process.env, { throwOnUnavailable: true }),
+  visibleProducts: async () => (await productCatalog()).visible,
+  optionMatches: async query => {
+    const context = getRequestContext();
+    if (context?.preview || context?.editMode) return [];
+    return findSearchOptionMatches(query, (await productCatalog()).products);
+  },
   fieldNotePreviews: async slugs => {
     // The CMS loader intentionally serves drafts in editor/preview contexts.
     // Search is published-only, so omit optional previews in those contexts.
@@ -34,7 +46,7 @@ if (results.state === 'unavailable') Astro.response.status = 503;
         <input id="store-search-query" type="search" name="q" value={results.query} minlength="2" maxlength="120" aria-describedby="search-help" placeholder="Try mug, fleece or wet gear" />
         <button type="submit">Search</button>
       </div>
-      <p id="search-help" class="search-help">Use at least two characters. Searches include gear, collections, field notes and guides.</p>
+      <p id="search-help" class="search-help">Use at least two characters. Try a product name, a size with its product (like “tee XL”), or a field-note topic.</p>
     </form>
 
     {results.state === 'unavailable' ? <section class="search-message" role="alert" data-search-unavailable>
@@ -51,11 +63,16 @@ if (results.state === 'unavailable') Astro.response.status = 503;
         <p>Looking for a read instead? <a href="/field-notes">Open the field notes</a>.</p>
       </div> : <>
         <p class="search-summary" data-search-results-count>{results.count} {results.count === 1 ? 'result' : 'results'}{results.limited ? ' shown. Try a more specific search to narrow the list.' : '.'}</p>
+        {results.optionMatches.length > 0 && <p class="search-summary" data-search-option-summary>Found by product option. Choose an option to see its details.</p>}
         {results.groups.map(group => <section class="search-group" aria-label={group.label}>
           <h3>{group.label}</h3>
           <ul>{group.items.map(item => <li>
             <a href={item.href}>{item.title}</a>
             {item.parts.length > 0 && <p>{item.parts.map(part => part.highlighted ? <mark>{part.text}</mark> : part.text)}</p>}
+            {results.optionMatches.find(match => `/products/${match.slug}` === item.href)?.options.map(option => <div class="search-option" data-search-option>
+              <a href={option.href} aria-label={`${option.label} — ${item.title}. ${availabilityLabels[option.availability] ?? 'Availability unavailable'}`}>{option.label}</a>
+              <span>{availabilityLabels[option.availability] ?? 'Availability unavailable'}</span>
+            </div>)}
           </li>)}</ul>
         </section>)}
       </>}
@@ -96,6 +113,11 @@ if (results.state === 'unavailable') Astro.response.status = 503;
   .search-group li:hover{border-color:var(--store-ink-border)}
   .search-group li>a{display:inline-flex;align-items:center;min-height:44px;font-family:var(--font-display);font-size:var(--text-lg);font-weight:500;overflow-wrap:anywhere}
   .search-group li p{margin:var(--space-2) 0 0;color:var(--store-muted);overflow-wrap:anywhere}
+  .search-option{display:flex;align-items:center;flex-wrap:wrap;gap:.25rem 1rem;margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border)}
+  .search-option a{display:inline-flex;align-items:center;min-height:44px;max-width:100%;padding:.5rem .75rem;border:1px solid var(--store-ink-border);border-radius:var(--radius-control);background:var(--store-surface-subtle);font-weight:600;text-decoration:none;overflow-wrap:anywhere}
+  .search-option a:hover{background:var(--store-surface);border-color:var(--store-accent)}
+  .search-option a:active{background:var(--store-surface-subtle)}
+  .search-option>span{font-size:var(--text-sm);color:var(--store-muted)}
   mark{background:var(--color-primary-subtle);color:var(--store-ink)}
   @media(max-width:30rem){.search-controls{flex-direction:column}.search-controls button{align-self:flex-start}}
 </style>

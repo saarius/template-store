@@ -137,11 +137,11 @@ export function filterStorefrontSearchHits<
  * `readProductEntries`, suppressed demonstration items, and products whose
  * linked Commerce catalog item was archived or removed.
  */
-export async function loadVisibleStorefrontProductSlugs(
+export async function loadSearchProductCatalog(
   context: InstalledCatalogContext,
   env: NodeJS.ProcessEnv = process.env,
   options: { throwOnUnavailable?: boolean } = {},
-): Promise<Set<string>> {
+) {
   const contentUnavailable = (error: unknown) => {
     if (options.throwOnUnavailable) throw error;
     return { entries: [] };
@@ -187,7 +187,23 @@ export async function loadVisibleStorefrontProductSlugs(
       visible.add(product.slug);
     }
   }
-  return visible;
+  const byId = new Map(commerceProducts.map(product => [product.id, product]));
+  return {
+    visible,
+    products: products.filter(product => visible.has(product.slug)).map(product => ({
+      slug: product.slug, title: product.title,
+      variants: byId.get(product.commerceItemId)?.variants ?? [],
+    })),
+  };
+}
+
+/** Shared visibility contract for native search and suggestions. */
+export async function loadVisibleStorefrontProductSlugs(
+  context: InstalledCatalogContext,
+  env: NodeJS.ProcessEnv = process.env,
+  options: { throwOnUnavailable?: boolean } = {},
+): Promise<Set<string>> {
+  return (await loadSearchProductCatalog(context, env, options)).visible;
 }
 
 export async function filterPublicSearchApiResponse(
