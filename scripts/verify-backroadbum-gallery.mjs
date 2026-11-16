@@ -8,8 +8,8 @@ await mkdir(output, { recursive: true });
 const browser = await chromium.launch();
 const results = [];
 try {
-  for (const width of [1280, 412]) for (const javaScriptEnabled of [true, false]) {
-    const context = await browser.newContext({ javaScriptEnabled, hasTouch: width === 412, viewport: { width, height: 1000 }, userAgent: 'BackroadBum-SelfCheck/1.0', reducedMotion: 'reduce' });
+  for (const width of [1440, 390]) for (const javaScriptEnabled of [true, false]) {
+    const context = await browser.newContext({ javaScriptEnabled, hasTouch: width === 390, viewport: { width, height: 1000 }, userAgent: 'BackroadBum-SelfCheck/1.0', reducedMotion: 'reduce' });
     try {
       const page = await context.newPage();
       const writes = [], errors = [], checkoutRequests = [];
@@ -29,6 +29,25 @@ try {
       await expect(images.last()).toHaveAttribute('loading', 'lazy');
       await expect(images.first()).toHaveAttribute('alt', 'Switchback Bandana — blue contour-pattern illustrated design');
       await expect(images.last()).toHaveAttribute('alt', 'Switchback Bandana — illustrated detail of cream contours and the yellow BRB corner');
+      const originals = page.getByRole('navigation', { name: 'Full-size product pictures', exact: true });
+      const links = originals.getByRole('link');
+      await expect(links).toHaveCount(2);
+      for (let index = 0; index < 2; index++) {
+        const link = links.nth(index);
+        await expect(link).toHaveAttribute('href', await images.nth(index).getAttribute('src'));
+        await expect(link).toHaveAttribute('target', '_blank');
+        await expect(link).toHaveAttribute('rel', 'noopener');
+        await expect(link).toHaveAccessibleName(new RegExp(`Open full-size image ${index + 1} of 2:.*\\(new tab\\)`));
+        await link.focus(); await expect(link).toBeFocused();
+        const popupPromise = context.waitForEvent('page');
+        await page.keyboard.press('Enter');
+        const popup = await popupPromise;
+        try {
+          await popup.waitForLoadState();
+          expect(new URL(popup.url()).origin).toBe(new URL(base).origin);
+          await expect.poll(() => popup.locator('img').evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
+        } finally { await popup.close(); }
+      }
       const initialSrc = await images.first().getAttribute('src');
       const metadata = await page.locator('[data-product-jsonld]').textContent();
       const price = await page.locator('[data-product-price]').textContent();
@@ -39,7 +58,7 @@ try {
       await expect.poll(() => images.first().evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
       await gallery.screenshot({ path: new URL(`server-${width}-js-${javaScriptEnabled ? 'on' : 'off'}.png`, output).pathname });
       const geometry = await gallery.evaluate(node => ({ client: node.clientWidth, scroll: node.scrollWidth, snap: getComputedStyle(node).scrollSnapType, lead: node.firstElementChild.getBoundingClientRect().width }));
-      if (width === 412) {
+      if (width === 390) {
         expect(geometry.snap).toBe('x mandatory');
         expect(geometry.scroll).toBeGreaterThan(geometry.client);
         expect(geometry.lead).toBeLessThan(geometry.client);
@@ -79,8 +98,11 @@ try {
       await page.goto(base + '/products/long-way-cap');
       await expect(page.locator('[data-product-gallery] img')).toHaveCount(1);
       await expect(page.locator('[data-gallery-extras], .product-gallery--multiple')).toHaveCount(0);
+      await expect(page.locator('[data-product-originals] a')).toHaveCount(1);
+      await page.goto(base + '/products/creekside-camp-mug');
+      await expect(page.locator('[data-product-originals] a')).toHaveCount(3);
       expect(writes).toEqual([]); expect(errors).toEqual([]); expect(checkoutRequests).toEqual([]);
-      results.push({ width, javaScriptEnabled, pictures: 2, geometry, sameOriginResponsiveImages: true, unchangedLeadPriceMetadataCart: true, metadataSha256: createHash('sha256').update(metadata).digest('hex'), singleImageNoStrip: true, syntheticChromiumTouch: width === 412, keyboardFocus: width === 412, arrowScrollingQualified: false, writes: 0, checkoutRequests: 0, errors: 0 });
+      results.push({ width, javaScriptEnabled, pictures: 2, geometry, sameOriginResponsiveImages: true, unchangedLeadPriceMetadataCart: true, metadataSha256: createHash('sha256').update(metadata).digest('hex'), singleImageNoStrip: true, syntheticChromiumTouch: width === 390, keyboardFocus: true, originalLinks: 'keyboard-opened, JS-on/off, same-origin image documents', arrowScrollingQualified: false, writes: 0, checkoutRequests: 0, errors: 0 });
     } finally { await context.close(); }
   }
 } finally { await browser.close(); }

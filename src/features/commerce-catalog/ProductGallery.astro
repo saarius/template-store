@@ -35,6 +35,7 @@ const pictures = (await Promise.all([image, ...gallery].filter((entry): entry is
 const first = pictures[0] ?? null;
 const multiple = pictures.length > 1;
 ---
+<div class="product-pictures">
 <div class:list={["product-gallery", { "product-gallery--multiple": multiple }]} data-product-gallery={productId}
   role={multiple ? "region" : undefined} aria-label={multiple ? "Product pictures" : undefined} tabindex={multiple ? 0 : undefined}>
   <div class={stageClass} data-product-stage-visual>
@@ -51,7 +52,24 @@ const multiple = pictures.length > 1;
     </div>
   )}
 </div>
+{pictures.length > 0 && <nav class="product-picture-links" aria-label="Full-size product pictures" data-product-originals>
+  <p>Take a closer look <span>· opens in a new tab</span></p>
+  <div>{pictures.map((picture, index) => <a href={picture.src} target="_blank" rel="noopener"
+    aria-label={`Open full-size image ${index + 1} of ${pictures.length}: ${picture.alt} (new tab)`}>
+    Image {index + 1}<span aria-hidden="true"> ↗</span>
+  </a>)}</div>
+</nav>}
+</div>
 <style>
+  .product-pictures { min-width: 0; }
+  .product-picture-links { margin-top: var(--space-4); }
+  .product-picture-links p { margin: 0 0 var(--space-2); font-size: var(--text-sm); font-weight: 600; }
+  .product-picture-links p span { color: var(--store-muted); font-weight: 400; }
+  .product-picture-links > div { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .product-picture-links a { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-width: 48px; min-height: 48px; padding: .5rem .75rem; border: 1px solid var(--store-ink-border); border-radius: var(--radius-control); background: var(--store-surface); color: var(--store-ink); font-size: var(--text-sm); font-variant-numeric: tabular-nums; text-decoration: none; }
+  .product-picture-links a:hover { background: var(--store-surface-subtle); text-decoration: underline; text-underline-offset: .2em; }
+  .product-picture-links a:focus-visible { outline: 3px solid var(--store-focus-ring); outline-offset: 4px; }
+  .product-picture-links a:active { border-color: var(--store-accent); background: var(--color-primary-subtle); }
   .product-gallery { display: grid; gap: .75rem; min-width: 0; }
   .product-gallery__extras { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
   .product-gallery__picture { margin: 0; min-width: 0; }
