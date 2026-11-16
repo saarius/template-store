@@ -81,6 +81,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - Field Notes opens with an asymmetric copy/photograph split, one featured published note and quieter two-column reading links. Ordinals are decorative/aria-hidden, not invented dates. The existing photograph/credit and native note ordering remain intact.
 - Articles use the generated editorial scale: expressive title, serif opening paragraph, DM Sans body at17–18px/1.75 and at most65ch. Chapter gaps are64px, versus24px paragraph spacing. Back/related/shop links work without JavaScript. Guides share this reading rhythm with smaller task headings and clear policy navigation; their native CMS words are not duplicated or edited by the theme.
 
+## Native editorial depth · November16
+The departure note uses the existing article hierarchy unchanged: four native headings, a real four-item ordered list and ordinary inline reading links. Do not turn safety guidance into decorative callout cards or shopping prompts; native source order, 65ch measure, script-free links and complete print content remain the contract. Four live390/1440 Light/Dark audits and eight script-on/off journeys pass; the earlier file-based manuscript preview used fallback fonts and is not the final typography proof.
+
 ## Public experiment dashboard · Phase 4
 - Operating typography follows the generated **1.125 scale**: a DM Sans title capped at2.027rem, section headings at1.266–1.424rem and1.125rem subheadings. No marketing-size reporting hero. Tabular numerals cover samples, tokens, amounts and identifiers.
 - Four sampled metric cards distinguish process state, advisory readiness, memory and explicitly unavailable visitor/order aggregates. A stale probe is called stale; advisory readiness is never payment proof. The sampled timestamp and detailed operations remain accessible through a native disclosure.

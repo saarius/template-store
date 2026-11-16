@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## The two-minute departure · November16
+The eighth Field Note gives a four-point walk-round and practical dirty-kit/waste guidance without a product pitch or an environmental performance claim. All17blocks are authored and published through native EmDash controls, with draft privacy, exact reload, script-on/off discovery, onward reading and print-media checks; the manuscript is authorship evidence, never runtime content authority.
+
 ## Owner Steer4 · November13 — Field Journal rebrand
 `ui-design` now owns the visual system; old styling-conservatism notes below are historical, not restrictions. Phase1 replaces the daylight-blue shell with warm OKLCH surfaces, self-hosted Fraunces/DM Sans, System/Light/Dark appearance and a photographic split home; native EmDash copy, signed Commerce facts and hosted checkout contracts remain authoritative. Baseline desktop/phone captures cover six routes outside git, and `DESIGN.md` is the current specification. Shop/PDP/search, transactional/editorial surfaces and dashboard detail follow in phases2–4; no business-state migration is implied.
 

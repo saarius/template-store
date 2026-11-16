@@ -114,6 +114,20 @@ describe('Backroad Bum source-authored merchant content', () => {
     expect(route).toContain('.field-note .cms-page__body :global(blockquote){margin:var(--space-6) 0;');
     expect(route).toContain('border-inline-start:3px solid var(--store-accent)');
   });
+  it('records departure-note structure and safe local links without replacing native CMS content', () => {
+    const note = JSON.parse(readFileSync('seed/backroadbum-departure-note.json', 'utf8'));
+    expect(note.slug).toBe('field-note-the-two-minute-departure');
+    expect(note.sections).toHaveLength(17);
+    expect(note.sections.filter((block: any) => block.style === 'h2')).toHaveLength(4);
+    expect(note.sections.filter((block: any) => block.listItem === 'number')).toHaveLength(4);
+    expect(note.sections.filter((block: any) => block.link).map((block: any) => block.link.href)).toEqual([
+      '/field-note-wet-gear-reset', '/field-note-lunch-stop',
+    ]);
+    const prose = note.sections.map((block: any) => block.text).join(' ');
+    for (const guidance of ['Stay clear of traffic', 'Do not handle needles', 'permitted disposal facilities', 'local food-storage rules']) expect(prose).toContain(guidance);
+    expect(JSON.stringify(note)).not.toMatch(/\$\d|field-tested|guaranteed|buy now/i);
+    for (const path of ['src/pages/[slug].astro', 'src/pages/field-notes.astro']) expect(readFileSync(path, 'utf8')).not.toContain('backroadbum-departure-note');
+  });
   it('keeps field notes editable in EmDash Pages', () => {
     const notes = pages.filter((p: any) => p.slug.startsWith('field-note-'));
     expect(notes).toHaveLength(4);
