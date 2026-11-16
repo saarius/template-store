@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('keeps the concrete feed source candidate separate from the signed live exports', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('Every size. Its own row.');
+    expect(report).toContain('Previous dispatch · Feed member projection');
+    expect(report).toContain('data-feed-member-candidate-history');
+    expect(report).toContain('https://github.com/dinkuskit/commerce/pull/282');
+    expect(reviews).toContain('fork 07e68fe');
+    expect(reviews).toContain('five-row XML/CSV exports');
+    expect(reviews).toContain('885 unit/workflow and 111 integration cases');
+    expect(reviews).toContain('hosts still need to wire selected URLs');
+  });
   it('distinguishes the compiled feed-member report from the native control candidate', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
