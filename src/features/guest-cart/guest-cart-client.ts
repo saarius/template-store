@@ -948,6 +948,68 @@ export function hydrateGuestCartPage(): void {
     retrying = true;
     void refreshSnapshot(root);
   });
+  const beginCheckout = () => {
+    if (!checkoutController || checkoutLocked() || invalidQuantities.size > 0 || !view().checkoutEnabled) return;
+    if (!root.hasAttribute("data-guest-checkout-page")) {
+      window.location.assign("/checkout");
+      return;
+    }
+    const originalIntent = structuredClone(session.intent);
+    clearCheckoutContactFeedback(root);
+    const contactInput = readCheckoutContact(root, view().needsDelivery);
+    if (contactInput.error !== null) {
+      setCheckoutContactFeedback(root, { field: contactInput.field, message: contactInput.error });
+      return;
+    }
+    // Coupons are coming soon: Registry Commerce refuses every code for v1,
+    // so checkout never sends one. COUPON_UNAVAILABLE stays handled below.
+    const couponCode = undefined;
+    pendingCheckout = true;
+    checkoutRecovery = false;
+    checkoutResumeUrl = null;
+    checkoutMessage = null;
+    renderCart(root);
+    const needsPreparation = !readGuestCheckoutRetention(checkoutStorage()) || checkoutController.canPrepareNew();
+    const preparation = needsPreparation ? checkoutController.prepare() : Promise.resolve(null);
+    void preparation.then(async (prepared) => {
+      if (prepared && (prepared.failure || !prepared.result || !prepared.result.ok)) {
+        pendingCheckout = false;
+        checkoutRecovery = Boolean(readGuestCheckoutRetention(checkoutStorage()));
+        setCheckoutMessage(checkoutFailureText(prepared.failure), true);
+        renderCart(root);
+        return;
+      }
+      const started = await checkoutController!.start(originalIntent, couponCode, contactInput.contact!);
+      pendingCheckout = false;
+      if (started.failure || !started.result || !started.result.ok) {
+        checkoutRecovery = Boolean(readGuestCheckoutRetention(checkoutStorage()));
+        setCheckoutMessage(
+          started.result && !started.result.ok ? commerceErrorText(started.result.error) : checkoutFailureText(started.failure),
+          true,
+        );
+        renderCart(root);
+        return;
+      }
+      if (started.result.ok) {
+        const redirect = strictStripeCheckoutUrl(started.result.checkout.redirectUrl);
+        if (redirect && started.result.checkout.state === "pending") {
+          window.location.assign(redirect);
+          return;
+        }
+        checkoutRecovery = true;
+        setCheckoutMessage("Checkout is pending. Check status before trying again.");
+        renderCart(root);
+        if (started.result.checkout.state === "paid") void recoverGuestCheckout(root);
+      }
+    });
+  };
+  const checkoutForm = root.querySelector("[data-guest-cart-checkout-form]");
+  checkoutForm?.addEventListener("submit", (event) => {
+    // Never let contact or capability data become a native URL/body submission.
+    // Enter and the submit button share the same validation and in-flight guard.
+    event.preventDefault();
+    beginCheckout();
+  });
   root.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
@@ -957,59 +1019,9 @@ export function hydrateGuestCartPage(): void {
       return;
     }
     if (target.closest("[data-guest-cart-checkout]")) {
-      if (!checkoutController || checkoutLocked() || invalidQuantities.size > 0 || !view().checkoutEnabled) return;
-      if (!root.hasAttribute("data-guest-checkout-page")) {
-        window.location.assign("/checkout");
-        return;
-      }
-      const originalIntent = structuredClone(session.intent);
-      clearCheckoutContactFeedback(root);
-      const contactInput = readCheckoutContact(root, view().needsDelivery);
-      if (contactInput.error !== null) {
-        setCheckoutContactFeedback(root, { field: contactInput.field, message: contactInput.error });
-        return;
-      }
-      // Coupons are coming soon: Registry Commerce refuses every code for v1,
-      // so checkout never sends one. COUPON_UNAVAILABLE stays handled below.
-      const couponCode = undefined;
-      pendingCheckout = true;
-      checkoutRecovery = false;
-      checkoutResumeUrl = null;
-      checkoutMessage = null;
-      renderCart(root);
-      const needsPreparation = !readGuestCheckoutRetention(checkoutStorage()) || checkoutController.canPrepareNew();
-      const preparation = needsPreparation ? checkoutController.prepare() : Promise.resolve(null);
-      void preparation.then(async (prepared) => {
-        if (prepared && (prepared.failure || !prepared.result || !prepared.result.ok)) {
-          pendingCheckout = false;
-          checkoutRecovery = Boolean(readGuestCheckoutRetention(checkoutStorage()));
-          setCheckoutMessage(checkoutFailureText(prepared.failure), true);
-          renderCart(root);
-          return;
-        }
-        const started = await checkoutController!.start(originalIntent, couponCode, contactInput.contact!);
-        pendingCheckout = false;
-        if (started.failure || !started.result || !started.result.ok) {
-          checkoutRecovery = Boolean(readGuestCheckoutRetention(checkoutStorage()));
-          setCheckoutMessage(
-            started.result && !started.result.ok ? commerceErrorText(started.result.error) : checkoutFailureText(started.failure),
-            true,
-          );
-          renderCart(root);
-          return;
-        }
-        if (started.result.ok) {
-          const redirect = strictStripeCheckoutUrl(started.result.checkout.redirectUrl);
-          if (redirect && started.result.checkout.state === "pending") {
-            window.location.assign(redirect);
-            return;
-          }
-          checkoutRecovery = true;
-          setCheckoutMessage("Checkout is pending. Check status before trying again.");
-          renderCart(root);
-          if (started.result.checkout.state === "paid") void recoverGuestCheckout(root);
-        }
-      });
+      // The checkout page uses its native submit event, not a second click path.
+      // The cart's onward button remains an ordinary navigation action.
+      if (!checkoutForm) beginCheckout();
       return;
     }
     if (target.closest("[data-guest-cart-recover]")) {

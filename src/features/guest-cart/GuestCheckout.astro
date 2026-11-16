@@ -70,9 +70,9 @@ const BILLING_COUNTRIES = Array.from({ length: 26 * 26 }, (_, i) => String.fromC
         </div>
       </dl>
     </aside>
-    <div class="guest-checkout-vault" data-checkout-vault>
+    <form class="guest-checkout-vault" data-checkout-vault data-guest-cart-checkout-form aria-labelledby="guest-checkout-contact-title" novalidate>
       <div class="guest-checkout-vault__header">
-        <h2>Contact &amp; delivery</h2>
+        <h2 id="guest-checkout-contact-title">Contact &amp; delivery</h2>
         <p class="checkout-test-card">Use Stripe test card <strong>4242 4242 4242 4242</strong>, a future expiry date and any three-digit CVC. <a href="/test-store">Test-store guide</a></p>
       </div>
       <fieldset class="guest-cart-contact" data-guest-cart-contact>
@@ -147,7 +147,7 @@ const BILLING_COUNTRIES = Array.from({ length: 26 * 26 }, (_, i) => String.fromC
       </div>
       <div class="guest-checkout-actions" data-checkout-payment-handoff>
         <p class="guest-checkout-handoff-note" data-checkout-payment-note>Payment is processed securely through the store's configured payment provider.</p>
-        <button type="button" data-guest-cart-checkout disabled>{checkoutAdmission ? GUEST_CHECKOUT_READY_LABEL : GUEST_CHECKOUT_LABEL}</button>
+        <button type="submit" data-guest-cart-checkout disabled>{checkoutAdmission ? GUEST_CHECKOUT_READY_LABEL : GUEST_CHECKOUT_LABEL}</button>
         <p data-guest-cart-checkout-reason>{checkoutAdmission ? "" : GUEST_CHECKOUT_REASON}</p>
         <p data-guest-cart-availability-message role="status" tabindex="-1" hidden></p>
         <button type="button" data-guest-cart-availability-retry hidden>Check checkout availability</button>
@@ -155,7 +155,7 @@ const BILLING_COUNTRIES = Array.from({ length: 26 * 26 }, (_, i) => String.fromC
         <a data-guest-cart-resume hidden rel="noopener noreferrer">Return to secure checkout</a>
         <button type="button" data-guest-cart-recover hidden>Check checkout status</button>
       </div>
-    </div>
+    </form>
   </div>
 </section>
 <style>
