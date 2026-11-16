@@ -136,6 +136,9 @@ A reusable disposable command creates two purchases with the actual Commerce0.8.
 ## Server-cart candidate observed · November13
 A late19:26UTC read-only check found Template229 is now a code candidate atc088bfe, paired with open Commerce272at986a382 rather than the pinned signed Commerce0.8.0. Its author explicitly says not to merge it alone; the claimed paired local proof is not independently qualified here. No migration or merchant adoption is made, and original pending-checkout browsers remain protected.
 
+## Concurrent beta cart updates · November16
+Two overlapping quantity updates saved the correct five-item $102 cart in actual Registry beta staging, but the enhanced page retained three items and a $66 subtotal. Unchanged upstream and the prepared Field Journal theme reproduce the same detached-section race on desktop and phone; Template242 now records the real responses and a reload workaround, not a repair. The live0.8 cart, ten Orders and hosted connections remain unchanged; a focused future fix must keep accepted actions and displayed Commerce facts in agreement.
+
 ## Cart product-detail recovery · November16
 An unavailable-size link preserved the correct selection, but the cart's product-detail retry dropped keyboard focus while pending and could pull it back after the shopper moved away. The current merchant cart and checkout now retain a focusable busy retry, refuse duplicate refreshes and move to the recovered item only if the retry still owns focus; another failure leaves it in place. Exact size, saved quantity and invalid drafts remain unchanged; outage fixtures are browser-only, not a serving incident, plugin upgrade or new payment.
 
