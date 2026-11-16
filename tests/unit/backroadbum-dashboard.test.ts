@@ -2,6 +2,19 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('labels native component tests as off-live synthetic coverage, not another runtime journey', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-native-presentation');
+    expect(report).toContain('data-native-presentation-history');
+    expect(report).toContain('Previous dispatch · Queued changes in Field Journal');
+    expect(report).toContain('the original components are restored unchanged');
+    expect(report).toContain('only reporting ships on stable Commerce 0.8.0');
+    expect(reviews).toContain('data-native-presentation-review');
+    expect(reviews).toContain('off-live preparation 1f5bbd0');
+    expect(reviews).toContain('all-unit baseline timed out without a complete report');
+    expect(reviews).toContain('no EmDash integration or permitted fetches');
+  });
   it('distinguishes provisional merchant queue preparation from live adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

@@ -1,12 +1,10 @@
 # Qualifying a future server-cart upgrade
 
+## Native presentation coverage · November 16, 19:34 UTC
+
+Off-live preparation **1f5bbd0** adds `pnpm test:presentation`: nine actual Astro-container checkout/receipt render cases, included in quick/full verification with no EmDash integration or permitted fetches. The two obsolete journey assertions now retain only CSS/route boundaries; rendered coverage owns dynamic field identities, autocomplete/countries, error association, safely retained values, digital/frozen forms and paid/non-paid print guidance. Temporary broken autocomplete/description association and non-paid print hints fail the expected cases; both components are restored byte-for-byte, nine render cases/38 focused units and full546-file typecheck pass. Evidence: `evidence/2026-11-16-native-cart-contracts/`; no runtime, browser/print, installed-backend, migration or hosted-purchase qualification is added, and an all-unit baseline timed out without a complete report.
+
 The serving store still uses signed Commerce 0.8.0 and its existing browser-bound recovery. As observed November15, Template #229 is merged in upstream/main167d736, pinning Commerce0.9.0-beta.1; Commerce #272 is also merged. Those source acceptances do not upgrade this store: the paired server-cart migration, same-ID signed upgrade and retained browsers still need coordinated qualification. A fresh signed beta installation is now qualified separately below. Do not merge that new template runtime into the signed0.8.0 store alone or discard original browser capabilities. A merchant-only recovery adapter is source-qualified below, but **not enabled**. Preserve PR237’s late-profile prefill guard when integrating the rewritten checkout.
-
-## Merchant queue preparation · November 16, 18:51 UTC
-
-Off-live preparation **1e24719** provisionally carries Template243/d0a950a without replacing Field Journal styles or accessible cart-link counts. Actual Registry-installed beta2 and the full merchant HTTPS build pass captured overlapping changes, later edits, sequential update/removal, reload, native fallback and JS-off forms. All four390/1440 Light/Dark lanes explicitly assert saved appearance and computed scheme, including after navigation; the nine browser contexts use separate synthetic peers within the unchanged real write budget. Four painted audits are clean,49 focused units/36 shopper safeguards and full544-file typecheck pass. Public captures: `/pr-proof/merchant-cart-queue/`; evidence: `evidence/2026-11-16-merchant-cart-queue/`.
-
-The first combined shopper correctly reached the eight-write limit; the fixture was split, not admission-disabled. Two unchanged legacy journey-markup assertions and the initial1000MiB heap failure remain disclosed; no full-suite pass is claimed. No Orders, Payments or consents were copied or created, and production business digests remain unchanged. Upstream243 still awaits review; the live0.8 runtime is untouched, same-ID stable0.9 is still unavailable, and signed upgrade/hosted TEST1011 remain unqualified. Revisit the provisional queue when maintainer feedback or accepted upstream code changes it.
 
 ## Merchant queue preparation · November 16, 18:51 UTC
 
