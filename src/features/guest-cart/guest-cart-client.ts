@@ -496,7 +496,10 @@ function renderCart(root: Element): void {
   if (retry instanceof HTMLButtonElement) {
     const retryState = guestCartRetryControlState(current);
     retry.hidden = retryState.hidden;
-    retry.disabled = retryState.disabled;
+    // Keep the explicit retry in the keyboard order while the click guard
+    // refuses reentry. Native disabled drops focus before its result arrives.
+    retry.setAttribute("aria-disabled", String(retryState.disabled));
+    retry.setAttribute("aria-busy", String(retryState.disabled));
   }
   if (checkoutRecoveryButton instanceof HTMLButtonElement) {
     checkoutRecoveryButton.hidden = !checkoutRecovery;
@@ -700,14 +703,14 @@ async function refreshSnapshot(root?: Element): Promise<void> {
     return;
   }
   const retryBtn = root?.querySelector("[data-guest-cart-retry]");
-  const retryHadFocus = Boolean(
-    retryBtn && (document.activeElement === retryBtn || retryBtn.contains(document.activeElement)),
-  );
   retrying = snapshotFailed || retrying;
   pending = true;
   snapshotFailed = false;
   if (root) renderCart(root);
   else renderNav();
+  if (retryBtn instanceof HTMLElement && retryBtn === document.activeElement) {
+    retryBtn.scrollIntoView({ block: "nearest", behavior: "instant" });
+  }
   const requestedIds = session.intent.lines.map((line) => line.id).join(",");
   try {
     const response = await fetch(`/api/guest-cart/snapshot?ids=${encodeURIComponent(requestedIds)}`, {
@@ -742,12 +745,15 @@ async function refreshSnapshot(root?: Element): Promise<void> {
       queuedSnapshotRoot = undefined;
       void refreshSnapshot(nextRoot);
     } else if (root) {
+      // Decide at completion, not at request time: a shopper who moved away
+      // keeps their place. Failed retries retain the same visible button.
+      const retryOwnsFocus = retryBtn === document.activeElement;
       renderCart(root);
-      if (retryHadFocus && snapshotFailed) {
-        const retry = root.querySelector("[data-guest-cart-retry]");
-        if (retry instanceof HTMLElement && !retry.hidden && !("disabled" in retry && retry.disabled)) {
-          retry.focus();
-        }
+      if (retryOwnsFocus && retryBtn instanceof HTMLElement) {
+        if (retryBtn.hidden) {
+          const next = root.querySelector("[data-guest-cart-product-link], [data-guest-cart-qty]:not(:disabled)");
+          if (next instanceof HTMLElement) next.focus();
+        } else retryBtn.scrollIntoView({ block: "nearest", behavior: "instant" });
       }
     } else {
       renderNav();

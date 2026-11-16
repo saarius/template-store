@@ -70,7 +70,8 @@ const { checkoutAdmission = null } = Astro.props;
   .guest-cart-checkout [data-guest-cart-availability-retry]{margin-top:1rem}
   .guest-cart-checkout [data-guest-cart-availability-retry][aria-disabled="true"]{color:var(--store-muted);cursor:not-allowed}
   .guest-cart-checkout [data-guest-cart-recover]{margin-top:1rem}
-  .guest-cart-retry{margin-top:1rem}
+  .guest-cart-retry{margin-top:1rem;scroll-margin-block:1rem}
+  .guest-cart-retry[aria-disabled="true"]{color:var(--store-muted);cursor:not-allowed}
   .guest-cart :global([data-guest-cart-line]){display:grid;grid-template-columns:8rem minmax(0,1fr) auto;gap:var(--space-3) var(--space-5);align-items:start;padding:var(--space-5) 0;border-top:1px solid var(--color-border);min-width:0;overflow-wrap:anywhere}
   .guest-cart :global([data-guest-cart-line]:last-child){border-bottom:1px solid var(--store-line)}
   .guest-cart :global(.guest-cart-line-media){grid-row:1/3;width:100%;aspect-ratio:4/3;overflow:hidden;border-radius:var(--store-radius-card);background:var(--store-surface-subtle)}
