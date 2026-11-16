@@ -12,6 +12,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('fork 07e68fe');
     expect(reviews).toContain('five-row XML/CSV exports');
     expect(reviews).toContain('885 unit/workflow and 111 integration cases');
+    expect(reviews).toContain('All eleven exact-head GitHub checks pass');
     expect(reviews).toContain('hosts still need to wire selected URLs');
   });
   it('distinguishes the compiled feed-member report from the native control candidate', () => {
