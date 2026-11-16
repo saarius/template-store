@@ -489,6 +489,20 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(ledger).toContain('Phone invalid-save continuation is NOT qualified');
   });
 
+  it('records native order focus loss as a human-review observation, not a repair', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const ledger = readFileSync('public/dashboard/emdash-bugs.txt', 'utf8');
+    expect(source).toContain('data-order-navigation-history');
+    expect(source).toContain('reaching Back to orders then takes 32 desktop or five phone Tabs');
+    expect(source).toContain('not a repair or private order capture');
+    expect(ledger).toContain('## 12. Native Orders inspection loses');
+    expect(ledger).toContain('without a post-update focus policy');
+    expect(ledger).toContain('not a universal tab-order contract');
+    expect(ledger).toContain('No host/plugin repair is installed');
+    expect(ledger).toContain('No EmDash issue, PR or comment was opened');
+    for (const state of ['before', 'after']) expect(source).toContain(`/pr-proof/emdash-order-focus/${state}-inspect-390.png`);
+  });
+
   it('separates served Ship proof from hosted deployment and carrier qualification', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(source).toContain('actual served Worker-route Before/After desktop and phone proof');
