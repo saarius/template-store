@@ -171,6 +171,9 @@ Cap specifications precede its native Fit & care disclosure, using the existing 
 
 Tee and fleece size tables are native EmDash specification blocks, with measuring instructions nearby and illustrative dimensions explicitly distinguished from manufactured samples. Signed Commerce alone supplies selected-size price and availability; the buyable XL fleece backorder must not imply a dispatch date. Browser-only cart proof refuses legacy preparation attempts and must not be described as checkout qualification.
 
+## Product option feedback
+A variant product's existing stock paragraph is a server-rendered atomic `status` region (implicit polite announcements), present before the first radio change. Update its text in place, retain native radio focus and keep the visible price/status/button behavior unchanged; simple products do not need this dynamic status role. Chromium accessibility-tree properties are proof of supplied semantics, not proof of speech on a physical assistive-technology setup.
+
 ## Product Add continuity
 The local product Add mutation is synchronous: do not transiently disable its button or programmatically move focus on success. Retain the native button focus cue through success, combined-line refusal and storage failure; only malformed quantity correction focuses the input. The onward View cart link remains success-only and next in keyboard order. A future asynchronous server-cart implementation needs its own honest pending state and focus qualification, not an assumption that this local strategy transfers unchanged.
 
