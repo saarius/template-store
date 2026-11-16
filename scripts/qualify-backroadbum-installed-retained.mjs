@@ -5,7 +5,8 @@
  * Source-built sandbox mount, NOT a signed installation or a live upgrade.
  */
 import assert from 'node:assert/strict';
-import { spawn, spawnSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
+import { spawnQualificationProcess as spawn, stopQualificationProcess as stop } from './lib/qualification-process.mjs';
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync, chmodSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -43,17 +44,6 @@ export function assertIsolated(interfaces, routes, unprivilegedPort) {
 export function safeMediaKey(key) {
   return typeof key === 'string' && key.length > 0 && key.length < 1024 &&
     !key.startsWith('/') && !key.split('/').some(x => !x || x === '.' || x === '..') && /^[a-zA-Z0-9._/-]+$/.test(key);
-}
-
-async function stop(child) {
-  if (!child || child.exitCode !== null || child.signalCode !== null) return;
-  const exited = new Promise(done => child.once('exit', done));
-  try { process.kill(-child.pid, 'SIGTERM'); } catch { spawnSync('sudo', ['-n', 'kill', '-TERM', '--', `-${child.pid}`], { stdio: 'ignore' }); }
-  await Promise.race([exited, pause(3000)]);
-  if (child.exitCode === null && child.signalCode === null) {
-    try { process.kill(-child.pid, 'SIGKILL'); } catch { spawnSync('sudo', ['-n', 'kill', '-KILL', '--', `-${child.pid}`], { stdio: 'ignore' }); }
-    await exited;
-  }
 }
 
 export async function qualify({ candidate, storefront = false }) {
