@@ -13,6 +13,6 @@ const trafficReady = !stale && !trafficIsStale(status?.traffic);
   <div data-traffic-pulse><span>Page responses · 7 UTC days</span><strong>{trafficReady ? value(status?.traffic?.last7Days) : 'Unavailable'}</strong><small>Bot-filtered · repeat views included</small></div>
 </div>
 <div class="dashboard-brief">
-  <div><h3>What’s running</h3><p>Seven product families, two collections and seven field notes, backed by EmDash. Commerce owns prices and availability; guest carts, retained receipts and hosted Stripe TEST checkout are live.</p><p>Signed Registry plugins: Commerce <strong>0.8.0</strong>, Payments <strong>0.5.0</strong>, Ship <strong>0.3.1</strong>. No local cloud-service replicas are serving.</p></div>
+  <div><h3>What’s running</h3><p>Seven product families, two collections and eight field notes, backed by EmDash. Commerce owns prices and availability; guest carts, retained receipts and hosted Stripe TEST checkout are live.</p><p>Signed Registry plugins: Commerce <strong>0.8.0</strong>, Payments <strong>0.5.0</strong>, Ship <strong>0.3.1</strong>. No local cloud-service replicas are serving.</p></div>
   <aside><h3>What’s still missing</h3><ul><li>Unrestricted email delivery is not available: the Account form works with the verified sandbox mailbox, not arbitrary visitor addresses.</li><li>The original expired attempts now release; their precise provider cause and hosted revision remain unverified.</li><li>Upstream merges are not signed-plugin releases or hosted rollout proof.</li></ul></aside>
 </div>

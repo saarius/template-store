@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports native editorial depth separately from commerce qualification', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-departure-note');
+    expect(report).toContain('data-departure-note-history');
+    expect(report).toContain('Previous dispatch · Prepared cart regressions');
+    expect(report).toContain('Eight EmDash field notes');
+    expect(report).toContain('draft stayed off the public route, journal and search');
+    expect(report).toContain('not a plugin upgrade or another checkout qualification');
+    expect(report).toContain('all eleven earlier CMS page rows, catalog and ten Orders remain unchanged');
+  });
   it('separates the completed unit/workflow inventory from browser and upgrade qualifications', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -440,7 +450,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('reports the native seventh product without rewriting older catalog or recovery claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
-    expect(pulse).toContain('Seven product families, two collections and seven field notes');
+    expect(pulse).toContain('Seven product families, two collections and eight field notes');
     expect(source).toContain('Seven EmDash-backed product families');
     expect(source).toContain('A $12 pocket notebook joins the gear shelf');
     expect(source).toContain('The six existing products and eight Orders remain unchanged');

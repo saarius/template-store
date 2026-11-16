@@ -1,0 +1,24 @@
+{
+  "slug": "field-note-the-two-minute-departure",
+  "title": "The two-minute departure",
+  "searchTerm": "departure",
+  "sections": [
+    { "style": "normal", "text": "The drink is finished, the map is folded and someone has already found the car keys. Give the stop two more minutes. Not for another photograph: for the cup behind the chair, the napkin under the table and the person who will use this space after you." },
+    { "style": "h2", "text": "Make a place for the dirty things" },
+    { "style": "normal", "text": "Before you unpack lunch, put a rubbish bag and a container for leftovers somewhere you can reach them. Keep a separate bag for the mug, cutlery and cloth that need washing at home. An easy place to put a dirty spoon is more useful than a promise to sort everything out later." },
+    { "style": "normal", "text": "Bring enough space to take your own waste home if the bins are full or there are none. Close bags and containers as you go; a loose wrapper can leave before you do. Follow local food-storage rules, and keep food and waste away from wildlife." },
+    { "style": "h2", "text": "Do one small walk-round" },
+    { "style": "normal", "text": "Once your things are packed, check the space you actually used. Stay clear of traffic and do not crawl beneath a vehicle or step into an unsafe area to retrieve something. With children or a dog, have someone keep them safely away from the road while you look." },
+    { "style": "normal", "listItem": "number", "text": "Look down: under the table, beside the seat and on the ground where you opened bags. Collect your scraps, including food waste." },
+    { "style": "normal", "listItem": "number", "text": "Look back: check the bench and the spot where the mug was resting. Count the things you meant to bring home." },
+    { "style": "normal", "listItem": "number", "text": "Look at the load: close containers, put loose kit away and secure it for travel. Keep the rubbish separate from food and clean gear." },
+    { "style": "normal", "listItem": "number", "text": "Look ahead: check that everyone is ready, access is clear and there is still time for the route home. Check around the vehicle before moving." },
+    { "style": "h2", "text": "Leave the washing for home" },
+    { "style": "normal", "text": "A creek is not a sink, even when a soap label sounds reassuring. Pack dirty dishes away and use permitted disposal facilities according to local rules. Do not pour drinks, food scraps or washing-up water onto the site. A no-cook stop can end without a washing-up operation beside the car." },
+    { "style": "normal", "text": "You do not need to turn departure into a cleanup expedition. Do not handle needles, broken glass, chemicals or unknown waste; keep clear and report hazards to the site operator where possible. Leaving a place well does not require taking a risk or disturbing habitat to reach litter." },
+    { "style": "h2", "text": "Finish the job when you get back" },
+    { "style": "normal", "text": "Take the rubbish out, wash the food containers and let the damp things dry before packing them away. Replace the bag you used. The next stop starts here, not when you reach another picnic table." },
+    { "style": "normal", "text": "If the kit comes home wet, try ", "link": { "text": "The wet-gear reset", "href": "/field-note-wet-gear-reset" }, "after": ". For a simpler meal to pack in the first place, read the lunch-stop note next." },
+    { "style": "normal", "text": "Start with ", "link": { "text": "A lunch stop worth taking", "href": "/field-note-lunch-stop" }, "after": ": a permitted place, an easy meal and enough time to enjoy being out. Two quiet minutes at the end are part of that time, not a task you have to earn." }
+  ]
+}
