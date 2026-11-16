@@ -10,6 +10,22 @@ Stage A is explicitly authorized in an isolated worktree/database/port using the
 
 Stage B is pre-authorized only when a non-beta 0.9.x release is listed under the **same stable Registry id**. Take a verified DB/uploads/release/environment snapshot with rollback steps, upgrade that installed plugin in place through admin, and deploy the qualified paired theme during the same window. Verify ten prior Orders, retained receipts, feeds and account isolation before one guarded TEST1011 purchase. Persist a private 0600 completion guard and never replay it. These are owner gates, not a claim that Stage A or B has completed.
 
+## Optional public receipt artwork · November 16, 02:10 UTC
+
+Off-live `backroadbum/server-cart-prep` **9e4176c** shares missing-artwork enrichment between server thank-you and explicit retained receipt reads. It resolves exact paid item IDs through Commerce's public catalog and native Media Library; missing/unpublished/unsafe/oversized media or catalog failure cannot replace frozen names, variants, SKUs, quantities or money. Default `status-v1` stays unchanged. Optional canonical numbers render only when supplied; no number or TEST fact is inferred from a UUID.
+
+Actual old-kernel disposable purchases and source beta2 pass all four390/1440 Light/Dark browser contexts: native fixture image really loads, $32 remains frozen despite current $14 pricing, original storage and the separate new-cart cookie stay unchanged, cross-tab revocation works and print retains paid text but excludes artwork. The painted snapshot auditor has zero findings;124 focused units and the full524-file Astro check pass. This is authored fixture art, not qualification of seven real merchant products or original live browsers. Evidence: `evidence/2026-11-16-cart-merchant/`.
+
+The same run confirms a numbered canonical TEST order but no guest number/test fields; an independent signed0.8 read confirms that gap live. [Commerce283](https://github.com/dinkuskit/commerce/issues/283) is a capability request, not an implemented repair or release blocker. Stable Registry still lists0.8.0; Stage B is not available and TEST1011 was not attempted.
+
+## Optional public receipt artwork · November 16, 02:10 UTC
+
+Off-live `backroadbum/server-cart-prep` **9e4176c** shares missing-artwork enrichment between server thank-you and explicit retained receipt reads. It resolves exact paid item IDs through Commerce's public catalog and native Media Library; missing/unpublished/unsafe/oversized media or catalog failure cannot replace frozen names, variants, SKUs, quantities or money. Default `status-v1` stays unchanged. Optional canonical numbers render only when supplied; no number or TEST fact is inferred from a UUID.
+
+Actual old-kernel disposable purchases and source beta2 pass all four390/1440 Light/Dark browser contexts: native fixture image really loads, $32 remains frozen despite current $14 pricing, original storage and the separate new-cart cookie stay unchanged, cross-tab revocation works and print retains paid text but excludes artwork. The painted snapshot auditor has zero findings;124 focused units and the full524-file Astro check pass. This is authored fixture art, not qualification of seven real merchant products or original live browsers. Evidence: `evidence/2026-11-16-cart-merchant/`.
+
+The same run confirms a numbered canonical TEST order but no guest number/test fields; an independent signed0.8 read confirms that gap live. [Commerce283](https://github.com/dinkuskit/commerce/issues/283) is a capability request, not an implemented repair or release blocker. Stable Registry still lists0.8.0; Stage B is not available and TEST1011 was not attempted.
+
 ## Explicit earlier-checkout handoff · November 15, 23:12 UTC
 
 Off-live `saarius/template-store:backroadbum/server-cart-prep` **d64e2d1** adds `/checkout/retained`, linked from the merchant footer and success page. A deliberate button reads the original `dinkus.guest-checkout.v1` capability through `/api/checkout/status`; it does not mint/replace capabilities, write localStorage, adopt the key into a server-cart cookie, settle a cart or start a payment. Missing/invalid/refused/changed retention cannot confirm an order, and unresolved payment stays unconfirmed. Cross-tab changes clear already-painted details and invalidate in-flight reads. The route is unavailable outside the merchant profile or inside the playground/proof profile; JavaScript-free visitors get email/account guidance.

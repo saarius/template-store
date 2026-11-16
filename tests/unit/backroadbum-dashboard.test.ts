@@ -2,6 +2,19 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('keeps receipt artwork staging and missing canonical identity separate from live migration', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-receipt-artwork-dispatch');
+    expect(report).toContain('data-receipt-artwork-history');
+    expect(report).toContain('data-receipt-identity-report');
+    expect(report).toContain('Previous dispatch · Concrete feed candidate');
+    expect(report).toContain('https://github.com/dinkuskit/commerce/issues/283');
+    expect(report).toContain('Only this report is deployed');
+    expect(reviews).toContain('merchant preparation 9e4176c');
+    expect(reviews).toContain('124 focused units');
+    expect(reviews).toContain('not original live Orders, signed installation or a complete regression matrix');
+  });
   it('keeps the concrete feed source candidate separate from the signed live exports', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
