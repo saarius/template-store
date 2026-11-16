@@ -134,46 +134,29 @@ describe("category pages on a shipping store", () => {
 });
 
 describe("saved checkout rediscovery", () => {
-  it("provides credential-free recovery links in the footer and cart", () => {
-    for (const path of [
-      "src/features/store-shell/StoreFooter.astro",
-      "src/features/guest-cart/GuestCart.astro",
-    ]) {
-      const markup = readFileSync(path, "utf8");
-      expect(markup).toMatch(/href="\/checkout\/success" data-last-checkout-link/);
-    }
-    const receipt = readFileSync("src/features/guest-cart/GuestCheckoutReturn.astro", "utf8");
-    expect(receipt).toContain("Your last checkout");
-    expect(receipt).toContain("only its latest checkout");
-    expect(receipt).toContain("page address alone cannot recover an order");
+  it("keeps the server-cart return and explicit earlier-checkout recovery in the shared footer", () => {
+    const footer = readFileSync("src/features/store-shell/StoreFooter.astro", "utf8");
+    expect(footer).toMatch(/href="\/checkout\/success" data-last-checkout-link/);
+    expect(footer).toContain("process.env.BACKROADBUM_MERCHANT_PROFILE === '1'");
+    expect(footer).toContain('href="/checkout/retained">Earlier checkout</a>');
+    const route = readFileSync("src/pages/checkout/retained.astro", "utf8");
+    expect(route).toContain("process.env.BACKROADBUM_MERCHANT_PROFILE !== '1'");
+    expect(route).toContain('data-retained-receipt');
+    expect(route).toContain('hydrateRetainedReceipt();');
+    // Actual server-return and retained-capability behavior are covered by their
+    // owning presentation/client tests, not the retired inline-lines copy.
   });
 });
 
-describe("checkout review before contact", () => {
-  it("keeps one editable summary before contact and the payment action in source order", () => {
+describe("native checkout layout contract", () => {
+  it("keeps the phone review above contact without hiding the native checkout", () => {
     const markup = readFileSync("src/features/guest-cart/GuestCheckout.astro", "utf8");
-    const summary = markup.indexOf('data-checkout-manifest hidden');
-    const contact = markup.indexOf('data-checkout-vault>');
-    const payment = markup.indexOf('data-checkout-payment-handoff>');
-    expect(summary).toBeGreaterThan(0);
-    expect(contact).toBeGreaterThan(summary);
-    expect(payment).toBeGreaterThan(contact);
-    expect(markup.match(/data-checkout-manifest hidden/g)).toHaveLength(1);
-    expect(markup.match(/data-guest-cart-lines/g)).toHaveLength(1);
-    expect(markup.match(/data-guest-cart-subtotal-amount/g)).toHaveLength(1);
     expect(markup).toContain('grid-template-areas:"contact review"');
     expect(markup).toContain('grid-template-areas:"review" "contact"');
-  });
-
-  it("gives non-scripted checkout a browse path instead of an unusable contact form", () => {
-    const markup = readFileSync("src/features/guest-cart/GuestCheckout.astro", "utf8");
-    const fallback = markup.match(/<noscript>([\s\S]*?)<\/noscript>/)?.[1] ?? '';
-    expect(fallback).toContain('data-checkout-no-script');
-    expect(fallback).toContain('Checkout needs JavaScript');
-    expect(fallback).toContain('href="/shop"');
-    // Keep this inside noscript; a bundled/global Astro style would hide JS checkout too.
-    expect(fallback).toContain('<style is:inline>');
-    expect(fallback).toContain('[data-guest-checkout-page] .guest-checkout-grid{display:none}');
+    expect(markup).not.toContain('Checkout needs JavaScript');
+    expect(markup).not.toContain('[data-guest-checkout-page] .guest-checkout-grid{display:none}');
+    // Emitted summary uniqueness, edit link and native POST controls belong to
+    // tests/presentation/native-journey.test.ts, not source-order assumptions.
   });
 });
 

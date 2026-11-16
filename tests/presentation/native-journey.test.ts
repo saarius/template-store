@@ -78,6 +78,27 @@ describe('native merchant journey rendering', () => {
     expect(html.match(/<form\b/gu)).toHaveLength(1);
   });
 
+  it('renders one visible, editable review and usable native payment controls without hydration', async () => {
+    const html = await renderCheckout();
+    const nodes = elements(html);
+    const withAttribute = (attribute: string) => nodes.filter(node => Object.hasOwn(node.attributes, attribute));
+    expect(withAttribute('data-checkout-manifest')).toHaveLength(1);
+    expect(withAttribute('data-checkout-manifest')[0].attributes).not.toHaveProperty('hidden');
+    expect(withAttribute('data-guest-cart-lines')).toHaveLength(1);
+    expect(withAttribute('data-guest-cart-subtotal-amount')).toHaveLength(1);
+    expect(html).toContain('Synthetic notebook');
+    expect(html).toContain('$12.00');
+    expect(tag(html, 'a', 'data-checkout-edit-cart', '').href).toBe('/cart');
+    expect(tag(html, 'a', 'data-checkout-back-to-cart', '').href).toBe('/cart');
+    const form = tag(html, 'form', 'data-checkout-form', '');
+    expect(form).toMatchObject({ action: '/checkout', method: 'post' });
+    expect(form).not.toHaveProperty('hidden');
+    expect(tag(html, 'button', 'data-guest-cart-checkout', '')).not.toHaveProperty('disabled');
+    expect(tag(html, 'fieldset', 'data-guest-cart-contact', '')).not.toHaveProperty('disabled');
+    expect(html).not.toContain('Checkout needs JavaScript');
+    expect(html).not.toContain('data-checkout-no-script');
+  });
+
   it('renders a refused postal field with one associated correction and safely retained values', async () => {
     const html = await renderCheckout({ values: { email: 'synthetic@example.test', 'delivery[name]': 'A "quoted" <shopper>', 'delivery[postalCode]': '', billingSame: 'on' }, error: { field: 'delivery[postalCode]', message: 'Enter your delivery postal code.' } });
     const invalid = tag(html, 'input', 'name', 'delivery[postalCode]');

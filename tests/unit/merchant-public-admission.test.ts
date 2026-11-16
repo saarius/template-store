@@ -13,7 +13,9 @@ function setup() {
   const open = () => { const store = openMerchantLimits(path, key); stores.push(store); return store; };
   return { path, key, open, store: open() };
 }
-const path = '/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/prepare';
+// Native outer cart forms have their own admission tests. This boundary still
+// validates JSON start and explicit, read-only retained-checkout recovery.
+const path = '/_emdash/api/plugins/r_gshdrqaldna3r7sn/checkout/guest/start';
 function request(extra: Record<string, string> = {}, body = '{}') {
   return new Request('https://backroadbum.com' + path, { method: 'POST', headers: {
     origin: 'https://backroadbum.com', 'content-type': 'application/json', [MERCHANT_PEER_HEADER]: '192.0.2.1', ...extra,
@@ -60,7 +62,7 @@ describe('merchant HTTP admission before Commerce', () => {
   it('allows a bounded, same-origin JSON request but does not consume its original body', async () => {
     const take = vi.fn(() => ({ allowed: true, retryAfter: 100 })); const req = request();
     expect(await admitMerchantCheckout(req, path, take)).toBeNull();
-    expect(take).toHaveBeenCalledWith('prepare', '192.0.2.1'); expect(await req.text()).toBe('{}');
+    expect(take).toHaveBeenCalledWith('start', '192.0.2.1'); expect(await req.text()).toBe('{}');
   });
   it('rejects foreign origin, fetch context, media type, oversized and invalid bodies before any counter write', async () => {
     const take = vi.fn(() => ({ allowed: true, retryAfter: 100 }));
@@ -78,15 +80,21 @@ describe('merchant HTTP admission before Commerce', () => {
   it('returns retryable rate refusal with no authority from spoofed forwarding headers', async () => {
     const take = vi.fn(() => ({ allowed: false, retryAfter: 123 }));
     const response = await admitMerchantCheckout(request({ 'x-forwarded-for': '203.0.113.1', 'cf-connecting-ip': '203.0.113.2' }), path, take);
-    expect(take).toHaveBeenCalledWith('prepare', '192.0.2.1');
+    expect(take).toHaveBeenCalledWith('start', '192.0.2.1');
     expect(response?.status).toBe(429); expect(response?.headers.get('Retry-After')).toBe('123');
     expect(response?.headers.get('Cache-Control')).toBe('no-store');
+  });
+  it('refuses removed inline-cart prepare and start payloads without spending a budget', async () => {
+    const take = vi.fn(() => ({ allowed: true, retryAfter: 100 }));
+    expect((await admitMerchantCheckout(request(), path.replace('start', 'prepare'), take))?.status).toBe(400);
+    expect((await admitMerchantCheckout(request({}, '{"lines":[{"catalogItemId":"synthetic-mug","quantity":1}]}'), path, take))?.status).toBe(400);
+    expect(take).not.toHaveBeenCalled();
   });
   it('status recovery uses its separate budget; GET readiness never takes a checkout budget', async () => {
     const take = vi.fn(() => ({ allowed: true, retryAfter: 100 }));
     expect(await admitMerchantCheckout(request(), '/api/checkout/status', take)).toBeNull();
     expect(take).toHaveBeenCalledWith('status', '192.0.2.1'); take.mockClear();
-    expect(await admitMerchantCheckout(new Request('https://backroadbum.com'), path.replace('prepare', 'readiness'), take)).toBeNull();
+    expect(await admitMerchantCheckout(new Request('https://backroadbum.com'), path.replace('start', 'readiness'), take)).toBeNull();
     expect(take).not.toHaveBeenCalled();
   });
 });
