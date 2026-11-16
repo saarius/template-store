@@ -110,6 +110,30 @@ describe('merchant store search', () => {
     const result = await loadStoreSearch('route', { search: async () => Array.from({ length: 25 }, (_, n) => hit('pages', `note-${n}`)), visibleProducts: products });
     expect(result.count).toBe(20); expect(result.limited).toBe(true);
   });
+  it('uses exact option matches only after no visible native results, without inventing a snippet', async () => {
+    const optionMatches = vi.fn(async () => [{ slug: 'camp-mug', title: 'Camp mug', options: [{ href: '/products/camp-mug?item=mug-blue', label: 'Color: Blue', availability: 'in-stock' as const }] }]);
+    const result = await loadStoreSearch('mug blue', { search: async () => [], visibleProducts: products, optionMatches });
+    expect(optionMatches).toHaveBeenCalledWith('mug blue');
+    expect(result.count).toBe(1); expect(result.state).toBe('results');
+    expect(result.groups[0].items[0]).toEqual({ title: 'Camp mug', href: '/products/camp-mug', parts: [] });
+    expect(result.optionMatches[0].options[0].href).toBe('/products/camp-mug?item=mug-blue');
+    optionMatches.mockClear();
+    await loadStoreSearch('mug', { search: async () => [hit('products', 'camp-mug')], visibleProducts: products, optionMatches });
+    await loadStoreSearch('map', { search: async () => [hit('pages', 'field-note-map')], visibleProducts: products, optionMatches });
+    await loadStoreSearch(' ', { search: vi.fn(), visibleProducts: products, optionMatches });
+    expect(optionMatches).not.toHaveBeenCalled();
+  });
+  it('does not present failed option discovery as a zero-result search', async () => {
+    const result = await loadStoreSearch('tee XL', { search: async () => [], visibleProducts: products, optionMatches: async () => { throw Error('Commerce unavailable'); } });
+    expect(result.state).toBe('unavailable'); expect(result.count).toBe(0); expect(result.optionMatches).toEqual([]);
+  });
+  it('bounds supplemental families and omits unsafe page destinations', async () => {
+    const result = await loadStoreSearch('XL', { search: async () => [], visibleProducts: products,
+      optionMatches: async () => [{ slug: '../admin', title: 'Bad', options: [] }, ...Array.from({ length: 22 }, (_, n) => ({ slug: `tee-${n}`, title: `Tee ${n}`, options: [] }))],
+    });
+    expect(result.count).toBe(20); expect(result.limited).toBe(true);
+    expect(JSON.stringify(result)).not.toContain('../admin');
+  });
   it('only links known collections and safe single-segment slugs', () => {
     expect(searchResultHref(hit('pages', 'home'))).toBe('/');
     expect(searchResultHref(hit('products', 'camp-mug'))).toBe('/products/camp-mug');

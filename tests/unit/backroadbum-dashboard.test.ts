@@ -2,6 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports option discovery as a merchant fallback, not a plugin release or new authority', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-option-search');
+    expect(report).toContain('data-option-search-history');
+    expect(report).toContain('Previous dispatch · The two-minute departure');
+    expect(report).toContain('When the native content index has no matches');
+    expect(report).toContain('sold-out option');
+    expect(report).toContain('no SKU, fuzzy-search or new price authority');
+    expect(report).toContain('/pr-proof/search-options/after-390-dark.png');
+    expect(report).toContain('this is merchant search, not a new plugin release');
+  });
   it('reports native editorial depth separately from commerce qualification', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('data-departure-note');
