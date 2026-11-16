@@ -1,5 +1,10 @@
 # Cart and checkout keyboard continuity
 
+## Product-detail retry ownership · November 16
+The browser-cart product-detail retry now stays focusable with `aria-disabled` / `aria-busy` while its existing pending guard refuses duplicate refreshes. A failed read retains that button; a successful read reaches the first product link, or the retained quantity when the product is unavailable, only if the retry still owns focus at completion. Immediate nearest scrolling keeps that owned control visible, while moved focus, exact saved sizes/quantities and invalid drafts remain intact.
+
+Run `pnpm exec playwright test -c playwright.backroadbum.config.ts backroadbum-cart-retry` from `repos/template-store`. Eight desktop/phone Light/Dark tests cover five outcomes each with synthetic outage/catalog responses and every unknown write blocked; no provider or merchant write is admitted. Evidence: `evidence/2026-11-16-cart-retry/`. This repairs the current 0.8-compatible merchant client, which current upstream server forms have replaced; do not transplant it into `backroadbum/server-cart-prep` or file an obsolete-client upstream PR.
+
 ## Native checkout submission · November 16
 The current 0.8-compatible merchant checkout uses a named native form so Enter in contact fields reaches the same custom corrections and guarded handoff as its submit button. The order manifest remains outside that form; auxiliary buttons cannot submit. Binding prevents native navigation before enabling the button, and no-script guidance hides the unbound form.
 

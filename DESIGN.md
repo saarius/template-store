@@ -184,6 +184,9 @@ The local product Add mutation is synchronous: do not transiently disable its bu
 ## Cart product-link continuity
 Cart and checkout keep each native product link attached while its name, destination and neighboring Commerce facts refresh. A tab return, quantity edit or catalog read must not replace an unchanged navigation target and drop keyboard focus to the document body; the next Tab still reaches Quantity. Changed prices and invalid drafts remain visible under the existing rules, with no focus restoration to a link that has legitimately disappeared and no new checkout authority.
 
+## Product-detail retry focus
+Keep the existing quiet Try again button in the keyboard order while snapshot refresh is pending, with `aria-disabled`, `aria-busy` and muted token ink; the existing request guard refuses repeat activation. Keep the owned target visible with immediate nearest scrolling, never an animated jump. A repeated refusal retains the same button; success moves to the first recovered product link (or retained quantity when no product link exists) only if the retry still owns focus at completion. Never return focus or scroll after the shopper moves elsewhere, and do not erase an invalid quantity draft or change the saved size/quantity. This is the current browser-cart presentation, not a policy to transplant into the native server-cart preparation.
+
 ## Saved-checkout status focus
 The asynchronous explicit status check keeps its native button focusable, with `aria-disabled` and `aria-busy` while the controller refuses reentry. A pending result preserves button focus for another keyboard check; a terminal result focuses the described status only if the disappearing button still owns focus. Automatic reads and shoppers who moved away never receive a forced focus change. The existing five-read limit keeps its explanation and a focusable unavailable control; it is not a new provider retry policy or server-receipt implementation.
 
