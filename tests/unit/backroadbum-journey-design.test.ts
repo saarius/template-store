@@ -11,21 +11,21 @@ describe('merchant journey presentation boundaries', () => {
     expect(page).toContain('import "../../features/guest-cart/receipt-print.css"');
     expect(page).toContain('import "../../features/guest-cart/receipt-screen.css"');
     expect(page).toContain('data-receipt-page');
-    const receipt = read('src/features/guest-cart/GuestCheckoutReturn.astro');
-    expect(receipt).toContain('data-guest-checkout-print');
-    expect(receipt).toContain('The page address alone cannot recover an order');
-    expect(receipt).toContain('data-guest-checkout-pending-review');
+    const print = read('src/features/guest-cart/receipt-print.css');
+    expect(print).toContain('@media print {');
+    expect(print).toContain('body[data-receipt-page]');
+    expect(print).toContain('.guest-checkout-item-thumb { display: none; }');
+    // Native receipt states and browser-print guidance are rendered in
+    // tests/presentation/native-journey.test.ts, not matched as legacy client markup.
   });
-  it('sizes address codes independently without changing contact field identities or country choices', () => {
+  it('sizes the native region and postal controls independently', () => {
     const checkout = read('src/features/guest-cart/GuestCheckout.astro');
     expect(checkout).toContain('width:min(100%,10rem)');
     expect(checkout).toContain('width:min(100%,14rem)');
     for (const kind of ['delivery', 'billing']) for (const field of ['region', 'postal-code']) {
-      expect(checkout).toContain(`data-guest-cart-${kind}-${field}`);
-      expect(checkout).toContain(`autocomplete="${kind === 'delivery' ? 'shipping' : 'billing'} ${field === 'region' ? 'address-level1' : 'postal-code'}"`);
+      expect(checkout).toContain(`[data-guest-cart-${kind}-${field}]`);
     }
-    expect(checkout).toContain('data-guest-cart-contact-error="delivery-postal-code"');
-    expect(checkout).toContain('<option value="US">United States</option>');
-    expect(checkout).toContain('4242 4242 4242 4242');
+    // Attribute identities, autocomplete, countries and associated corrections
+    // are checked against actual rendered controls by the presentation suite.
   });
 });

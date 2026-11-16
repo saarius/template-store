@@ -40,6 +40,7 @@ fi
 
 pnpm exec astro check
 pnpm exec vitest run
+pnpm test:presentation
 node --test tests/workflows/*.test.mjs
 node scripts/check-features.mjs
 node scripts/check-worktree-text.mjs

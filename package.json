@@ -43,6 +43,8 @@
     "typecheck": "astro check",
     "pretest": "pnpm prepare:sources",
     "test": "vitest run",
+    "pretest:presentation": "node scripts/prepare-source-deps.mjs",
+    "test:presentation": "vitest run --config vitest.presentation.config.ts",
     "pretest:e2e": "pnpm prepare:sources",
     "test:e2e": "playwright test",
     "audit:features": "node scripts/check-features.mjs",
