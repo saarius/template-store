@@ -1,5 +1,10 @@
 # Native product content and pictures
 
+## Full-size inspection · November 16
+The merchant gallery keeps its native desktop grid and phone snap strip, with an additional server-rendered group of full-size image links. Only resolved approved Commerce media becomes a link; placeholders do not. Each 48px link announces its image order, alt text and separate tab, preserving the shopping page without JavaScript, dialogs or commerce requests.
+
+`node scripts/verify-backroadbum-gallery.mjs` checks desktop/mobile with JavaScript on/off, opens both bandana originals with the keyboard and verifies one cap/three mug links while retaining price, metadata and browser cart intent. Evidence: workspace `evidence/2026-11-16-gallery-inspection/`; public captures: `/pr-proof/gallery-originals/`. This merchant-only affordance does not reopen the upstream gallery architecture or change media/CMS/catalog records.
+
 ## Details navigation · November 15
 Buying panels without a used native summary link now receive a Details & care shortcut; the tee keeps its authored measurement wording without a duplicate. The return link targets the product heading, and both directions use native fragments with scripts on or off. No summary, details block, media or Commerce field was edited; evidence: `evidence/2026-11-15-product-details-navigation/`.
 
