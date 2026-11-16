@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates actual private source reads from a signed upgrade or browser runtime proof', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-retained-storage');
+    expect(report).toContain('data-retained-storage-history');
+    expect(reviews).toContain('data-retained-storage-review');
+    expect(reviews).toContain('8215265');
+    expect(reviews).toContain('OS-level network isolation');
+    expect(reviews).toContain('not installed-artifact migration or original-browser rendering');
+    expect(report).toContain('three Regular/Sale pairs');
+    expect(report).toContain('the live store remains on Commerce 0.8.0');
+  });
   it('labels the public catalog fixture separately from real storage migration', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

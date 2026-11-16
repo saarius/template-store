@@ -4,11 +4,19 @@ The serving store still uses signed Commerce 0.8.0 and its existing browser-boun
 
 ## Owner Steer 6 release gates · November 15
 
-Registry discovery and GitHub tags rechecked November 16, 02:42 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
+Registry discovery and GitHub tags rechecked November 16, 03:25 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
 
 Stage A is explicitly authorized in an isolated worktree/database/port using the newest beta and matching upstream server-cart template. Qualify JS-off forms, enhanced cart, frozen/expired edges, tracking thank-you views, WebMCP and retained 0.8.0 capabilities; then prepare the Field Journal integration branch without deploying it. Preserve the shopper-session/prefill/validation safeguards from Template235/237/239.
 
 Stage B is pre-authorized only when a non-beta 0.9.x release is listed under the **same stable Registry id**. Take a verified DB/uploads/release/environment snapshot with rollback steps, upgrade that installed plugin in place through admin, and deploy the qualified paired theme during the same window. Verify ten prior Orders, retained receipts, feeds and account isolation before one guarded TEST1011 purchase. Persist a private 0600 completion guard and never replay it. These are owner gates, not a claim that Stage A or B has completed.
+
+## Actual merchant storage reads · November 16, 03:30 UTC
+
+Off-live preparation **8215265** adds `scripts/qualify-backroadbum-retained-storage.mjs --check --candidate=/path/to/built-clean-beta2`. It opens the fixed merchant SQLite file read-only with `query_only`, holds one consistent read transaction, uses the actual EmDash1.4.0 repository, traps non-read storage methods, binds no Payments host and refuses fetch. Original private TEST1009/1010 storage states are read only; no database/capability/URL arguments or private snapshot copies are accepted. Failures emit only the check phase and source line, never assertion values.
+
+All ten canonical Orders pass duplicate handoff and preserve frozen lines, contact, receipt identity and totals; current completion still matches. All eleven actual SKUs resolve with native sizes, three Regular/Sale pairs and the two backorders/one sold-out size. Original TEST1009/1010 capabilities return their own paid receipt, exact attempt and current fulfillment, while forged/foreign authority and mutations of paid carts are refused. Both original files and the transaction digest remain unchanged; five driver guards and thirteen candidate cart tests pass. The same check also passes under `sudo unshare --net runuser -u agent -- env -i PATH="$PATH" HOME="$HOME" node <script> --check --candidate=<source>`, which denies external networking at the OS boundary.
+
+This is **actual merchant source read compatibility**, not an applied SQLite/plugin migration, signed Registry installation, HTTP/browser rendering, hosted reconciliation or complete regression qualification. Commerce283's guest number/TEST projection gap remains. No live checkout, mail, profile, order or label operation occurs. Evidence: `evidence/2026-11-16-merchant-upgrade/qualification-network-isolated.json`; no TEST1011 attempt or completion guard exists.
 
 ## Public catalog cart qualification · November 16
 
