@@ -2,6 +2,23 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes provisional merchant queue preparation from live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-merchant-cart-queue');
+    expect(report).toContain('data-merchant-cart-queue-history');
+    expect(report).toContain('Previous dispatch · Queued cart changes');
+    expect(report).toContain('explicitly selected Light and Dark');
+    expect(report).toContain('only this report is deployed: live Commerce remains 0.8.0');
+    expect(reviews).toContain('data-merchant-cart-queue-review');
+    expect(reviews).toContain('off-live Field Journal 1e24719');
+    expect(reviews).toContain('real eight-write budget remains enabled');
+    expect(reviews).toContain('two inherited legacy markup assertions remain unresolved');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('/pr-proof/merchant-cart-queue/after-1440-light.png');
+      expect(source).toContain('/pr-proof/merchant-cart-queue/after-390-dark.png');
+    }
+  });
   it('separates the proposed queued-change repair from the deployed 0.8 cart', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
