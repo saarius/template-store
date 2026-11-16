@@ -54,6 +54,14 @@ const telemetrySchema = z.object({
       reasoning: metric, totalTokens: metric,
     })),
   })),
+  traffic: section(z.object({
+    schema: z.literal('backroadbum.traffic/v1'), since: timestamp, through: timestamp,
+    retentionDays: z.literal(90),
+    today: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+    last7Days: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+    last30Days: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER),
+  }).refine(value => value.today <= value.last7Days && value.last7Days <= value.last30Days &&
+    Date.parse(value.since) <= Date.parse(value.through))),
   // The existing recovery helper separately validates its own versioned shape.
   uploadRecovery: z.unknown().optional(),
 });
@@ -68,6 +76,12 @@ export function parseTelemetry(input: unknown): DashboardTelemetry | null {
 export function telemetryIsStale(status: DashboardTelemetry | null, now = Date.now()): boolean {
   if (!status || !Number.isFinite(now)) return true;
   const age = now - Date.parse(status.collectedAt);
+  return !Number.isFinite(age) || age < 0 || age > 180_000;
+}
+
+export function trafficIsStale(traffic: DashboardTelemetry['traffic'], now = Date.now()): boolean {
+  if (!traffic || !Number.isFinite(now)) return true;
+  const age = now - Date.parse(traffic.through);
   return !Number.isFinite(age) || age < 0 || age > 180_000;
 }
 

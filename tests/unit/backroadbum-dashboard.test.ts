@@ -414,7 +414,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
     expect(pulse).toContain("stale ? 'Stale advisory'");
     expect(pulse).toContain('not a payment');
-    expect(pulse).toContain('Aggregate counting is not wired yet');
+    expect(pulse).toContain('Page responses · 7 UTC days');
+    expect(pulse).toContain('Bot-filtered · repeat views included');
+    expect(pulse).toContain("trafficReady ? value(status?.traffic?.last7Days) : 'Unavailable'");
+    expect(source).toContain('not people, sessions or sales');
+    expect(source).toContain('Unique visitors / visitor orders');
     const css = readFileSync('src/features/experiment-report/dashboard.css', 'utf8');
     expect(css).toContain('font-variant-numeric:tabular-nums');
     expect(css).toContain('var(--dashboard-title)');

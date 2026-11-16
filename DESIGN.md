@@ -89,6 +89,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - A six-surface Before/After showcase links original1440px captures to final-phase Light/Dark desktop and390px phone captures. Media stays outside git. All five archived instruction versions, including Steer4, remain in date order and unchanged.
 - Dashboard components add no JavaScript. Navigation, disclosures, instructions and evidence work without scripting; only the existing shared appearance preference needs enhancement.
 
+## Traffic observations
+The fourth operations card reports recorded page responses for seven UTC dates, not visitors or orders. Reuse the existing tabular metric/status/disclosure primitives: a native privacy/method disclosure supplies today/seven/thirty-day counts, observation start and filtering limits, with unavailable text for missing or stale data rather than a fabricated zero. This adds no tracking script, identifier or new chart idiom; initialized zero, positive, stale and absent projections require separate checks.
+
 ## Server-cart preparation · off live
 The isolated `backroadbum/server-cart-prep` branch carries the same Field Journal token system onto upstream server forms, not a second visual direction. Keep the 1.618:1 contact/summary desktop split and summary-first phone layout,48px controls, proportional postal/region fields and tabular totals; native option inputs belong to the actual Add form, so the ordinary POST remains useful without JavaScript. The receipt uses the merchant screen/print surface instead of decorative stamps and barcodes. November15 scoped cart/checkout/receipt Light/Dark audits pass at390/1440 with synthetic Payments and generic products, excluding only the playground host toolbar/tour; original-browser recovery, real signed catalog/receipt visuals and complete regression qualification remain separate gates before deployment.
 

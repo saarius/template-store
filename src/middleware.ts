@@ -426,6 +426,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
       })
     : rawResponse;
   applySecurityHeaders(response.headers);
+  if (process.env.BACKROADBUM_MERCHANT_PROFILE === '1' && !isCloudflare && !isProofMode && !isPlayground) {
+    // Optional, best-effort aggregates never alter a response or retain requests.
+    try {
+      const { observeStoreTraffic } = await import('./features/experiment-report/traffic-ledger.server.js');
+      observeStoreTraffic(context.request, response);
+    } catch { /* Metrics must not affect shopping or checkout. */ }
+  }
   return response;
 });
 

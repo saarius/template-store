@@ -1,15 +1,16 @@
 ---
-import type { DashboardTelemetry } from './telemetry';
+import { trafficIsStale, type DashboardTelemetry } from './telemetry';
 interface Props { status: DashboardTelemetry | null; stale: boolean }
 const { status, stale } = Astro.props;
 const value = (n: unknown, suffix = '') => typeof n === 'number' && Number.isFinite(n) ? `${new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 }).format(n)}${suffix}` : 'Unavailable';
 const ready = status?.checkoutProbe?.outcome === 'ready-advisory';
+const trafficReady = !stale && !trafficIsStale(status?.traffic);
 ---
 <div class="dashboard-pulse" aria-label="Latest sampled operations" data-dashboard-pulse>
   <div><span>Store process</span><strong>{status?.services?.backroadbum ?? 'Unavailable'}</strong><small>{stale ? 'Sample stale or unavailable' : 'Latest minute sample'}</small></div>
   <div><span>Test checkout</span><strong>{!status?.checkoutProbe ? 'Unavailable' : stale ? 'Stale advisory' : ready ? 'Readiness supported' : 'Check needed'}</strong><small>Non-creating advisory · not a payment</small></div>
   <div><span>Memory in use</span><strong>{value(status?.host?.usedMiB, ' MiB')}</strong><small>Of {value(status?.host?.totalMiB, ' MiB')} on this host</small></div>
-  <div><span>Visitor / order counts</span><strong>Unavailable</strong><small>Aggregate counting is not wired yet</small></div>
+  <div data-traffic-pulse><span>Page responses · 7 UTC days</span><strong>{trafficReady ? value(status?.traffic?.last7Days) : 'Unavailable'}</strong><small>Bot-filtered · repeat views included</small></div>
 </div>
 <div class="dashboard-brief">
   <div><h3>What’s running</h3><p>Seven product families, two collections and seven field notes, backed by EmDash. Commerce owns prices and availability; guest carts, retained receipts and hosted Stripe TEST checkout are live.</p><p>Signed Registry plugins: Commerce <strong>0.8.0</strong>, Payments <strong>0.5.0</strong>, Ship <strong>0.3.1</strong>. No local cloud-service replicas are serving.</p></div>
