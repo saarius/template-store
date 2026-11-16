@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports current local data recovery without claiming new-host or hosted restoration', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-current-recovery');
+    expect(report).toContain('data-current-recovery-history');
+    expect(report).toContain('Previous dispatch · Product option search');
+    expect(report).toContain('eight published Field Notes rendering');
+    expect(report).toContain('ten ready-media hashes offline');
+    expect(report).toContain('all scoped business, plugin-storage and media rows remain unchanged');
+    expect(report).toContain('not a new-host restore, admin sign-in, TLS recovery or hosted-payment qualification');
+  });
   it('reports option discovery as a merchant fallback, not a plugin release or new authority', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('data-option-search');

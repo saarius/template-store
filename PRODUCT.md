@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Current archive recovery · November16
+The opt-in isolated runtime drill now reads every archived published Field Note and the passive agent feed, while retaining its fixed public-page, encrypted-settings, media and business-row checks. The latest completed archive preserves ten Orders and twelve CMS pages; eight notes render and the feed serves seven families/eleven members, without hosted access or commerce writes. Deployed code and dependencies are reused, so this is local data recovery—not a self-contained new-host restore or a paid-checkout qualification.
+
 ## Search by product option · November16
 A real “tee XL” search returned nothing, so an empty native result now checks exact public option values on published, Commerce-visible products. The result keeps each concrete member’s own availability and selected-item link: tee XL is sold out, fleece XL is backordered. Native content results, ranking and previews stay first; no fuzzy matching, SKU promise, indexed price, stock alias or new catalog authority is introduced.
 

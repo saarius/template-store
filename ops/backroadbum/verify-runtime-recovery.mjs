@@ -11,12 +11,44 @@ import { inspectEmDashCopy } from './verify-emdash-recovery.mjs';
 const root = '/var/lib/backroadbum';
 const origin = 'http://127.0.0.1:4399';
 const catalogPath = '/_emdash/api/plugins/r_gshdrqaldna3r7sn/catalog/public';
+const feedPath = '/feeds/agent-catalog.json';
+const noteSlug = /^field-note-[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export const publicPaths = ['/', '/shop', '/products/creekside-camp-mug', '/products/long-way-cap', '/field-notes', '/cart'];
 
-export function runtimeRecoveryRequestAllowed(input, method = 'GET') {
+/** Only current published journal routes; never turn archived slugs into arbitrary API reads. */
+export function recoveryFieldNotePaths(rows) {
+  const notes = rows.filter(row => row.status === 'published' && row.deleted_at === null &&
+    typeof row.slug === 'string' && row.slug.startsWith('field-note-'));
+  assert.ok(notes.length <= 32, 'Bounded journal recovery reads required');
+  assert.ok(notes.every(row => row.slug.length <= 160 && noteSlug.test(row.slug)), 'Unsafe journal slug');
+  const paths = notes.map(row => '/' + row.slug).sort();
+  assert.equal(new Set(paths).size, paths.length, 'Ambiguous journal routes');
+  return paths;
+}
+
+/** Count the actual feed envelope, whose variants are an object, not an array. */
+export function recoveryFeedCounts(feed) {
+  assert.ok(Array.isArray(feed?.products) && feed.products.length <= 200, 'Bounded agent feed required');
+  const products = feed.products;
+  const ids = products.map(product => product.id);
+  const members = products.flatMap(product => {
+    if (product.variants === undefined) return [product.id];
+    assert.ok(Array.isArray(product.variants?.members) && product.variants.members.length > 0 &&
+      product.variants.members.length <= 200, 'Concrete feed members required');
+    return product.variants.members.map(member => member.catalogItemId);
+  });
+  for (const group of [ids, members]) {
+    assert.ok(group.every(id => typeof id === 'string' && /^[A-Za-z0-9._-]{1,128}$/.test(id)), 'Public identity required');
+    assert.equal(new Set(group).size, group.length, 'Duplicate public identity');
+  }
+  return { products: products.length, members: members.length };
+}
+
+export function runtimeRecoveryRequestAllowed(input, method = 'GET', fieldNotePaths = []) {
   const url = new URL(input, origin);
-  return method === 'GET' && url.origin === origin && !url.search &&
-    (publicPaths.includes(url.pathname) || url.pathname === catalogPath || url.pathname === '/_emdash/admin' ||
+  return method === 'GET' && url.origin === origin && !url.search && !url.hash && !url.username && !url.password &&
+    (publicPaths.includes(url.pathname) || url.pathname === catalogPath || url.pathname === feedPath ||
+      noteSlug.test(url.pathname.slice(1)) && fieldNotePaths.includes(url.pathname) || url.pathname === '/_emdash/admin' ||
       /^\/_emdash\/api\/media\/file\/[a-zA-Z0-9._/-]+$/.test(url.pathname) && !url.pathname.includes('..'));
 }
 
@@ -46,9 +78,11 @@ export async function inspectRuntimeCopy() {
   };
   const before = snapshot();
   const db = new DatabaseSync(`${root}/content.db`, { readOnly: true });
-  let media;
-  try { media = db.prepare("SELECT storage_key,size,content_hash FROM media WHERE status='ready' ORDER BY id LIMIT 1").get(); }
-  finally { db.close(); }
+  let media, fieldNotePaths;
+  try {
+    media = db.prepare("SELECT storage_key,size,content_hash FROM media WHERE status='ready' ORDER BY id LIMIT 1").get();
+    fieldNotePaths = recoveryFieldNotePaths(db.prepare('SELECT slug,status,deleted_at FROM ec_pages').all());
+  } finally { db.close(); }
   assert.ok(media, 'Ready media required');
   const child = spawn('/opt/node/bin/node', ['ops/backroadbum/start-store.mjs', `${root}/restored-release/server/entry.mjs`], {
     cwd: process.cwd(), stdio: 'ignore', env: { ...process.env, HOST: '127.0.0.1', PORT: '4399',
@@ -58,7 +92,7 @@ export async function inspectRuntimeCopy() {
   child.once('exit', (code, signal) => { exited = { code, signal }; });
   child.once('error', () => { exited = { code: 1, signal: null }; });
   async function get(path) {
-    assert.equal(runtimeRecoveryRequestAllowed(path), true);
+    assert.equal(runtimeRecoveryRequestAllowed(path, 'GET', fieldNotePaths), true);
     return fetch(new URL(path, origin), { redirect: 'manual', signal: AbortSignal.timeout(15000) });
   }
   try {
@@ -79,6 +113,19 @@ export async function inspectRuntimeCopy() {
       assert.match(html, /Backroad Bum/);
       pages.push({ surface: path === '/' ? 'home' : path.split('/').at(-1), http: response.status });
     }
+    for (const path of fieldNotePaths) {
+      const response = await get(path);
+      assert.equal(response.status, 200, 'Archived published journal page must render');
+      const html = await response.text();
+      assert.match(html, /<h1[\s>]/);
+      assert.match(html, /Backroad Bum/);
+      assert.ok(html.includes(`data-cms-page="${path.slice(1)}"`), 'Requested CMS page required');
+      assert.ok(html.includes('data-field-note-page'), 'Journal reading shell required');
+    }
+    const feedResponse = await get(feedPath);
+    assert.equal(feedResponse.status, 200);
+    assert.match(feedResponse.headers.get('content-type') ?? '', /application\/json/);
+    const agentCatalog = recoveryFeedCounts(await feedResponse.json());
     const catalogResponse = await get(catalogPath);
     assert.equal(catalogResponse.status, 200);
     const catalog = await catalogResponse.json();
@@ -103,7 +150,10 @@ export async function inspectRuntimeCopy() {
     return { schema: 'backroadbum.runtime-recovery-check/v1', checkedAt: new Date().toISOString(),
       outboundNetwork: 'isolated', liveFilesReplaced: false, hostPrivateConfigurationHidden: true,
       archivedCredentialDecryption: credentials.decryption, encryptedPlugins: credentials.encryptedPlugins,
-      pages, catalogProducts: catalog.data.products.length, catalogRegistryRuntime: 'ok',
+      pages, fieldNotePagesVerified: fieldNotePaths.length, agentCatalog,
+      businessCollectionsRetained: Object.fromEntries(Object.entries(before)
+        .filter(([, value]) => value.source !== 'runtime-table').map(([name, value]) => [name, value.count])),
+      catalogProducts: catalog.data.products.length, catalogRegistryRuntime: 'ok',
       mediaHttpAndHash: 'ok', anonymousAdminRequiresSignIn: true, adminSignInTested: false,
       businessRowsUnchanged: true, allPluginStorageAndMediaRowsUnchanged: true,
       ordersRetained: before.orders.count, runtimeDrain: 'ok',
