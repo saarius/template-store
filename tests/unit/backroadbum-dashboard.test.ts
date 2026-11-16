@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('labels the concurrent server-cart report as an unfixed staging bug, not a live checkout failure', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-server-cart-concurrency');
+    expect(report).toContain('data-server-cart-concurrency-history');
+    expect(report).toContain('Previous dispatch · Cart recovery');
+    expect(report).toContain('workaround, not a repair');
+    expect(report).toContain('only this report ships on stable 0.8.0');
+    expect(reviews).toContain('https://github.com/dinkuskit/template-store/issues/242');
+    expect(reviews).toContain('No fix branch or PR exists yet');
+    expect(reviews).toContain('no checkout, order or hosted-service mutation occurred');
+  });
   it('labels bounded qualification teardown as operator-only, not another checkout qualification', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('data-qualification-cleanup');

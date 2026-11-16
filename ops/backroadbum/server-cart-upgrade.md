@@ -2,6 +2,12 @@
 
 The serving store still uses signed Commerce 0.8.0 and its existing browser-bound recovery. As observed November15, Template #229 is merged in upstream/main167d736, pinning Commerce0.9.0-beta.1; Commerce #272 is also merged. Those source acceptances do not upgrade this store: the paired server-cart migration, same-ID signed upgrade and retained browsers still need coordinated qualification. A fresh signed beta installation is now qualified separately below. Do not merge that new template runtime into the signed0.8.0 store alone or discard original browser capabilities. A merchant-only recovery adapter is source-qualified below, but **not enabled**. Preserve PR237’s late-profile prefill guard when integrating the rewritten checkout.
 
+## Concurrent enhanced updates · November 16, 15:34 UTC
+
+[Template issue242](https://github.com/dinkuskit/template-store/issues/242) records an unfixed browser presentation race on unchanged main167d736 and merchant prep6995d9a, both with actually Registry-installed beta2. Two overlapping quantity changes save2/3 and$102 in Commerce, but the second handler replaces the already-detached old section, leaving2/1 and$66 beside badge5. Response delivery is paused for deterministic timing; requests, returned HTML and cookies are real. Desktop/phone captures and exact output: `evidence/2026-11-16-server-cart-concurrency/` and `/pr-proof/server-cart-concurrency/`.
+
+Reload is the verified workaround, not a repair. A future focused fix should reconcile accepted concurrent changes and preserve ordinary sequential/plain-form behavior; no implementation policy has been accepted. This finding does not change the owner's stable-release trigger or authorize a beta-ID live cutover. The live0.8 browser-cart implementation is different and was not changed; no checkout/payment/order/consent was created or copied. A historical fixture's shutdown hung after its assertions completed; the orphan was explicitly killed and the unchanged-main rerun exited0 after bounded teardown. Prefer the already-qualified transient-systemd helper for a reusable verifier rather than reviving that one-off stop helper.
+
 ## Owner Steer 6 release gates · November 15
 
 Registry discovery and GitHub tags rechecked November 16, 07:24 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
