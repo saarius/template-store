@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Reading from the gear shelf · November16
+The Field Book now leads to its notebook prompts and the Field Tote to the road-day reset, using the published notes’ actual product links. A quiet reading shelf sits after product details, before related gear; products without a genuine match gain no shelf. Native keyboard/script-free round trips preserve Commerce facts, browser intent and existing collection reading; no CMS, catalog or order edit is involved.
+
 ## Current archive recovery · November16
 The opt-in isolated runtime drill now reads every archived published Field Note and the passive agent feed, while retaining its fixed public-page, encrypted-settings, media and business-row checks. The latest completed archive preserves ten Orders and twelve CMS pages; eight notes render and the feed serves seven families/eleven members, without hosted access or commerce writes. Deployed code and dependencies are reused, so this is local data recovery—not a self-contained new-host restore or a paid-checkout qualification.
 

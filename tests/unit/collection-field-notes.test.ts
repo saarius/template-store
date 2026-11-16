@@ -15,6 +15,17 @@ describe('Collection reading from native published links', () => {
     expect(collectionFieldNotes(entries, new Set(['/products/camp-mug']))).toEqual([]);
     expect(entries).toEqual(before);
   });
+  it('matches a single product without admitting sibling or prefix relationships', async () => {
+    const entries = [page('field-note-book'), page('field-note-tote', [block('/products/field-tote')]),
+      page('field-note-long-book', [block('/products/field-book-large')])];
+    const read = vi.fn(async () => entries);
+    expect((await loadCollectionFieldNotes(new Set(['/products/field-book']), false, read)).map(note => note.slug)).toEqual(['field-note-book']);
+    expect((await loadCollectionFieldNotes(new Set(['/products/field-tote']), false, read)).map(note => note.slug)).toEqual(['field-note-tote']);
+    expect(await loadCollectionFieldNotes(new Set(['/products/no-note']), false, read)).toEqual([]);
+    const calls = read.mock.calls.length;
+    expect(await loadCollectionFieldNotes(new Set(['/products/field-book']), true, read)).toEqual([]);
+    expect(read).toHaveBeenCalledTimes(calls);
+  });
   it('excludes unused definitions, empty or non-span links and wrong mark keys', () => {
     for (const children of [[], [{ _type: 'span', text: 'No link' }], [{ _type: 'span', text: ' ', marks: ['gear'] }],
       [{ _type: 'image', text: 'Not a span', marks: ['gear'] }], [{ _type: 'span', text: 'Gear', marks: ['other'] }], [null]]) {
