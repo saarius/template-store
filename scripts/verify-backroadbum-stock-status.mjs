@@ -42,7 +42,9 @@ try {
         ['last-light-fleece', 'Available on backorder', 'available-on-backorder', true],
         ['wrong-turn-tee', 'Out of stock', 'out-of-stock', false],
       ]) {
-        expect((await page.goto(`${base}/products/${slug}`)).status()).toBe(200);
+        const response = await page.goto(`${base}/products/${slug}`);
+        expect(response.status()).toBe(200);
+        expect(await response.text()).toMatch(/data-product-status[^>]*role="status"[^>]*aria-atomic="true"/);
         await expect(page.locator('[data-variant-picker-ready]')).toHaveCount(1);
         const status = page.locator('[data-product-status]'), originalStatus = await status.elementHandle();
         await expect(status).toHaveAttribute('role', 'status');
@@ -53,6 +55,7 @@ try {
         const xlMember = members.find(member => member.values.Size === 'XL');
         expect(xlMember).toBeDefined();
         const originalPrice = await page.locator('[data-product-price]').innerText();
+        const preparedMetadata = JSON.parse(await page.locator('[data-variant-product-jsonld]').textContent());
         const cart = JSON.stringify({ version: 1, lines: [{ id: members[0].id, quantity: 2 }] });
         await page.evaluate(value => localStorage.setItem('dinkus.guest-cart.v1', value), cart);
         const xl = page.getByRole('radio', { name: sellable ? 'XL' : 'XL (sold out)', exact: true });
@@ -68,7 +71,9 @@ try {
         expect(new URL(page.url()).searchParams.get('item')).toBe(xlMember.id);
         expect(await page.locator('[data-product-price]').innerText()).toBe(originalPrice);
         const selectedData = JSON.parse(await page.locator('[data-product-jsonld]').textContent());
-        expect(selectedData.offers.availability).toBe(`https://schema.org/${sellable ? 'BackOrder' : 'OutOfStock'}`);
+        // Signed Commerce 0.8 omits some member SKUs, so their prepared blocks
+        // intentionally omit Offers rather than borrow the default member's identity.
+        expect(selectedData).toEqual(preparedMetadata[xlMember.id]);
         // Arrow-key navigation updates the same live region and keeps native radio focus.
         await page.keyboard.press('ArrowLeft');
         await expect(page.getByRole('radio', { name: 'L', exact: true })).toBeChecked();
