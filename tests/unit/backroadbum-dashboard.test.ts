@@ -2,6 +2,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('labels the public catalog fixture separately from real storage migration', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-public-catalog-cart');
+    expect(report).toContain('data-public-catalog-cart-history');
+    expect(reviews).toContain('data-public-catalog-cart-review');
+    expect(reviews).toContain('b599c9f');
+    expect(reviews).toContain('Four omitted child SKUs use explicit fixture aliases');
+    expect(reviews).toContain('Stable remains 0.8.0');
+    expect(report).toContain('this is not storage migration, signed-plugin or hosted payment proof');
+  });
   it('keeps receipt artwork staging and missing canonical identity separate from live migration', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

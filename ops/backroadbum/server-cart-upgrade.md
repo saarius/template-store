@@ -4,19 +4,17 @@ The serving store still uses signed Commerce 0.8.0 and its existing browser-boun
 
 ## Owner Steer 6 release gates · November 15
 
-Registry discovery and GitHub tags rechecked November 15, 23:14 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
+Registry discovery and GitHub tags rechecked November 16, 02:42 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
 
 Stage A is explicitly authorized in an isolated worktree/database/port using the newest beta and matching upstream server-cart template. Qualify JS-off forms, enhanced cart, frozen/expired edges, tracking thank-you views, WebMCP and retained 0.8.0 capabilities; then prepare the Field Journal integration branch without deploying it. Preserve the shopper-session/prefill/validation safeguards from Template235/237/239.
 
 Stage B is pre-authorized only when a non-beta 0.9.x release is listed under the **same stable Registry id**. Take a verified DB/uploads/release/environment snapshot with rollback steps, upgrade that installed plugin in place through admin, and deploy the qualified paired theme during the same window. Verify ten prior Orders, retained receipts, feeds and account isolation before one guarded TEST1011 purchase. Persist a private 0600 completion guard and never replay it. These are owner gates, not a claim that Stage A or B has completed.
 
-## Optional public receipt artwork · November 16, 02:10 UTC
+## Public catalog cart qualification · November 16
 
-Off-live `backroadbum/server-cart-prep` **9e4176c** shares missing-artwork enrichment between server thank-you and explicit retained receipt reads. It resolves exact paid item IDs through Commerce's public catalog and native Media Library; missing/unpublished/unsafe/oversized media or catalog failure cannot replace frozen names, variants, SKUs, quantities or money. Default `status-v1` stays unchanged. Optional canonical numbers render only when supplied; no number or TEST fact is inferred from a UUID.
+Off-live preparation **b599c9f** adds `scripts/qualify-backroadbum-catalog-cart.mjs`. Run it with `--check --candidate=/path/to/built-clean-commerce`; it fetches only the fixed anonymous merchant catalog URL, writes only disposable SQLite, and removes that fixture afterward. Owning beta2 catalog/cart APIs preserve exact IDs, effective prices and sizes across seven families/eleven members: ten sellable two-unit synthetic checkouts succeed, including Fleece XL and Tote backorders, while Tee XL is refused by ID and choice. Unknown choices retain saved intent; checkout freezes carts and retains choices/totals.
 
-Actual old-kernel disposable purchases and source beta2 pass all four390/1440 Light/Dark browser contexts: native fixture image really loads, $32 remains frozen despite current $14 pricing, original storage and the separate new-cart cookie stay unchanged, cross-tab revocation works and print retains paid text but excludes artwork. The painted snapshot auditor has zero findings;124 focused units and the full524-file Astro check pass. This is authored fixture art, not qualification of seven real merchant products or original live browsers. Evidence: `evidence/2026-11-16-cart-merchant/`.
-
-The same run confirms a numbered canonical TEST order but no guest number/test fields; an independent signed0.8 read confirms that gap live. [Commerce283](https://github.com/dinkuskit/commerce/issues/283) is a capability request, not an implemented repair or release blocker. Stable Registry still lists0.8.0; Stage B is not available and TEST1011 was not attempted.
+Four omitted child SKUs use explicitly synthetic aliases; only effective prices are available, not authoritative Regular/Sale storage. Fourteen driver tests and thirteen unchanged candidate cart tests pass on Node24.22.2. This is public-projection source-kernel evidence, not actual database/Orders migration, signed Registry/HTTP/browser qualification or hosted Payments. Evidence: `evidence/2026-11-16-catalog-cart/`. The live plugin, capabilities, records and hosted settings remain unchanged; Stage B is unavailable.
 
 ## Optional public receipt artwork · November 16, 02:10 UTC
 
