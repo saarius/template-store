@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { observationTime, parseTelemetry, telemetryIsStale } from '../../src/features/experiment-report/telemetry';
+import { observationTime, parseTelemetry, telemetryIsStale, trafficIsStale } from '../../src/features/experiment-report/telemetry';
 
 const collectedAt = '2026-11-15T02:40:00Z';
 const now = Date.parse(collectedAt);
@@ -71,6 +71,22 @@ describe('public dashboard telemetry boundary', () => {
     expect(telemetryIsStale(result, now - 1)).toBe(true);
     expect(telemetryIsStale(null, now)).toBe(true);
     expect(telemetryIsStale(result, NaN)).toBe(true);
+  });
+  it('distinguishes an initialized zero from absent or stale traffic and strips private extras', () => {
+    const traffic = { schema: 'backroadbum.traffic/v1', since: collectedAt, through: collectedAt,
+      retentionDays: 90, today: 0, last7Days: 0, last30Days: 0, privateExtra: 'not-for-the-view' };
+    const result = parseTelemetry({ ...sample, traffic });
+    expect(result?.traffic?.last7Days).toBe(0);
+    expect(result?.traffic).not.toHaveProperty('privateExtra');
+    expect(trafficIsStale(result?.traffic, now)).toBe(false);
+    expect(trafficIsStale(result?.traffic, now + 180_001)).toBe(true);
+    expect(trafficIsStale(result?.traffic, now - 1)).toBe(true);
+    expect(trafficIsStale(undefined, now)).toBe(true);
+    expect(trafficIsStale(null, NaN)).toBe(true);
+    for (const extra of [{ today: -1 }, { today: 1.5 }, { last7Days: '0' }, { today: 3, last7Days: 2 },
+      { last7Days: 3, last30Days: 2 }, { retentionDays: 365 }, { schema: 'future' }, { since: '2099-01-01T00:00:00Z' }]) {
+      expect(parseTelemetry({ ...sample, traffic: { ...traffic, ...extra } })?.traffic).toBeNull();
+    }
   });
   it('formats UTC observation times without throwing on missing/bad dates', () => {
     expect(observationTime(collectedAt)).toContain('02:40:00');

@@ -2,6 +2,152 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('labels bounded qualification teardown as operator-only, not another checkout qualification', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-qualification-cleanup');
+    expect(report).toContain('data-qualification-cleanup-history');
+    expect(report).toContain('Previous dispatch · Installed beta, complete theme');
+    expect(report).toContain('https://github.com/saarius/template-store/commit/dfeb50d');
+    expect(report).toContain('operator-tool repair, not another commerce qualification');
+    expect(report).toContain('only reporting ships here, and Commerce stays on stable 0.8.0');
+  });
+  it('separates the Registry-installed whole storefront from stable in-place upgrade and hosted payment', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-installed-storefront');
+    expect(report).toContain('data-installed-storefront-history');
+    expect(report).toContain('Previous dispatch · Real Registry installation');
+    expect(report).toContain('The installed plugin. The whole storefront.');
+    expect(report).toContain('with no source sandbox mount');
+    expect(report).toContain('not an in-place upgrade or hosted purchase');
+    expect(reviews).toContain('data-installed-storefront-review');
+    expect(reviews).toContain('no Orders, hosted consents or Payments are copied or created');
+    expect(reviews).toContain('only reporting ships on stable 0.8.0');
+    expect(reviews).toContain('/pr-proof/installed-storefront/cart-desktop-light.jpg');
+  });
+  it('separates a real fresh Registry install from an in-place stable upgrade', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-registry-install');
+    expect(report).toContain('data-registry-install-history');
+    expect(report).toContain('Previous dispatch · Merchant HTTPS rehearsal');
+    expect(report).toContain('Verified release. Installed for real.');
+    expect(report).toContain('not an in-place stable upgrade');
+    expect(report).toContain('only reporting ships here while stable remains 0.8.0');
+    expect(reviews).toContain('data-registry-install-review');
+    expect(reviews).toContain('130929-byte backend hash exactly matches');
+    expect(reviews).toContain('no Orders, hosted consents or Payments');
+    expect(reviews).toContain('/pr-proof/commerce-beta-registry/verified-consent.jpg');
+  });
+  it('distinguishes full-source HTTPS qualification from signed installation and hosted payment', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-storefront-https');
+    expect(report).toContain('data-storefront-https-history');
+    expect(report).toContain('Previous dispatch · Original saved receipts');
+    expect(report).toContain('Real forms. A private proving ground.');
+    expect(reviews).toContain('data-storefront-https-review');
+    expect(reviews).toContain('7465e73');
+    expect(reviews).toContain('not production configuration or a signed installation');
+    expect(reviews).toContain('no Payments/hosted consents are copied');
+    expect(report).toContain('/pr-proof/merchant-storefront-https/cart-desktop-light.jpg');
+    expect(report).toContain('signed stable remains 0.8.0');
+  });
+  it('labels original saved-state sandbox journeys separately from a signed migration', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-installed-retained');
+    expect(report).toContain('data-installed-retained-history');
+    expect(reviews).toContain('data-installed-retained-review');
+    expect(reviews).toContain('88bf394');
+    expect(reviews).toContain('not a signed installation, applied upgrade or hosted payment');
+    expect(report).toContain('/pr-proof/merchant-retained-runtime/desktop-light.jpg');
+    expect(report).toContain('the live store stays on Commerce 0.8.0');
+  });
+  it('separates actual private source reads from a signed upgrade or browser runtime proof', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-retained-storage');
+    expect(report).toContain('data-retained-storage-history');
+    expect(reviews).toContain('data-retained-storage-review');
+    expect(reviews).toContain('8215265');
+    expect(reviews).toContain('OS-level network isolation');
+    expect(reviews).toContain('not installed-artifact migration or original-browser rendering');
+    expect(report).toContain('three Regular/Sale pairs');
+    expect(report).toContain('the live store remains on Commerce 0.8.0');
+  });
+  it('labels the public catalog fixture separately from real storage migration', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-public-catalog-cart');
+    expect(report).toContain('data-public-catalog-cart-history');
+    expect(reviews).toContain('data-public-catalog-cart-review');
+    expect(reviews).toContain('b599c9f');
+    expect(reviews).toContain('Four omitted child SKUs use explicit fixture aliases');
+    expect(reviews).toContain('Stable remains 0.8.0');
+    expect(report).toContain('this is not storage migration, signed-plugin or hosted payment proof');
+  });
+  it('keeps receipt artwork staging and missing canonical identity separate from live migration', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-receipt-artwork-dispatch');
+    expect(report).toContain('data-receipt-artwork-history');
+    expect(report).toContain('data-receipt-identity-report');
+    expect(report).toContain('Previous dispatch · Concrete feed candidate');
+    expect(report).toContain('https://github.com/dinkuskit/commerce/issues/283');
+    expect(report).toContain('Only this report is deployed');
+    expect(reviews).toContain('merchant preparation 9e4176c');
+    expect(reviews).toContain('124 focused units');
+    expect(reviews).toContain('not original live Orders, signed installation or a complete regression matrix');
+  });
+  it('keeps the concrete feed source candidate separate from the signed live exports', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('Every size. Its own row.');
+    expect(report).toContain('Previous dispatch · Feed member projection');
+    expect(report).toContain('data-feed-member-candidate-history');
+    expect(report).toContain('https://github.com/dinkuskit/commerce/pull/282');
+    expect(reviews).toContain('fork 07e68fe');
+    expect(reviews).toContain('five-row XML/CSV exports');
+    expect(reviews).toContain('885 unit/workflow and 111 integration cases');
+    expect(reviews).toContain('All eleven exact-head GitHub checks pass');
+    expect(reviews).toContain('hosts still need to wire selected URLs');
+  });
+  it('distinguishes the compiled feed-member report from the native control candidate', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('Eleven members. Five feed rows.');
+    expect(report).toContain('Previous dispatch · Earlier-checkout recovery');
+    expect(report).toContain('data-feed-member-report');
+    expect(report).toContain('<article class="cycle-entry" data-feed-member-history>');
+    expect(report).toContain('<h3>November 15, 2026 · Earlier-checkout recovery</h3>');
+    expect(report).toContain('https://github.com/dinkuskit/commerce/issues/281');
+    expect(report).toContain('Open bug report, not an implemented repair');
+    expect(report).toContain('supplying a family price still loses four sizes');
+    expect(report).toContain('separately from feed-control PR #280');
+    expect(reviews).toContain('unchanged compiled main');
+  });
+  it('separates disposable earlier-checkout recovery from original live browsers and signed cutover', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('A new cart. Your earlier receipt.');
+    expect(report).toContain('Previous dispatch · Field Journal cart preparation');
+    expect(report).toContain('only this report is deployed');
+    expect(report).toContain('actual 0.8.0-kernel disposable purchases');
+    expect(reviews).toContain('merchant preparation d64e2d1');
+    expect(reviews).toContain('not an upstream proposal or deployment');
+    expect(reviews).toContain('111 focused units');
+    expect(reviews).toContain('does not qualify the real ten Orders');
+    expect(reviews).toContain('/pr-proof/retained-receipt-prep/paid-390-dark.png');
+  });
+  it('keeps Field Journal cart preparation visibly off live', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('Same journal. A new cart underneath.');
+    expect(report).toContain('backroadbum/server-cart-prep');
+    expect(report).toContain('Original-browser receipt handoff, the signed stable upgrade and the complete regression matrix remain unqualified');
+    expect(report).toContain('not a hosted purchase');
+    expect(report).toContain('Previous dispatch · Native feed control repair');
+  });
   it('separates the native feed control candidate from live release and serializer readiness', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -20,7 +166,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('source-built staging with synthetic Payments');
     expect(report).toContain('not a signed upgrade or a live checkout');
     expect(report).toContain('development-server suite failed during fixture setup');
-    expect(report).toContain('original-browser handoff and signed artifact qualification remain unfinished');
+    expect(report).toContain('original live browsers, the complete regression matrix and signed merchant artifact qualification remain unfinished');
   });
   it('separates populated JSON proof from native controls and incomplete Google/Meta exports', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
@@ -268,7 +414,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
     expect(pulse).toContain("stale ? 'Stale advisory'");
     expect(pulse).toContain('not a payment');
-    expect(pulse).toContain('Aggregate counting is not wired yet');
+    expect(pulse).toContain('Page responses · 7 UTC days');
+    expect(pulse).toContain('Bot-filtered · repeat views included');
+    expect(pulse).toContain("trafficReady ? value(status?.traffic?.last7Days) : 'Unavailable'");
+    expect(source).toContain('not people, sessions or sales');
+    expect(source).toContain('Unique visitors / visitor orders');
     const css = readFileSync('src/features/experiment-report/dashboard.css', 'utf8');
     expect(css).toContain('font-variant-numeric:tabular-nums');
     expect(css).toContain('var(--dashboard-title)');

@@ -1,4 +1,16 @@
-# Cart product-link continuity
+# Cart and checkout keyboard continuity
+
+## Native checkout submission · November 16
+The current 0.8-compatible merchant checkout uses a named native form so Enter in contact fields reaches the same custom corrections and guarded handoff as its submit button. The order manifest remains outside that form; auxiliary buttons cannot submit. Binding prevents native navigation before enabling the button, and no-script guidance hides the unbound form.
+
+Run `pnpm exec playwright test -c playwright.backroadbum.config.ts backroadbum-checkout-keyboard` from `repos/template-store`. Ten desktop/phone Light/Dark checks cover blank/malformed email, valid pointer/Enter submission, duplicate in-flight refusal, synthetic provider rejection and JavaScript-off guidance; every write is intercepted. This is browser interaction proof, not a new Stripe purchase, physical mobile keyboard or screen-reader qualification. Evidence: `evidence/2026-11-16-checkout-navigation/`; no upstream submission because current upstream already uses native server forms.
+
+## Product option stock feedback · November 16
+Keyboard selection of fleece XL exposed a plain paragraph after changing its visible stock message to Available on backorder; Chromium reported no live-region properties. The merchant PDP now renders the existing variant-stock paragraph as `role=status` with `aria-atomic=true` before any option changes, retaining the same node and native radio focus. Static simple-product stock stays unchanged.
+
+Run `node scripts/verify-backroadbum-stock-status.mjs` from `repos/template-store`. It checks fleece XL backorder and tee XL sold-out transitions, arrow-key recovery to L, actual Chromium polite/atomic accessibility properties, selected member/price/JSON-LD/cart intent and the simple mug at1440/390 Light/Dark, blocking all non-GET traffic. This supplies browser semantics without asserting NVDA/VoiceOver speech or physical-device qualification; evidence is in workspace `evidence/2026-11-16-variant-stock-feedback/`.
+
+## Retained cart links
 
 ## Product option stock feedback · November 16
 Keyboard selection of fleece XL exposed a plain paragraph after changing its visible stock message to Available on backorder; Chromium reported no live-region properties. The merchant PDP now renders the existing variant-stock paragraph as `role=status` with `aria-atomic=true` before any option changes, retaining the same node and native radio focus. Static simple-product stock stays unchanged.
