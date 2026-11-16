@@ -46,6 +46,10 @@ export async function proveRetainedReceipt({ merchant, origin, scenarios, artifa
         if (scenario.state === 'paid') {
           await expect(page.locator('[data-retained-order]')).toBeVisible();
           await expect(page.locator('[data-retained-order]')).toContainText('$32.00');
+          await expect(page.locator('[data-retained-order]')).toContainText('Fixture cap × 2');
+          const artwork = page.locator('[data-retained-order] img');
+          await expect(artwork).toHaveAttribute('alt', 'Illustrative cap fixture');
+          assert.equal(await artwork.evaluate(image => image.complete && image.naturalWidth > 0), true, 'Current public artwork must really load');
           assert.equal(await page.locator('[data-retained-order]').innerText().then(value => value.includes('$28.00')), false);
           // Stale already-painted private data must disappear after a real cross-tab storage event.
           const tab = await context.newPage(); await tab.goto(origin);
@@ -57,6 +61,9 @@ export async function proveRetainedReceipt({ merchant, origin, scenarios, artifa
           await page.emulateMedia({ media: 'print' });
           assert.equal(await page.locator('[data-retained-check]').isVisible(), false);
           assert.equal(await page.locator('[data-retained-order]').isVisible(), true);
+          assert.equal(await artwork.isVisible(), false, 'Artwork stays out of the printed receipt');
+          await expect(page.locator('[data-retained-order]')).toContainText('Fixture cap × 2');
+          await expect(page.locator('[data-retained-order]')).toContainText('$32.00');
           await page.emulateMedia({ media: 'screen' });
           if (artifacts) {
             await page.screenshot({ path: join(artifacts, `paid-${width}-${scheme}.png`), fullPage: true });
@@ -78,7 +85,7 @@ export async function proveRetainedReceipt({ merchant, origin, scenarios, artifa
       assert.deepEqual([...new Set(posts)], ['/api/checkout/status']);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       assert.deepEqual(errors, []);
-      reports.push({ width, scheme, originalPaidAndPending: true, frozenTotal: '3200', storageUnchanged: true, newCartCookieUnchanged: true, onlyStatusPosts: true, crossTabRevocation: true, print: true, overflow: false });
+      reports.push({ width, scheme, originalPaidAndPending: true, frozenTotal: '3200', currentPublicArtworkLoaded: true, artworkExcludedFromPrint: true, storageUnchanged: true, newCartCookieUnchanged: true, onlyStatusPosts: true, crossTabRevocation: true, print: true, overflow: false });
       await context.close();
     }
     await browser.close();

@@ -81,7 +81,8 @@ export function confirmedOrderView(checkout: GuestCheckoutProjection): Confirmed
     ["Total", money(order.total ?? checkout.total)],
   ] as const).flatMap(([label, amount]) => amount ? [{ label, amount }] : []);
   return {
-    orderNumber: order.orderId.replace(/^order:/u, ""),
+    orderNumber: Number.isSafeInteger(order.number) && order.number! > 0
+      ? `#${order.number}` : order.orderId.replace(/^order:/u, ""),
     test: order.test === true,
     lines: order.lines.map((line) => {
       const unit = line.unitPrice && /^-?\d+$/u.test(line.unitPrice.minor) ? Number(line.unitPrice.minor) : NaN;

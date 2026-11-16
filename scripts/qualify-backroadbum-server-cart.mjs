@@ -7,7 +7,7 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { proveRetainedReceipt } from './lib/retained-receipt-proof.mjs';
 import { createRequire } from "node:module";
 import { createServer } from "node:net";
@@ -94,6 +94,17 @@ export async function qualify({ old, candidate }) {
       ["storefrontOutOfStockListing", "storefront_out_of_stock_listing"],
     ].map(([key, name]) => [key, collection(name)]));
     await seedGuestCatalog(storage, { itemId: "legacy-hat", price: "1600" });
+    const hat = await storage.catalogItems.get('legacy-hat');
+    await storage.catalogItems.put('legacy-hat', { ...hat, name: 'Fixture cap' });
+    // Current public artwork deliberately lives in Media Library/catalog media,
+    // not in the frozen purchase. This is synthetic data and authored fixture art.
+    await db.insertInto('media').values({ id: 'receipt-fixture-art', filename: 'receipt-fixture.svg',
+      mime_type: 'image/svg+xml', storage_key: 'receipt-fixture.svg', width: 960, height: 720,
+      alt: 'Illustrative cap fixture' }).execute();
+    await collection('catalog_media').put('legacy-hat', { recordKind: 'catalog-media', recordId: 'legacy-hat',
+      catalogItemId: 'legacy-hat', image: { mediaId: 'receipt-fixture-art' }, gallery: [] });
+    mkdirSync(join(site, '.artifacts/uploads'), { recursive: true });
+    copyFileSync(join(merchant, 'public/backroad/cap.svg'), join(site, '.artifacts/uploads/receipt-fixture.svg'));
     const carts = collection("checkout_carts");
     const capabilities = collection("checkout_guest_capabilities");
     const orders = collection("orders");
@@ -234,6 +245,9 @@ export default defineConfig({ output:'server', adapter:node({mode:'standalone'})
         assert.equal(wrapped.data.checkout.order?.total?.minor, "3200");
         assert.equal(wrapped.data.checkout.order?.lines?.[0]?.quantity, 2);
         assert.equal(wrapped.data.checkout.order?.contact?.email, read.data.checkout.order?.contact?.email);
+        assert.equal(wrapped.data.checkout.order?.lines?.[0]?.name, 'Fixture cap');
+        assert.equal(wrapped.data.checkout.order?.lines?.[0]?.imageAlt, 'Illustrative cap fixture');
+        assert.match(wrapped.data.checkout.order?.lines?.[0]?.imageUrl ?? '', /receipt-fixture\.svg$/u);
       } else assert.equal(wrapped.data.checkout.redirectUrl, null);
       assert.equal(wrapped.data.cart, undefined, "Wrapper cannot expose mutable cart data");
       assert.match(wrapped.response.headers.get("cache-control"), /no-store/);
@@ -246,10 +260,16 @@ export default defineConfig({ output:'server', adapter:node({mode:'standalone'})
         assert.equal(refused.response.status, expected);
         assert.equal(refused.data?.checkout, undefined);
       }
+      const keptOrder = scenario.before.order ? await orders.get(scenario.before.order.orderId) : null;
+      if (scenario.state === 'paid') assert.ok(Number.isSafeInteger(keptOrder?.number), 'The canonical fixture order is numbered');
       installed.push({ priorAttempt: scenario.state, oldStatusState: scenario.before.state, currentState: read.data.checkout.state,
+        canonicalNumberPresent: Number.isSafeInteger(keptOrder?.number),
+        canonicalTestOrder: keptOrder ? keptOrder.paidOrder.mode !== 'live' : null,
         frozenFactsEqual: true, frozenTotal: "3200", emptyNewCart: true, forgedDenied: true, foreignDenied: true, writeFrozen: true,
         merchantWrapperHTTP: wrapped.response.status, wrapperSameAttempt: true,
-        wrapperPaidReceiptTotalPreserved: scenario.state === "paid" ? true : null, wrapperRefusesMutationAndOtherAttempt: true });
+        wrapperPaidReceiptTotalPreserved: scenario.state === "paid" ? true : null, wrapperRefusesMutationAndOtherAttempt: true,
+        canonicalOrderNumberPresent: Number.isSafeInteger(read.data.checkout.order?.number),
+        explicitTestModePresent: typeof read.data.checkout.order?.test === 'boolean' });
     }
     const browser = await proveRetainedReceipt({ merchant, origin, scenarios, artifacts: process.env.BACKROADBUM_QUALIFICATION_ARTIFACTS });
     assert.equal(hash(business()), baseline, "Installed inspection and browser handoff must not rewrite old carts or Orders");

@@ -1,5 +1,4 @@
-import { readCommerceCatalogSnapshots } from "../commerce-catalog/index.js";
-import { projectGuestCartCatalogSnapshots } from "./present.js";
+import { withReceiptCatalogMedia } from "./receipt-media.js";
 import { confirmedOrderView, type ConfirmedOrderView } from "./order-view.js";
 import { readServerCart, writeCartCookies, type ServerCartContext } from "./server-cart.js";
 
@@ -30,12 +29,14 @@ export async function loadCheckoutReturn(ctx: ServerCartContext): Promise<Checko
   if (!read.ok) return read.error.code === "NO_CART" ? { kind: "no-cart" } : { kind: "unavailable" };
   const checkout = read.checkout;
   if (checkout.state === "paid") {
-    const order = confirmedOrderView(checkout);
+    const order = confirmedOrderView(await withReceiptCatalogMedia(checkout, {
+      runtime: ctx.locals.emdash as never, request: ctx.request,
+    }));
     if (!order) return { kind: "unavailable" };
     // Commerce reads a paid cart as empty; the next add starts a fresh cart. The key stays so a reload
     // shows this order again.
     writeCartCookies(ctx, null, 0);
-    return { kind: "paid", order: await withCatalogThumbnails(ctx, order) };
+    return { kind: "paid", order };
   }
   if (checkout.state === "pending" && checkout.attemptId) {
     const check = checkNumber(ctx.url);
@@ -47,27 +48,4 @@ export async function loadCheckoutReturn(ctx: ServerCartContext): Promise<Checko
     };
   }
   return { kind: "not-paid", redirect: "/cart?cart_error=NOT_PAID" };
-}
-
-/** Lines whose order record has no photo take the product's current photo, as the old page did. */
-async function withCatalogThumbnails(ctx: ServerCartContext, order: ConfirmedOrderView): Promise<ConfirmedOrderView> {
-  const missing = [...new Set(order.lines.filter((line) => !line.thumbnail).map((line) => line.id))];
-  if (!missing.length) return order;
-  try {
-    const snapshots = projectGuestCartCatalogSnapshots(await readCommerceCatalogSnapshots(
-      missing,
-      { runtime: ctx.locals.emdash as never, request: ctx.request },
-    ));
-    if (!snapshots) return order;
-    const byId = new Map(snapshots.map((entry) => [entry.id, entry]));
-    return {
-      ...order,
-      lines: order.lines.map((line) => {
-        const found = byId.get(line.id);
-        return line.thumbnail || !found?.found || !found.thumbnail ? line : { ...line, thumbnail: found.thumbnail };
-      }),
-    };
-  } catch {
-    return order;
-  }
 }

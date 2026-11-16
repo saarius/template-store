@@ -8,6 +8,7 @@ import {
 } from "../../../features/guest-cart/checkout-protocol.js";
 
 import { canDispatchInstalledGuestCheckout } from "../../../features/guest-cart/checkout-admission.js";
+import { withReceiptCatalogMedia } from "../../../features/guest-cart/receipt-media.js";
 import { playgroundCheckoutConfigured } from "../../../features/playground-checkout/index.js";
 import {
   playgroundAttemptBelongsToVisitor,
@@ -238,7 +239,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return Response.json({
       ok: true,
       capabilityId: validated.capabilityId,
-      checkout: guestCheckoutWire(validated.checkout),
+      // The retained browser bridge needs the same optional public artwork as
+      // the server thank-you page. Never fetch media for an unconfirmed read.
+      checkout: guestCheckoutWire(cartRead
+        ? await withReceiptCatalogMedia(validated.checkout, { runtime, request })
+        : validated.checkout),
     }, { status: 200, headers: { "Cache-Control": "no-store" } });
   } catch {
     return unavailable(503, "CHECKOUT_STATUS_UNAVAILABLE");
