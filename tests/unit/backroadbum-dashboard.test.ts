@@ -2,6 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates the Registry-installed whole storefront from stable in-place upgrade and hosted payment', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-installed-storefront');
+    expect(report).toContain('data-installed-storefront-history');
+    expect(report).toContain('Previous dispatch · Real Registry installation');
+    expect(report).toContain('The installed plugin. The whole storefront.');
+    expect(report).toContain('with no source sandbox mount');
+    expect(report).toContain('not an in-place upgrade or hosted purchase');
+    expect(reviews).toContain('data-installed-storefront-review');
+    expect(reviews).toContain('no Orders, hosted consents or Payments are copied or created');
+    expect(reviews).toContain('only reporting ships on stable 0.8.0');
+    expect(reviews).toContain('/pr-proof/installed-storefront/cart-desktop-light.jpg');
+  });
   it('separates a real fresh Registry install from an in-place stable upgrade', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

@@ -4,11 +4,19 @@ The serving store still uses signed Commerce 0.8.0 and its existing browser-boun
 
 ## Owner Steer 6 release gates · November 15
 
-Registry discovery and GitHub tags rechecked November 16, 05:44 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
+Registry discovery and GitHub tags rechecked November 16, 06:58 UTC: stable `dinkus-commerce` is still **0.8.0**, beta is **0.9.0-beta.2**. No live upgrade is available yet. The beta Registry id `r_fjzjvld3ssb4j63o` has its own storage namespace: never install it over the live stable id `r_gshdrqaldna3r7sn`.
 
 Stage A is explicitly authorized in an isolated worktree/database/port using the newest beta and matching upstream server-cart template. Qualify JS-off forms, enhanced cart, frozen/expired edges, tracking thank-you views, WebMCP and retained 0.8.0 capabilities; then prepare the Field Journal integration branch without deploying it. Preserve the shopper-session/prefill/validation safeguards from Template235/237/239.
 
 Stage B is pre-authorized only when a non-beta 0.9.x release is listed under the **same stable Registry id**. Take a verified DB/uploads/release/environment snapshot with rollback steps, upgrade that installed plugin in place through admin, and deploy the qualified paired theme during the same window. Verify ten prior Orders, retained receipts, feeds and account isolation before one guarded TEST1011 purchase. Persist a private 0600 completion guard and never replay it. These are owner gates, not a claim that Stage A or B has completed.
+
+## Whole prepared storefront on the installed beta · November 16, 06:49 UTC
+
+A new disposable development store repeats the real Registry verify/install workflow (verified provenance, acknowledged capabilities/public routes/release CIDs, install201). Only the beta id is active, source Registry; the downloaded130929-byte backend still hashes to `ac9205c2bd745cd09a90e55790549267b5b022875d110205515a57034fd483f4`. The **whole prepared Field Journal storefront** then builds and boots from that persisted installation, with no configured source sandbox descriptor or backend mount. Frontend feature imports use beta2 source; that is separate from the installed sandbox backend.
+
+Only public catalog/media/page rows and published CMS content/metadata are explicitly copied into disposable storage; this is not namespace migration or an admin clone. No Orders, hosted consents or Payments are copied or created. The built runtime uses loopback-only network isolation, private operational mounts and local canonical HTTPS. Plain desktop and enhanced phone journeys pass actual add/change/reload forms, $18 mug/$54 subtotal, Secure/HttpOnly/SameSite=Lax cookies, foreign-origin/browser isolation and blank-quantity intent preservation. Checkout correctly remains unavailable without Payments. Eight painted cart/checkout390/1440 Light/Dark audits report zero findings; inspected captures are at `/pr-proof/installed-storefront/`.
+
+Evidence: `evidence/2026-11-16-installed-storefront/{installed.json,fixture-state.json,artifact.json,storefront-proof.json,audit-cart.md,audit-checkout.md,cycle.md}`. Public rows and all six production business digests remain unchanged. Fixture retries include corrected consent argument/seed-schema assumptions, a synchronous audit asset deadlock and a repeat-run limiter429; final audit reports passed separately. Detached staging children needed explicit scoped termination after the checker exited; no staging process or dependency link is retained. This closes **whole prepared storefront on an actually installed beta**, not signed same-ID upgrade, production proxy/configuration, complete regression, original saved receipts through this beta namespace, or hosted purchase. Stage B and TEST1011 remain untouched.
 
 ## Real Registry fresh-install proof · November 16, 06:07 UTC
 
