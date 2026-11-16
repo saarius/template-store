@@ -13,6 +13,7 @@ import { createServer } from 'node:https';
 import http from 'node:http';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { copyPublicContent, isolatedServerCommand, proveStorefrontHTTPS, localHTTPS } from './lib/storefront-https-proof.mjs';
 
 const PRIMARY = '/var/lib/trialrun/workspace/repos/template-store';
 const ORIGIN = 'https://backroadbum.com';
@@ -24,11 +25,13 @@ const pause = ms => new Promise(done => setTimeout(done, ms));
 
 export function options(args) {
   if (!args.length) return null;
-  assert.equal(args.length, 2);
+  const storefront = args.includes('--storefront');
+  assert.equal(args.length, storefront ? 3 : 2);
   assert.equal(args.filter(x => x === '--check').length, 1);
+  assert.ok(args.every(x => x === '--check' || x === '--storefront' || x.startsWith('--candidate=')));
   const candidate = args.find(x => x.startsWith('--candidate='))?.slice(12);
   assert.ok(candidate);
-  return { candidate: resolve(candidate) };
+  return { candidate: resolve(candidate), storefront };
 }
 
 export function assertIsolated(interfaces, routes, unprivilegedPort) {
@@ -45,19 +48,24 @@ export function safeMediaKey(key) {
 async function stop(child) {
   if (!child || child.exitCode !== null || child.signalCode !== null) return;
   const exited = new Promise(done => child.once('exit', done));
-  try { process.kill(-child.pid, 'SIGTERM'); } catch { child.kill('SIGTERM'); }
+  try { process.kill(-child.pid, 'SIGTERM'); } catch { spawnSync('sudo', ['-n', 'kill', '-TERM', '--', `-${child.pid}`], { stdio: 'ignore' }); }
   await Promise.race([exited, pause(3000)]);
   if (child.exitCode === null && child.signalCode === null) {
-    try { process.kill(-child.pid, 'SIGKILL'); } catch { child.kill('SIGKILL'); }
+    try { process.kill(-child.pid, 'SIGKILL'); } catch { spawnSync('sudo', ['-n', 'kill', '-KILL', '--', `-${child.pid}`], { stdio: 'ignore' }); }
     await exited;
   }
 }
 
-export async function qualify({ candidate }) {
+export async function qualify({ candidate, storefront = false }) {
   let stage = 'isolation admission';
+  const artifacts = process.env.BACKROADBUM_QUALIFICATION_ARTIFACTS;
   let site, db, source, server, tls, assets, browser, linkedPeers, staged;
   const originalUmask = process.umask(0o077);
   try {
+    if (artifacts) {
+      assert.ok(resolve(artifacts).startsWith('/var/lib/trialrun/workspace/evidence/'), 'Painted artifacts must stay outside git');
+      mkdirSync(artifacts, { recursive: true });
+    }
     const command = (file, args, cwd) => {
       const result = spawnSync(file, args, { cwd, encoding: 'utf8', env: { PATH: process.env.PATH, HOME: process.env.HOME }, maxBuffer: 1024 * 1024 });
       assert.equal(result.status, 0, 'Local command failed');
@@ -76,7 +84,7 @@ export async function qualify({ candidate }) {
       symlinkSync(join(PRIMARY, 'node_modules'), linkedPeers, 'dir');
     }
     const require = createRequire(join(PRIMARY, 'package.json'));
-    const { Kysely } = await import(pathToFileURL(require.resolve('kysely')).href);
+    const { Kysely, sql } = await import(pathToFileURL(require.resolve('kysely')).href);
     const { createDialect } = await import(pathToFileURL(require.resolve('emdash/db/sqlite')).href);
     const { runMigrations } = await import(pathToFileURL(require.resolve('emdash/db')).href);
     const Database = require('better-sqlite3');
@@ -93,6 +101,8 @@ export async function qualify({ candidate }) {
     const originalRows = source.prepare('SELECT * FROM _plugin_storage WHERE plugin_id=? ORDER BY collection,id').all(ID).filter(x => COLLECTIONS.includes(x.collection));
     const baseline = digest(originalRows.map(({ collection, id, data, revision }) => ({ collection, id, data, revision })));
     for (const row of originalRows) await db.insertInto('_plugin_storage').values(row).execute();
+    const contentCounts = storefront ? await copyPublicContent(source, db, sql) : null;
+    const originalKeys = new Set(originalRows.map(x => `${x.collection}:${x.id}`));
     const orders = originalRows.filter(x => x.collection === 'orders').map(x => JSON.parse(x.data));
     assert.equal(orders.length, 10);
     const mediaIds = new Set(originalRows.filter(x => x.collection === 'catalog_media').flatMap(x => {
@@ -134,47 +144,54 @@ export async function qualify({ candidate }) {
     writeFileSync(join(site, 'astro.config.mjs'), `
 import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
+import react from '@astrojs/react';
 import emdash, { local } from 'emdash/astro';
 import { sqlite } from 'emdash/db';
 import descriptor from ${JSON.stringify(pathToFileURL(join(candidate, 'dist/sandbox/index.mjs')).href)};
-export default defineConfig({output:'server',adapter:node({mode:'standalone'}),
-  integrations:[emdash({database:sqlite({url:${JSON.stringify(`file:${file}`)}}),
+export default defineConfig({output:'server',adapter:node({mode:'standalone'}),trailingSlash:'never',
+  ${storefront ? `srcDir:${JSON.stringify(join(merchant, 'src'))},` : ''}
+  integrations:[react(),emdash({database:sqlite({url:${JSON.stringify(`file:${file}`)}}),
     storage:local({directory:${JSON.stringify(join(site, 'uploads'))},baseUrl:'/_emdash/api/media/file'}),
     siteUrl:${JSON.stringify(ORIGIN)},sandboxRunner:'@emdash-cms/sandbox-workerd/sandbox',
     sandboxed:[{...descriptor,id:${JSON.stringify(ID)},entrypoint:${JSON.stringify(join(candidate, 'dist/sandbox/plugin.mjs'))}}]})],
-  vite:{resolve:{alias:${JSON.stringify(Object.fromEntries(['checkout', 'customers', 'orders', 'structured-data', 'feeds', 'store-policies'].map(name => [`@dinkuskit/commerce/features/${name}`, join(candidate, 'dist/features', name, 'index.js')]).concat([['@dinkuskit/commerce', join(candidate, 'dist/index.js')]])))}},server:{fs:{allow:[${JSON.stringify(PRIMARY)},${JSON.stringify(merchant)},${JSON.stringify(candidate)}]}}},devToolbar:{enabled:false}});
+  vite:{define:{__DINKUS_COMMERCE_PROFILE__:JSON.stringify('stable')},resolve:{alias:${JSON.stringify(Object.fromEntries(['checkout', 'customers', 'orders', 'structured-data', 'feeds', 'store-policies'].map(name => [`@dinkuskit/commerce/features/${name}`, join(candidate, 'dist/features', name, 'index.js')]).concat([['@dinkuskit/commerce', join(candidate, 'dist/index.js')]])))}},server:{fs:{allow:[${JSON.stringify(PRIMARY)},${JSON.stringify(merchant)},${JSON.stringify(candidate)}]}}},devToolbar:{enabled:false}});
 `);
     command('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', join(site, 'key.pem'), '-out', join(site, 'cert.pem'), '-days', '1', '-subj', '/CN=backroadbum.com', '-addext', 'subjectAltName=DNS:backroadbum.com']);
     const env = { PATH: process.env.PATH, HOME: process.env.HOME, NODE_OPTIONS: '--max-old-space-size=1000', NODE_ENV: 'production',
-      EMDASH_SITE_URL: ORIGIN, BACKROADBUM_MERCHANT_PROFILE: '1', BACKROADBUM_RECOVERY_PROTOCOL: 'cart-v1', HOST: '127.0.0.1', PORT: '4398',
+      EMDASH_SITE_URL: ORIGIN, BACKROADBUM_MERCHANT_PROFILE: '1', BACKROADBUM_RECOVERY_PROTOCOL: 'cart-v1', BACKROADBUM_CHECKOUT_ENABLED: '1', HOST: '127.0.0.1', PORT: '4398',
       NO_PROXY: '*', no_proxy: '*' };
     const build = spawnSync(process.execPath, [join(PRIMARY, 'node_modules/astro/bin/astro.mjs'), 'build'], { cwd: site, env, encoding: 'utf8', timeout: 180_000 });
+    if (artifacts) writeFileSync(join(artifacts, 'build.log'), (build.stdout ?? '') + (build.stderr ?? ''), { mode: 0o600 });
     assert.equal(build.status, 0);
-    server = spawn(process.execPath, [join(site, 'dist/server/entry.mjs')], { cwd: site, detached: true, env, stdio: 'ignore' });
+    const launch = (enabled = '1') => {
+      const serverEnv = { ...env, BACKROADBUM_CHECKOUT_ENABLED: enabled };
+      const [file, args] = storefront ? isolatedServerCommand(site, serverEnv, join(site, 'dist/server/entry.mjs')) : [process.execPath, [join(site, 'dist/server/entry.mjs')]];
+      return spawn(file, args, { cwd: site, detached: true, env: serverEnv, stdio: 'ignore' });
+    };
+    server = launch();
     stage = 'local HTTPS runtime';
     tls = createServer({ key: readFileSync(join(site, 'key.pem')), cert: readFileSync(join(site, 'cert.pem')) }, (request, response) => {
       const upstream = http.request({ hostname: '127.0.0.1', port: 4398, path: request.url, method: request.method,
-        headers: { ...request.headers, host: 'backroadbum.com', 'x-forwarded-proto': 'https', 'x-forwarded-host': 'backroadbum.com' } }, result => {
+        headers: { ...request.headers, host: 'backroadbum.com', 'x-forwarded-proto': 'https', 'x-forwarded-host': 'backroadbum.com',
+          ...(storefront ? { 'x-backroadbum-client-ip': '192.0.2.10' } : {}) } }, result => {
         response.writeHead(result.statusCode, result.headers); result.pipe(response);
       });
       upstream.on('error', () => { response.writeHead(502); response.end('Not ready'); }); request.pipe(upstream);
     });
     await new Promise((done, fail) => { tls.once('error', fail); tls.listen(443, '127.0.0.1', done); });
-    for (let i = 0; i < 120; i++) {
-      try { const r = await fetch('http://127.0.0.1:4398/', { signal: AbortSignal.timeout(1000) }); if (r.ok) break; } catch {}
-      assert.ok(i < 119); await pause(500);
-    }
+    const ready = async () => {
+      for (let i = 0; i < 120; i++) {
+        try { const r = await fetch('http://127.0.0.1:4398/', { signal: AbortSignal.timeout(1000) }); if (r.ok) return; } catch {}
+        assert.ok(i < 119); await pause(500);
+      }
+    };
+    await ready();
     staged = new Database(file, { readonly: true });
-    const business = () => digest(staged.prepare('SELECT collection,id,data,revision FROM _plugin_storage WHERE plugin_id=? ORDER BY collection,id').all(ID).filter(x => COLLECTIONS.includes(x.collection)));
+    const business = () => digest(staged.prepare('SELECT collection,id,data,revision FROM _plugin_storage WHERE plugin_id=? ORDER BY collection,id').all(ID).filter(x => originalKeys.has(`${x.collection}:${x.id}`)));
     assert.equal(business(), baseline);
     stage = 'original-browser receipt recovery';
     browser = await chromium.launch({ args: ['--host-resolver-rules=MAP backroadbum.com 127.0.0.1', '--no-proxy-server'] });
     const reports = [];
-    const artifacts = process.env.BACKROADBUM_QUALIFICATION_ARTIFACTS;
-    if (artifacts) {
-      assert.ok(resolve(artifacts).startsWith('/var/lib/trialrun/workspace/evidence/'), 'Redacted painted artifacts must stay outside git');
-      mkdirSync(artifacts, { recursive: true });
-    }
     let paintedSnapshot = false;
     for (const original of originals) for (const width of [390, 1440]) for (const colorScheme of ['light', 'dark']) {
       const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme, storageState: original.storageState, ignoreHTTPSErrors: true });
@@ -255,8 +272,39 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),
         crossTabRevocation: true, originalFileUnchanged: true, newCartCookieUnchanged: true, onlyStatusPosts: true, noOverflow: true });
       await context.close();
     }
+    let storefrontProof = null;
+    if (storefront) {
+      stage = 'whole storefront HTTPS';
+      storefrontProof = await proveStorefrontHTTPS({ browser, expect, origin: ORIGIN,
+        assertBusiness: () => assert.equal(business(), baseline), artifacts });
+      stage = 'durable HTTPS admission';
+      let limited;
+      for (let i = 0; i < 9; i++) {
+        limited = await localHTTPS('/cart/add');
+        if (limited.status === 429) break;
+        assert.equal(limited.status, 303);
+      }
+      assert.equal(limited.status, 429); assert.ok(Number(limited.headers['retry-after']) > 0);
+      await stop(server); server = launch(); await ready();
+      assert.equal((await localHTTPS('/cart/add')).status, 429);
+      await stop(server); server = launch('0'); await ready();
+      assert.equal((await localHTTPS('/cart/add')).status, 503);
+      assert.equal((await localHTTPS('/checkout')).status, 503);
+      const recovery = await browser.newContext({ storageState: originals[1].storageState, ignoreHTTPSErrors: true });
+      const page = await recovery.newPage();
+      await page.goto(ORIGIN + '/checkout/retained');
+      await page.locator('[data-retained-check]').click();
+      await expect(page.locator('[data-retained-order]')).toBeVisible();
+      assert.equal(business(), baseline); await recovery.close();
+      storefrontProof.push({ durable429: true, positiveRetryAfter: true, restartKeepsBudget: true,
+        pauseRefusesCartAndCheckout: true, pausedOriginalReceiptRecovers: true,
+        limiterStateAndKey: 'disposable private mount namespace; real production directories hidden' });
+    }
     await browser.close(); browser = null;
-    assert.equal(business(), baseline); staged.close(); staged = null;
+    assert.equal(business(), baseline);
+    const addedRecords = staged.prepare('SELECT collection,id FROM _plugin_storage WHERE plugin_id=?').all(ID).filter(x => !originalKeys.has(`${x.collection}:${x.id}`));
+    assert.ok(addedRecords.every(x => storefront && ['checkout_carts', 'checkout_guest_capabilities'].includes(x.collection)));
+    staged.close(); staged = null;
     let audit = null;
     if (artifacts && paintedSnapshot) {
       stage = 'redacted painted audit';
@@ -281,18 +329,34 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),
       writeFileSync(join(artifacts, 'audit.md'), checked.stdout ?? '', { mode: 0o600 });
       assert.equal(checked.status, 0);
       assert.match(checked.stdout, /0 error\(s\), 0 warning\(s\)/);
-      audit = 'redacted DOM clone: 390/1440 Light/Dark clean; actual private facts asserted before cloning';
+      if (storefront) for (const surface of ['cart', 'checkout']) {
+        const result = await new Promise((done, fail) => {
+          const child = spawn(process.execPath, ['/var/lib/trialrun/workspace/.pi/skills/ui-design/scripts/audit-dom.mjs', join(artifacts, `${surface}-painted.html`), '--screenshots', join(artifacts, `${surface}-audit`)], {
+            detached: true, stdio: ['ignore', 'pipe', 'ignore'], env: { PATH: process.env.PATH, HOME: process.env.HOME } });
+          let stdout = ''; child.stdout.on('data', chunk => { stdout += chunk; });
+          const timer = setTimeout(() => { void stop(child); }, 120_000);
+          child.on('error', error => { clearTimeout(timer); fail(error); });
+          child.on('exit', status => { clearTimeout(timer); done({ status, stdout }); });
+        });
+        writeFileSync(join(artifacts, `${surface}-audit.md`), result.stdout, { mode: 0o600 });
+        assert.equal(result.status, 0); assert.match(result.stdout, /0 error\(s\), 0 warning\(s\)/);
+      }
+      audit = 'painted DOM clones: 390/1440 Light/Dark clean; actual facts asserted before cloning';
     }
     return { checkedAt: new Date().toISOString(), candidate: head, candidateBundleSHA256: createHash('sha256').update(readFileSync(join(candidate, 'dist/sandbox/plugin.mjs'))).digest('hex'),
-      scope: 'Actual merchant row subset + original browser state + source-built sandbox + merchant page/wrapper; isolated local canonical HTTPS',
+      scope: storefront ? 'All merchant src routes/middleware + selected published CMS/catalog/orders + original saved states; source sandbox on isolated local canonical HTTPS, not production configuration' : 'Actual merchant row subset + original browser state + source-built sandbox + merchant page/wrapper; isolated local canonical HTTPS',
       copiedCollections: COLLECTIONS, mediaFiles: media.length, canonicalOrders: orders.length, hostedConsentsCopied: false,
       paymentsMounted: false, network: 'loopback-only namespace; canonical hostname resolved locally', businessUnchanged: true,
-      signedInstallation: false, appliedUpgrade: false, paintedAudit: audit, contexts: reports };
+      signedInstallation: false, appliedUpgrade: false, paintedAudit: audit, contexts: reports, contentCounts, storefrontProof,
+      newRecordsOnlyCartCapabilities: true };
   } catch (error) {
     const line = /qualify-backroadbum-installed-retained\.mjs:(\d+):\d+/.exec(error.stack ?? '')?.[1] ?? 'unknown';
     const category = ['AssertionError', 'SyntaxError', 'TypeError', 'Error'].includes(error.name) ? error.name : 'Error';
     const protocol = /Protocol error/.test(error.message ?? '') ? '; browser protocol' : '';
-    throw new Error(`Private installed recovery failed at ${stage} (checker line ${line}; ${category}${protocol})`);
+    const helperLine = /storefront-https-proof\.mjs:(\d+):\d+/.exec(error.stack ?? '')?.[1];
+    if (/^Public schema [a-z_]+ column [a-z_]+$/.test(error.message)) stage += `; ${error.message}`;
+    const safeCode = typeof error.code === 'string' && /^[A-Z_0-9]+$/.test(error.code) ? `; ${error.code}` : '';
+    throw new Error(`Private installed recovery failed at ${stage} (checker line ${line}; ${category}${protocol}${safeCode}${helperLine ? `; helper line ${helperLine}` : ''})`);
   } finally {
     await browser?.close();
     if (assets) await new Promise(done => assets.close(done));
