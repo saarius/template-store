@@ -2,6 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates a real fresh Registry install from an in-place stable upgrade', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-registry-install');
+    expect(report).toContain('data-registry-install-history');
+    expect(report).toContain('Previous dispatch · Merchant HTTPS rehearsal');
+    expect(report).toContain('Verified release. Installed for real.');
+    expect(report).toContain('not an in-place stable upgrade');
+    expect(report).toContain('only reporting ships here while stable remains 0.8.0');
+    expect(reviews).toContain('data-registry-install-review');
+    expect(reviews).toContain('130929-byte backend hash exactly matches');
+    expect(reviews).toContain('no Orders, hosted consents or Payments');
+    expect(reviews).toContain('/pr-proof/commerce-beta-registry/verified-consent.jpg');
+  });
   it('distinguishes full-source HTTPS qualification from signed installation and hosted payment', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
