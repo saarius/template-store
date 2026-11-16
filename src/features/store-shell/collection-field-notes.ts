@@ -18,7 +18,8 @@ function linkedProducts(content: unknown): Set<string> {
   return paths;
 }
 
-/** Published CMS prose selects reading; the current collection supplies product paths.
+/** Published CMS prose selects reading; the current shopping surface supplies product paths.
+ * A product page passes a singleton set; a collection passes its current members.
  * The caller must pass published-only pages and omit this secondary shelf in preview.
  */
 export function collectionFieldNotes(entries: readonly PageEntry[], productPaths: ReadonlySet<string>): FieldNote[] {

@@ -2,6 +2,11 @@
 
 Eight notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
 
+## Product reading · November16
+Product pages now reuse the collection shelf’s exact used native-link relationships. The current notebook and tote each have one matching published note; the other five products render no shelf. Optional reading is omitted in preview/edit mode or on a failed Pages read, and never supplies buying facts or changes the product’s canonical metadata.
+
+`node scripts/verify-backroadbum-product-reading.mjs --check` blocks all HTTP writes and checks seven products, two keyboard note→product round trips, the journal link, missing-product exclusion, unchanged collection reading and browser intent across eight script-on/off phone/desktop Light/Dark contexts. `BACKROADBUM_VERIFY_BASELINE` compares buying copy and structured data with a prior read; `BACKROADBUM_VERIFY_ALLOW_ORIGIN_CHANGE=1` permits only explicit schema-URL origin translation for a local HTTP fixture, never a blanket metadata bypass. Evidence: `evidence/2026-11-16-shopper-discovery/`; this is optional merchant discovery, not a CMS or plugin release.
+
 ## Bounded authoring
 - Take a current backup and `node scripts/inspect-backroadbum-business.mjs --check` before editing. For a new note, record a unique operation guard in `/etc/backroadbum/operator/` with mode0600; refuse an existing guard/slug rather than recreating an uncertain save.
 - Use the native Pages editor for Title/slug, headings, ordered lists and inline links. Save one draft, reload, and compare all native blocks, styles, list items and link destinations with the manuscript. Never assign the editor DOM or write CMS tables directly.

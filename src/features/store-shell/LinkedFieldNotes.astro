@@ -1,14 +1,16 @@
 ---
 import type { FieldNote } from './field-notes.js';
-interface Props { notes: readonly FieldNote[] }
-const { notes } = Astro.props;
+interface Props { notes: readonly FieldNote[]; context?: 'collection' | 'product' }
+const { notes, context = 'collection' } = Astro.props;
+const titleId = `${context}-reading-title`;
 ---
-{notes.length > 0 && <section class="collection-reading" aria-labelledby="collection-reading-title" data-collection-reading>
-  <header><p class="reading-kicker">The field journal</p><h2 id="collection-reading-title">From the field notes</h2><p>Notes featuring gear from this collection.</p><a href="/field-notes">All field notes <span aria-hidden="true">&rarr;</span></a></header>
-  <ul>{notes.map(note => <li><a href={`/${note.slug}`} aria-labelledby={`collection-${note.slug}-title`}><h3 id={`collection-${note.slug}-title`}>{note.title}</h3>{note.excerpt && <p>{note.excerpt}</p>}<span class="reading-action" aria-hidden="true">Read the note &rarr;</span></a></li>)}</ul>
+{notes.length > 0 && <section class:list={['collection-reading', context === 'product' && 'product-reading']} aria-labelledby={titleId} data-collection-reading={context === 'collection' ? '' : undefined} data-product-reading={context === 'product' ? '' : undefined}>
+  <header><p class="reading-kicker">The field journal</p><h2 id={titleId}>From the field notes</h2><p>{context === 'product' ? 'Notes featuring this gear.' : 'Notes featuring gear from this collection.'}</p><a href="/field-notes">All field notes <span aria-hidden="true">&rarr;</span></a></header>
+  <ul>{notes.map(note => <li><a href={`/${note.slug}`} aria-labelledby={`${context}-${note.slug}-title`}><h3 id={`${context}-${note.slug}-title`}>{note.title}</h3>{note.excerpt && <p>{note.excerpt}</p>}<span class="reading-action" aria-hidden="true">Read the note &rarr;</span></a></li>)}</ul>
 </section>}
 <style>
 .collection-reading{width:min(80rem,calc(100% - 2.5rem));margin:0 auto var(--space-9);padding-top:var(--space-8);border-top:1px solid var(--color-border);display:grid;gap:var(--space-7)}
+.product-reading{width:100%}
 .reading-kicker{font-size:var(--text-sm);color:var(--store-muted);margin:0 0 var(--space-3)}
 .collection-reading h2{font-size:var(--text-2xl);line-height:1.2;margin:0 0 var(--space-4)}
 .collection-reading header>p:not(.reading-kicker){max-width:35ch;margin:0 0 var(--space-4);color:var(--store-muted)}

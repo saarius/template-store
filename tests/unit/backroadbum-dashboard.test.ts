@@ -2,6 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports native product reading without inventing recommendations or a release', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-product-reading-dispatch');
+    expect(report).toContain('data-product-reading-history');
+    expect(report).toContain('Previous dispatch · Current archive recovery');
+    expect(report).toContain('/products/county-line-field-book#product-reading-title');
+    expect(report).toContain('published notes’ own product references');
+    expect(report).toContain('Products without a matching note gain no reading shelf');
+  });
   it('reports current local data recovery without claiming new-host or hosted restoration', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('data-current-recovery');
