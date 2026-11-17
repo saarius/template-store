@@ -2,6 +2,38 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports the cold-option proposal without implying live server-cart adoption or full local matrix', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-initial-stock-pr-dispatch');
+    expect(report).toContain('data-initial-stock-pr-history');
+    expect(reviews).toContain('data-initial-stock-pr-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('https://github.com/dinkuskit/template-store/pull/248');
+      expect(source).toContain('/pr-proof/template-initial-stock/after-desktop-light.png');
+      expect(source).toContain('567 units, 101 workflows');
+      expect(source).toContain('four targeted browser tests');
+      expect(source).toContain('eight painted views');
+      expect(source).toContain('unchanged main');
+      expect(source).toContain('CI and review remain separate');
+    }
+    expect(report).toContain('only this report ships on stable Commerce 0.8.0');
+    expect(reviews).toContain('not a signed installation or merchant theme');
+  });
+  it('separates installed-beta variant preparation from the live cart and full-matrix gates', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-variant-startup-dispatch');
+    expect(report).toContain('data-variant-startup-history');
+    expect(reviews).toContain('data-variant-startup-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('https://github.com/dinkuskit/template-store/issues/247');
+      expect(source).toContain('/pr-proof/server-cart-initial-sellability/after-390-dark.png');
+    }
+    expect(report).toContain('not a live Commerce upgrade');
+    expect(report).toContain('1,271 units, 13 rendered cases and 120 workflows');
+    expect(reviews).toContain('full local browser matrix and a generic PR remain separate');
+  });
   it('reports the submitted cart-focus proposal without claiming full local matrix or live adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
