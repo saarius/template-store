@@ -2,6 +2,19 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates deployed feed URL production from the proposed consumer and signed rows', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-feed-landings-dispatch');
+    expect(report).toContain('data-feed-landings-history');
+    expect(report).toContain('Previous dispatch · Product reading');
+    expect(report).toContain('signed XML/CSV still have five rows');
+    expect(report).toContain('a released consumer remains necessary');
+    expect(reviews).toContain('data-feed-landings-review');
+    expect(reviews).toContain('fix/feed-variant-urls');
+    expect(reviews).toContain('https://github.com/dinkuskit/template-store/pull/244');
+    expect(reviews).toContain('not the generic variant query');
+  });
   it('reports native product reading without inventing recommendations or a release', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('data-product-reading-dispatch');

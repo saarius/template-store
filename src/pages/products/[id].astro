@@ -169,9 +169,9 @@ const productCanonical = item
 // This optional reading shelf uses the same native-link relationships as collections.
 // Never ask for drafts in preview or attach reading to a missing/unpriced product.
 const context = getRequestContext();
-const reading = await loadCollectionFieldNotes(new Set(
-  linkedProduct && !lookupUnavailable && !noLongerAvailable && Astro.response.status === 200 && item
-    ? [productPath(item.id)] : []),
+const readingPath = linkedProduct && !lookupUnavailable && !noLongerAvailable && Astro.response.status === 200 && item
+  ? productPath(item.id) : null;
+const reading = await loadCollectionFieldNotes(new Set(readingPath ? [readingPath] : []),
   Boolean(context?.preview || context?.editMode),
   async () => (await getEmDashCollection<'pages', Record<string, unknown>>('pages', { status: 'published' })).entries);
 // Produce every selectable block on the server through the Commerce builder.
