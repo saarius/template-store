@@ -2,6 +2,46 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports the submitted cart-focus proposal without claiming full local matrix or live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-cart-focus-pr-dispatch');
+    expect(report).toContain('data-cart-focus-pr-history');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('https://github.com/dinkuskit/template-store/pull/246');
+      expect(source).toContain('575 units, 101 workflows');
+      expect(source).toContain('unchanged main');
+      expect(source).toContain('Registry-site builds');
+      expect(source).toContain('64 desktop and 63 phone browser tests');
+      expect(source).toContain('44026879796');
+    }
+    expect(report).toContain('not a stable Commerce upgrade or completed merchant regression');
+    expect(reviews).toContain('No live cart cutover is claimed');
+  });
+  it('separates generic cart focus proof from synthetic projections and live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-cart-focus-edges-dispatch');
+    expect(report).toContain('data-cart-focus-edges-history');
+    expect(report).toContain('synthetic projections separately check frozen');
+    expect(report).toContain('not a submitted PR, completed full regression or Commerce upgrade');
+    expect(reviews).toContain('data-cart-focus-edges-review');
+    expect(reviews).toContain('source-built pinned-beta1');
+    expect(reviews).toContain('not renewed complete merchant regression or hosted frozen-payment proof');
+    expect(reviews).toContain('e2cc307');
+    expect(reviews).toContain('254b6e4');
+    for (const source of [report, reviews]) expect(source).toContain('/pr-proof/template-cart-focus/after-desktop-light.png');
+  });
+  it('reports untouched delivery as a merchant-client correction with intercepted transport', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-empty-delivery-dispatch');
+    expect(report).toContain('data-empty-delivery-history');
+    expect(report).toContain('Previous dispatch · Feed member landings');
+    expect(report).toContain('synthetic capability transport and every real start blocked');
+    expect(report).toContain('not the prepared server-cart flow or a signed-plugin contract');
+    expect(report).toContain('/pr-proof/empty-delivery/before-390.png');
+    expect(report).toContain('/pr-proof/empty-delivery/after-390-dark.png');
+  });
   it('bounds current preparation regression proof to its exact off-live source', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -508,7 +548,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('reports the native seventh product without rewriting older catalog or recovery claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
-    expect(pulse).toContain('Seven product families, two collections and eight field notes');
+    expect(pulse).toContain('Seven product families, two collections and nine field notes');
     expect(source).toContain('Seven EmDash-backed product families');
     expect(source).toContain('A $12 pocket notebook joins the gear shelf');
     expect(source).toContain('The six existing products and eight Orders remain unchanged');

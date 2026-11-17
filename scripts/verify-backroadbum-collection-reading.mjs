@@ -58,13 +58,13 @@ try {
       }
       await shelf.getByRole('link', { name: 'All field notes', exact: true }).click();
       await page.waitForURL(url => url.pathname === '/field-notes');
-      assert.equal(await page.locator('.field-index .brb-story-link').count(), 7);
+      assert((await page.locator('.field-index .brb-story-link').count()) >= 9);
     }
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await page.goto(origin + '/categories/slow-camp');
     assert.equal(await page.locator('[data-collection-reading]').count(), absent ? 0 : 1);
     if (!absent) assert.deepEqual(await page.locator('[data-collection-reading] li a').evaluateAll(nodes => nodes.map(node => node.getAttribute('href'))),
-      ['/field-note-after-a-road-day'], 'Only the shared tote supplies a Slow camp relationship');
+      ['/field-note-a-layer-within-reach', '/field-note-after-a-road-day'], 'Fleece and shared tote supply native Slow camp relationships');
     assert((await page.locator('[data-commerce-product]').count()) > 0);
     assert.equal((await page.goto(origin + '/categories/not-a-real-collection')).status(), 404);
     assert.equal(await page.locator('[data-collection-reading]').count(), 0);

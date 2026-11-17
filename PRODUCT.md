@@ -1,6 +1,15 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Native cart keyboard continuity · November17
+The isolated beta store lost keyboard focus after Update and non-final Remove; the unchanged-main cart client reproduces it. An off-live candidate retains the current control or a useful neighboring row and respects movement during delayed responses, including agent-triggered redraws. Template issue245 has hosted Before/After proof; the serving Commerce0.8cart and all business records remain unchanged.
+
+## A layer within reach · November17
+The fleece now has a native reading companion about finding a dry spare at a safe stop, keeping it separate and recognizing a comfort layer’s limits. The ninth Field Note is authored and published in EmDash, with exact draft reload, draft privacy, journal/search discovery, product/collection round trips and script-free print content verified. Catalog facts and existing pages/orders remain unchanged; the seed manuscript is only an authorship checklist.
+
+## An untouched delivery address · November17
+A valid email with no delivery fields previously bypassed local corrections and attempted checkout with email alone. Physical baskets now focus and describe Recipient before any start request, whether billing is shared or separate; editing clears that correction and preserves the email/cart. This is a merchant 0.8-client refinement using the existing form design, not a signed-plugin or future server-cart change.
+
 ## Reading from the gear shelf · November16
 The Field Book now leads to its notebook prompts and the Field Tote to the road-day reset, using the published notes’ actual product links. A quiet reading shelf sits after product details, before related gear; products without a genuine match gain no shelf. Native keyboard/script-free round trips preserve Commerce facts, browser intent and existing collection reading; no CMS, catalog or order edit is involved.
 

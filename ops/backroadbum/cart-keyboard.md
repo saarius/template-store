@@ -1,5 +1,12 @@
 # Cart and checkout keyboard continuity
 
+## Untouched delivery correction · November 17
+A valid email plus an untouched physical delivery skipped the local required-field checks, attempting an email-only start; with synthetic preparation and the start aborted, focus fell to BODY and no field correction appeared. The serving 0.8-compatible client now corrects Recipient before submission, with shared/separate billing handled alike. Existing geographic validation, digital-only behavior, later missing-field order, typed email and saved cart are unchanged.
+
+Run `node scripts/verify-backroadbum-contact-feedback.mjs` from `repos/template-store` (optional `--capture` writes ignored local images). Four390/1440 Light/Dark contexts exercise eleven rejected submissions each, retaining focused/described inline corrections and per-field clearing; the transport synthesizes prepare/status and blocks every other non-read request, so it creates no server capability or payment. Focused unit coverage includes wholly empty/whitespace physical addresses, email priority and unchanged digital-only billing. Candidate-client/browser and static painted-correction evidence: `evidence/2026-11-17-native-merchant/`.
+
+Current upstream checkout has native server forms, so no obsolete-client PR is opened and this hydration change is not transplanted into `backroadbum/server-cart-prep`. The first exploratory diagnostic allowed one normal capability prepare while checking admission; no start/contact submission or Order resulted. Subsequent Before/After and regression drivers use synthetic transport exclusively; do not mistake those refusal fixtures for a real Commerce/provider error response or another paid checkout.
+
 ## Product-detail retry ownership · November 16
 The browser-cart product-detail retry now stays focusable with `aria-disabled` / `aria-busy` while its existing pending guard refuses duplicate refreshes. A failed read retains that button; a successful read reaches the first product link, or the retained quantity when the product is unavailable, only if the retry still owns focus at completion. Immediate nearest scrolling keeps that owned control visible, while moved focus, exact saved sizes/quantities and invalid drafts remain intact.
 
@@ -9,13 +16,6 @@ Run `pnpm exec playwright test -c playwright.backroadbum.config.ts backroadbum-c
 The current 0.8-compatible merchant checkout uses a named native form so Enter in contact fields reaches the same custom corrections and guarded handoff as its submit button. The order manifest remains outside that form; auxiliary buttons cannot submit. Binding prevents native navigation before enabling the button, and no-script guidance hides the unbound form.
 
 Run `pnpm exec playwright test -c playwright.backroadbum.config.ts backroadbum-checkout-keyboard` from `repos/template-store`. Ten desktop/phone Light/Dark checks cover blank/malformed email, valid pointer/Enter submission, duplicate in-flight refusal, synthetic provider rejection and JavaScript-off guidance; every write is intercepted. This is browser interaction proof, not a new Stripe purchase, physical mobile keyboard or screen-reader qualification. Evidence: `evidence/2026-11-16-checkout-navigation/`; no upstream submission because current upstream already uses native server forms.
-
-## Product option stock feedback · November 16
-Keyboard selection of fleece XL exposed a plain paragraph after changing its visible stock message to Available on backorder; Chromium reported no live-region properties. The merchant PDP now renders the existing variant-stock paragraph as `role=status` with `aria-atomic=true` before any option changes, retaining the same node and native radio focus. Static simple-product stock stays unchanged.
-
-Run `node scripts/verify-backroadbum-stock-status.mjs` from `repos/template-store`. It checks fleece XL backorder and tee XL sold-out transitions, arrow-key recovery to L, actual Chromium polite/atomic accessibility properties, selected member/price/JSON-LD/cart intent and the simple mug at1440/390 Light/Dark, blocking all non-GET traffic. This supplies browser semantics without asserting NVDA/VoiceOver speech or physical-device qualification; evidence is in workspace `evidence/2026-11-16-variant-stock-feedback/`.
-
-## Retained cart links
 
 ## Product option stock feedback · November 16
 Keyboard selection of fleece XL exposed a plain paragraph after changing its visible stock message to Available on backorder; Chromium reported no live-region properties. The merchant PDP now renders the existing variant-stock paragraph as `role=status` with `aria-atomic=true` before any option changes, retaining the same node and native radio focus. Static simple-product stock stays unchanged.
