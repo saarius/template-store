@@ -2,6 +2,24 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('bounds native size saves to temporary fixture prices and retained member identities', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-native-variant-cart-dispatch');
+    expect(report).toContain('data-native-variant-cart-history');
+    expect(reviews).toContain('data-native-variant-cart-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('M×2 + XL×1');
+      expect(source).toContain('/pr-proof/native-variant-cart/staged-xl-admin.png');
+      expect(source).toContain('/pr-proof/native-variant-cart/staged-sizes-cart.png');
+      expect(source).toContain('original');
+    }
+    expect(report).toContain('$204→$196→$204');
+    expect(report).toContain('Agent-feed reads match the XL sale');
+    expect(report).toContain('signed same-ID upgrade and hosted payment remain separate');
+    expect(reviews).toContain('not a live promotion');
+    expect(reviews).toContain('no new defect, upstream request');
+  });
   it('separates native price/cart staging and manifest fallout from live promotions or CMS repairs', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
