@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Sibling prices, protected saves · November17 (off live)
+Two native merchant editors now have installed-beta proof for stale sibling-size forms: an accepted M or XL save refuses older corrections whole while keeping the typing, and deliberate reload permits the next save. Retained plain desktop/enhanced phone carts and agent feed agree at $204→$188→$182→$204; exact size links, quantities and secure cart capabilities survive, and all original staged catalog facts are restored. This validates existing safeguards, not a new framework repair, live promotion or stable-plugin upgrade.
+
 ## Retirement without losing intent · November17 (off live)
 The prepared cart now has real installed-beta proof for native page Trash, Restore as draft and Publish. The same plain desktop/enhanced Dark phone carts retain two units through unavailability, then recover their exact product link and $24 subtotal after republishing, without a new capability or checkout. This verifies Commerce277’s accepted workflow in a fresh public-only fixture with a native initial publication—not original CMS revision migration, a live catalog edit or a stable-plugin upgrade.
 

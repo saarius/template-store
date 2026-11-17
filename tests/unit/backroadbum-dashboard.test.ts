@@ -2,6 +2,25 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('bounds native sibling-form contention to refused writes and disposable prices', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const runbook = readFileSync('ops/backroadbum/catalog-editing.md', 'utf8');
+    expect(report).toContain('data-native-contention-dispatch');
+    expect(report).toContain('data-native-contention-history');
+    expect(reviews).toContain('data-native-contention-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('/pr-proof/native-catalog-contention/stale-phone.png');
+      expect(source).toContain('/pr-proof/native-catalog-contention/cart-390.png');
+      expect(source).toContain('No new framework defect');
+    }
+    expect(report).toContain('$204→$188→$182→$204');
+    expect(report).toContain('HTTP200 alone is not a successful Save');
+    expect(reviews).toContain('not a live promotion, signed upgrade');
+    expect(runbook).toContain('same stale form remains refused');
+    expect(runbook).toContain('not an authoritative Regular/Sale pair');
+    expect(runbook).toContain('The first incomplete fixture was discarded');
+  });
   it('bounds the accepted native lifecycle rehearsal to a fresh public-only beta fixture', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
