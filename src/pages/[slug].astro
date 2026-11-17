@@ -4,8 +4,11 @@
  * (template-cms-pages-and-redirects-20261027). Pages with their own storefront
  * file (/shipping, /returns, the home page) keep it; Astro serves those first.
  */
-import { getEmDashEntry, getEmDashCollection, type PortableTextBlock } from "emdash";
+import { getEmDashEntry, getEmDashCollection, getRequestContext, getEditMeta, type PortableTextBlock } from "emdash";
 import FieldNoteFooter from "../features/store-shell/FieldNoteFooter.astro";
+import FieldNoteSections from "../features/store-shell/FieldNoteSections.astro";
+import FieldNoteBlock from "../features/store-shell/portable-text/FieldNoteBlock.astro";
+import { fieldNoteSections } from "../features/store-shell/field-note-sections.js";
 import MissingPageContent from "../features/store-shell/MissingPageContent.astro";
 import TestStoreActions from "../features/store-shell/TestStoreActions.astro";
 import { fieldNote, nextFieldNotes } from "../features/store-shell/field-notes.js";
@@ -33,6 +36,11 @@ const content = Array.isArray(data?.content) ? data.content : [];
 const title = data?.title?.trim() || "Page not found";
 const profile = readStorefrontProfile();
 const note = layout.length === 0 ? fieldNote(entry) : null;
+const context = getRequestContext();
+// Keep native inline-editor metadata and unpublished previews out of this projection.
+const reading = note && !context?.preview && !context?.editMode && !getEditMeta(content)
+  ? fieldNoteSections(content) : null;
+const textComponents = reading ? { ...legacyPortableTextComponents, block: FieldNoteBlock } : legacyPortableTextComponents;
 const testGuide = Boolean(entry && slug === "test-store" && layout.length === 0);
 // Continue through the published journal; an optional read must not hide the article.
 const relatedNotes = note ? await getEmDashCollection<"pages", Record<string, unknown>>("pages", { status: "published" })
@@ -60,13 +68,14 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
         <>
           {note && <><a class="field-note__back" href="/field-notes">Back to field notes</a><p class="field-note__kicker">From the field journal</p></>}
           {layout.length === 0 && <h1 class="cms-page__title">{title}</h1>}
+          {reading && <FieldNoteSections sections={reading.sections} />}
           {layout.length > 0 ? (
             <div class="cms-composition" data-cms-composition data-layout="blocks">
               <Blocks value={layout} components={pageLayoutComponents} fallback={UnknownBlock} />
             </div>
           ) : content.length > 0 && (
             <div class="cms-page__body prose" data-cms-page-body>
-              <PortableText value={content} components={legacyPortableTextComponents} />
+              <PortableText value={reading?.content ?? content} components={textComponents} />
             </div>
           )}
           {note && <>
@@ -101,6 +110,8 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
   .cms-reading .cms-page__body :global(ol),.cms-reading .cms-page__body :global(ul){margin:0 0 1.5rem;padding-inline-start:1.6em}
   .cms-reading .cms-page__body :global(li + li){margin-top:.75rem}
   .field-note .cms-page__body :global(blockquote){margin:var(--space-6) 0;padding:var(--space-4) var(--space-5);border-inline-start:3px solid var(--store-accent);background:var(--store-surface);color:var(--store-ink);font:inherit;overflow-wrap:anywhere}
+  .field-note .cms-page__body :global([data-note-section]){scroll-margin-block-start:var(--space-7)}
+  .field-note .cms-page__body :global([data-note-section]:focus-visible){outline:3px solid var(--store-accent);outline-offset:6px;border-radius:var(--radius-control)}
   .cms-reading .cms-page__body :global(a){color:var(--store-ink);text-decoration:underline;text-underline-offset:.18em}
   .cms-reading .cms-page__body :global(a:hover){text-decoration-thickness:2px}
 </style>

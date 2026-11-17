@@ -2,6 +2,11 @@
 
 Ten notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
 
+## Chapter navigation · November17
+The merchant presentation derives sections from real non-list native h2 blocks. Two or more chapters expose a closed native disclosure; heading fragments are focusable with scripts off and hidden from print. Titles remain plain text in navigation while EmDash retains marks/alignment in the article; duplicate titles get distinct position-based targets. This is request-local projection, not a CMS save, topic taxonomy or permanent-link promise after reordering. Non-note/policy/layout pages retain their own renderer.
+
+`node scripts/verify-backroadbum-note-sections.mjs` checks every published article and eight phone/desktop Light/Dark script-on/off contexts, blocking HTTP writes. `--baseline` records prior native article facts; `BACKROADBUM_VERIFY_BASELINE=<result.json>` requires exact subsequent prose/list/link/heading equality, and `BACKROADBUM_VERIFY_ORIGIN` / `BACKROADBUM_VERIFY_OUT` select an isolated preview and ignored evidence directory. Browser checks cover actual heading focus, native Back/reload, print omission and policy/missing-page exclusion. Evidence: `evidence/2026-11-17-journal-sections/`; no account, payment or authoring replay is involved.
+
 ## Shade note · November17
 `seed/backroadbum-shade-note.json` records16native blocks, four chapters, three list items and two links. Native draft save/reload, anonymous draft exclusion and one confirmed publication pass; completed0600 guard `/etc/backroadbum/operator/shade-note.json` must not be replayed. The cap gains its first reading shelf; Road day now shows notebook/shade under the existing two-note stable ordering, while the reset note stays in the journal and tote shelf. Evidence:`evidence/2026-11-17-cap-care/`.
 
