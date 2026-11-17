@@ -1,17 +1,19 @@
 ---
 import { GUEST_CHECKOUT_LABEL, GUEST_CHECKOUT_REASON } from "./index.js";
 import type { GuestCheckoutAdmission } from "./index.js";
-import { loadServerCartPage } from "./server-view.js";
+import { loadServerCartPage, type ServerCartPage } from "./server-view.js";
 import { GUEST_CART_MAX_QUANTITY } from "./intent.js";
 
 interface Props {
   checkoutAdmission?: GuestCheckoutAdmission | null;
+  /** An already-read cart, when composed by another server component. */
+  page?: ServerCartPage;
 }
 
 const { checkoutAdmission = null } = Astro.props;
 // Drawn on the server from Commerce's cart (template-cart-real-form-20261113): it works with script off, and the
 // page script only swaps in a fresh copy of this section after a change.
-const page = await loadServerCartPage(
+const page = Astro.props.page ?? await loadServerCartPage(
   { locals: Astro.locals, request: Astro.request, url: Astro.url, cookies: Astro.cookies },
   Boolean(checkoutAdmission),
 );
@@ -33,7 +35,7 @@ const canCheckout = view.checkoutEnabled && !page.openPayment;
             : <p data-guest-cart-thumbnail-placeholder>No image</p>}
         </div>
         <div data-guest-cart-line-copy>
-          <h2>{line.name}</h2>
+          <h2>{line.productPath ? <a data-guest-cart-product-link href={line.productPath}>{line.name}</a> : line.name}</h2>
           {line.sku && <p data-guest-cart-sku>SKU: {line.sku}</p>}
           {line.saleText && line.regularText
             ? <p class="price"><s data-regular-price>{line.regularText}</s><strong data-sale-price>{line.saleText}</strong></p>
@@ -95,6 +97,10 @@ const canCheckout = view.checkoutEnabled && !page.openPayment;
   [data-guest-cart-thumbnail-placeholder]{display:grid;place-items:center;height:100%;margin:0;color:var(--store-muted);font-size:.85rem;text-align:center}
   [data-guest-cart-line-copy]{min-width:0}
   [data-guest-cart-line] h2{font-size:var(--text-xl);line-height:1.3;margin:0 0 .5rem}
+  [data-guest-cart-product-link]{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-underline-offset:.15em}
+  [data-guest-cart-product-link]:hover{text-decoration-thickness:2px}
+  [data-guest-cart-product-link]:active{background:var(--store-surface-subtle)}
+  [data-guest-cart-product-link]:focus-visible{outline:3px solid var(--store-focus-ring);outline-offset:3px;border-radius:var(--radius-control)}
   [data-guest-cart-line] p{margin:.4rem 0}
   .price,[data-guest-cart-line-total],[data-guest-cart-qty]{font-variant-numeric:tabular-nums}
   .price{display:flex;gap:.65rem;flex-wrap:wrap;font-size:1.4rem}

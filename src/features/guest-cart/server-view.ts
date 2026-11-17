@@ -1,5 +1,6 @@
 import { readCommerceCatalogSnapshots } from "../commerce-catalog/index.js";
 import { GUEST_CART_VERSION } from "./intent.js";
+import { linkPublishedCartProducts } from "./product-links.server.js";
 import {
   presentGuestCart,
   projectGuestCartCatalogSnapshots,
@@ -43,10 +44,11 @@ export async function loadServerCartPage(ctx: ServerCartContext, checkoutAdmitte
   let snapshotFailed = false;
   if (lines.length) {
     try {
-      snapshots = projectGuestCartCatalogSnapshots(await readCommerceCatalogSnapshots(
+      const catalog = await readCommerceCatalogSnapshots(
         lines.map((line) => line.catalogItemId),
         { runtime: ctx.locals.emdash as never, request: ctx.request },
-      ));
+      );
+      snapshots = projectGuestCartCatalogSnapshots(await linkPublishedCartProducts(catalog));
       snapshotFailed = snapshots === null;
     } catch {
       snapshots = null;

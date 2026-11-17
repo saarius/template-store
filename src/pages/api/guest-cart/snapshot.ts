@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
-import { getEmDashCollection } from "emdash";
-import { attachCartProductPaths } from "../../../features/guest-cart/product-links.js";
+import { linkPublishedCartProducts } from "../../../features/guest-cart/product-links.server.js";
 
 import { readCommerceCatalogSnapshots } from "../../../features/commerce-catalog/index.js";
 import { parseGuestCartSnapshotIds, projectGuestCartCatalogSnapshots } from "../../../features/guest-cart/index.js";
@@ -21,16 +20,7 @@ export const GET: APIRoute = async ({ url, locals, request }) => {
   }
   try {
     const snapshots = await readCommerceCatalogSnapshots(ids, { runtime: locals.emdash, request });
-    let linked = snapshots;
-    // Navigation is optional: a CMS read failure must not hide current prices
-    // or discard a cart that Commerce can still resolve.
-    if (snapshots.some(snapshot => snapshot.found && snapshot.page)) {
-      try {
-        const { entries } = await getEmDashCollection<"products", Record<string, unknown>>("products", { status: "published" });
-        linked = attachCartProductPaths(snapshots, entries);
-      } catch { /* Keep plain product names when published pages are unavailable. */ }
-    }
-    const products = projectGuestCartCatalogSnapshots(linked);
+    const products = projectGuestCartCatalogSnapshots(await linkPublishedCartProducts(snapshots));
     if (products === null) {
       return snapshotJson(
         {

@@ -2,12 +2,17 @@ import { createRequire } from 'node:module';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import Checkout from '../../src/features/guest-cart/GuestCheckout.astro';
+import Cart from '../../src/features/guest-cart/GuestCart.astro';
 import Receipt from '../../src/features/guest-cart/GuestCheckoutReturn.astro';
 import AddToCart from '../../src/features/guest-cart/AddToCart.astro';
 import type { PublicCommerceProduct, PublicCommerceVariant } from '../../src/features/commerce-catalog/types';
 import { presentGuestCart } from '../../src/features/guest-cart/present';
 import type { CheckoutReturn } from '../../src/features/guest-cart/server-return';
 import type { ConfirmedOrderView } from '../../src/features/guest-cart/order-view';
+
+vi.mock('../../src/features/guest-cart/server-view.js', () => ({
+  loadServerCartPage: () => { throw new Error('Presentation cases must supply a server-read cart.'); },
+}));
 
 const view = presentGuestCart({
   intent: { version: 1, lines: [{ id: 'synthetic-notebook', quantity: 1 }] },
@@ -79,6 +84,20 @@ describe('native merchant journey rendering', () => {
     expect(tag(html, 'input', 'name', 'productId').value).toBe('synthetic-root');
     expect(tag(html, 'input', 'name', 'quantity').value).toBe('1');
     expect(elements(html).some(node => node.attributes.name === 'id')).toBe(false);
+  });
+
+  it.each([true, false])('renders a native cart product destination only when a published path exists (%s)', async linked => {
+    const cartView = { ...view, lines: view.lines.map(line => ({ ...line, productPath: linked ? '/products/field-book?item=synthetic-notebook' : null })) };
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Cart, { props: { page: { ...page, view: cartView }, checkoutAdmission: {} } });
+    const links = elements(html).filter(node => Object.hasOwn(node.attributes, 'data-guest-cart-product-link'));
+    expect(links).toHaveLength(linked ? 1 : 0);
+    if (linked) expect(links[0].attributes.href).toBe('/products/field-book?item=synthetic-notebook');
+    else expect(html).toMatch(/<h2[^>]*>Synthetic notebook<\/h2>/u);
+    expect(html).toContain('$12.00');
+    expect(tag(html, 'form', 'data-cart-change-form', '')).toMatchObject({ method: 'post', action: '/cart/change' });
+    expect(tag(html, 'input', 'name', 'id').value).toBe('synthetic-notebook');
+    expect(tag(html, 'input', 'data-guest-cart-qty', 'synthetic-notebook').value).toBe('1');
   });
 
   it('renders named shipping and billing controls with native autocomplete and country choices', async () => {
