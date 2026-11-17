@@ -9,6 +9,13 @@ export function cartLineFocusAfterRedraw(focus: CartLineFocus, ids: readonly str
   return id === undefined ? null : { id, control: focus.control };
 }
 
+/** A frozen or unavailable control cannot take focus, even if it survived the redraw. */
+function focusElement(target: HTMLElement | null | undefined): boolean {
+  if (!target || target.matches(":disabled, [aria-disabled='true']") || target.closest("[hidden], [inert]")) return false;
+  target.focus();
+  return target.ownerDocument.activeElement === target;
+}
+
 /** Observe focus at response time, not submission time: later keyboard movement wins. */
 export function replaceCartSection(previous: Element, next: Element): void {
   const active = previous.ownerDocument.activeElement;
@@ -25,16 +32,21 @@ export function replaceCartSection(previous: Element, next: Element): void {
   const alert = next.querySelector<HTMLElement>("[role=alert]");
   if (alert) {
     alert.tabIndex = -1;
-    alert.focus();
-    return;
+    if (focusElement(alert)) return;
   }
   if (focus) {
     const nextRows = Array.from(next.querySelectorAll<HTMLElement>(`[${LINE}]`));
     const target = cartLineFocusAfterRedraw(focus, nextRows.map(line => line.getAttribute(LINE)!));
     const nextRow = target && nextRows.find(line => line.getAttribute(LINE) === target.id);
     const input = target && nextRow?.querySelector<HTMLElement>(`[${target.control}]`);
-    if (input) { input.focus(); return; }
+    if (focusElement(input)) return;
   }
-  const target = sectionControl && next.querySelector<HTMLElement>(`[${sectionControl}]`);
-  (target || next.querySelector<HTMLElement>("[data-guest-cart-empty]"))?.focus();
+  if (sectionControl && focusElement(next.querySelector<HTMLElement>(`[${sectionControl}]`))) return;
+  // Checkout may have frozen the row, or an expired payment may have removed Resume.
+  // Try useful surviving actions, then a stable reading position rather than BODY.
+  for (const selector of ["[data-guest-cart-resume]", "[data-guest-cart-proceed]", "[data-guest-cart-empty]"]) {
+    if (focusElement(next.querySelector<HTMLElement>(selector))) return;
+  }
+  const title = next.querySelector<HTMLElement>("h1");
+  if (title) { title.tabIndex = -1; focusElement(title); }
 }

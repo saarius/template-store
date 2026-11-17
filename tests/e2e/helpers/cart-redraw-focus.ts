@@ -51,10 +51,33 @@ export async function exerciseCartRedrawFocus(page: Page, capture?: () => Promis
   const outside = page.locator("header a").first();
   await heldChange("5", () => outside.focus(), () => expect(outside).toBeFocused());
 
+  // Bypass browser constraints deliberately: the real server's refusal must be focusable.
+  await quantity.first().fill("100");
+  await quantity.first().evaluate(input => { input.closest("form")!.noValidate = true; });
+  await update.first().focus(); await page.keyboard.press("Enter");
+  await expect(page.locator("[data-server-cart] [role=alert]")).toBeFocused();
+  await expect(page.locator("[data-guest-cart-count]").first()).toHaveText("6");
+
+  // WebMCP uses the same redraw path; it must keep the current row's keyboard task.
+  await quantity.nth(1).focus();
+  const changed = await page.evaluate(async () => {
+    const actions = (window as unknown as { Dinkus: { actions: {
+      getCart(): Promise<{ version: string }>;
+      updateCart(input: { version: string; lines: { id: string; quantity: number }[] }): Promise<{ ok: boolean }>;
+    } } }).Dinkus.actions;
+    const ids = Array.from(document.querySelectorAll("[data-guest-cart-line]"), row => row.getAttribute("data-guest-cart-line")!);
+    const cart = await actions.getCart();
+    return actions.updateCart({ version: cart.version, lines: ids.map((id, index) => ({ id, quantity: index === 0 ? 6 : 1 })) });
+  });
+  expect(changed.ok).toBe(true);
+  await expect(quantity.first()).toHaveValue("6");
+  await expect(quantity.nth(1)).toBeFocused();
+
   await remove.first().focus(); await page.keyboard.press("Enter");
   await expect(quantity).toHaveCount(1); await expect(remove.first()).toBeFocused();
   await remove.first().press("Enter");
   await expect(page.locator("[data-guest-cart-empty]")).toBeFocused();
   return { inputSubmitFocus: true, buttonSubmitFocus: true, nextTabStaysNearRow: true,
-    laterRowFocusWins: true, outsideFocusNotStolen: true, removalFocus: true, emptyFocus: true };
+    laterRowFocusWins: true, outsideFocusNotStolen: true, rejectedChangeAlertFocus: true,
+    agentRedrawKeepsFocus: true, removalFocus: true, emptyFocus: true };
 }
