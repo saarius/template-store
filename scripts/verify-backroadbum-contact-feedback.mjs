@@ -39,6 +39,9 @@ try {
       await expect(error).toHaveText(text);
       await expect(field).toBeFocused();
       await expect(field).toHaveAttribute('aria-invalid', 'true');
+      // Focus scrolling can place a field under the pointer; inspect its
+      // invalid border outside the separate accent-colored hover state.
+      await page.mouse.move(0, 0);
       const danger = await field.evaluate(element => {
         const probe = document.createElement('span'); probe.style.borderTopColor = 'var(--color-danger)';
         element.parentElement.append(probe); const color = getComputedStyle(probe).borderTopColor; probe.remove(); return color;
