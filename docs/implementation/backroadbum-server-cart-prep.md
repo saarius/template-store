@@ -2,6 +2,10 @@
 
 November 15, 2026. `backroadbum/server-cart-prep` merges upstream/main167d736 downstream into merchant7df906f, pins Commerce beta2 b460433, and carries proposed Template240's four source changes without merging that unaccepted PR. It is not eligible for production, an upstream PR, or a signed-plugin upgrade.
 
+## Current continuity · November17, 07:00UTC
+
+Merge `8f4be9b` brings in live703a42e's nine-note content and reporting without replacing native checkout with its legacy retry implementation. Candidate9996119 repairs cold sold-out selected-member controls ([Template247](https://github.com/dinkuskit/template-store/issues/247)); fresh signed Registry-beta2 proof covers all seven families/eleven members in plain and enhanced cart journeys, with no Payments binding. Current557-file Astro check,1271units,13 rendered cases,120workflows/two skips, source Registry gate and four-view cart/product/dashboard audits pass; the attempted full local browser wrapper exhausted its first-admin dev-server child and was stopped after650seconds, so no complete matrix/crawl or live upgrade is claimed. Evidence: `evidence/2026-11-17-prep-continuity/`; public effective-price projections do not yet qualify a Regular/Sale pair.
+
 ## Prepared
 - Real server-rendered Add, Cart, Checkout and thank-you components use the existing Field Journal fonts, dual theme, proportional fields and merchant print CSS. Native variant forms submit selected options without JavaScript; retained `?item` links still work beside upstream `?variant` links.
 - Checkout calls the existing session-safe prefill helper (PR237). Account client/feedback safeguards from235/239 are unchanged. The merchant parser preserves billing and accepts native `status`/`completed.at` alongside retained wrapper fulfillment, without trusting malformed completion metadata.
