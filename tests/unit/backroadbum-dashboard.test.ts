@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports untouched delivery as a merchant-client correction with intercepted transport', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-empty-delivery-dispatch');
+    expect(report).toContain('data-empty-delivery-history');
+    expect(report).toContain('Previous dispatch · Feed member landings');
+    expect(report).toContain('synthetic capability transport and every real start blocked');
+    expect(report).toContain('not the prepared server-cart flow or a signed-plugin contract');
+    expect(report).toContain('/pr-proof/empty-delivery/before-390.png');
+    expect(report).toContain('/pr-proof/empty-delivery/after-390-dark.png');
+  });
   it('bounds current preparation regression proof to its exact off-live source', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

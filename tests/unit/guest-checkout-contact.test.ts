@@ -178,10 +178,17 @@ describe("guest checkout delivery contact", () => {
     expect(readCheckoutContact(contactForm({ region: "NY", line2: "" }), true).error).toBeNull();
   });
 
-  it("leaves an empty delivery address for Commerce to refuse rather than sending an empty billing copy", () => {
-    expect(readCheckoutContact(contactForm({ name: "", line1: "", city: "", "postal-code": "", country: "" }), true)).toEqual({
-      contact: { email: "shopper@example.test" },
-      error: null,
-    });
+  it.each([true, false])("corrects an untouched physical delivery before checkout (same billing: %s)", (same) => {
+    for (const value of ["", "   "]) {
+      const fields = { name: value, line1: value, line2: value, city: value, region: value, "postal-code": value, country: value };
+      expect(readCheckoutContact(contactForm(fields, same), true)).toEqual({
+        contact: null,
+        error: "Enter the delivery recipient name to continue.",
+        field: "delivery-name",
+      });
+      expect(readCheckoutContact(contactForm({ ...fields, email: "" }, same), true)).toEqual({
+        contact: null, error: "Enter your email address to continue.", field: "email",
+      });
+    }
   });
 });

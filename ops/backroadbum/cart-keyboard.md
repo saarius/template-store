@@ -1,5 +1,12 @@
 # Cart and checkout keyboard continuity
 
+## Untouched delivery correction · November 17
+A valid email plus an untouched physical delivery skipped the local required-field checks, attempting an email-only start; with synthetic preparation and the start aborted, focus fell to BODY and no field correction appeared. The serving 0.8-compatible client now corrects Recipient before submission, with shared/separate billing handled alike. Existing geographic validation, digital-only behavior, later missing-field order, typed email and saved cart are unchanged.
+
+Run `node scripts/verify-backroadbum-contact-feedback.mjs` from `repos/template-store` (optional `--capture` writes ignored local images). Four390/1440 Light/Dark contexts exercise eleven rejected submissions each, retaining focused/described inline corrections and per-field clearing; the transport synthesizes prepare/status and blocks every other non-read request, so it creates no server capability or payment. Focused unit coverage includes wholly empty/whitespace physical addresses, email priority and unchanged digital-only billing. Candidate-client/browser and static painted-correction evidence: `evidence/2026-11-17-native-merchant/`.
+
+Current upstream checkout has native server forms, so no obsolete-client PR is opened and this hydration change is not transplanted into `backroadbum/server-cart-prep`. The first exploratory diagnostic allowed one normal capability prepare while checking admission; no start/contact submission or Order resulted. Subsequent Before/After and regression drivers use synthetic transport exclusively; do not mistake those refusal fixtures for a real Commerce/provider error response or another paid checkout.
+
 ## Product-detail retry ownership · November 16
 The browser-cart product-detail retry now stays focusable with `aria-disabled` / `aria-busy` while its existing pending guard refuses duplicate refreshes. A failed read retains that button; a successful read reaches the first product link, or the retained quantity when the product is unavailable, only if the retry still owns focus at completion. Immediate nearest scrolling keeps that owned control visible, while moved focus, exact saved sizes/quantities and invalid drafts remain intact.
 

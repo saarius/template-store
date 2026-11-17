@@ -219,21 +219,24 @@ export function readCheckoutContact(
   let delivery: GuestCheckoutDelivery | undefined;
   if (needsDelivery) {
     const read = readAddress(root, "delivery");
-    if (read !== "empty" && "missing" in read) {
+    // A physical basket needs delivery even when the shopper has not started
+    // the address. Use the same local correction as a partially filled form.
+    if (read === "empty") {
+      return { contact: null, error: addressCorrection("delivery", "name"), field: "delivery-name" };
+    }
+    if ("missing" in read) {
       return { contact: null, error: addressCorrection("delivery", read.missing), field: addressField("delivery", read.missing) };
     }
-    if (read !== "empty") {
-      if (!/^[A-Z]{2}$/u.test(read.country)) return { contact: null, error: "Choose a country this store ships to.", field: "delivery-country" };
-      if (read.country === "US" && !read.region) {
-        return { contact: null, error: "Enter a state for United States delivery.", field: "delivery-region" };
-      }
-      delivery = read;
+    if (!/^[A-Z]{2}$/u.test(read.country)) return { contact: null, error: "Choose a country this store ships to.", field: "delivery-country" };
+    if (read.country === "US" && !read.region) {
+      return { contact: null, error: "Enter a state for United States delivery.", field: "delivery-region" };
     }
+    delivery = read;
   }
   // Commerce needs a full billing copy on every order; "same as delivery" sends the delivery address again.
   const same = root.querySelector("[data-guest-cart-billing-same]");
   if (needsDelivery && (!(same instanceof HTMLInputElement) || same.checked)) {
-    // With no delivery address, Commerce answers that one is required.
+    // Physical delivery has already passed the same required-field checks.
     return { contact: delivery ? { email, delivery, billing: { ...delivery } } : { email }, error: null };
   }
   const billing = readAddress(root, "billing");
