@@ -1,4 +1,5 @@
 import { CART_COUNT_COOKIE_NAME } from "./cart-cookie-name.js";
+import { replaceCartSection } from "./cart-redraw-focus.js";
 import { GUEST_CART_MAX_QUANTITY } from "./intent.js";
 import { installStorefrontWebMcp } from "./webmcp.js";
 
@@ -86,9 +87,9 @@ async function submitChange(form: HTMLFormElement): Promise<boolean> {
     const html = await response.text();
     const next = new DOMParser().parseFromString(html, "text/html").querySelector("[data-server-cart]");
     if (!response.ok || !next) return submitPlainChange(form);
-    document.querySelector("[data-server-cart]")?.replaceWith(next);
+    const current = document.querySelector("[data-server-cart]");
+    if (current) replaceCartSection(current, next);
     renderCartCount();
-    next.querySelector<HTMLElement>("[role=alert], [data-guest-cart-empty]")?.focus?.();
     return true;
   } catch {
     return submitPlainChange(form);
@@ -103,7 +104,7 @@ async function cartChangedElsewhere(count: number): Promise<void> {
   try {
     const response = await fetch("/cart", { headers: { accept: "text/html" }, credentials: "same-origin" });
     const next = new DOMParser().parseFromString(await response.text(), "text/html").querySelector("[data-server-cart]");
-    if (response.ok && next) section.replaceWith(next);
+    if (response.ok && next) replaceCartSection(section, next);
   } catch {
     // The next visit draws the current cart.
   }

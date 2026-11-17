@@ -7,6 +7,7 @@ import { expect, test, type Browser, type Page, type TestInfo } from "@playwrigh
 
 import { COMMERCE_SKU_INDEX, listCatalog, openProductsList, sellProduct } from "./helpers/product-page";
 import { exerciseOverlappingCartChanges } from "./helpers/cart-change-queue";
+import { exerciseCartRedrawFocus } from "./helpers/cart-redraw-focus";
 
 // The cart lives in Commerce; the browser holds only its key in an HttpOnly cookie
 // (template-cart-real-form-20261113, template-cart-count-cookie-20261113).
@@ -285,6 +286,23 @@ test("a lost change answer uses its captured plain form without sending queued c
     release();
     await context.close();
   }
+});
+
+test("enhanced cart redraws retain current keyboard focus without stealing it back", async ({ browser }, testInfo) => {
+  test.setTimeout(180_000);
+  const first = await storeWithProduct(browser, testInfo, "focus-first", false);
+  const second = await storeWithProduct(browser, testInfo, "focus-second", false);
+  const context = await browser.newContext({ viewport: testInfo.project.use.viewport });
+  try {
+    const shopper = await context.newPage();
+    for (const product of [first, second]) {
+      await shopper.goto(product.productPath);
+      await shopper.locator("[data-add-to-cart-form] button[type=submit]").click();
+      await expect(shopper.locator("[data-add-to-cart-status]")).toHaveText("Added to your cart.");
+    }
+    await shopper.goto("/cart");
+    await exerciseCartRedrawFocus(shopper);
+  } finally { await context.close(); }
 });
 
 test("the thank-you page trusts only the order behind the cart cookie", async ({ browser }, testInfo) => {
