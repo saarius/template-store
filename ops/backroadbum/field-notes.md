@@ -1,11 +1,16 @@
 # Native Field Notes
 
-Eight notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+Nine notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
 
 ## Product reading · November16
-Product pages now reuse the collection shelf’s exact used native-link relationships. The current notebook and tote each have one matching published note; the other five products render no shelf. Optional reading is omitted in preview/edit mode or on a failed Pages read, and never supplies buying facts or changes the product’s canonical metadata.
+Product pages now reuse the collection shelf’s exact used native-link relationships. The current notebook, tote and fleece each have one matching published note; the other four products render no shelf. Optional reading is omitted in preview/edit mode or on a failed Pages read, and never supplies buying facts or changes the product’s canonical metadata.
 
-`node scripts/verify-backroadbum-product-reading.mjs --check` blocks all HTTP writes and checks seven products, two keyboard note→product round trips, the journal link, missing-product exclusion, unchanged collection reading and browser intent across eight script-on/off phone/desktop Light/Dark contexts. `BACKROADBUM_VERIFY_BASELINE` compares buying copy and structured data with a prior read; `BACKROADBUM_VERIFY_ALLOW_ORIGIN_CHANGE=1` permits only explicit schema-URL origin translation for a local HTTP fixture, never a blanket metadata bypass. Evidence: `evidence/2026-11-16-shopper-discovery/`; this is optional merchant discovery, not a CMS or plugin release.
+`node scripts/verify-backroadbum-product-reading.mjs --check` blocks all HTTP writes and checks seven products, three keyboard note→product round trips, the journal link, missing-product exclusion, unchanged collection reading and browser intent across eight script-on/off phone/desktop Light/Dark contexts. `BACKROADBUM_VERIFY_BASELINE` compares buying copy and structured data with a prior read; `BACKROADBUM_VERIFY_ALLOW_ORIGIN_CHANGE=1` permits only explicit schema-URL origin translation for a local HTTP fixture, never a blanket metadata bypass. Evidence: `evidence/2026-11-16-shopper-discovery/`; this is optional merchant discovery, not a CMS or plugin release.
+
+## Layer note · November17
+`seed/backroadbum-layer-note.json` records16native blocks, four headings, three numbered packing steps and two links. EmDash draft/reload/publication and anonymous draft exclusion were verified; `/etc/backroadbum/operator/layer-note.json` retains the completed operation and must not be replayed. The note is reachable from journal/search, the fleece and Slow camp; its content distinguishes a comfort design from technical weather protection. Evidence: `evidence/2026-11-17-reachable-layer/`.
+
+`node scripts/verify-backroadbum-authored-note.mjs --check` compares the published manuscript, native headings/list/links, metadata, onward reading, search, print visibility and optional gear/collection keyboard round trips in eight script-on/off Light/Dark390/1440contexts. `--source=backroadbum-layer-note.json` selects a seed checklist, not runtime content; all browser writes are blocked. Updated product/collection checks pass the same eight contexts, including the new fleece relationship; the collection checker no longer assumes the older seven-note index.
 
 ## Bounded authoring
 - Take a current backup and `node scripts/inspect-backroadbum-business.mjs --check` before editing. For a new note, record a unique operation guard in `/etc/backroadbum/operator/` with mode0600; refuse an existing guard/slug rather than recreating an uncertain save.

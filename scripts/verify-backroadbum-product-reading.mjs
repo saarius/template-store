@@ -14,7 +14,8 @@ if (!process.argv.includes('--check')) {
   const products = [
     ['county-line-field-book', 'A page from the road', '/field-note-a-page-from-the-road'],
     ['glovebox-field-tote', 'The reset after a road day', '/field-note-after-a-road-day'],
-    ['creekside-camp-mug'], ['switchback-bandana'], ['wrong-turn-tee'], ['last-light-fleece'], ['long-way-cap'],
+    ['creekside-camp-mug'], ['switchback-bandana'], ['wrong-turn-tee'],
+    ['last-light-fleece', 'A layer within reach', '/field-note-a-layer-within-reach'], ['long-way-cap'],
   ];
   await mkdir(output, { recursive: true });
   const browser = await chromium.launch();

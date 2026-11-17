@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## A layer within reach · November17
+The fleece now has a native reading companion about finding a dry spare at a safe stop, keeping it separate and recognizing a comfort layer’s limits. The ninth Field Note is authored and published in EmDash, with exact draft reload, draft privacy, journal/search discovery, product/collection round trips and script-free print content verified. Catalog facts and existing pages/orders remain unchanged; the seed manuscript is only an authorship checklist.
+
 ## An untouched delivery address · November17
 A valid email with no delivery fields previously bypassed local corrections and attempted checkout with email alone. Physical baskets now focus and describe Recipient before any start request, whether billing is shared or separate; editing clears that correction and preserves the email/cart. This is a merchant 0.8-client refinement using the existing form design, not a signed-plugin or future server-cart change.
 

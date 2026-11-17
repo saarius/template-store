@@ -82,6 +82,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - Field Notes opens with an asymmetric copy/photograph split, one featured published note and quieter two-column reading links. Ordinals are decorative/aria-hidden, not invented dates. The existing photograph/credit and native note ordering remain intact.
 - Articles use the generated editorial scale: expressive title, serif opening paragraph, DM Sans body at17–18px/1.75 and at most65ch. Chapter gaps are64px, versus24px paragraph spacing. Back/related/shop links work without JavaScript. Guides share this reading rhythm with smaller task headings and clear policy navigation; their native CMS words are not duplicated or edited by the theme.
 
+## Reachable-layer reading · November17
+The ninth native note uses the established article scale, four chapter breaks and a three-item numbered list, not new callout or safety-badge styling. Its genuine fleece link automatically supplies product and Slow camp reading cards through the existing optional relationship rule. Retain exact native prose, parking-only guidance and illustrative comfort-versus-technical boundaries in screen and print; no shopping fact, recommendation map or new control belongs in the manuscript.
+
 ## Native editorial depth · November16
 The departure note uses the existing article hierarchy unchanged: four native headings, a real four-item ordered list and ordinary inline reading links. Do not turn safety guidance into decorative callout cards or shopping prompts; native source order, 65ch measure, script-free links and complete print content remain the contract. Four live390/1440 Light/Dark audits and eight script-on/off journeys pass; the earlier file-based manuscript preview used fallback fonts and is not the final typography proof.
 
