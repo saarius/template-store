@@ -2,6 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports the submitted cart-focus proposal without claiming full local matrix or live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-cart-focus-pr-dispatch');
+    expect(report).toContain('data-cart-focus-pr-history');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('https://github.com/dinkuskit/template-store/pull/246');
+      expect(source).toContain('575 units, 101 workflows');
+      expect(source).toContain('unchanged main');
+      expect(source).toContain('Registry-site builds');
+    }
+    expect(report).toContain('not a stable Commerce upgrade or completed merchant regression');
+    expect(reviews).toContain('No live cart cutover is claimed');
+  });
   it('separates generic cart focus proof from synthetic projections and live adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

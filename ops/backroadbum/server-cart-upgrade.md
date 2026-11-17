@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Generic focus PR · November17, 05:50UTC
+
+[Template PR246](https://github.com/dinkuskit/template-store/pull/246) submits unchanged generic head **e2cc307** with four hosted Before/After images and runtime output. On pinned Node24.22.0 the final head now passes `bin/verify-web quick` (306-file Astro check, 575 units, 101 workflows/two optional skips), four targeted desktop/mobile tests, Node build and Cloudflare Registry-site build/config assertion. Commerce beta1's Registry size gate passes at130760bytes; this is its exact upstream source pin, not a beta2 installation or whole merchant regression.
+
+The attempted full wrapper stops at the first unrelated admin-category welcome timeout after dev-server heap exhaustion. A fresh untouched-main167d736 worktree reproduces it under the same Node/dependencies, qualifying the owner's CI exception; GitHub owns the full browser matrix. Initial local quick attempts at600/1100MB heap failed, while the full quick gate passes at1700MB. Prior four-view painted audits and exact-head captures remain valid because source did not change. Evidence: `evidence/2026-11-17-focus-pr/`; all live migration/payment gates below stay open.
+
 ## Focus destinations and generic isolation · November17, 04:52UTC
 
 Generic `saarius/template-store:fix/server-cart-redraw-focus` **e2cc307**, based on unchanged upstream167d736 without the merchant theme or proposed243queue, now covers real pinned-beta1 form refusals, response-time focus movement and WebMCP redraw through the standard desktop/mobile harness. Ten separate synthetic DOM projections cover disabled controls/fieldsets, frozen Resume, expired/unavailable actions, errors, empty state and outside-task focus; these do **not** prove hosted payment freezing. The helper tries usable controls and checks that focus actually landed, then falls back to the Cart heading. Merchant **254b6e4** carries identical helper/browser checks off live; no renewed whole-merchant regression is claimed.
