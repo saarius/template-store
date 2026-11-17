@@ -1,5 +1,10 @@
 # Qualifying a future server-cart upgrade
 
+## Native redraw focus · November17
+Off-live **7f533ee** repairs a keyboard task found in actual Registry-installed beta2 staging: Update and non-final Remove detached the focused control, leaving BODY; the next Tab restarted at the first quantity. The unchanged-main167d736 client reproduces this over real staged requests. [Template issue245](https://github.com/dinkuskit/template-store/issues/245) includes hosted Before/After proof; no new upstream PR or live cart change is claimed.
+
+The candidate observes focus at response time, restores the matching control or neighboring row, respects later outside/other-row focus and shares this rule with agent-triggered redraws. Seventeen focused units, strict source/helper types and a whole merchant Node build pass on Node24.22.0; four390/1440 Light/Dark browser lanes, JS-off forms, the existing queued-change proof, real WebMCP read/update redraw and four official painted audits pass. Full unit/workflow/Astro/browser regression has not been renewed on this head. Evidence: `evidence/2026-11-17-server-cart-focus/`; candidate dependencies/builds are trimmed after checks, primary dependencies stay intact.
+
 ## Current preparation regression · November 17, 01:12 UTC
 
 Off-live **9f9ee81** now passes **130 unit files / 1,255 tests**, **120 workflow tests with two optional skips**, **ten presentation renders**, full **551-file Astro check** (zero errors/warnings; three existing hints), feature/text audits and a complete merchant **Node build** on pinned Node24.22.0. This refresh includes the option-search, product-reading, feed-producer and report deltas since3d1b690. The build uses a scrubbed environment and disposable database/uploads paths; no production service or business write is involved. Evidence: `evidence/2026-11-17-prep-regression/`.
