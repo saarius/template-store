@@ -15,7 +15,8 @@ if (!process.argv.includes('--check')) {
     ['county-line-field-book', 'A page from the road', '/field-note-a-page-from-the-road'],
     ['glovebox-field-tote', 'The reset after a road day', '/field-note-after-a-road-day'],
     ['creekside-camp-mug'], ['switchback-bandana'], ['wrong-turn-tee'],
-    ['last-light-fleece', 'A layer within reach', '/field-note-a-layer-within-reach'], ['long-way-cap'],
+    ['last-light-fleece', 'A layer within reach', '/field-note-a-layer-within-reach'],
+    ['long-way-cap', 'A shady place to stop', '/field-note-a-shady-place-to-stop'],
   ];
   await mkdir(output, { recursive: true });
   const browser = await chromium.launch();
@@ -102,7 +103,7 @@ if (!process.argv.includes('--check')) {
         await expect(page.locator('[data-product-reading]')).toHaveCount(0);
         await page.goto(base + '/categories/road-day');
         assert.deepEqual(await page.locator('[data-collection-reading] li a').evaluateAll(nodes => nodes.map(n => n.getAttribute('href'))),
-          ['/field-note-a-page-from-the-road', '/field-note-after-a-road-day']);
+          ['/field-note-a-page-from-the-road', '/field-note-a-shady-place-to-stop']);
         if (javaScriptEnabled) {
           assert.equal(await page.evaluate(() => localStorage.getItem('dinkus.guest-cart.v1')), intent);
           assert.equal(await page.evaluate(() => localStorage.getItem('dinkus.guest-checkout.v1')), null);

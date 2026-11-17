@@ -1,6 +1,11 @@
 # Native Field Notes
 
-Nine notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+Ten notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+
+## Shade note · November17
+`seed/backroadbum-shade-note.json` records16native blocks, four chapters, three list items and two links. Native draft save/reload, anonymous draft exclusion and one confirmed publication pass; completed0600 guard `/etc/backroadbum/operator/shade-note.json` must not be replayed. The cap gains its first reading shelf; Road day now shows notebook/shade under the existing two-note stable ordering, while the reset note stays in the journal and tote shelf. Evidence:`evidence/2026-11-17-cap-care/`.
+
+`node scripts/verify-backroadbum-authored-note.mjs --check --source=backroadbum-shade-note.json` verifies the exact published manuscript, links, search, onward reading and print in eight script-on/off390/1440 Light/Dark contexts with all HTTP writes blocked. Updated product-reading checks retain all seven products’ prior buying facts/structured data and now cover four note round trips; collection-reading checks retain Slow camp and unlisted-route exclusion. The prior thirteen Pages, catalog and ten Orders remain unchanged.
 
 ## Product reading · November16
 Product pages now reuse the collection shelf’s exact used native-link relationships. The current notebook, tote and fleece each have one matching published note; the other four products render no shelf. Optional reading is omitted in preview/edit mode or on a failed Pages read, and never supplies buying facts or changes the product’s canonical metadata.

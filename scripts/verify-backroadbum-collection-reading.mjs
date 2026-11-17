@@ -37,10 +37,10 @@ try {
       const items = shelf.locator('li a');
       assert.equal(await items.count(), 2);
       assert.deepEqual(await items.evaluateAll(nodes => nodes.map(node => node.getAttribute('href'))),
-        ['/field-note-a-page-from-the-road', '/field-note-after-a-road-day']);
+        ['/field-note-a-page-from-the-road', '/field-note-a-shady-place-to-stop']);
       await shelf.scrollIntoViewIfNeeded();
       if (captures) await page.screenshot({ path: `${captures}/reading-${width}-${colorScheme}-${javaScriptEnabled ? 'js' : 'native'}.png` });
-      for (const [note, product] of [['A page from the road', 'county-line-field-book'], ['The reset after a road day', 'glovebox-field-tote']]) {
+      for (const [note, product] of [['A page from the road', 'county-line-field-book'], ['A shady place to stop', 'long-way-cap']]) {
         const link = shelf.getByRole('link', { name: note, exact: true });
         assert((await link.boundingBox()).height >= 44);
         await link.focus();
@@ -58,7 +58,7 @@ try {
       }
       await shelf.getByRole('link', { name: 'All field notes', exact: true }).click();
       await page.waitForURL(url => url.pathname === '/field-notes');
-      assert((await page.locator('.field-index .brb-story-link').count()) >= 9);
+      assert((await page.locator('.field-index .brb-story-link').count()) >= 10);
     }
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await page.goto(origin + '/categories/slow-camp');
