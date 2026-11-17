@@ -2,6 +2,21 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('bounds current preparation regression proof to its exact off-live source', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-prep-refresh-history');
+    expect(report).toContain('data-prep-refresh');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('9f9ee81');
+      expect(source).toContain('1,255 units, 120 workflows with two optional skips');
+      expect(source).toContain('551-file typecheck');
+      expect(source).toContain('complete browser matrix');
+    }
+    expect(report).toContain('Cloudflare site command correctly refuses missing deployment configuration');
+    expect(report).toContain('24 live public pages');
+    expect(reviews).toContain('No new upstream submission or duplicate review trigger was sent');
+  });
   it('separates deployed feed URL production from the proposed consumer and signed rows', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Current preparation regression · November 17, 01:12 UTC
+
+Off-live **9f9ee81** now passes **130 unit files / 1,255 tests**, **120 workflow tests with two optional skips**, **ten presentation renders**, full **551-file Astro check** (zero errors/warnings; three existing hints), feature/text audits and a complete merchant **Node build** on pinned Node24.22.0. This refresh includes the option-search, product-reading, feed-producer and report deltas since3d1b690. The build uses a scrubbed environment and disposable database/uploads paths; no production service or business write is involved. Evidence: `evidence/2026-11-17-prep-regression/`.
+
+Owning preparation builds the beta2 source Registry backend at130929bytes /143-byte headroom, with the previously qualified digest. The subsequent `build:registry` **Cloudflare site** command correctly refuses missing deployment variables; it is not a site-build pass, signed install or defect. The separate Node build passes. Full browser matrix, same-ID signed migration, paired live deployment and hosted TEST1011 remain unqualified; stable discovery still lists0.8.0/beta2. Report-only changes after9f9ee81 have focused checks, not another invented full-suite pass.
+
 ## Prepared regression inventory · November 16, 20:14 UTC
 
 Off-live preparation **3d1b690** aligns remaining obsolete checkout/admission assertions with the server-cart protocol, preserves the product-name check despite its heading attributes, and adds a real rendered-summary/native-control contract. All **129 unit files / 1235 tests**, **120 workflow tests (two optional skips)**, **10 presentation cases** and the full546-file Astro check pass on the repository-pinned Node24.22.0. A temporary hidden order summary fails exactly the new rendered case; the checkout component is restored byte-for-byte. Feature/text audits and the beta2 Registry build also pass. Evidence: `evidence/2026-11-16-cart-regression-inventory/`.
