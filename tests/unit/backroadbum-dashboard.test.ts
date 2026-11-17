@@ -2,6 +2,22 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('bounds journal-to-cart preparation to disposable installed-beta journeys', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-reading-cart-sync-dispatch');
+    expect(report).toContain('data-reading-cart-sync-history');
+    expect(reviews).toContain('data-reading-cart-sync-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('7a3ce50');
+      expect(source).toContain('80 focused units');
+      expect(source).toContain('/pr-proof/server-cart-reading/phone-enhanced.png');
+      expect(source).toContain('without Payments');
+    }
+    expect(report).toContain('not a live cart upgrade or hosted purchase');
+    expect(report).toContain('authoritative public Regular/Sale projection');
+    expect(reviews).toContain('Twelve authored PRs remain open');
+  });
   it('reports native shade reading without invented cap performance or commerce changes', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('data-shade-note-dispatch');

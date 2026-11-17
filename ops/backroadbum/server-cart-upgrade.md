@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Journal-to-cart continuity · November 17, 11:02 UTC
+
+Off-live **7a3ce50** merges live1edff95 into the prepared branch, retaining native cart/checkout, retained receipts and shopper safeguards; the only conflict was the earlier runbook summary, whose detailed staging evidence and green CI paragraph both remain. Fresh real Registry beta2 install201, the whole merchant Node build and80 focused units pass; eight390/1440 Light/Dark script-on/off journeys follow Road day → native notes → cap/notebook, add2caps/$48, add1book/$60, update3caps/$84, reload and remove book/$72.
+
+Twelve actual cart/article/collection painted audits are clean. The fixture copies only public content/catalog/media (7products/2published collections/14Pages,10notes), has zero Orders/Payments/hosted consents and leaves all serving business digests unchanged; proof:`evidence/2026-11-17-prep-shade-sync/`. This is focused merge/installed-beta continuity, not the complete merchant admin/browser matrix, authoritative public Regular/Sale pair, signed same-ID upgrade or hosted payment. Stable remains0.8.0; StageB and TEST1011 stay untouched.
+
 ## Published membership and built-route coverage · November 17, 09:50 UTC
 
 The public-only qualification copier omitted native product/category relations. Earlier installed-storefront samples therefore did not qualify collection navigation: the new crawl discovered only a Road day editorial link, not the shop’s two collection links. The helper now copies only `product_categories` metadata and edges whose two translation groups have published, non-deleted rows; draft, deleted, dangling and other private relations stay excluded. Four owning helper tests pass, including real SQLite filtering, ordering and unchanged-source checks.
