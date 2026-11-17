@@ -2,6 +2,24 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('bounds the accepted native lifecycle rehearsal to a fresh public-only beta fixture', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-native-lifecycle-dispatch');
+    expect(report).toContain('data-native-lifecycle-history');
+    expect(reviews).toContain('data-native-lifecycle-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('/pr-proof/native-cart-lifecycle/unavailable-390.png');
+      expect(source).toContain('/pr-proof/native-cart-lifecycle/republished-390.png');
+      expect(source).toContain('native initial publication');
+      expect(source).toContain('revision pointers');
+    }
+    expect(report).toContain('same desktop and phone carts');
+    expect(report).toContain('not an original-revision clone');
+    expect(report).toContain('or checkout POST occurs');
+    expect(reviews).toContain('https://github.com/dinkuskit/commerce/pull/277');
+    expect(reviews).toContain('no new upstream request, live catalog edit or hosted purchase');
+  });
   it('distinguishes restored merchant cart navigation from a live or generic runtime change', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

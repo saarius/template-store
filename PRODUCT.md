@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Retirement without losing intent · November17 (off live)
+The prepared cart now has real installed-beta proof for native page Trash, Restore as draft and Publish. The same plain desktop/enhanced Dark phone carts retain two units through unavailability, then recover their exact product link and $24 subtotal after republishing, without a new capability or checkout. This verifies Commerce277’s accepted workflow in a fresh public-only fixture with a native initial publication—not original CMS revision migration, a live catalog edit or a stable-plugin upgrade.
+
 ## Back to the exact size · November17 (off live)
 The prepared server cart had dropped the live cart’s product-name links. Its native headings now return to the same published product/member after ordinary and enhanced quantity updates, preserving the existing cart capability, saved quantities and authoritative totals. Eight keyboard/script-on/off phone/desktop Light/Dark journeys pass; missing CMS links leave usable plain names, and this does not activate server-cart checkout on signedCommerce0.8.
 
