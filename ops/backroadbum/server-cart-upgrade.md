@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Selected product round trips · November17, 13:25 UTC
+
+Off-live **d394981** restores the live merchant cart’s published product-name links in the prepared server cart; the integration had dropped both path enrichment and linked headings. One optional server-side CMS join is shared with the legacy snapshot route: failed, unmatched, ambiguous or unsafe page data leaves plain names and unchanged Commerce prices; each valid path retains the exact member id. Native link targets use existing Field Journal tokens,44px height and visible keyboard focus, not a clickable card wrapper.
+
+Fresh Registry-beta2 staging and the whole merchant Node build pass before/after captures and eight390/1440Light/Dark script-on/off keyboard journeys: M/XL round trips, saved1/2→3/2quantities,$204→$340, native/enhanced updates, reload and unchanged cart capability. Fifteen focused units, fifteen component renders, full560-file Astro check and four populated-cart painted audits pass; all staged catalog/media/page rows and six serving business digests stay unchanged, with zero staged Orders. Evidence:`evidence/2026-11-17-native-cart-links/`; this is a merchant integration repair, not a generic upstream defect, renewed full matrix, live runtime adoption, signed migration or hosted purchase. Stable remains0.8.0; StageB/TEST1011 untouched.
+
 ## Native size price and stock loop · November 17, 12:35 UTC
 
 Fresh Registry-beta2 staging on **b2e2c3f** completes native XL saves with a retained M×2 + XL×1 basket in plain desktop and enhanced phone lanes: Regular80/Sale60 reprices$204→$196, leaves M/L at68, retains XL quantity when sold out and disables its new-add control; restoring Regular68/no Sale/backorder returns$204. Native editor reloads and agent-feed reads verify the matching member prices/statuses, with four clean populated-cart painted audits; evidence:`evidence/2026-11-17-native-variant-cart/` and public `/pr-proof/native-variant-cart/` captures.

@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Back to the exact size · November17 (off live)
+The prepared server cart had dropped the live cart’s product-name links. Its native headings now return to the same published product/member after ordinary and enhanced quantity updates, preserving the existing cart capability, saved quantities and authoritative totals. Eight keyboard/script-on/off phone/desktop Light/Dark journeys pass; missing CMS links leave usable plain names, and this does not activate server-cart checkout on signedCommerce0.8.
+
 ## A shady place to stop · November17
 The tenth native Field Note connects the cap to choosing a suitable rest stop, unpacking with care and leaving access clear, without inventing a sun-protection rating or fit range. Exact editor save/reload, draft exclusion, journal/search, keyboard product/collection reading and print content pass with scripts on/off in both appearances. Product buying facts and the previous thirteen Pages remain unchanged; the source manuscript records authorship only.
 
