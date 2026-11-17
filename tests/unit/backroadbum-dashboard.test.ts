@@ -2,6 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates generic cart focus proof from synthetic projections and live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-cart-focus-edges-dispatch');
+    expect(report).toContain('data-cart-focus-edges-history');
+    expect(report).toContain('synthetic projections separately check frozen');
+    expect(report).toContain('not a submitted PR, completed full regression or Commerce upgrade');
+    expect(reviews).toContain('data-cart-focus-edges-review');
+    expect(reviews).toContain('source-built pinned-beta1');
+    expect(reviews).toContain('not renewed complete merchant regression or hosted frozen-payment proof');
+    expect(reviews).toContain('e2cc307');
+    expect(reviews).toContain('254b6e4');
+    for (const source of [report, reviews]) expect(source).toContain('/pr-proof/template-cart-focus/after-desktop-light.png');
+  });
   it('reports untouched delivery as a merchant-client correction with intercepted transport', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     expect(report).toContain('data-empty-delivery-dispatch');
