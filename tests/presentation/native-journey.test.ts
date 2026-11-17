@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import Checkout from '../../src/features/guest-cart/GuestCheckout.astro';
 import Receipt from '../../src/features/guest-cart/GuestCheckoutReturn.astro';
+import AddToCart from '../../src/features/guest-cart/AddToCart.astro';
+import type { PublicCommerceProduct, PublicCommerceVariant } from '../../src/features/commerce-catalog/types';
 import { presentGuestCart } from '../../src/features/guest-cart/present';
 import type { CheckoutReturn } from '../../src/features/guest-cart/server-return';
 import type { ConfirmedOrderView } from '../../src/features/guest-cart/order-view';
@@ -56,6 +58,29 @@ describe('native merchant journey rendering', () => {
     try { expect(fetch).not.toHaveBeenCalled(); }
     finally { vi.unstubAllGlobals(); }
   });
+  it.each(['in-stock', 'available-on-backorder', 'out-of-stock'] as const)('renders the selected %s member honestly before hydration', async status => {
+    const sellable = status !== 'out-of-stock';
+    const product: PublicCommerceProduct = {
+      id: 'synthetic-xl', name: 'Synthetic tee', sku: 'SYNTHETIC-XL', image: null, gallery: [],
+      price: { listable: true, regularText: '$34.00', saleText: null, unitMinor: '3400' },
+      availability: { status, sellable, listable: true },
+    };
+    const variants: PublicCommerceVariant[] = [
+      { id: 'synthetic-l', selections: [['Size', 'L']], unitMinor: '3400', priceText: '$34.00', availability: { status: 'in-stock', sellable: true } },
+      { id: product.id, selections: [['Size', 'XL']], unitMinor: '3400', priceText: '$34.00', availability: { status, sellable } },
+    ];
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(AddToCart, { props: { product, variants, productId: 'synthetic-root', formId: 'synthetic-add' } });
+    const button = tag(html, 'button', 'data-add-to-cart', product.id);
+    expect(Object.hasOwn(button, 'disabled')).toBe(!sellable);
+    expect(button['data-add-to-cart-sellable']).toBe(String(sellable));
+    expect(html).toContain(sellable ? 'Add to cart' : 'Sold out');
+    expect(tag(html, 'form', 'id', 'synthetic-add')).toMatchObject({ method: 'post', action: '/cart/add' });
+    expect(tag(html, 'input', 'name', 'productId').value).toBe('synthetic-root');
+    expect(tag(html, 'input', 'name', 'quantity').value).toBe('1');
+    expect(elements(html).some(node => node.attributes.name === 'id')).toBe(false);
+  });
+
   it('renders named shipping and billing controls with native autocomplete and country choices', async () => {
     const html = await renderCheckout();
     for (const kind of ['delivery', 'billing']) {
