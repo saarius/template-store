@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Native price and stock loop · November 17, 11:50 UTC
+
+Off-live **57f0ec0** fixes a qualification omission: copy block-type definitions and versions alongside collection/field schema, with five owning tests preserving source rows and excluding content revisions. Without them, EmDash1.4.0 returned three schema collections but an empty admin manifest after the missing home_opener expansion; the corrected fresh Registry-beta2 fixture exposes all three collections and completes actual desktop/phone native panel saves. Two existing-cap carts reprice$48→$40 after Regular30/Sale20, retain quantity2 when out of stock, and return to$48 after restoring original Regular28/Sale24/in-stock; phone uses the documented Settings-reopen workaround.
+
+Evidence:`evidence/2026-11-17-native-price-cart/`; four merchant cart painted views are clean, untargeted staged rows/zero Orders and all six serving business digests remain unchanged. This qualifies that built native-admin/public-cart loop only—not the complete merchant matrix, public Regular/Sale pair, signed same-ID migration or hosted purchase. Stable remains0.8.0; StageB and TEST1011 are untouched. EmDash human-review ledger item13 distinguishes our copier omission from the host's whole-manifest failure isolation; no CMS patch or upstream contact.
+
 ## Journal-to-cart continuity · November 17, 11:02 UTC
 
 Off-live **7a3ce50** merges live1edff95 into the prepared branch, retaining native cart/checkout, retained receipts and shopper safeguards; the only conflict was the earlier runbook summary, whose detailed staging evidence and green CI paragraph both remain. Fresh real Registry beta2 install201, the whole merchant Node build and80 focused units pass; eight390/1440 Light/Dark script-on/off journeys follow Road day → native notes → cap/notebook, add2caps/$48, add1book/$60, update3caps/$84, reload and remove book/$72.
