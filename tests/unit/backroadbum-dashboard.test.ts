@@ -12,6 +12,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
       expect(source).toContain('575 units, 101 workflows');
       expect(source).toContain('unchanged main');
       expect(source).toContain('Registry-site builds');
+      expect(source).toContain('64 desktop and 63 phone browser tests');
+      expect(source).toContain('44026879796');
     }
     expect(report).toContain('not a stable Commerce upgrade or completed merchant regression');
     expect(reviews).toContain('No live cart cutover is claimed');
