@@ -212,6 +212,9 @@ The asynchronous explicit status check keeps its native button focusable, with `
 ## Product quantity feedback
 A rejected explicit Add associates its existing alert with Quantity via a stable ID and `aria-describedby`, marks `aria-invalid` and focuses the retained input. The stepper outline and alert use the established danger token, not a new palette; editing or stepping clears only the quantity correction without moving focus. Storage refusals and combined-cart-line limits remain separate, and success-only View cart never appears for a failed save.
 
+## Native retirement states · November17 (off live)
+Keep an unavailable native cart line honest: retain saved quantity and ordinary Update/Remove controls, but do not borrow a name, photo, link or money from an absent public catalog projection. The existing placeholder and reason distinguish it from an active product. Native republishing restores the same item’s current catalog presentation and published-page link without replacing its cart capability; installed-beta plain desktop/enhanced Dark phone captures verify these existing states, not a new visual repair. The public-only fixture requires native initial publication because original revision pointers are excluded; do not present this as original-publication migration.
+
 ## Native merchant diagnostic evidence
 The public EmDash ledger links two synthetic phone captures showing a successful weight save dismissing the Settings sheet. They are before/after an interaction, not before/after a repair; the original EmDash/Kumo visual system is retained. Inspect `aria-hidden`, inertness and viewport geometry when testing a translated drawer: a CSS-visible offscreen element is not a usable open control.
 

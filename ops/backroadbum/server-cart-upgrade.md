@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Native retirement and return · November17, 14:01 UTC
+
+Fresh Registry-beta2 staging of **33d5979** now verifies the accepted Commerce277 lifecycle through actual page Trash, native Trash-tab Restore and Publish confirmation. Plain1440Light/enhanced390Dark shoppers retain two units and the same secure cart capability while Shop/product availability becomes absent/404; native republish restores the product link/$24 subtotal. Exactly the selected product/publication claims and storage revisions change among32 imported public plugin rows; authored fields, identities, SKU, price, availability, feed choices and media stay unchanged. No Orders, Payments or consents are copied/created, and no checkout POST occurs.
+
+The public copier omits live/draft revision pointers intentionally: imported published rows look like drafts in admin. Native initial Publish establishes this rehearsal’s actual live revision before cart creation; **this is not an original-revision clone or migration**. Evidence:`evidence/2026-11-17-native-cart-lifecycle/`; four inspected public lifecycle-state captures at `/pr-proof/native-cart-lifecycle/` are not a repair comparison. Only reporting/runbooks ship live; stable0.8.0 and StageB/TEST1011 remain unchanged. The accepted page-owned workflow supersedes the older0.8 Commerce-Archive detour when the applicable beta becomes the installed release; see `ops/product-lifecycle.md` for both scopes.
+
 ## Selected product round trips · November17, 13:25 UTC
 
 Off-live **d394981** restores the live merchant cart’s published product-name links in the prepared server cart; the integration had dropped both path enrichment and linked headings. One optional server-side CMS join is shared with the legacy snapshot route: failed, unmatched, ambiguous or unsafe page data leaves plain names and unchanged Commerce prices; each valid path retains the exact member id. Native link targets use existing Field Journal tokens,44px height and visible keyboard focus, not a clickable card wrapper.
