@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Focus destinations and generic isolation · November17, 04:52UTC
+
+Generic `saarius/template-store:fix/server-cart-redraw-focus` **e2cc307**, based on unchanged upstream167d736 without the merchant theme or proposed243queue, now covers real pinned-beta1 form refusals, response-time focus movement and WebMCP redraw through the standard desktop/mobile harness. Ten separate synthetic DOM projections cover disabled controls/fieldsets, frozen Resume, expired/unavailable actions, errors, empty state and outside-task focus; these do **not** prove hosted payment freezing. The helper tries usable controls and checks that focus actually landed, then falls back to the Cart heading. Merchant **254b6e4** carries identical helper/browser checks off live; no renewed whole-merchant regression is claimed.
+
+Whole unchanged-main storefront Before/After captures now exist at `/pr-proof/template-cart-focus/` (Light1440/Dark390), with four clean official painted audits after fixing the generic quantity target and placeholder surface. Initial575units/101workflow passes and306-file Astro check are distinct from final8focus units/strict helper types/four targeted browser passes; no full-wrapper, Registry-site compile, complete browser matrix or paired migration is claimed on this head. No new issue/PR or review trigger this cycle; `evidence/2026-11-17-focus-edges/cycle.md` records exact lanes, local retries and remaining gates. Prefer finishing these gates to another keyboard issue when reviews remain quiet.
+
 ## Native redraw focus · November17
 Off-live **7f533ee** repairs a keyboard task found in actual Registry-installed beta2 staging: Update and non-final Remove detached the focused control, leaving BODY; the next Tab restarted at the first quantity. The unchanged-main167d736 client reproduces this over real staged requests. [Template issue245](https://github.com/dinkuskit/template-store/issues/245) includes hosted Before/After proof; no new upstream PR or live cart change is claimed.
 
