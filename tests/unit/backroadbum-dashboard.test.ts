@@ -546,7 +546,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('reports the native seventh product without rewriting older catalog or recovery claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
-    expect(pulse).toContain('Seven product families, two collections and eight field notes');
+    expect(pulse).toContain('Seven product families, two collections and nine field notes');
     expect(source).toContain('Seven EmDash-backed product families');
     expect(source).toContain('A $12 pocket notebook joins the gear shelf');
     expect(source).toContain('The six existing products and eight Orders remain unchanged');
