@@ -13,6 +13,7 @@ import type { PublicCommerceProduct } from "../commerce-catalog/index.js";
 import { resolveCommerceImage } from "../commerce-catalog/media.js";
 import { canonicalProductPath, commercePageLinks, readProductEntries } from "../store-shell/product-routes.js";
 import { canonicalUrl } from "../store-shell/structured-data.js";
+import { productSelectionUrl } from "../store-shell/product-selection.js";
 
 export interface CommerceFeedContext extends InstalledCatalogContext {
   /** Same `Astro.site` value the product page uses for its canonical link. */
@@ -109,10 +110,14 @@ export async function buildInstalledCommerceFeedFacts(
     // Commerce's public catalog carries each product's approved channels; none means no feed.
     const eligibility = product.feedChannels ?? [];
     const imageUrls = await publicImageUrls(product, context);
+    const productUrl = canonicalUrl(canonicalProductPath(entry.slug), context.site, context.request.url);
     facts.push({
       product: catalogProduct(product),
       content: {
-        canonicalUrl: canonicalUrl(canonicalProductPath(entry.slug), context.site, context.request.url),
+        canonicalUrl: productUrl,
+        // Merchant selection is ?item=; do not copy the generic starter's query contract.
+        ...(product.variants?.length ? { variantUrls: Object.fromEntries(product.variants.map(member =>
+          [member.id, productSelectionUrl(productUrl, member.id)])) } : {}),
         title: product.name,
         ...(entry.description ? { description: entry.description } : {}),
         ...(imageUrls.length ? { imageUrls } : {}),
