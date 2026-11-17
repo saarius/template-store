@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Installed-beta merchant continuity · November17, 07:00UTC
+
+Prepared branch is pushed at `9996119` after merging live `703a42e` (merge `8f4be9b`), retaining native cart/checkout rather than legacy browser retry code. A fresh verified Registry `0.9.0-beta.2` install exercises all seven public families / eleven concrete members in both plain1440 Light and enhanced390 Dark, including quantity2, retained size lines, effective prices, backorders and sold-out refusal. A cold XL tee exposed the enabled-submit mismatch tracked in [Template247](https://github.com/dinkuskit/template-store/issues/247); its selected-member initial-state repair is **off-live only**, with actual rendered in-stock/backorder/sold-out tests.
+
+557-file Astro check,132files/1271units,13 rendered tests,120workflows (two optional skips), Node build and130929/131072-byte pinned-beta2 source Registry packaging pass; four-view cart/product/dashboard DOM audits are clean. The full local wrapper exhausted its600MB dev-server child at first-admin and was stopped after650seconds: **no full browser matrix/crawl or paid checkout pass** is claimed. Signed-beta2 public catalog still exposes effective customer-pays only, not an authoritative Regular/Sale pair; retain that limitation. Evidence: `evidence/2026-11-17-prep-continuity/`; this supersedes the prior stale-report preparation note, not stable-release or live-purchase gates below.
+
 ## Generic focus PR · November17, 05:50UTC
 
 [Template PR246](https://github.com/dinkuskit/template-store/pull/246) submits unchanged generic head **e2cc307** with four hosted Before/After images and runtime output. On pinned Node24.22.0 the final head now passes `bin/verify-web quick` (306-file Astro check, 575 units, 101 workflows/two optional skips), four targeted desktop/mobile tests, Node build and Cloudflare Registry-site build/config assertion. Commerce beta1's Registry size gate passes at130760bytes; this is its exact upstream source pin, not a beta2 installation or whole merchant regression.

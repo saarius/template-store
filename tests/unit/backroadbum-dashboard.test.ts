@@ -2,6 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates installed-beta variant preparation from the live cart and full-matrix gates', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-variant-startup-dispatch');
+    expect(report).toContain('data-variant-startup-history');
+    expect(reviews).toContain('data-variant-startup-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('https://github.com/dinkuskit/template-store/issues/247');
+      expect(source).toContain('/pr-proof/server-cart-initial-sellability/after-390-dark.png');
+    }
+    expect(report).toContain('not a live Commerce upgrade');
+    expect(report).toContain('1,271 units, 13 rendered cases and 120 workflows');
+    expect(reviews).toContain('full local browser matrix and a generic PR remain separate');
+  });
   it('reports the submitted cart-focus proposal without claiming full local matrix or live adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
