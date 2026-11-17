@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Published membership and built-route coverage · November 17, 09:50 UTC
+
+The public-only qualification copier omitted native product/category relations. Earlier installed-storefront samples therefore did not qualify collection navigation: the new crawl discovered only a Road day editorial link, not the shop’s two collection links. The helper now copies only `product_categories` metadata and edges whose two translation groups have published, non-deleted rows; draft, deleted, dangling and other private relations stay excluded. Four owning helper tests pass, including real SQLite filtering, ordering and unchanged-source checks.
+
+Fresh verified Registry beta2 install201 and a complete Field Journal Node build now pass **34 public routes in each of plain1440 Light and enhanced390 Dark**, discovering seven products, two published collections and all nine notes. Native/enhanced mug quantity2 retains$36; unconfigured checkout stays disabled and an unpaid success visit returns NOT_PAID without an Order. Browser errors, failed static assets and horizontal overflow are absent; the isolated TLS fixture mirrors only Caddy’s public proof-media mapping. This is a built public-route crawl, not the full admin/browser matrix, hosted payment, signed same-ID migration or live rollout. Evidence:`evidence/2026-11-17-merchant-stock/`;13 focused tests pass/four optional process integrations skip. Stable Registry remains0.8.0, so StageB and TEST1011 are untouched.
+
 ## Generic cold-option proposal · November 17, 09:09 UTC
 
 [Template PR #248](https://github.com/dinkuskit/template-store/pull/248), fork `fix/initial-variant-sellability` at **e3ec37a**, fixes the initial sold-out state and supplies a no-script GET option inspector so another size remains reachable. Generic main/head captures and real sandbox HTTP output are embedded in the PR; the merchant already has its separate native inspector and selected-state candidate, so no generic branding or runtime was deployed here.

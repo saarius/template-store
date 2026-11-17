@@ -20,6 +20,27 @@ export const PUBLIC_CONTENT_TABLES = ['ec_products', 'ec_categories', 'ec_pages'
 const METADATA = ['_emdash_collections', '_emdash_fields', 'content_taxonomies', 'taxonomies', '_emdash_taxonomy_defs'];
 const PUBLIC_OPTIONS = ['dinkus:storefront-upgrades', 'emdash:seed_complete', 'emdash:setup_complete', 'site:tagline', 'site:title'];
 
+/** Preserve native collection membership only between the public rows we copied.
+ * Relations point at translation groups, not slugs or author identities.
+ */
+export async function copyPublicProductMembership(source, db) {
+  const relations = source.prepare(`SELECT * FROM _emdash_relations
+    WHERE slug='product_categories' AND parent_collection='categories' AND child_collection='products'`).all();
+  const references = source.prepare(`SELECT reference.* FROM _emdash_content_references AS reference
+    JOIN _emdash_relations AS relation ON relation.id=reference.relation_id
+    WHERE relation.slug='product_categories' AND relation.parent_collection='categories' AND relation.child_collection='products'
+    AND EXISTS (SELECT 1 FROM ec_categories AS category
+      WHERE coalesce(category.translation_group,category.id)=reference.parent_group
+      AND category.status='published' AND category.deleted_at IS NULL)
+    AND EXISTS (SELECT 1 FROM ec_products AS product
+      WHERE coalesce(product.translation_group,product.id)=reference.child_group
+      AND product.status='published' AND product.deleted_at IS NULL)`).all();
+  for (const [table, rows] of [['_emdash_relations', relations], ['_emdash_content_references', references]]) {
+    for (const row of rows) await db.insertInto(table).values(row).onConflict(oc => oc.doNothing()).execute();
+  }
+  return { _emdash_relations: relations.length, _emdash_content_references: references.length };
+}
+
 export async function copyPublicContent(source, db, sql) {
   const counts = {};
   for (const table of [...METADATA, ...PUBLIC_CONTENT_TABLES]) {
@@ -44,6 +65,7 @@ export async function copyPublicContent(source, db, sql) {
     }
     counts[table] = rows.length;
   }
+  Object.assign(counts, await copyPublicProductMembership(source, db));
   for (const name of PUBLIC_OPTIONS) {
     const row = source.prepare('SELECT * FROM options WHERE name=?').get(name);
     if (row) await db.insertInto('options').values(row).onConflict(oc => oc.column('name').doUpdateSet({ value: row.value })).execute();

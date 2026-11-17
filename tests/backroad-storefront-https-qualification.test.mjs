@@ -3,8 +3,9 @@ import { test } from 'node:test';
 import { mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import Database from 'better-sqlite3';
 import { options } from '../scripts/qualify-backroadbum-installed-retained.mjs';
-import { copyPublicContent, isolatedServerCommand, PUBLIC_CONTENT_TABLES } from '../scripts/lib/storefront-https-proof.mjs';
+import { copyPublicContent, copyPublicProductMembership, isolatedServerCommand, PUBLIC_CONTENT_TABLES } from '../scripts/lib/storefront-https-proof.mjs';
 
 test('whole storefront is an explicit extra scope, not the default retained read', () => {
   assert.equal(options(['--check', '--candidate=/source']).storefront, false);
@@ -32,6 +33,36 @@ test('server hides both hardcoded operational directories before dropping root',
     isolatedServerCommand(site, {}, '/fixture/entry.mjs');
     assert.deepEqual(readFileSync(key), bytes, 'restart must not rotate the limiter key and reset visitor admission');
   } finally { rmSync(site, { recursive: true, force: true }); }
+});
+
+test('public membership preserves ordering and translation groups, excludes drafts, deleted and private edges', async () => {
+  const source = new Database(':memory:');
+  try {
+    source.exec(`CREATE TABLE _emdash_relations(id TEXT, slug TEXT, parent_collection TEXT, child_collection TEXT);
+      CREATE TABLE _emdash_content_references(id TEXT, relation_id TEXT, parent_group TEXT, child_group TEXT, sort_order INTEGER);
+      CREATE TABLE ec_categories(id TEXT, translation_group TEXT, status TEXT, deleted_at TEXT);
+      CREATE TABLE ec_products(id TEXT, translation_group TEXT, status TEXT, deleted_at TEXT);
+      INSERT INTO _emdash_relations VALUES('public','product_categories','categories','products'),
+        ('private','customer_orders','customers','orders'),('wrong','product_categories','customers','orders');
+      INSERT INTO ec_categories VALUES('c-en','category-group','published',NULL),
+        ('draft-category',NULL,'draft',NULL),('deleted-category',NULL,'published','yesterday');
+      INSERT INTO ec_products VALUES('p-en','product-group','published',NULL),
+        ('p-de','product-group','published',NULL),('draft-product',NULL,'draft',NULL),
+        ('deleted-product',NULL,'published','yesterday'),('simple',NULL,'published',NULL);
+      INSERT INTO _emdash_content_references VALUES
+        ('keep','public','category-group','product-group',7),('fallback','public','category-group','simple',2),
+        ('draft-parent','public','draft-category','product-group',0),('draft-child','public','category-group','draft-product',0),
+        ('deleted-parent','public','deleted-category','product-group',0),('deleted-child','public','category-group','deleted-product',0),
+        ('dangling','public','category-group','missing',0),('private-edge','private','category-group','product-group',0),
+        ('wrong-edge','wrong','category-group','product-group',0);`);
+    const before=source.serialize(); const inserts=[];
+    const db={insertInto(table){return {values(row){inserts.push({table,row});return {onConflict(){return {async execute(){}};}};}};}};
+    const counts=await copyPublicProductMembership(source,db);
+    assert.deepEqual(counts,{_emdash_relations:1,_emdash_content_references:2});
+    assert.deepEqual(inserts.filter(x=>x.table==='_emdash_content_references').map(x=>[x.row.id,x.row.sort_order]).sort(),[['fallback',2],['keep',7]]);
+    assert.equal(inserts[0].row.id,'public');
+    assert.deepEqual(source.serialize(),before,'source is never changed');
+  } finally {source.close();}
 });
 
 test('copies only published public content, strips author/revision links, never copies users or options wholesale', async () => {
