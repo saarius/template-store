@@ -212,6 +212,9 @@ The asynchronous explicit status check keeps its native button focusable, with `
 ## Product quantity feedback
 A rejected explicit Add associates its existing alert with Quantity via a stable ID and `aria-describedby`, marks `aria-invalid` and focuses the retained input. The stepper outline and alert use the established danger token, not a new palette; editing or stepping clears only the quantity correction without moving focus. Storage refusals and combined-cart-line limits remain separate, and success-only View cart never appears for a failed save.
 
+## Native stale-form feedback · November17 (off live)
+Keep the existing Block Kit inline refusal and toast together: a successful HTTP transport is not a saved merchant edit. In installed-beta sibling M/XL contention, the native panel preserves typed Regular/Sale/SKU/stock corrections while saying to reload; do not silently replace those edits, call the stale form fresh, or invent a force-save control. Public evidence shows unchanged native host styling and the merchant cart’s resulting effective totals; no Backroad Bum branding is injected into EmDash admin and no new UI styling is shipped.
+
 ## Native retirement states · November17 (off live)
 Keep an unavailable native cart line honest: retain saved quantity and ordinary Update/Remove controls, but do not borrow a name, photo, link or money from an absent public catalog projection. The existing placeholder and reason distinguish it from an active product. Native republishing restores the same item’s current catalog presentation and published-page link without replacing its cart capability; installed-beta plain desktop/enhanced Dark phone captures verify these existing states, not a new visual repair. The public-only fixture requires native initial publication because original revision pointers are excluded; do not present this as original-publication migration.
 

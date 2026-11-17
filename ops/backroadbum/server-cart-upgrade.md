@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Sibling-form contention · November17, 14:47 UTC
+
+Fresh Registry-beta2 staging on **76970b7** verifies two actual native editors against sibling M/XL forms. One save makes the other stale; three deliberately refused submissions retain their typed Regular/Sale/SKU/stock values without partial writes, including a repeat from the same refused form. Native reload supplies a fresh form that saves; original plain1440Light/enhanced390Dark M×2 + XL×1 carts and the agent feed agree at$204→$188→$182→$204 with unchanged exact member links and Secure/HttpOnly capabilities.
+
+Original prices/stock/SKUs are restored through native fresh forms, and all32 imported public catalog/media/page data remain byte-identical afterward (storage revisions may advance). ZeroOrders/Payments/consents are copied/created and no checkout POST occurs. Evidence:`evidence/2026-11-17-native-catalog-contention/`; new `ops/backroadbum/catalog-editing.md` distinguishes Block Kit HTTP200 from the actual success/refusal toast. A first incomplete fixture incorrectly expected cart SKU text; final fresh-fixture proof checks exact member links plus separate staged SKU rows, never claims missing public SKU fields. No new framework bug, full-regression renewal, live catalog edit or StageB/TEST1011.
+
 ## Native retirement and return · November17, 14:01 UTC
 
 Fresh Registry-beta2 staging of **33d5979** now verifies the accepted Commerce277 lifecycle through actual page Trash, native Trash-tab Restore and Publish confirmation. Plain1440Light/enhanced390Dark shoppers retain two units and the same secure cart capability while Shop/product availability becomes absent/404; native republish restores the product link/$24 subtotal. Exactly the selected product/publication claims and storage revisions change among32 imported public plugin rows; authored fields, identities, SKU, price, availability, feed choices and media stay unchanged. No Orders, Payments or consents are copied/created, and no checkout POST occurs.
