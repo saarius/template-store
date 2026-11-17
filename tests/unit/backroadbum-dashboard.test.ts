@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports native shade reading without invented cap performance or commerce changes', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    expect(report).toContain('data-shade-note-dispatch');
+    expect(report).toContain('data-shade-note-history');
+    expect(report).toContain('/field-note-a-shady-place-to-stop');
+    expect(report).toContain('Ten EmDash field notes');
+    expect(report).toContain('without inventing a protection rating or measured fit range');
+    expect(report).toContain('all thirteen earlier Pages, catalog and ten Orders remain unchanged');
+    expect(report).toContain('/pr-proof/shade-note/phone-dark.png');
+  });
   it('limits published membership qualification to installed public routes, not merchant cutover', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -151,7 +161,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('data-departure-note');
     expect(report).toContain('data-departure-note-history');
     expect(report).toContain('Previous dispatch · Prepared cart regressions');
-    expect(report).toContain('Eight EmDash field notes');
+    expect(report).toContain('Ten EmDash field notes');
     expect(report).toContain('draft stayed off the public route, journal and search');
     expect(report).toContain('not a plugin upgrade or another checkout qualification');
     expect(report).toContain('all eleven earlier CMS page rows, catalog and ten Orders remain unchanged');

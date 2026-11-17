@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## A shady place to stop · November17
+The tenth native Field Note connects the cap to choosing a suitable rest stop, unpacking with care and leaving access clear, without inventing a sun-protection rating or fit range. Exact editor save/reload, draft exclusion, journal/search, keyboard product/collection reading and print content pass with scripts on/off in both appearances. Product buying facts and the previous thirteen Pages remain unchanged; the source manuscript records authorship only.
+
 ## Native cart keyboard continuity · November17
 The isolated beta store lost keyboard focus after Update and non-final Remove; the unchanged-main cart client reproduces it. An off-live candidate retains the current control or a useful neighboring row and respects movement during delayed responses, including agent-triggered redraws. Template issue245 has hosted Before/After proof; the serving Commerce0.8cart and all business records remain unchanged.
 
