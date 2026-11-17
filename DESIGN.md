@@ -82,6 +82,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - Field Notes opens with an asymmetric copy/photograph split, one featured published note and quieter two-column reading links. Ordinals are decorative/aria-hidden, not invented dates. The existing photograph/credit and native note ordering remain intact.
 - Articles use the generated editorial scale: expressive title, serif opening paragraph, DM Sans body at17–18px/1.75 and at most65ch. Chapter gaps are64px, versus24px paragraph spacing. Back/related/shop links work without JavaScript. Guides share this reading rhythm with smaller task headings and clear policy navigation; their native CMS words are not duplicated or edited by the theme.
 
+## Prepared native-cart product links · November17 (off live)
+The future server cart restores the existing merchant convention: each public product name is one underlined, keyboard-focusable link back to that exact member, not an entirely clickable card. Reuse Field Journal ink/underline, a44px minimum target and the rust focus ring; keep quantity/Remove tasks separate. Published CMS paths are optional enrichment only: missing, ambiguous, unsafe or failed joins leave plain headings and unchanged Commerce prices. This belongs to `backroadbum/server-cart-prep`, not the serving0.8cart or an upstream starter redesign.
+
 ## Roadside shade reading · November17
 The tenth native note uses the existing four-chapter article rhythm, real three-item ordered list and ordinary cap/departure links. Keep its parking and untested-protection limits in the prose rather than adding badges or shopping callouts; no new colors, controls or layout are needed. The cap gains its first published reading match and Road day’s two-note shelf follows the existing stable ordering, while the displaced reset note remains in the journal and its tote shelf.
 

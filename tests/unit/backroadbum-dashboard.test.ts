@@ -2,6 +2,22 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes restored merchant cart navigation from a live or generic runtime change', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-native-cart-links-dispatch');
+    expect(report).toContain('data-native-cart-links-history');
+    expect(reviews).toContain('data-native-cart-links-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('d394981');
+      expect(source).toContain('/pr-proof/native-cart-links/after-phone.png');
+      expect(source).toContain('full 560-file typecheck');
+    }
+    expect(report).toContain('without hiding Commerce facts');
+    expect(report).toContain('not the future cart runtime or a signed upgrade');
+    expect(reviews).toContain('not a generic upstream regression or live runtime change');
+    expect(reviews).toContain('no duplicate review trigger or new upstream request');
+  });
   it('bounds native size saves to temporary fixture prices and retained member identities', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
