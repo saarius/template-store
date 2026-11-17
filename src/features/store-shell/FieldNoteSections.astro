@@ -1,0 +1,25 @@
+---
+import type { FieldNoteSection } from './field-note-sections.js';
+interface Props { sections: FieldNoteSection[] }
+const { sections } = Astro.props;
+---
+{sections.length > 1 && <details class="field-note-sections" data-note-sections>
+  <summary>Jump to a section</summary>
+  <nav aria-label="Sections in this note">
+    <ol>{sections.map(section => <li><a href={`#${section.id}`}>{section.title}</a></li>)}</ol>
+  </nav>
+</details>}
+<style>
+.field-note-sections{margin:0 0 var(--space-7);border-block:1px solid var(--color-border);font-family:var(--font-sans);font-size:var(--text-sm)}
+summary{min-height:48px;padding:var(--space-3) var(--space-2);cursor:pointer;font-weight:600;color:var(--store-ink)}
+summary:hover,summary:active{background:var(--color-surface-muted)}
+summary:focus-visible,a:focus-visible{outline:3px solid var(--store-accent);outline-offset:3px;border-radius:var(--radius-control)}
+summary::marker{color:var(--store-accent)}
+[open]>summary{background:var(--store-surface)}
+nav{padding:var(--space-4) var(--space-2) var(--space-5)}
+ol{list-style:none;margin:0;padding:0;display:grid;gap:var(--space-2)}
+a{display:flex;align-items:center;min-height:44px;width:fit-content;max-width:100%;padding:var(--space-2);color:var(--store-ink);text-decoration:underline;text-underline-offset:.2em;overflow-wrap:anywhere}
+a:hover{text-decoration-thickness:2px;background:var(--store-surface)}
+a:active{color:var(--store-accent)}
+@media print{.field-note-sections{display:none}}
+</style>

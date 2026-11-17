@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Find a journal section · November17
+Longer Field Notes now offer a quiet “Jump to a section” disclosure derived from their actual native chapter headings, without a parallel topic list or client script. Keyboard and script-free fragments reach the heading; native Back/reload and print keep the reading task intact. All ten articles retain their published prose, lists and reading links, and no CMS, catalog or transaction record is edited.
+
 ## Sibling prices, protected saves · November17 (off live)
 Two native merchant editors now have installed-beta proof for stale sibling-size forms: an accepted M or XL save refuses older corrections whole while keeping the typing, and deliberate reload permits the next save. Retained plain desktop/enhanced phone carts and agent feed agree at $204→$188→$182→$204; exact size links, quantities and secure cart capabilities survive, and all original staged catalog facts are restored. This validates existing safeguards, not a new framework repair, live promotion or stable-plugin upgrade.
 

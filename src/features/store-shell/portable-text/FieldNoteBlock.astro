@@ -1,0 +1,17 @@
+---
+import { emdashComponents } from 'emdash/ui';
+import type { ComponentProps } from 'astro/types';
+const NativeBlock = emdashComponents.block;
+type NativeProps = ComponentProps<typeof NativeBlock>;
+interface Props extends NativeProps {
+  node: NativeProps['node'] & { backroadSectionId?: string };
+}
+
+// Delegate all text, marks, alignment and non-heading blocks to EmDash. The
+// request-local projection supplies only a safe, focusable fragment target.
+const { node } = Astro.props;
+const id = node?.style === 'h2' && typeof node.backroadSectionId === 'string'
+  && /^note-section-[1-9][0-9]*$/.test(node.backroadSectionId)
+  ? node.backroadSectionId : undefined;
+---
+<NativeBlock {...Astro.props} {...(id ? { id, tabindex: '-1', 'data-note-section': '' } : {})}><slot /></NativeBlock>
