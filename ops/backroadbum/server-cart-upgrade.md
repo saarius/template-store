@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Native size price and stock loop · November 17, 12:35 UTC
+
+Fresh Registry-beta2 staging on **b2e2c3f** completes native XL saves with a retained M×2 + XL×1 basket in plain desktop and enhanced phone lanes: Regular80/Sale60 reprices$204→$196, leaves M/L at68, retains XL quantity when sold out and disables its new-add control; restoring Regular68/no Sale/backorder returns$204. Native editor reloads and agent-feed reads verify the matching member prices/statuses, with four clean populated-cart painted audits; evidence:`evidence/2026-11-17-native-variant-cart/` and public `/pr-proof/native-variant-cart/` captures.
+
+Original fixture values, untargeted staged rows and all serving business digests remain unchanged; zero staged Orders/Payments/consents are created or copied. No new framework defect or upstream request emerged; this is focused native size qualification, not renewed full regression, authoritative public Regular/Sale projection, signed same-ID upgrade or hosted payment. Registry stable remains0.8.0; StageB/TEST1011 stay untouched.
+
 ## Native price and stock loop · November 17, 11:50 UTC
 
 Off-live **57f0ec0** fixes a qualification omission: copy block-type definitions and versions alongside collection/field schema, with five owning tests preserving source rows and excluding content revisions. Without them, EmDash1.4.0 returned three schema collections but an empty admin manifest after the missing home_opener expansion; the corrected fresh Registry-beta2 fixture exposes all three collections and completes actual desktop/phone native panel saves. Two existing-cap carts reprice$48→$40 after Regular30/Sale20, retain quantity2 when out of stock, and return to$48 after restoring original Regular28/Sale24/in-stock; phone uses the documented Settings-reopen workaround.
