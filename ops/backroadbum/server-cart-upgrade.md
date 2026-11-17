@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Generic cold-option proposal · November 17, 09:09 UTC
+
+[Template PR #248](https://github.com/dinkuskit/template-store/pull/248), fork `fix/initial-variant-sellability` at **e3ec37a**, fixes the initial sold-out state and supplies a no-script GET option inspector so another size remains reachable. Generic main/head captures and real sandbox HTTP output are embedded in the PR; the merchant already has its separate native inspector and selected-state candidate, so no generic branding or runtime was deployed here.
+
+Pinned Node24.22.0 checks pass:303-file Astro check,567units,101workflow passes/two optional skips,four targeted plain/enhanced desktop/phone tests,Node/Registry-site builds and130760-byte beta1 source Registry admission; eight native/enhanced painted views are clean. The full wrapper completes its non-browser stages then stops at the unrelated admin welcome client30s timeout also reproduced on unchanged main; CI/review and whole merchant qualification remain separate. Evidence:`evidence/2026-11-17-initial-stock-pr/`; stable discovery remains0.8.0, so Stage B and TEST1011 are untouched.
+
 ## Installed-beta merchant continuity · November17, 07:00UTC
 
 Prepared branch is pushed at `9996119` after merging live `703a42e` (merge `8f4be9b`), retaining native cart/checkout rather than legacy browser retry code. A fresh verified Registry `0.9.0-beta.2` install exercises all seven public families / eleven concrete members in both plain1440 Light and enhanced390 Dark, including quantity2, retained size lines, effective prices, backorders and sold-out refusal. A cold XL tee exposed the enabled-submit mismatch tracked in [Template247](https://github.com/dinkuskit/template-store/issues/247); its selected-member initial-state repair is **off-live only**, with actual rendered in-stock/backorder/sold-out tests.
