@@ -6,12 +6,6 @@ Off-live **7a3ce50** merges live1edff95 into the prepared branch, retaining nati
 
 Twelve actual cart/article/collection painted audits are clean. The fixture copies only public content/catalog/media (7products/2published collections/14Pages,10notes), has zero Orders/Payments/hosted consents and leaves all serving business digests unchanged; proof:`evidence/2026-11-17-prep-shade-sync/`. This is focused merge/installed-beta continuity, not the complete merchant admin/browser matrix, authoritative public Regular/Sale pair, signed same-ID upgrade or hosted payment. Stable remains0.8.0; StageB and TEST1011 stay untouched.
 
-## Journal-to-cart continuity · November 17, 11:02 UTC
-
-Off-live **7a3ce50** merges live1edff95 into the prepared branch, retaining native cart/checkout, retained receipts and shopper safeguards; the only conflict was the earlier runbook summary, whose detailed staging evidence and green CI paragraph both remain. Fresh real Registry beta2 install201, the whole merchant Node build and80 focused units pass; eight390/1440 Light/Dark script-on/off journeys follow Road day → native notes → cap/notebook, add2caps/$48, add1book/$60, update3caps/$84, reload and remove book/$72.
-
-Twelve actual cart/article/collection painted audits are clean. The fixture copies only public content/catalog/media (7products/2published collections/14Pages,10notes), has zero Orders/Payments/hosted consents and leaves all serving business digests unchanged; proof:`evidence/2026-11-17-prep-shade-sync/`. This is focused merge/installed-beta continuity, not the complete merchant admin/browser matrix, authoritative public Regular/Sale pair, signed same-ID upgrade or hosted payment. Stable remains0.8.0; StageB and TEST1011 stay untouched.
-
 ## Published collection continuity · November 17, 09:50 UTC
 
 Off-live preparation **3b8ffcc** repairs the public qualification copier: native product/category relations were absent from earlier sampled fixtures. It now copies only `product_categories` edges between published, non-deleted translation groups, retaining sort order; real SQLite tests exclude drafts, deleted rows, dangling groups and other private relations without changing the source.
