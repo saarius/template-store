@@ -2,6 +2,22 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates cross-tab staging evidence and reload recovery from a shipped repair', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-cart-tab-return-dispatch');
+    expect(report).toContain('data-cart-tab-return-history');
+    expect(reviews).toContain('data-cart-tab-return-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('https://github.com/dinkuskit/template-store/issues/249');
+      expect(source).toContain('/pr-proof/server-cart-tab-return/stale-390.png');
+      expect(source).toContain('not a');
+    }
+    expect(report).toContain('workaround, not a repair');
+    expect(report).toContain('only this report ships on stable Commerce 0.8.0');
+    expect(reviews).toContain('not a whole unchanged generic starter');
+    expect(reviews).toContain('no runtime repair, live upgrade or new purchase');
+  });
   it('bounds native sibling-form contention to refused writes and disposable prices', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

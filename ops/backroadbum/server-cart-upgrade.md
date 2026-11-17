@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Cross-tab return regression · November 17, 16:12 UTC
+
+[Template issue249](https://github.com/dinkuskit/template-store/issues/249) records a fresh Registry-beta2 reproduction on prepared7343f09 and separately the byte-identical upstream167d736 cart client in the merchant shell. After another tab updates/removes an item, returning updates the cookie-backed header but not rows/quantity/subtotal; native reload recovers the current server cart. Real Chromium hidden→visible/focus events pass at1440Light/390Dark. The main-client substitution is not a whole unchanged generic-starter test, and reload is a workaround, not an implemented repair.
+
+Evidence:`evidence/2026-11-17-cart-tab-return/`; four public diagnostic captures under `/pr-proof/server-cart-tab-return/` show before/after reload. Only add/change writes occur in disposable staging; all32 imported catalog/media/page rows remain unchanged, with zero Orders/Payments/consents copied or created. Initial Playwright visibility emulation was inconclusive; the final raw Chromium connection uses `noDefaults:true`. A future repair needs cart-only reconciliation that respects drafts, pending mutations and focus, without adding shell-wide fragment reads; no runtime fix, full regression, stable migration or hosted purchase is claimed.
+
 ## Sibling-form contention · November17, 14:47 UTC
 
 Fresh Registry-beta2 staging on **76970b7** verifies two actual native editors against sibling M/XL forms. One save makes the other stale; three deliberately refused submissions retain their typed Regular/Sale/SKU/stock values without partial writes, including a repeat from the same refused form. Native reload supplies a fresh form that saves; original plain1440Light/enhanced390Dark M×2 + XL×1 carts and the agent feed agree at$204→$188→$182→$204 with unchanged exact member links and Secure/HttpOnly capabilities.
