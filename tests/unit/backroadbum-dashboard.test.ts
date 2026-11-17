@@ -2,6 +2,24 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates native price/cart staging and manifest fallout from live promotions or CMS repairs', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const bugs = readFileSync('public/dashboard/emdash-bugs.txt', 'utf8');
+    expect(report).toContain('data-native-price-cart-dispatch');
+    expect(report).toContain('data-native-price-cart-history');
+    expect(reviews).toContain('data-native-price-cart-review');
+    for (const source of [report, reviews]) {
+      expect(source).toContain('57f0ec0');
+      expect(source).toContain('/pr-proof/native-price-cart/staged-cart-phone.png');
+    }
+    expect(reviews).toContain('not a live promotion');
+    expect(report).toContain('only reporting ships here, not new live prices');
+    expect(report).toContain('full merchant regression, public Regular/Sale projection');
+    expect(bugs).toContain('## 13. Missing block schemas');
+    expect(bugs).toContain('our qualification copier omitted schema dependencies');
+    expect(bugs).toContain('No EmDash issue, PR or comment was opened');
+  });
   it('bounds journal-to-cart preparation to disposable installed-beta journeys', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
