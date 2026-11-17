@@ -65,6 +65,32 @@ test('public membership preserves ordering and translation groups, excludes draf
   } finally {source.close();}
 });
 
+test('block metadata preserves field schemas and versions without copying content revisions', async () => {
+  const source = new Database(':memory:');
+  try {
+    source.exec(`CREATE TABLE _emdash_block_types(id TEXT, slug TEXT, current_version INTEGER);
+      CREATE TABLE _emdash_block_type_versions(id TEXT, block_type_id TEXT, version INTEGER, fields TEXT, fingerprint TEXT);
+      INSERT INTO _emdash_block_types VALUES('opener','home_opener',2);
+      INSERT INTO _emdash_block_type_versions VALUES
+        ('v1','opener',1,'[{"slug":"heading","type":"text"}]','first'),
+        ('v2','opener',2,'[{"slug":"heading","type":"text"},{"slug":"summary","type":"richtext"}]','second');`);
+    const before = source.serialize(), inserts = [];
+    const fake = { prepare(query) {
+      if (query.includes('FROM _emdash_block_')) return source.prepare(query);
+      return { get(name) { return query.includes('sqlite_master') ? { sql: `CREATE TABLE ${name} (id text)` } : undefined; }, all() { return []; } };
+    } };
+    const db = { insertInto(table) { return { values(row) { inserts.push({ table, row }); return { onConflict() { return { async execute() {} }; } }; } }; } };
+    const sql = { raw() { return { async execute() {} }; } };
+    const counts = await copyPublicContent(fake, db, sql);
+    assert.equal(counts._emdash_block_types, 1);
+    assert.equal(counts._emdash_block_type_versions, 2);
+    assert.deepEqual(inserts.map(x => x.table), ['_emdash_block_types', '_emdash_block_type_versions', '_emdash_block_type_versions']);
+    assert.equal(inserts[0].row.current_version, 2);
+    assert.deepEqual(JSON.parse(inserts[2].row.fields), [{ slug: 'heading', type: 'text' }, { slug: 'summary', type: 'richtext' }]);
+    assert.deepEqual(source.serialize(), before);
+  } finally { source.close(); }
+});
+
 test('copies only published public content, strips author/revision links, never copies users or options wholesale', async () => {
   const reads = [], inserts = [], schemas = [];
   const source = { prepare(query) {
@@ -81,6 +107,10 @@ test('copies only published public content, strips author/revision links, never 
   const sql = { raw(query) { schemas.push(query); return { async execute() {} }; } };
   const counts = await copyPublicContent(source, db, sql);
   assert.equal(schemas.length, 3);
+  for (const table of ['_emdash_block_types', '_emdash_block_type_versions']) {
+    assert.ok(reads.includes(`SELECT * FROM ${table}`), 'native admin manifest needs persisted block definitions');
+    assert.equal(counts[table], 0);
+  }
   for (const table of PUBLIC_CONTENT_TABLES) {
     assert.equal(counts[table], 1);
     assert.ok(reads.includes(`SELECT * FROM ${table} WHERE status='published' AND deleted_at IS NULL`));

@@ -17,7 +17,10 @@ export async function localHTTPS(path, { origin = 'https://backroadbum.com', met
 }
 
 export const PUBLIC_CONTENT_TABLES = ['ec_products', 'ec_categories', 'ec_pages'];
-const METADATA = ['_emdash_collections', '_emdash_fields', 'content_taxonomies', 'taxonomies', '_emdash_taxonomy_defs'];
+// Block schemas are metadata, not content revisions or merchant configuration.
+// Omitting them makes EmDash's manifest drop every collection when a blocks
+// field refers to a missing type, even though public content queries still work.
+const METADATA = ['_emdash_collections', '_emdash_fields', '_emdash_block_types', '_emdash_block_type_versions', 'content_taxonomies', 'taxonomies', '_emdash_taxonomy_defs'];
 const PUBLIC_OPTIONS = ['dinkus:storefront-upgrades', 'emdash:seed_complete', 'emdash:setup_complete', 'site:tagline', 'site:title'];
 
 /** Preserve native collection membership only between the public rows we copied.
