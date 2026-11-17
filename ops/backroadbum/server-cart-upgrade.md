@@ -1,5 +1,13 @@
 # Qualifying a future server-cart upgrade
 
+## Published collection continuity · November 17, 09:50 UTC
+
+Off-live preparation **3b8ffcc** repairs the public qualification copier: native product/category relations were absent from earlier sampled fixtures. It now copies only `product_categories` edges between published, non-deleted translation groups, retaining sort order; real SQLite tests exclude drafts, deleted rows, dangling groups and other private relations without changing the source.
+
+Fresh verified Registry beta2 install201 and the full Field Journal Node build pass34 public routes in each of plain1440 Light and enhanced390 Dark: seven products, two published collections and nine notes. Native/enhanced mug quantity2 retains$36; unconfigured checkout stays disabled and an unpaid success visit returns NOT_PAID without an Order. Thirteen focused tests pass/four optional integrations skip. Evidence:`evidence/2026-11-17-merchant-stock/`; this is built public-route coverage, not the complete merchant admin/browser matrix, signed same-ID upgrade or hosted payment. Stable Registry remains0.8.0, so StageB and TEST1011 stay untouched.
+
+[Template248 exact-head CI44052916802](https://github.com/dinkuskit/template-store/actions/runs/44052916802) passes64desktop/63phone browser tests, the full wrapper,32URLcrawl, Registry/Playground builds and workflows. Its PR body now carries this evidence and a standalone ClawSweeper review request follows completion; no source changed upstream.
+
 ## Generic cold-option proposal · November 17, 09:09 UTC
 
 [Template PR #248](https://github.com/dinkuskit/template-store/pull/248), fork `fix/initial-variant-sellability` at **e3ec37a**, fixes the initial sold-out state and supplies a no-script GET option inspector so another size remains reachable. Generic main/head captures and real sandbox HTTP output are embedded in the PR; the merchant already has its separate native inspector and selected-state candidate, so no generic branding or runtime was deployed here.

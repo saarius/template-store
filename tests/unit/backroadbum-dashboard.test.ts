@@ -2,6 +2,20 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('limits published membership qualification to installed public routes, not merchant cutover', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-published-membership-dispatch');
+    expect(report).toContain('data-published-membership-history');
+    expect(report).toContain('3b8ffcc');
+    expect(report).toContain('34 public routes');
+    expect(report).toContain('seven products, two collections and all nine notes');
+    expect(report).toContain('earlier sampled storefront checks did not cover that navigation');
+    expect(report).toContain('same-ID stable upgrade, complete merchant admin/browser matrix and hosted purchase remain separate');
+    expect(reviews).toContain('44052916802');
+    expect(reviews).toContain('64 desktop and 63 phone browser tests');
+    expect(reviews).toContain('ClawSweeper review is requested');
+  });
   it('reports the cold-option proposal without implying live server-cart adoption or full local matrix', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -15,7 +29,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       expect(source).toContain('four targeted browser tests');
       expect(source).toContain('eight painted views');
       expect(source).toContain('unchanged main');
-      expect(source).toContain('CI and review remain separate');
+      expect(source).toContain('Commerce 0.8.0');
     }
     expect(report).toContain('only this report ships on stable Commerce 0.8.0');
     expect(reviews).toContain('not a signed installation or merchant theme');
