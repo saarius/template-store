@@ -1245,7 +1245,7 @@ export function confirmedOrderMarkup(
       ? order.test ? "The store marked this test order complete. No parcel was sent." : "Marked shipped by the store. This is not delivery confirmation."
       : "The store has not marked this order complete.";
     const rows: Array<[string, string | undefined]> = completed ? [
-      ["Marked complete", new Date(fulfillment.completedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })],
+      ["Marked complete", fulfillment.completedAt ? new Date(fulfillment.completedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) : undefined],
       [order.test ? "Carrier (demo)" : "Carrier", fulfillment.carrier],
       [order.test ? "Tracking reference (demo)" : "Tracking number", fulfillment.tracking],
     ] : [];

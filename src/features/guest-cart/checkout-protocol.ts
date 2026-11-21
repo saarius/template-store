@@ -73,6 +73,7 @@ export function parseGuestOrderFulfillment(value: unknown): GuestOrderFulfillmen
 /** Completed means the owner marked the order shipped, never that it was delivered. */
 export type GuestCheckoutFulfillment = Readonly<{
   status: "processing" | "completed";
+  completedAt?: string;
   carrier?: string;
   tracking?: string;
 }>;
@@ -83,7 +84,10 @@ function parseFulfillment(status: unknown, completed: unknown): GuestCheckoutFul
   if (status !== "completed") return undefined;
   const done = isObject(completed) ? completed : {};
   const carrier = boundedText(done.carrier, 64), tracking = boundedText(done.tracking, 64);
-  return { status, ...(carrier ? { carrier } : {}), ...(tracking ? { tracking } : {}) };
+  const completedAt = typeof done.at === "string" && done.at.length <= 64 &&
+    Number.isFinite(Date.parse(done.at)) ? done.at : undefined;
+  return { status, ...(completedAt ? { completedAt } : {}),
+    ...(carrier ? { carrier } : {}), ...(tracking ? { tracking } : {}) };
 }
 
 export type GuestCheckoutProjection = Readonly<{
@@ -437,7 +441,15 @@ export function guestCheckoutWire(checkout: GuestCheckoutProjection) {
       ...(order.contact ? { contact: order.contact } : {}),
       ...(order.delivery ? { delivery: order.delivery } : {}),
       ...(order.shippingMethod ? { shippingMethod: order.shippingMethod } : {}),
-      ...(order.fulfillment ? { fulfillment: order.fulfillment } : {}),
+      ...(order.fulfillment ? {
+        fulfillment: order.fulfillment,
+        status: order.fulfillment.status,
+        ...(order.fulfillment.status === "completed" ? { completed: {
+          ...(order.fulfillment.completedAt ? { at: order.fulfillment.completedAt } : {}),
+          ...(order.fulfillment.carrier ? { carrier: order.fulfillment.carrier } : {}),
+          ...(order.fulfillment.tracking ? { tracking: order.fulfillment.tracking } : {}),
+        } } : {}),
+      } : {}),
     },
     ...(checkout.contact ? { contact: checkout.contact } : {}),
     ...(checkout.delivery ? { delivery: checkout.delivery } : {}),

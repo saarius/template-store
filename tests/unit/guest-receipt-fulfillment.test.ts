@@ -30,6 +30,20 @@ describe("canonical receipt number", () => {
 });
 
 describe("guest receipt fulfillment", () => {
+  it.each([undefined, "2026-11-10T01:00:00.000Z", "not-a-date"])(
+    "reads native Commerce completion without requiring the retained wrapper timestamp (%j)", at => {
+      const value = wire(undefined);
+      const parsed = parseGuestCheckoutWireResult({ ...value, checkout: { ...value.checkout,
+        order: { ...value.checkout.order, status: "completed", completed: { at, carrier: "Demo carrier", tracking: "TEST-NOT-A-SHIPMENT" } },
+      } });
+      if (!parsed?.ok) throw Error("native receipt must parse");
+      expect(parsed.checkout.order?.fulfillment).toEqual({ status: "completed", carrier: "Demo carrier", tracking: "TEST-NOT-A-SHIPMENT",
+        ...(at === completed.completedAt ? { completedAt: at } : {}),
+      });
+      const relayed = parseGuestCheckoutWireResult({ ...parsed, checkout: guestCheckoutWire(parsed.checkout) });
+      expect(relayed?.ok && relayed.checkout.order?.fulfillment).toEqual(parsed.checkout.order?.fulfillment);
+    },
+  );
   it("preserves current completion through the server status relay and browser parser", () => {
     const parsed = parseGuestCheckoutWireResult(wire(completed));
     expect(parsed?.ok).toBe(true);
