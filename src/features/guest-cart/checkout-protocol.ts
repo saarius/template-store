@@ -70,6 +70,22 @@ export function parseGuestOrderFulfillment(value: unknown): GuestOrderFulfillmen
     ...(carrier ? { carrier } : {}), ...(tracking ? { tracking } : {}) };
 }
 
+/** Completed means the owner marked the order shipped, never that it was delivered. */
+export type GuestCheckoutFulfillment = Readonly<{
+  status: "processing" | "completed";
+  carrier?: string;
+  tracking?: string;
+}>;
+
+/** Commerce's order.status and order.completed; anything else reads as no status. */
+function parseFulfillment(status: unknown, completed: unknown): GuestCheckoutFulfillment | undefined {
+  if (status === "processing") return { status };
+  if (status !== "completed") return undefined;
+  const done = isObject(completed) ? completed : {};
+  const carrier = boundedText(done.carrier, 64), tracking = boundedText(done.tracking, 64);
+  return { status, ...(carrier ? { carrier } : {}), ...(tracking ? { tracking } : {}) };
+}
+
 export type GuestCheckoutProjection = Readonly<{
   schema: typeof GUEST_CHECKOUT_PROJECTION_SCHEMA;
   state: "pending" | "paid" | "recoverable-failure" | "released-retry";
@@ -85,7 +101,8 @@ export type GuestCheckoutProjection = Readonly<{
     contact?: GuestCheckoutContact;
     delivery?: GuestCheckoutDelivery;
     shippingMethod?: string;
-    fulfillment?: GuestOrderFulfillment;
+    /** Native order status or the retained receipt's validated wrapper projection. */
+    fulfillment?: GuestCheckoutFulfillment | GuestOrderFulfillment;
   }> | null;
   contact?: GuestCheckoutContact;
   delivery?: GuestCheckoutDelivery;
@@ -342,11 +359,9 @@ function projectCheckout(value: unknown): GuestCheckoutProjection | null {
       (typeof rawOrder.email === "string" ? parseContact({ email: rawOrder.email }, orderDelivery) : undefined) ??
       topContact;
     const orderShippingMethod = boundedText(rawOrder.shippingMethod, 160) ?? topShippingMethod;
-    // Preserve retained receipts' wrapper shape while accepting Commerce 0.9's native Orders projection.
-    const completed = isObject(rawOrder.completed) ? rawOrder.completed : {};
-    const fulfillment = parseGuestOrderFulfillment(rawOrder.fulfillment) ?? parseGuestOrderFulfillment({
-      status: rawOrder.status, completedAt: completed.at, carrier: completed.carrier, tracking: completed.tracking,
-    });
+    // Keep original receipts readable while using the upstream native Orders contract.
+    const fulfillment = parseGuestOrderFulfillment(rawOrder.fulfillment) ??
+      parseFulfillment(rawOrder.status, rawOrder.completed);
     order = {
       orderId: value.order.orderId,
       receiptId: value.order.receiptId,
