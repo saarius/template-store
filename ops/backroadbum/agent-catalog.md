@@ -1,5 +1,11 @@
 # Agent catalog dogfooding
 
+## Queue reconciliation · November 21
+
+Commerce **#280/#282** merged November18 and closed **#279/#281**; DinkusKit **#130** merged the same day. The catalog-dogfood branch now includes upstream **a84c69f** and passes its focused catalog tests; no shared Worker deployment or new feed enrollment occurred. Template **#244** remains clean/green at **f03d136** after the November18 requested script removal and non-rebased main merge; it is untouched in this pass.
+
+These merges do not update installed Commerce0.8.0: live agent JSON remains seven families/eleven members, and signed XML/CSV remain five simple rows until a release adopts the serializers. Current queue details and unchanged earlier proof are on `/dashboard/contributions/`; housekeeping evidence is `evidence/2026-11-21-housekeeping/`. DinkusKit **#136 / 91c8201** chooses dynamic test ports, but main still admits a bound non-listening socket through its connect-only preflight; a fresh exact-function comparison confirms **#132/#133 remain unresolved**, so neither is closed or conflict-churn pushed.
+
 The merchant branch merged upstream template-store `23207d9` one way on November 14. `/feeds/agent-catalog.json` now serves the upstream route with the existing signed Commerce0.8.0 projection; no plugin, marketing-channel setting or hosted service was replaced. Run `node scripts/verify-backroadbum-agent-catalog.mjs` for a read-only public comparison.
 
 ## Current result and boundary · November15

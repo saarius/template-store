@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Manual housekeeping · November 21
+
+Registry discovery still lists stable Commerce **0.8.0** under `r_gshdrqaldna3r7sn`; the newest GitHub tag is **v0.9.0-beta.2**. Stage B and TEST1011 remain gated. `backroadbum/server-cart-prep` now merges upstream **7391319 / #240** without replacing the Field Journal theme or shopper safeguards: native completion works with or without a timestamp, while retained wrapper receipts keep their stricter timestamp validation and original print guidance. The bridge relays both shapes and omits an absent completion date instead of rendering an invalid date.
+
+Focused qualification: 128 cart/receipt/session units, 15 actual component renders and the full 566-file Astro check pass on Node24.22.2. This is source/component merge verification, not a renewed installed-beta journey, signed same-ID migration, full browser matrix or hosted purchase. Evidence: `evidence/2026-11-21-housekeeping/`; an initial 1200MiB typecheck exhausted its heap, then the serialized 1536MiB run passed after the compatibility correction. Account PR235 is held by the maintainer’s November18 server-rendered redesign comment; do not churn235/237/239 while that plan settles. Owner Steer7 replaces the old push/re-review trigger, and this manual pass sends none.
+
 ## Cross-tab return regression · November 17, 16:12 UTC
 
 [Template issue249](https://github.com/dinkuskit/template-store/issues/249) records a fresh Registry-beta2 reproduction on prepared7343f09 and separately the byte-identical upstream167d736 cart client in the merchant shell. After another tab updates/removes an item, returning updates the cookie-backed header but not rows/quantity/subtotal; native reload recovers the current server cart. Real Chromium hidden→visible/focus events pass at1440Light/390Dark. The main-client substitution is not a whole unchanged generic-starter test, and reload is a workaround, not an implemented repair.

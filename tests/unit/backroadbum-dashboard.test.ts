@@ -2,6 +2,35 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reconciles the manual housekeeping queue without claiming signed adoption or superseded port repair', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-housekeeping-dispatch');
+    expect(report).toContain('data-housekeeping-history');
+    expect(report.match(/class="cycle-entry"/g)).toHaveLength(235);
+    expect(report).toContain('recurring cycles remain paused');
+    expect(reviews).toContain('data-housekeeping-ledger');
+    expect(reviews).toContain('data-historical-review-context');
+    for (const link of ['commerce/pull/280', 'commerce/pull/282', 'dinkuskit/pull/130', 'payments/issues/118',
+      'template-store/pull/244', 'template-store/pull/248', 'template-store/pull/246', 'template-store/pull/243',
+      'template-store/pull/241', 'template-store/pull/235', 'template-store/pull/237', 'template-store/pull/239',
+      'dinkuskit/pull/133', 'dinkuskit/issues/132', 'template-store/pull/240']) {
+      expect(reviews).toContain('https://github.com/dinkuskit/' + link);
+    }
+    for (const fact of ['f03d136', 'Account-redesign hold', 'not superseded by merged #136 / 91c8201',
+      'connect-only preflight', 'Stage B and TEST1011 stay gated', 'Live signed feeds still have five rows']) expect(reviews).toContain(fact);
+  });
+
+  it('archives Steer 7 exactly while making its precedence over the old push trigger clear', () => {
+    const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const archive = readFileSync('public/dashboard/instructions/steer-7-2026-11-20.txt', 'utf8');
+    expect(source).toContain('Steer 7 arrived November 20');
+    expect(source).toContain('replace Steer 3');
+    expect(archive).toContain('Owner Steer 7 — November 20, 2026');
+    expect(archive).toContain('Every push to a PR starts a ClawSweeper review by itself');
+    expect(archive).toContain('Post it **once per commit**');
+    expect(archive).toContain('**never** while a review is queued or running');
+  });
   it('separates cross-tab staging evidence and reload recovery from a shipped repair', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -738,7 +767,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(current).toContain('now return released-retry');
     expect(current).toContain('durably record expired-unpaid');
     expect(current).toContain('without a replacement start');
-    expect(current).toContain('provider objects and exact deployed source remain unverified');
+    expect(current).toContain('the maintainer closed #118 November 20 as resolved by #119');
+    expect(current).toContain('provider objects and exact deployed source remain independently unverified');
     expect(current).not.toContain('still pending');
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
     expect(pulse).toContain('original expired attempts now release');
@@ -979,6 +1009,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-4-2026-11-13.txt',
       '/dashboard/instructions/steer-5-2026-11-14.txt',
       '/dashboard/instructions/steer-6-2026-11-15.txt',
+      '/dashboard/instructions/steer-7-2026-11-20.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');
