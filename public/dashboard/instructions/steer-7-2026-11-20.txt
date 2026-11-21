@@ -1,0 +1,8 @@
+## Owner Steer 7 — November 20, 2026 (Supersedes Steer 3 `@clawsweeper re-review` push trigger)
+
+### ClawSweeper Re-Review Rule (from Ronald, 18 Nov)
+- Every push to a PR starts a ClawSweeper review by itself. **Do not post `@clawsweeper re-review` after you push.** That queues a second review of the same commit and delays the result.
+- Post `@clawsweeper re-review` **only** when:
+  - the review on your latest commit ended in an error, or
+  - about 10 minutes after a push, there is still no "ClawSweeper picked this up" comment for that commit.
+- Post it **once per commit**, and **never** while a review is queued or running.
