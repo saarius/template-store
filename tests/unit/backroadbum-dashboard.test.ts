@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates the disposable upgrade rehearsal from the live storefront', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-emdash-bridge-dispatch');
+    expect(report).toContain('data-emdash-bridge-history');
+    expect(report).toContain('The live store remains on Commerce 0.8.0');
+    expect(report).toContain('with a test mail sink');
+    expect(reviews).toContain('template-store/pull/255');
+    expect(reviews).toContain('template-store/pull/253');
+  });
   it('records the maintainer-ordered review refresh and dependent waits without a live upgrade claim', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -18,7 +28,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-housekeeping-dispatch');
     expect(report).toContain('data-housekeeping-history');
-    expect(report.match(/class="cycle-entry"/g)).toHaveLength(237);
+    expect(report.match(/class="cycle-entry"/g)).toHaveLength(238);
     expect(report).toContain('recurring cycles remain paused');
     expect(reviews).toContain('data-housekeeping-ledger');
     expect(reviews).toContain('data-historical-review-context');

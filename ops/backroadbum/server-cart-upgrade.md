@@ -1,10 +1,18 @@
 # Qualifying a future server-cart upgrade
 
-## Owner Steer 9 · November 22
+## EmDash 1.5 bridge rehearsal · November 22
+
+The stable channel still lists **0.8.0** under `r_gshdrqaldna3r7sn`; the separate beta channel lists **0.9.0-beta.4**. Template main **8743e59** still pins EmDash 1.4.0 / Commerce beta.2; [Template #255](https://github.com/dinkuskit/template-store/pull/255) proposes EmDash 1.5.0 / beta.3, and [#253](https://github.com/dinkuskit/template-store/pull/253) proposes the order lookup page. Neither is merged. Do not run stable Commerce 0.8.0 on EmDash 1.5: its index matcher cannot confirm the renamed indexes. Rehearse the compatible Commerce build on 1.4 first, then EmDash 1.5 (migration 095), within one controlled cutover. Never substitute the beta Registry ID in production.
+
+Source-built Commerce **beta.3** (130,739 bytes) passes seven targeted compiled workerd cases, including creating a product in fresh 1.5 storage and persisting an order across restart. Newly tagged **beta.4** (124,997 bytes) passes 33 focused tests and the owning three-phase HTTP order-lookup spec against one disposable SQLite database: 0.8.0/1.4 → beta.4/1.4 → beta.4/1.5. Indexed and pre-index fixture orders remain unchanged and retrievable, wrong pairs refused, and the old account route disabled without erasing its rows. The suite seeds synthetic Orders directly; this does not qualify a signed upgrade, merchant receipt capabilities, startup demo seeding, hosted payments, or a full template pairing.
+
+Accounts **0143b6e** passes typecheck, 22 unit tests, the 10,202-byte Registry build and seven real workerd/D1 cases with the test mail sink. It exercises OTP/session and saved-address lifecycle, not relay delivery or server-side storefront pages. Reviews **84ee932** now stores and moderates reviews and serves product ratings; the shipment handoff is decided but unbuilt, and request email is still undecided. Evidence: `evidence/2026-11-22-isolated-plugins/`. Stage B and TEST1011 remain untouched.
+
+## Owner Steer 9 · Earlier November 22 snapshot
 
 Accounts and Reviews are separate, pre-Registry plugins. Accounts main 0143b6e has emailed sign-in and one saved delivery address/phone, but the server-rendered template integration has not landed. Qualify its EmDash 1.5 plugin runtime and later the merchant email relay in disposable staging before any paired signed cutover. Existing Commerce shopper sessions do not migrate; historical Orders do. The new shopper order lookup is not the deferred own-orders list. Reconcile #235/#237/#239 only when their server-rendered replacements land upstream.
 
-Reviews is currently a scaffold. Wait for the charter to decide the shipped-order signal and email delivery before dogfooding invitations. Under Steer 10, Courier staging waits for Courier #1 to merge and the owning integrations to land. No shared deployment or speculative integration is needed.
+At this earlier checkpoint Reviews was a scaffold. Wait for the shipped-order handoff and email delivery implementation before dogfooding invitations. Under Steer 10, Courier staging waits for Courier #1 to merge and the owning integrations to land. No shared deployment or speculative integration is needed.
 
 ## Maintainer follow-up · November 22
 
