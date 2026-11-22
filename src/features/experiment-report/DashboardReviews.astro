@@ -8,11 +8,12 @@ const reviews = [
   { repo: 'DinkusKit', number: 124, head: '92fbb24', href: 'https://github.com/dinkuskit/dinkuskit/pull/124', state: 'Merged November 15', title: 'Independent store settings', copy: 'Hosted setup mixed plugins, shipping and payments in one crowded card. Native tabs and separate saves preserve the hosted site’s own tokens and forms.' },
 ];
 ---
-<p class="small" data-housekeeping-review>Checked November 22, 2026. Two authored Template PRs remain open: the cart lock and keyboard focus. The sold-out option fix has merged. These are starter changes, not upgrades to the signed plugins or hosted services.</p>
+<p class="small" data-housekeeping-review>Checked November 22, 2026. Two authored Template PRs remain open: the cart lock and keyboard focus. The sold-out option fix has merged. Courier’s Registry handoff issue remains open; the Cloudflare timer merge does not resolve it or change this Node storefront.</p>
 <table id="housekeeping-ledger" data-housekeeping-ledger>
   <caption>Current contribution queue · November 22</caption>
   <thead><tr><th scope="col">Contribution</th><th scope="col">State &amp; store evidence</th></tr></thead>
   <tbody>
+    <tr data-courier-registry-ledger><td><a href="https://github.com/dinkuskit/courier/issues/3">Courier #3</a><br/><a href="https://github.com/dinkuskit/template-store/pull/254">Template #254</a></td><td>Courier #3 is open. The same compiled plugins handed off a test order by their source IDs, but Reviews could not reach the Registry-installed Commerce ID. Template #254 merged the Cloudflare timer, not a fix for that ID mismatch. No Reviews rollout on Backroad Bum.</td></tr>
     <tr><td><a href="https://github.com/dinkuskit/commerce/pull/280">Commerce #280</a></td><td>Merged November 18 · 42f0e8a. Restores feed controls for size families; issue #279 closed. The serving signed 0.8.0 admin still lacks the repair.</td></tr>
     <tr><td><a href="https://github.com/dinkuskit/commerce/pull/282">Commerce #282</a></td><td>Merged November 18 · 07e68fe. Expands eligible size members into XML/CSV rows; issue #281 closed. Live signed feeds still have five rows, not eleven.</td></tr>
     <tr><td><a href="https://github.com/dinkuskit/dinkuskit/pull/130">DinkusKit #130</a></td><td>Merged November 18 · f4f2cbd. Corrects available-only exact-size lookup; catalog dogfooding now includes current upstream main. No shared catalog deployment.</td></tr>

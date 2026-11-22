@@ -2,6 +2,22 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports the Reviews rehearsal and Registry handoff separately from live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const issue = 'https://github.com/dinkuskit/courier/issues/3';
+    expect(report).toContain('data-reviews-rollout-dispatch');
+    expect(report).toContain('data-courier-registry-history');
+    expect(report).toContain('data-storefront-reviews-history');
+    expect(report).toContain('the product page, not the agent feed');
+    expect(report).toContain('Reviews are not installed on Backroad Bum');
+    expect(report).toContain(issue);
+    const row = reviews.match(/<tr data-courier-registry-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(row).toContain(issue);
+    expect(row).toContain('Courier #3 is open');
+    expect(row).toContain('merged the Cloudflare timer, not a fix');
+    expect(row).toContain('No Reviews rollout on Backroad Bum');
+  });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
