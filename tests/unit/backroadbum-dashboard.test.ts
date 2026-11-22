@@ -18,7 +18,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-housekeeping-dispatch');
     expect(report).toContain('data-housekeeping-history');
-    expect(report.match(/class="cycle-entry"/g)).toHaveLength(236);
+    expect(report.match(/class="cycle-entry"/g)).toHaveLength(237);
     expect(report).toContain('recurring cycles remain paused');
     expect(reviews).toContain('data-housekeeping-ledger');
     expect(reviews).toContain('data-historical-review-context');
@@ -28,8 +28,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
       'dinkuskit/pull/133', 'dinkuskit/issues/132', 'template-store/pull/240']) {
       expect(reviews).toContain('https://github.com/dinkuskit/' + link);
     }
-    for (const fact of ['f03d136', 'Account-redesign hold', 'not superseded by merged #136 / 91c8201',
-      'connect-only preflight', 'Stage B and TEST1011 stay gated', 'Live signed feeds still have five rows']) expect(reviews).toContain(fact);
+    for (const fact of ['f03d136', 'Account-redesign hold', 'The maintainer chose the already-merged #136',
+      'OS-assigned ports', 'Stage B and TEST1011 stay gated', 'Live signed feeds still have five rows']) expect(reviews).toContain(fact);
   });
 
   it('archives Steer 7 exactly while making its precedence over the old push trigger clear', () => {
@@ -41,6 +41,25 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(archive).toContain('Every push to a PR starts a ClawSweeper review by itself');
     expect(archive).toContain('Post it **once per commit**');
     expect(archive).toContain('**never** while a review is queued or running');
+  });
+  it('records the cart lock as upstream proof rather than a live change', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-cart-lock-dispatch');
+    expect(report).toContain('data-cart-lock-history');
+    expect(report).toContain('A second submit is ignored, not queued');
+    expect(report).toContain('not a live cart change');
+    expect(reviews).toContain('#243 at 735a86c');
+  });
+  it('links the two November 22 instruction archives in order without claiming plugin adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const eighth = 'dashboard/instructions/steer-8-2026-11-22.txt';
+    const ninth = 'dashboard/instructions/steer-9-2026-11-22.txt';
+    expect(report).toContain('/' + eighth);
+    expect(report.indexOf('/' + ninth)).toBeGreaterThan(report.indexOf('/' + eighth));
+    expect(report).toContain('Neither is installed here');
+    expect(readFileSync('public/' + eighth, 'utf8')).toContain('Runtime Upgraded (`Pi v1.6.0`');
+    expect(readFileSync('public/' + ninth, 'utf8')).toContain('Expand DinkusKit Allowlist: `dinkuskit/accounts` & `dinkuskit/reviews`');
   });
   it('separates cross-tab staging evidence and reload recovery from a shipped repair', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
@@ -1021,6 +1040,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-5-2026-11-14.txt',
       '/dashboard/instructions/steer-6-2026-11-15.txt',
       '/dashboard/instructions/steer-7-2026-11-20.txt',
+      '/dashboard/instructions/steer-8-2026-11-22.txt',
+      '/dashboard/instructions/steer-9-2026-11-22.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');

@@ -1,0 +1,20 @@
+## Owner Steer 9 — November 22, 2026
+
+### 1. Expand DinkusKit Allowlist: `dinkuskit/accounts` & `dinkuskit/reviews`
+- Two new official DinkusKit plugin repositories are now online, forked under `saarius/*`, and cloned on this host:
+  - `/var/lib/trialrun/workspace/repos/accounts` (`origin`: `saarius/accounts`, `upstream`: `dinkuskit/accounts`)
+  - `/var/lib/trialrun/workspace/repos/reviews` (`origin`: `saarius/reviews`, `upstream`: `dinkuskit/reviews`)
+- Both repositories are **explicitly added to your allowed `saarius/*` fork push list and `dinkuskit/*` upstream issue/PR allowlist** alongside `commerce`, `template-store`, `payments`, `ship`, `inventory`, and `dinkuskit` (all existing rate limits, Node 24 verification gates, and Steer 3/7 PR proof & ClawSweeper rules apply).
+
+### 2. Stage A (Pre-Registry) Dogfooding & Charter Guardrails
+- Always finish active maintainer review requests and CI follow-ups on open PRs (`template-store#241`, `#243`, `#246`, `#248`) first, and keep `workerd` / build runs strictly serialized within the 2 GB RAM budget (cleaning `node_modules` / `dist` from idle checkouts per Steer 2).
+- **`dinkuskit/accounts` (`dinkus-accounts`):**
+  - Read `repos/accounts/docs/CHARTER.md` and `README.md`. `dinkus-accounts` extracts shopper sign-in (6-digit email OTP via EmDash `email:send`, zero cloud dependency), saved addresses, and server-rendered `/account` pages (`HttpOnly` cookie → `x-dinkus-accounts-session`, server-side checkout address prefill, zero client JS) out of `dinkus-commerce` ahead of stable `Commerce 0.9.0`.
+  - While pre-Registry, keep live `https://backroadbum.com` untouched and dogfood `dinkus-accounts` in isolation using its `@emdash-cms/plugin-test` (`workerd` + D1) runtime suite and isolated `template-store` staging wired to Backroad Bum's existing Cloudflare HTTPS `email:deliver` relay (`shopper-test@backroadbum.com`) as saved addresses and `template-store` server-account pages land upstream. Once server-rendered `dinkus-accounts` pages supersede legacy client-JS `/account` upstream, close out parked PRs `template-store#235`, `#237`, and `#239` cleanly if still open.
+- **`dinkuskit/reviews` (`dinkus-reviews`):**
+  - Read `repos/reviews/docs/CHARTER.md` and `README.md`. `dinkus-reviews` is currently an early scaffold (`0.0.0`, pre-Registry) with open `"Not decided"` items in `docs/CHARTER.md` (cross-plugin shipped-order detection and 14-day review email delivery). **Never** open speculative issues or PRs inventing architecture for undecided `CHARTER.md` items; begin dogfooding and filing concrete fixes as decided features land on `dinkuskit/reviews:main`.
+
+### 3. Stage B — Pre-Authorized Live Adoption Once Published on EmDash Registry
+- **When signed `dinkus-accounts` publishes to the EmDash Registry (paired with stable `dinkus-commerce@0.9.0`):** Install `dinkus-accounts` (`email:send` permission) in `/_emdash/admin` during the snapshotted Stage B `Commerce 0.9.0` upgrade window (per `accounts/docs/CHARTER.md`, legacy Commerce shopper sessions do not migrate while all historical orders remain intact), adapt Backroad Bum's `ui-design` Field Journal theme to the server-rendered `/account` and order-lookup pages, remove retired `r_gshdrqaldna3r7sn/account/*` client-JS bypasses from `/etc/caddy/backroadbum-public.caddy`, and verify live OTP sign-in, saved addresses, checkout server prefill, and order lookup end-to-end using `shopper-test@backroadbum.com`.
+- **When signed `dinkus-reviews` publishes to the EmDash Registry:** Install `dinkus-reviews` in `/_emdash/admin`, dogfood post-shipment buyer review links via `shopper-test@backroadbum.com`, and verify UCP `rating` display on Backroad Bum product pages and `/feeds/agent-catalog.json`.
+- Archive `Owner Steer 9` under `/dashboard/instructions/` alongside `Original` and `Steer 1–8` on your next dashboard update without altering prior entries.

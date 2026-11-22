@@ -1,16 +1,16 @@
 # Qualifying a future server-cart upgrade
 
+## Owner Steer 9 · November 22
+
+Accounts and Reviews are separate, pre-Registry plugins. Accounts main 0143b6e has emailed sign-in and one saved delivery address/phone, but the server-rendered template integration has not landed. Qualify its EmDash 1.5 plugin runtime and later the merchant email relay in disposable staging before any paired signed cutover. Existing Commerce shopper sessions do not migrate; historical Orders do. The new shopper order lookup is not the deferred own-orders list. Reconcile #235/#237/#239 only when their server-rendered replacements land upstream.
+
+Reviews is currently a scaffold. Wait for the charter to decide the shipped-order signal and email delivery before dogfooding invitations. No shared deployment or speculative integration is needed.
+
 ## Maintainer follow-up · November 22
 
 Stable discovery remains **0.8.0**; Stage B and TEST1011 are untouched. Template #241 now merges upstream **9f7a8f6** without rebasing at **caf9709**: typecheck, 575 units, 103 workflow checks, targeted browser proof, Registry compilation and all four CI browser shards pass. Fresh 1440Light/390Dark main/head captures live in `/pr-proof/template-pr241-refresh/`; local full-matrix/heap limits remain disclosed in the PR. Evidence: `evidence/2026-11-22-review/`.
 
-The maintainer requests a busy/disabled mutation lock instead of #243’s queue; #246 waits for that merge and then reduces focus restoration to same control/line, empty message or first remaining line. #248 waits for #241 to merge before removing duplicate phone-target CSS. These branches and merchant preparation remain unchanged; accounts #235/#237/#239 are explicitly deferred until server-rendered account work. Refresh preparation only after the owning decisions land, not by silently retaining a rejected upstream policy.
-
-## Maintainer follow-up · November 22
-
-Stable discovery remains **0.8.0**; Stage B and TEST1011 are untouched. Template #241 now merges upstream **9f7a8f6** without rebasing at **caf9709**: typecheck, 575 units, 103 workflow checks, targeted browser proof, Registry compilation and all four CI browser shards pass. Fresh 1440Light/390Dark main/head captures live in `/pr-proof/template-pr241-refresh/`; local full-matrix/heap limits remain disclosed in the PR. Evidence: `evidence/2026-11-22-review/`.
-
-The maintainer requests a busy/disabled mutation lock instead of #243’s queue; #246 waits for that merge and then reduces focus restoration to same control/line, empty message or first remaining line. #248 waits for #241 to merge before removing duplicate phone-target CSS. These branches and merchant preparation remain unchanged; accounts #235/#237/#239 are explicitly deferred until server-rendered account work. Refresh preparation only after the owning decisions land, not by silently retaining a rejected upstream policy.
+Template #243 at **735a86c** replaces its queue with a busy/disabled mutation lock and preserves the attached-section redraw and 44px quantity target. The committed desktop/phone regression verifies one POST and server/visible parity in a fresh disposable store. #246 waits for that merge and then reduces focus restoration to same control/line, empty message or first remaining line. #248 waits for #241 to merge before removing duplicate phone-target CSS. Merchant preparation is unchanged; refresh it only after the owning decisions land, not by retaining the old queue.
 
 ## Manual housekeeping · November 21
 
