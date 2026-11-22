@@ -1,6 +1,14 @@
 # Qualifying a future server-cart upgrade
 
-## EmDash 1.5 bridge rehearsal · November 22
+## Fresh proof-store seed and signed beta · November 22
+
+[Template #255](https://github.com/dinkuskit/template-store/pull/255) merged as **24636d4** (EmDash **1.5.0** / paired Commerce **beta.3**); [#253](https://github.com/dinkuskit/template-store/pull/253) then merged as **555a73d** (pins **beta.4**, replaces legacy sign-in with Track your order). That lookup is not the separate signed-in Accounts experience. Maintainers closed the three superseded legacy starter PRs; the live 0.8 shopper workflow is unchanged.
+
+A fresh SQLite proof store at **24636d4** seeded nine published demo pages and 14 catalog rows with the paired beta.3 build. A second disposable instance at the same template commit used no paired mount: EmDash verified the signed **beta.4** release (HTTP 200; verified provenance) and installed it (HTTP 201) under the **beta** Registry ID. Shipping profile left the fixture catalog empty; starting the proof profile on that fixture seeded the same nine pages and 14 rows, all nine product URLs returned 200, and a restart left the catalog digest unchanged. No `commandId` index refusal in either final seed log. Zero orders in both databases. Local Chromium stock/focus passes on desktop and phone, but the longer product-page spec crashes or loses its renderer here; do not count it as a full browser pass. Evidence: `evidence/2026-11-22-fresh-store/`.
+
+This closes fresh demo seeding for the tested pairings only. [Template #243](https://github.com/dinkuskit/template-store/pull/243) and [#248](https://github.com/dinkuskit/template-store/pull/248) separately recheck the cart lock and cold sold-out member on the newer 555a73d/beta.4 pairing with actual desktop and phone browser proof. This does not qualify a same-ID stable install, the Field Journal upgrade, a retained merchant receipt capability, or hosted payment. Stable remains **0.8.0** on `r_gshdrqaldna3r7sn`; Stage B and TEST1011 remain untouched.
+
+## EmDash 1.5 bridge rehearsal · Earlier November 22
 
 The stable channel still lists **0.8.0** under `r_gshdrqaldna3r7sn`; the separate beta channel lists **0.9.0-beta.4**. Template main **8743e59** still pins EmDash 1.4.0 / Commerce beta.2; [Template #255](https://github.com/dinkuskit/template-store/pull/255) proposes EmDash 1.5.0 / beta.3, and [#253](https://github.com/dinkuskit/template-store/pull/253) proposes the order lookup page. Neither is merged. Do not run stable Commerce 0.8.0 on EmDash 1.5: its index matcher cannot confirm the renamed indexes. Rehearse the compatible Commerce build on 1.4 first, then EmDash 1.5 (migration 095), within one controlled cutover. Never substitute the beta Registry ID in production.
 

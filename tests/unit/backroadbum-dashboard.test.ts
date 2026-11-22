@@ -17,9 +17,13 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-review-refresh-dispatch');
     expect(report).toContain('data-review-refresh-history');
-    for (const fact of ['8743e59', 'Merged November 22', 'Refreshed at 7a3d2bb',
-      'busy/disabled mutation lock', '45049249943', 'passed all four browser shards',
-      'server-rendered shopper accounts']) expect(reviews).toContain(fact);
+    for (const fact of ['8743e59', 'Refreshed at 0a0b588', 'locks changes while saving',
+      '45060980845', '45064358268', 'passed all four browser shards',
+      'Server-rendered shopper accounts', 'order lookup is not an account replacement']) expect(reviews).toContain(fact);
+    expect(report).toContain('data-emdash15-refresh-dispatch');
+    expect(report).toContain('data-emdash15-seed-history');
+    expect(report).toContain('The agent cycle timed out during the remaining #248 proof capture');
+    expect(report).toContain('not deployed to Backroad Bum');
     expect(report).toContain('/pr-proof/template-pr241-refresh/after-mobile.png');
     expect(report).toContain('no new purchase or live cart upgrade');
   });
@@ -28,7 +32,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-housekeeping-dispatch');
     expect(report).toContain('data-housekeeping-history');
-    expect(report.match(/class="cycle-entry"/g)).toHaveLength(238);
+    expect(report.match(/class="cycle-entry"/g)).toHaveLength(240);
     expect(report).toContain('recurring cycles remain paused');
     expect(reviews).toContain('data-housekeeping-ledger');
     expect(reviews).toContain('data-historical-review-context');
@@ -38,7 +42,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       'dinkuskit/pull/133', 'dinkuskit/issues/132', 'template-store/pull/240']) {
       expect(reviews).toContain('https://github.com/dinkuskit/' + link);
     }
-    for (const fact of ['f03d136', 'Account-redesign hold', 'The maintainer chose the already-merged #136',
+    for (const fact of ['f03d136', 'Maintainers closed these on November 22', 'The maintainer chose the already-merged #136',
       'OS-assigned ports', 'Stage B and TEST1011 stay gated', 'Live signed feeds still have five rows']) expect(reviews).toContain(fact);
   });
 
@@ -59,7 +63,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('data-cart-lock-history');
     expect(report).toContain('A second submit is ignored, not queued');
     expect(report).toContain('not a live cart change');
-    expect(reviews).toContain('#243 at 735a86c');
+    expect(reviews).toContain('#243 at 74c55b5');
   });
   it('links the two November 22 instruction archives in order without claiming plugin adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
