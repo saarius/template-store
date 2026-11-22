@@ -4,13 +4,13 @@
 
 Accounts and Reviews are separate, pre-Registry plugins. Accounts main 0143b6e has emailed sign-in and one saved delivery address/phone, but the server-rendered template integration has not landed. Qualify its EmDash 1.5 plugin runtime and later the merchant email relay in disposable staging before any paired signed cutover. Existing Commerce shopper sessions do not migrate; historical Orders do. The new shopper order lookup is not the deferred own-orders list. Reconcile #235/#237/#239 only when their server-rendered replacements land upstream.
 
-Reviews is currently a scaffold. Wait for the charter to decide the shipped-order signal and email delivery before dogfooding invitations. No shared deployment or speculative integration is needed.
+Reviews is currently a scaffold. Wait for the charter to decide the shipped-order signal and email delivery before dogfooding invitations. Under Steer 10, Courier staging waits for Courier #1 to merge and the owning integrations to land. No shared deployment or speculative integration is needed.
 
 ## Maintainer follow-up · November 22
 
-Stable discovery remains **0.8.0**; Stage B and TEST1011 are untouched. Template #241 now merges upstream **9f7a8f6** without rebasing at **caf9709**: typecheck, 575 units, 103 workflow checks, targeted browser proof, Registry compilation and all four CI browser shards pass. Fresh 1440Light/390Dark main/head captures live in `/pr-proof/template-pr241-refresh/`; local full-matrix/heap limits remain disclosed in the PR. Evidence: `evidence/2026-11-22-review/`.
+Stable discovery remains **0.8.0**; Stage B and TEST1011 are untouched. Template #241 now merges upstream **9f7a8f6** without rebasing at **caf9709**: typecheck, 575 units, 103 workflow checks, targeted browser proof, Registry compilation and all four CI browser shards pass. Fresh 1440Light/390Dark main/head captures live in `/pr-proof/template-pr241-refresh/`; local full-matrix/heap limits remain disclosed in the PR. #241 has since merged as **8743e59**. Evidence: `evidence/2026-11-22-review/`.
 
-Template #243 at **735a86c** replaces its queue with a busy/disabled mutation lock and preserves the attached-section redraw and 44px quantity target. The committed desktop/phone regression verifies one POST and server/visible parity in a fresh disposable store. #246 waits for that merge and then reduces focus restoration to same control/line, empty message or first remaining line. #248 waits for #241 to merge before removing duplicate phone-target CSS. Merchant preparation is unchanged; refresh it only after the owning decisions land, not by retaining the old queue.
+Template #243 at **735a86c** replaces its queue with a busy/disabled mutation lock and preserves the attached-section redraw and 44px quantity target. The committed desktop/phone regression verifies one POST and server/visible parity in a fresh disposable store. CI 45049249943 passes every shard; review remains separate. #246 waits for that merge and then reduces focus restoration to same control/line, empty message or first remaining line. #248 waits for #241 to merge before removing duplicate phone-target CSS. Merchant preparation is unchanged; refresh it only after the owning decisions land, not by retaining the old queue.
 
 ## Manual housekeeping · November 21
 

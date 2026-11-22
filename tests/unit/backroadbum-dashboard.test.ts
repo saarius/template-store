@@ -7,8 +7,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-review-refresh-dispatch');
     expect(report).toContain('data-review-refresh-history');
-    for (const fact of ['caf9709', 'Merged November 22', 'Waiting for #241 to merge',
-      'busy/disabled mutation lock', '575 units, 103 workflow checks', 'Exact-head CI also passes all four browser shards',
+    for (const fact of ['8743e59', 'Merged November 22', 'Refreshed at 7a3d2bb',
+      'busy/disabled mutation lock', '45049249943', 'passed all four browser shards',
       'server-rendered shopper accounts']) expect(reviews).toContain(fact);
     expect(report).toContain('/pr-proof/template-pr241-refresh/after-mobile.png');
     expect(report).toContain('no new purchase or live cart upgrade');
@@ -1042,6 +1042,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-7-2026-11-20.txt',
       '/dashboard/instructions/steer-8-2026-11-22.txt',
       '/dashboard/instructions/steer-9-2026-11-22.txt',
+      '/dashboard/instructions/steer-10-2026-11-22.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');
