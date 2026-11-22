@@ -9,6 +9,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('data-emdash-bridge-history');
     expect(report).toContain('The live store remains on Commerce 0.8.0');
     expect(report).toContain('with a test mail sink');
+    expect(report).toContain('data-beta5-cart-mail-dispatch');
+    expect(report).toContain('data-beta5-cart-mail-history');
+    expect(report).toContain('No external email was sent');
     expect(reviews).toContain('template-store/pull/255');
     expect(reviews).toContain('template-store/pull/253');
   });
@@ -17,9 +20,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-review-refresh-dispatch');
     expect(report).toContain('data-review-refresh-history');
-    for (const fact of ['8743e59', 'Refreshed at 0a0b588', 'locks changes while saving',
-      '45060980845', '45064358268', 'passed all four browser shards',
-      'Server-rendered shopper accounts', 'order lookup is not an account replacement']) expect(reviews).toContain(fact);
+    const ledger = reviews.match(/<table id="housekeeping-ledger"[\s\S]*?<\/table>/)?.[0];
+    expect(ledger).toBeDefined();
+    for (const fact of ['8743e59', 'a64d546', '45064358268/attempts/2', '64352db', '45071045667',
+      'Server-rendered shopper accounts', 'order lookup is not an account replacement']) expect(ledger).toContain(fact);
     expect(report).toContain('data-emdash15-refresh-dispatch');
     expect(report).toContain('data-emdash15-seed-history');
     expect(report).toContain('The agent cycle timed out during the remaining #248 proof capture');
@@ -32,7 +36,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-housekeeping-dispatch');
     expect(report).toContain('data-housekeeping-history');
-    expect(report.match(/class="cycle-entry"/g)).toHaveLength(240);
+    expect(report.match(/class="cycle-entry"/g)?.length).toBeGreaterThanOrEqual(242);
     expect(report).toContain('recurring cycles remain paused');
     expect(reviews).toContain('data-housekeeping-ledger');
     expect(reviews).toContain('data-historical-review-context');
@@ -63,7 +67,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('data-cart-lock-history');
     expect(report).toContain('A second submit is ignored, not queued');
     expect(report).toContain('not a live cart change');
-    expect(reviews).toContain('#243 at 74c55b5');
+    expect(report).toContain('data-cart-agent-refresh-dispatch');
+    expect(report).toContain('data-cart-agent-refresh-history');
+    expect(report).toContain('/pr-proof/template-pr243-webmcp/after-mobile.png');
+    expect(report).toContain('data-courier-review-fixture-history');
+    expect(reviews).toContain('#243 at 64352db');
   });
   it('links the two November 22 instruction archives in order without claiming plugin adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');

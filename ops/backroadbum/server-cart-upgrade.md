@@ -1,5 +1,13 @@
 # Qualifying a future server-cart upgrade
 
+## Cutover checks for the new starter · November 22
+
+- [Template #257](https://github.com/dinkuskit/template-store/pull/257) uses EmDash's **Go live** setting for search indexing. Backroad Bum currently returns `X-Robots-Tag: noindex, nofollow` on the home page and public feed. Preserve that behavior in staging and after upgrades; do not toggle indexing as a checkout step. Stripe must independently stay in TEST mode.
+- Commerce beta.5 adds **Abandoned cart email** (default: **Shoppers who ticked the box**). Leave it **Off** on this demo when adopting a release that includes it, before reopening checkout. Verify the saved setting plus a due reminder in disposable staging with EmDash's mail sink; verify approved OTP delivery separately. Do not send reminder tests to real shoppers or use the hosted relay for them.
+- The new Track your order flow takes an order number and email; it does not bring back the deferred signed-in order list. Verify matching and mismatched lookups and preserve retained browser receipts independently of Accounts sign-in. Keep the current usable 0.8 Account flow on live until the coordinated migration.
+
+Commerce **beta.5 / 6077448** is listed on the separate beta channel; stable remains **0.8.0**. Node 24 typecheck, its 129,120-byte Registry-shaped bundle gate, and eleven owning reminder and scheduled-sale cases passed. One disposable SQLite fixture passed the old-host and bridge phases; after a local dev-server heap failure, the final phase passed with 1100 MiB V8 old space against that same database. An old cart still opened, the saved catalog setting held, and the actual background check sent no mail for that cart. This is source-built compatibility with a test sink, not a signed same-ID upgrade, hosted email or merchant-data migration. Evidence: `evidence/2026-11-22-commerce-beta5/`.
+
 ## Fresh proof-store seed and signed beta · November 22
 
 [Template #255](https://github.com/dinkuskit/template-store/pull/255) merged as **24636d4** (EmDash **1.5.0** / paired Commerce **beta.3**); [#253](https://github.com/dinkuskit/template-store/pull/253) then merged as **555a73d** (pins **beta.4**, replaces legacy sign-in with Track your order). That lookup is not the separate signed-in Accounts experience. Maintainers closed the three superseded legacy starter PRs; the live 0.8 shopper workflow is unchanged.
