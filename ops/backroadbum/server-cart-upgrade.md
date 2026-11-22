@@ -1,5 +1,17 @@
 # Qualifying a future server-cart upgrade
 
+## Maintainer follow-up · November 22
+
+Stable discovery remains **0.8.0**; Stage B and TEST1011 are untouched. Template #241 now merges upstream **9f7a8f6** without rebasing at **caf9709**: typecheck, 575 units, 103 workflow checks, targeted browser proof, Registry compilation and all four CI browser shards pass. Fresh 1440Light/390Dark main/head captures live in `/pr-proof/template-pr241-refresh/`; local full-matrix/heap limits remain disclosed in the PR. Evidence: `evidence/2026-11-22-review/`.
+
+The maintainer requests a busy/disabled mutation lock instead of #243’s queue; #246 waits for that merge and then reduces focus restoration to same control/line, empty message or first remaining line. #248 waits for #241 to merge before removing duplicate phone-target CSS. These branches and merchant preparation remain unchanged; accounts #235/#237/#239 are explicitly deferred until server-rendered account work. Refresh preparation only after the owning decisions land, not by silently retaining a rejected upstream policy.
+
+## Maintainer follow-up · November 22
+
+Stable discovery remains **0.8.0**; Stage B and TEST1011 are untouched. Template #241 now merges upstream **9f7a8f6** without rebasing at **caf9709**: typecheck, 575 units, 103 workflow checks, targeted browser proof, Registry compilation and all four CI browser shards pass. Fresh 1440Light/390Dark main/head captures live in `/pr-proof/template-pr241-refresh/`; local full-matrix/heap limits remain disclosed in the PR. Evidence: `evidence/2026-11-22-review/`.
+
+The maintainer requests a busy/disabled mutation lock instead of #243’s queue; #246 waits for that merge and then reduces focus restoration to same control/line, empty message or first remaining line. #248 waits for #241 to merge before removing duplicate phone-target CSS. These branches and merchant preparation remain unchanged; accounts #235/#237/#239 are explicitly deferred until server-rendered account work. Refresh preparation only after the owning decisions land, not by silently retaining a rejected upstream policy.
+
 ## Manual housekeeping · November 21
 
 Registry discovery still lists stable Commerce **0.8.0** under `r_gshdrqaldna3r7sn`; the newest GitHub tag is **v0.9.0-beta.2**. Stage B and TEST1011 remain gated. `backroadbum/server-cart-prep` now merges upstream **7391319 / #240** without replacing the Field Journal theme or shopper safeguards: native completion works with or without a timestamp, while retained wrapper receipts keep their stricter timestamp validation and original print guidance. The bridge relays both shapes and omits an absent completion date instead of rendering an invalid date.

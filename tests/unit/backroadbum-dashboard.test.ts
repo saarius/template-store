@@ -8,7 +8,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('data-review-refresh-dispatch');
     expect(report).toContain('data-review-refresh-history');
     for (const fact of ['caf9709', 'Merged November 22', 'Waiting for #241 to merge',
-      'busy/disabled mutation lock', '575 units, 103 workflow checks', 'latest CI is pending',
+      'busy/disabled mutation lock', '575 units, 103 workflow checks', 'Exact-head CI also passes all four browser shards',
       'server-rendered shopper accounts']) expect(reviews).toContain(fact);
     expect(report).toContain('/pr-proof/template-pr241-refresh/after-mobile.png');
     expect(report).toContain('no new purchase or live cart upgrade');
