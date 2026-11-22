@@ -2,12 +2,23 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('records the maintainer-ordered review refresh and dependent waits without a live upgrade claim', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-review-refresh-dispatch');
+    expect(report).toContain('data-review-refresh-history');
+    for (const fact of ['caf9709', 'Merged November 22', 'Waiting for #241 to merge',
+      'busy/disabled mutation lock', '575 units, 103 workflow checks', 'latest CI is pending',
+      'server-rendered shopper accounts']) expect(reviews).toContain(fact);
+    expect(report).toContain('/pr-proof/template-pr241-refresh/after-mobile.png');
+    expect(report).toContain('no new purchase or live cart upgrade');
+  });
   it('reconciles the manual housekeeping queue without claiming signed adoption or superseded port repair', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-housekeeping-dispatch');
     expect(report).toContain('data-housekeeping-history');
-    expect(report.match(/class="cycle-entry"/g)).toHaveLength(235);
+    expect(report.match(/class="cycle-entry"/g)).toHaveLength(236);
     expect(report).toContain('recurring cycles remain paused');
     expect(reviews).toContain('data-housekeeping-ledger');
     expect(reviews).toContain('data-historical-review-context');
