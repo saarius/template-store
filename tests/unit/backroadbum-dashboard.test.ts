@@ -33,6 +33,14 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('Another browser could not open the receipt');
     expect(report).toContain('This used a local inbox; Reviews is not installed');
   });
+  it('reports the distinction between voiding a queued label and one sent to Commerce', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const history = report.match(/<article[^>]+data-ship-label-void-history>[\s\S]*?<\/article>/)?.[0];
+    expect(history).toContain('ship/pull/103');
+    expect(history).toContain('until a replacement supplied new tracking');
+    expect(history).toContain('the order could still complete with it');
+    expect(history).toContain('no live order or label changed');
+  });
   it('links the cart-return fix and proof without claiming a live cutover', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
