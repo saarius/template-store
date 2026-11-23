@@ -29,7 +29,9 @@ if (!process.argv.includes('--check')) {
         await expect(page.locator('[data-search-results-count]')).toHaveText('1 result.');
         const choice = page.locator('[data-search-option] a');
         await expect(choice).toHaveCount(1);
-        await expect(choice).toHaveAccessibleName('Size: XL — Wrong Turn Tee. Out of stock');
+        await expect(page.getByRole('region', { name: 'Gear', exact: true }).getByRole('link')).toHaveCount(1);
+        await expect(choice).toHaveAccessibleName('Wrong Turn Tee Size: XL');
+        await expect(choice).toHaveAccessibleDescription('Out of stock');
         const teeHref = await choice.getAttribute('href');
         expect(teeHref).toMatch(/^\/products\/wrong-turn-tee\?item=[A-Za-z0-9._-]+$/);
         await choice.focus();
@@ -52,7 +54,9 @@ if (!process.argv.includes('--check')) {
         await page.goto(base + '/search?q=fleece+XL');
         await expect(page.locator('[data-search-results-count]')).toHaveText('1 result.');
         const fleece = page.locator('[data-search-option] a');
-        await expect(fleece).toHaveAccessibleName('Size: XL — Last Light Fleece. Available on backorder');
+        await expect(page.getByRole('region', { name: 'Gear', exact: true }).getByRole('link')).toHaveCount(1);
+        await expect(fleece).toHaveAccessibleName('Last Light Fleece Size: XL');
+        await expect(fleece).toHaveAccessibleDescription('Available on backorder');
         const fleeceHref = await fleece.getAttribute('href');
         await fleece.click();
         await expect(page).toHaveURL(base + fleeceHref);
@@ -62,6 +66,10 @@ if (!process.argv.includes('--check')) {
         await page.goto(base + '/search?q=XL');
         await expect(page.locator('[data-search-results-count]')).toHaveText('2 results.');
         await expect(page.locator('[data-search-option]')).toHaveCount(2);
+        await expect(page.getByRole('region', { name: 'Gear', exact: true }).getByRole('link')).toHaveCount(2);
+        await page.goto(base + '/search?q=tee');
+        await expect(page.getByRole('link', { name: 'Wrong Turn Tee', exact: true })).toHaveAttribute('href', '/products/wrong-turn-tee');
+        await expect(page.locator('[data-search-option]')).toHaveCount(0);
         await page.goto(base + '/search?q=tee+XXL');
         await expect(page.locator('[data-search-empty]')).toBeVisible();
         await page.goto(base + '/search?q=mug');
@@ -69,7 +77,7 @@ if (!process.argv.includes('--check')) {
         expect(await page.getByRole('region', { name: 'Field notes & guides', exact: true }).locator('li p').count()).toBeGreaterThan(0);
         await expect(page.locator('[data-search-option-summary]')).toHaveCount(0);
         expect(errors).toEqual([]); expect(writes).toEqual([]);
-        checks.push({ width, colorScheme, javaScriptEnabled, teeHref, fleeceHref, exactSelection: true, reload: true, keyboard: true, touchTarget: true, nativeSearchPreserved: true, noOverflow: true, writes, errors });
+        checks.push({ width, colorScheme, javaScriptEnabled, teeHref, fleeceHref, exactSelection: true, oneDestinationPerExactMatch: true, reload: true, keyboard: true, touchTarget: true, nativeSearchPreserved: true, noOverflow: true, writes, errors });
       } finally { await context.close(); }
     }
   } finally { await browser.close(); }
