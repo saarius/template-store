@@ -1,8 +1,25 @@
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
+
+// The static audit runs in a file origin. Chromium can block its requests to the
+// fixture port, so embed the same public fonts and synthetic artwork it just rendered.
+export function retainedAuditSnapshot(html, merchant) {
+  const assets = [
+    ['/backroad/fonts/dm-sans-latin.woff2', 'font/woff2', 'fonts/dm-sans-latin.woff2'],
+    ['/backroad/fonts/fraunces-latin.woff2', 'font/woff2', 'fonts/fraunces-latin.woff2'],
+    ['/_emdash/api/media/file/receipt-fixture.svg', 'image/svg+xml', 'cap.svg'],
+  ];
+  let snapshot = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+  for (const [url, type, file] of assets) {
+    assert.ok(snapshot.includes(url), 'Expected authored asset in the painted snapshot');
+    const bytes = readFileSync(join(merchant, 'public/backroad', file));
+    snapshot = snapshot.replaceAll(url, `data:${type};base64,${bytes.toString('base64')}`);
+  }
+  return snapshot;
+}
 
 /** Browser proof against the real merchant page/wrapper and actual old-kernel capabilities.
  * Artifacts, when requested, must be kept outside git; no capabilities are written.
@@ -47,6 +64,12 @@ export async function proveRetainedReceipt({ merchant, origin, scenarios, artifa
           await expect(page.locator('[data-retained-order]')).toBeVisible();
           await expect(page.locator('[data-retained-order]')).toContainText('$32.00');
           await expect(page.locator('[data-retained-order]')).toContainText('Fixture cap × 2');
+          if (scenario.projected?.number !== undefined) {
+            await expect(page.locator('[data-retained-order] h2')).toHaveText(`Order #${scenario.projected.number}`);
+          }
+          if (scenario.projected?.test === true) {
+            await expect(page.locator('[data-retained-order] .guest-checkout-test-badge')).toHaveText('TEST');
+          }
           const artwork = page.locator('[data-retained-order] img');
           await expect(artwork).toHaveAttribute('alt', 'Illustrative cap fixture');
           assert.equal(await artwork.evaluate(image => image.complete && image.naturalWidth > 0), true, 'Current public artwork must really load');
@@ -71,7 +94,7 @@ export async function proveRetainedReceipt({ merchant, origin, scenarios, artifa
               // Static painted snapshot for the official four-view auditor, not a fake API response.
               const html = await page.content();
               assert(!html.includes(scenario.retention.capability));
-              writeFileSync(join(artifacts, 'paid-audit.html'), html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '').replace('<head>', `<head><base href="${origin}/">`));
+              writeFileSync(join(artifacts, 'paid-audit.html'), retainedAuditSnapshot(html, merchant));
             }
           }
         } else {
@@ -92,7 +115,7 @@ export async function proveRetainedReceipt({ merchant, origin, scenarios, artifa
     // Optional workspace UI skill; not a dependency of the portable qualification.
     let auditExit = null;
     if (artifacts && process.env.UI_DESIGN_AUDITOR) {
-      const child = spawn(process.execPath, [process.env.UI_DESIGN_AUDITOR, join(artifacts, 'paid-audit.html'), '--screenshots', join(artifacts, 'audit')], { stdio: ['ignore', 'pipe', 'pipe'] });
+      const child = spawn(process.execPath, [process.env.UI_DESIGN_AUDITOR, join(artifacts, 'paid-audit.html'), '--screenshots', join(artifacts, 'audit'), '--strict'], { stdio: ['ignore', 'pipe', 'pipe'] });
       let stdout = '', stderr = '';
       child.stdout.on('data', chunk => stdout += chunk); child.stderr.on('data', chunk => stderr += chunk);
       auditExit = await new Promise(resolve => child.on('exit', resolve));

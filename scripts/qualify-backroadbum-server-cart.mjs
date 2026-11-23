@@ -261,7 +261,13 @@ export default defineConfig({ output:'server', adapter:node({mode:'standalone'})
         assert.equal(refused.data?.checkout, undefined);
       }
       const keptOrder = scenario.before.order ? await orders.get(scenario.before.order.orderId) : null;
-      if (scenario.state === 'paid') assert.ok(Number.isSafeInteger(keptOrder?.number), 'The canonical fixture order is numbered');
+      if (scenario.state === 'paid') {
+        assert.ok(Number.isSafeInteger(keptOrder?.number), 'The canonical fixture order is numbered');
+        const projected = read.data.checkout.order;
+        if (Number.isSafeInteger(projected?.number)) assert.equal(projected.number, keptOrder.number);
+        if (typeof projected?.test === 'boolean') assert.equal(projected.test, keptOrder.paidOrder.mode !== 'live');
+        scenario.projected = { number: projected?.number, test: projected?.test };
+      }
       installed.push({ priorAttempt: scenario.state, oldStatusState: scenario.before.state, currentState: read.data.checkout.state,
         canonicalNumberPresent: Number.isSafeInteger(keptOrder?.number),
         canonicalTestOrder: keptOrder ? keptOrder.paidOrder.mode !== 'live' : null,
