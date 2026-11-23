@@ -2,11 +2,12 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, readlinkSync } from 'node:fs';
+import { existsSync, readFileSync, readlinkSync, realpathSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import { setTimeout as delay } from 'node:timers/promises';
 import { readBusinessSnapshot } from '../../scripts/inspect-backroadbum-business.mjs';
 import { inspectEmDashCopy } from './verify-emdash-recovery.mjs';
+import { confirmRecoveryWorkerd } from './start-recovery-runtime.mjs';
 
 const root = '/var/lib/backroadbum';
 const origin = 'http://127.0.0.1:4399';
@@ -84,7 +85,8 @@ export async function inspectRuntimeCopy() {
     fieldNotePaths = recoveryFieldNotePaths(db.prepare('SELECT slug,status,deleted_at FROM ec_pages').all());
   } finally { db.close(); }
   assert.ok(media, 'Ready media required');
-  const child = spawn('/opt/node/bin/node', ['ops/backroadbum/start-store.mjs', `${root}/restored-release/server/entry.mjs`], {
+  const selectedDependencies = realpathSync(`${root}/node_modules`);
+  const child = spawn('/opt/node/bin/node', ['ops/backroadbum/start-recovery-runtime.mjs'], {
     cwd: process.cwd(), stdio: 'ignore', env: { ...process.env, HOST: '127.0.0.1', PORT: '4399',
       EMDASH_ENCRYPTION_KEY: encryption, BACKROADBUM_CHECKOUT_ENABLED: '0', NODE_OPTIONS: '--max-old-space-size=400' },
   });
@@ -133,6 +135,7 @@ export async function inspectRuntimeCopy() {
     assert.ok(Array.isArray(catalog.data?.products) && catalog.data.products.length > 0);
     const mug = catalog.data.products.find(product => product.name === 'Creekside Camp Mug');
     assert.ok(mug?.gallery?.length >= 2, 'Archived native mug gallery required');
+    confirmRecoveryWorkerd(child.pid, selectedDependencies);
     const mediaResponse = await get(`/_emdash/api/media/file/${media.storage_key}`);
     assert.equal(mediaResponse.status, 200);
     const bytes = Buffer.from(await mediaResponse.arrayBuffer());
@@ -159,7 +162,7 @@ export async function inspectRuntimeCopy() {
       businessRowsUnchanged: true, allPluginStorageAndMediaRowsUnchanged: true,
       ordersRetained: before.orders.count, runtimeDrain: 'ok',
       hostedAuthorizationTested: false, offHostRecoveryTested: false, commerceActionsReplayed: 0,
-      deployedCodeAndDependenciesReused: true };
+      dependencyResolutionGuard: true, workerdFromDependencyTree: true };
   } finally {
     if (!exited) { child.kill('SIGINT'); await delay(1000); }
     // The transient systemd cgroup owns and bounds all descendant workerd processes.

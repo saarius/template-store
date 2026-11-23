@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runtimeRecoveryRequestAllowed, publicPaths, recoveryFieldNotePaths, recoveryFeedCounts } from './verify-runtime-recovery.mjs';
 
@@ -65,12 +68,46 @@ test('agent feed refuses malformed, duplicated, missing or unbounded public iden
     { products: [{ id: 'tee', variants: { members: Array.from({ length: 201 }, (_, n) => ({ catalogItemId: `tee-${n}` })) } }] },
   ]) assert.throws(() => recoveryFeedCounts(feed));
 });
+test('guard allows bundle and selected packages, rejects another tree even through a link', t => {
+  const root = mkdtempSync(join(tmpdir(), 'brb-runtime-selection-'));
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const release = join(root, 'release');
+  const dependencies = join(root, 'selected', 'node_modules');
+  const other = join(root, 'other', 'node_modules');
+  const nested = join(release, 'node_modules');
+  const launch = join(root, 'launcher.mjs');
+  for (const path of [release, dependencies, other, nested]) mkdirSync(path, { recursive: true });
+  for (const [dir, val] of [[release, 'bundle'], [dependencies, 'selected'], [other, 'other'], [nested, 'nested']]) {
+    writeFileSync(join(dir, 'item.mjs'), `export default ${JSON.stringify(val)};`);
+  }
+  writeFileSync(launch, 'export default "launcher";');
+  symlinkSync(join(other, 'item.mjs'), join(dependencies, 'fallback.mjs'));
+  const guard = new URL('./start-recovery-runtime.mjs', import.meta.url).href;
+  const child = spawnSync(process.execPath, ['--input-type=module', '-e', `
+    import assert from 'node:assert/strict';
+    import { join } from 'node:path';
+    import { pinRecoveryModules } from ${JSON.stringify(guard)};
+    const [release, dependencies, other, nested, launch] = process.argv.slice(1);
+    pinRecoveryModules(release, dependencies, launch);
+    assert.equal((await import(join(release, 'item.mjs'))).default, 'bundle');
+    assert.equal((await import(join(dependencies, 'item.mjs'))).default, 'selected');
+    assert.equal((await import(launch)).default, 'launcher');
+    for (const path of [join(other, 'item.mjs'), join(nested, 'item.mjs'), join(dependencies, 'fallback.mjs')]) {
+      await assert.rejects(import(path), /outside the selected release and dependency tree/);
+    }
+  `, release, dependencies, other, nested, launch], { encoding: 'utf8', timeout: 15000 });
+  assert.equal(child.status, 0, child.stderr);
+});
+
 test('direct execution outside the isolated namespace refuses before live reads', () => {
   const env = { ...process.env };
   delete env.BACKROADBUM_RESTORE_DRILL;
   delete env.BACKROADBUM_RESTORE_HOST_NET;
-  const result = spawnSync(process.execPath, [command], { encoding: 'utf8', env, timeout: 15000 });
-  assert.equal(result.status, 1);
-  assert.equal(result.stdout, '');
-  assert.match(result.stderr, /Isolated runtime recovery check refused; private details withheld\./);
+  for (const [script, message] of [[command, /Isolated runtime recovery check refused; private details withheld\./],
+    [fileURLToPath(new URL('./start-recovery-runtime.mjs', import.meta.url)), /Isolated recovery startup refused\./]]) {
+    const result = spawnSync(process.execPath, [script], { encoding: 'utf8', env, timeout: 15000 });
+    assert.equal(result.status, 1);
+    assert.equal(result.stdout, '');
+    assert.match(result.stderr, message);
+  }
 });

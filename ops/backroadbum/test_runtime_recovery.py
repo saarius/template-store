@@ -129,26 +129,58 @@ class RuntimeRecoveryTests(unittest.TestCase):
                 with self.subTest(invalid=invalid), self.assertRaises((RuntimeError, FileNotFoundError)):
                     recovery.retained_release(invalid)
 
+    def test_dependency_selection_refuses_aliases_missing_or_outside_trees(self):
+        repo = self.root / 'workspace/repos/template-store'
+        primary = repo / 'node_modules'
+        alternate = self.root / 'workspace/candidate/node_modules'
+        outside = self.root / 'outside/node_modules'
+        alias = self.root / 'workspace/alias/node_modules'
+        for path in (primary, alternate, outside, alias.parent):
+            path.mkdir(parents=True)
+        alias.symlink_to(alternate, target_is_directory=True)
+        with patch.object(recovery, 'REPO', repo):
+            self.assertEqual(recovery.dependency_tree(), primary)
+            self.assertEqual(recovery.dependency_tree(alternate), alternate)
+            missing = self.root / 'workspace/missing/node_modules'
+            for invalid in (outside, alias, missing, alternate.parent, primary.parent / '../../candidate/node_modules'):
+                with self.subTest(invalid=invalid), self.assertRaises((RuntimeError, FileNotFoundError)):
+                    recovery.dependency_tree(invalid)
+
     def test_parent_stops_unit_and_removes_private_copy_on_success_failure_and_timeout(self):
         current = self.create_release('20261123T103500Z')
         release = self.create_release('20261123T100000Z')
         (self.root / 'current').symlink_to(current, target_is_directory=True)
         repo = self.root / 'workspace/repos/template-store'
-        repo.mkdir(parents=True)
+        (repo / 'node_modules').mkdir(parents=True)
+        alternate = self.root / 'workspace/candidate/node_modules'
+        alternate.mkdir(parents=True)
         report = {'schema': 'backroadbum.runtime-recovery-check/v1', 'outboundNetwork': 'isolated',
-                  'businessRowsUnchanged': True, 'businessCollectionsSha256': 'a' * 64}
+                  'businessRowsUnchanged': True, 'businessCollectionsSha256': 'a' * 64,
+                  'dependencyResolutionGuard': True, 'workerdFromDependencyTree': True}
         success = subprocess.CompletedProcess([], 0, json.dumps(report), '')
         missing_digest = subprocess.CompletedProcess([], 0, json.dumps({**report, 'businessCollectionsSha256': ''}), '')
+        missing_worker = subprocess.CompletedProcess([], 0, json.dumps({**report, 'workerdFromDependencyTree': False}), '')
         failure = subprocess.CompletedProcess([], 1, 'private-never-relay', 'private-never-relay')
         timeout = subprocess.TimeoutExpired('synthetic', 1, output='private-never-relay')
-        for outcome in [success, missing_digest, failure, timeout]:
+        for outcome in [success, missing_digest, missing_worker, failure, timeout]:
             with self.subTest(outcome=type(outcome).__name__), patch.object(recovery, 'ROOT', self.root), \
                     patch.object(recovery, 'REPO', repo), patch.object(recovery.subprocess, 'run') as run:
-                run.side_effect = [outcome, subprocess.CompletedProcess([], 0, '', '')]
+                def fixture_run(command, **_kwargs):
+                    mounted = next((item for item in command if item.startswith('BindPaths=')), None)
+                    if mounted:
+                        source = pathlib.Path(mounted.removeprefix('BindPaths=').split(':', 1)[0])
+                        self.assertEqual((source / 'node_modules').resolve(),
+                                         alternate if outcome is success else repo / 'node_modules')
+                        if isinstance(outcome, Exception):
+                            raise outcome
+                        return outcome
+                    return subprocess.CompletedProcess([], 0, '', '')
+                run.side_effect = fixture_run
                 if outcome is success:
-                    result = recovery.verify_archive(self.archive, release.name)
+                    result = recovery.verify_archive(self.archive, release.name, alternate)
                     self.assertEqual(result['readyMediaVerified'], 1)
                     self.assertEqual(result['retainedRelease'], release.name)
+                    self.assertEqual(result['dependencySelection'], 'explicit')
                     self.assertIn(f'BindReadOnlyPaths={release}:{self.root}/restored-release',
                                   run.call_args_list[0].args[0])
                     self.assertEqual((self.root / 'current').resolve(), current)
