@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { fieldNote, fieldNotes, nextFieldNotes } from '../../src/features/store-shell/field-notes.js';
+import { fieldNote, fieldNotes, latestFieldNote, nextFieldNotes } from '../../src/features/store-shell/field-notes.js';
 
 const intro = (text: string) => ({ _type: 'block', style: 'normal', children: [{ _type: 'span', text }] });
 describe('EmDash field-note navigation', () => {
@@ -36,6 +36,28 @@ describe('EmDash field-note navigation', () => {
     for (const content of [undefined, null, {}, [], [null], [{ _type: 'image' }], [{ _type: 'block', children: 'not spans' }]]) {
       expect(fieldNote({ id: 'field-note-no-intro', data: { title: 'Title', content } })?.excerpt).toBe('');
     }
+  });
+  it('teases the most recently published native note without ranking by edit time or slug', () => {
+    const older = { id: 'field-note-a', data: { title: 'Older', status: 'published', publishedAt: new Date('2026-11-15'), updatedAt: new Date('2026-11-24') } };
+    const latest = { id: 'field-note-z', data: { title: 'Newer', status: 'published', publishedAt: '2026-11-23T17:25:07Z', content: [intro('Start here.')] } };
+    const excluded = [
+      { id: 'test-store', data: { ...latest.data, publishedAt: '2026-11-24' } },
+      { id: 'field-note-draft', data: { ...latest.data, status: 'draft', publishedAt: '2026-11-24' } },
+      { id: 'field-note-no-date', data: { ...latest.data, publishedAt: null } },
+      { id: 'field-note-invalid', data: { ...latest.data, publishedAt: new Date(NaN) } },
+      { id: 'field-note-composed', data: { ...latest.data, publishedAt: '2026-11-24', layout: [{}] } },
+    ];
+    expect(latestFieldNote([older, latest, ...excluded])).toEqual({ slug: latest.id, title: 'Newer', excerpt: 'Start here.' });
+    expect(latestFieldNote(excluded)).toBeNull();
+  });
+  it('breaks publication ties by slug and bounds only the home excerpt', () => {
+    const prose = 'field notebook '.repeat(18).trim();
+    const data = { title: 'A note', status: 'published', publishedAt: '2026-11-23', content: [intro(prose)] };
+    const entries = [{ id: 'field-note-b', data }, { id: 'field-note-a', data }];
+    const before = structuredClone(entries);
+    expect(latestFieldNote(entries)).toMatchObject({ slug: 'field-note-a', excerpt: `${'field notebook '.repeat(12).trim()}…` });
+    expect(fieldNotes(entries)[0].excerpt).toBe(prose);
+    expect(entries).toEqual(before);
   });
   it('continues through every published note and wraps without repeating the current one', () => {
     const entries = ['g', 'e', 'c', 'a', 'f', 'd', 'b'].map(letter => ({

@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Pick up the latest note · November 23
+The home page now points directly to the latest published note in addition to the complete journal. The title and short preview come from EmDash, not a separate staff-maintained list, and editing an older note does not move it ahead of a newer publication.
+
 ## One last warm drink · November 23
 The eleventh Field Note offers a simple end-of-camp ritual: pour a small drink from what you brought, then pack the cup and scraps out. It gives the Creekside Camp Mug and Slow camp a natural reading link without changing buying facts or making heat-retention claims.
 

@@ -62,7 +62,7 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 - Native EmDash headline, deck and CTA destinations remain authoritative and unchanged. The existing landscape is eager/high-priority, with honest authored alt text and no fabricated place name.
 - Two published nonempty collections use tactile, bounded text cards. Their copy and membership still come from EmDash; a failed catalog read cannot invent an empty collection list or copied prices.
 - All published product families continue through the signed Commerce catalog. Cards gain tonal surfaces and quieter body facts; no indexed or seeded price becomes shopping authority.
-- A final 1.618:1 reading invitation leads to Field Notes with distinct serif rhythm. No extra carousel, fake testimonials, newsletter collection or duplicated shopping flow.
+- A final 1.618:1 reading invitation keeps the complete journal link and, when available, shows the latest native Field Note’s title and at most 180 characters of opening prose before an ellipsis. Use the existing muted surface, a quiet divider, serif title and 48px native links; stack on phones. Sort by publication, not edits, and omit the teaser for missing/failed data or CMS preview/edit mode. This does not reorder the journal, add a client script or change shopping.
 
 ## Shop, collections, product and search · Phase 2
 - Shop and collection containers align to the shell's 80rem / 20px gutters. The introduction separates its lead from a quiet illustrated-design note; 48px collection filters mark the current route with both underline and rust border.
