@@ -31,6 +31,8 @@ import { hydrateProductCollectionMembership, productPageOffersCart, readProductE
 import { leftCommerceCatalog } from "../../features/store-shell/merch-catalog.js";
 import { playgroundCheckoutAdmission, playgroundCheckoutConfigured, playgroundEnvOf, showsSandboxCheckoutNotice } from "../../features/playground-checkout/index.js";
 import { isDemoCatalogProfile } from "../../features/playground/demo-products.js";
+import { readProductReviews, reviewsJsonLd } from "../../features/product-reviews/index.js";
+import { ProductRating, ProductReviews } from "../../features/product-reviews/ui.ts";
 import "../../features/store-shell/global.css";
 
 const productCollection = await getEmDashCollection<"products", Record<string, unknown>>("products", { status: "published" });
@@ -174,19 +176,27 @@ const readingPath = linkedProduct && !lookupUnavailable && !noLongerAvailable &&
 const reading = await loadCollectionFieldNotes(new Set(readingPath ? [readingPath] : []),
   Boolean(context?.preview || context?.editMode),
   async () => (await getEmDashCollection<'pages', Record<string, unknown>>('pages', { status: 'published' })).entries);
+// The product's rating and published reviews, kept by DinkusKit Reviews under the product's Commerce id
+// (template-product-rating-20261122). Nothing shows when Reviews is not installed or nobody has reviewed it.
+const productReviews = linkedProduct && !noLongerAvailable && !lookupUnavailable
+  ? await readProductReviews({ locals: Astro.locals, request: Astro.request, url: Astro.url }, linkedProduct.id)
+  : null;
+// The same rating and newest reviews go into the product's data for search engines
+// (template-product-rating-jsonld-20261122), whichever option is picked.
+const rated = <T extends object>(jsonLd: T | null) => (jsonLd && productReviews ? { ...jsonLd, ...reviewsJsonLd(productReviews) } : jsonLd);
 // Produce every selectable block on the server through the Commerce builder.
 // The browser only selects a prepared block; it never recalculates an Offer.
 const selectedProductJsonLd = (variant: (typeof variants)[number] | null) => {
   if (!linkedProduct || !item || !productName) return null;
-  if (variants.length && !variant) return buildProductPreviewJsonLd({
+  if (variants.length && !variant) return rated(buildProductPreviewJsonLd({
     url: productCanonical, name: productName,
     ...(item.description ? { description: item.description } : {}),
-  });
-  return linkedProductJsonLd(linkedProduct, {
+  }));
+  return rated(linkedProductJsonLd(linkedProduct, {
     url: productCanonical,
     name: productName,
     ...(item.description ? { description: item.description } : {}),
-  }, variant);
+  }, variant));
 };
 // Editorial pages use the preview builder. Unavailable routes emit no data.
 const productJsonLd = allowsProductJsonLd(Astro.response.status ?? 200) && item && productName &&
@@ -205,11 +215,11 @@ const productJsonLd = allowsProductJsonLd(Astro.response.status ?? 200) && item 
 const variantJsonLd = productJsonLd && linkedProduct && item && productName && variants.length
   ? {
     ...Object.fromEntries(variants.map((variant) => [variant.id, selectedProductJsonLd(variant)])),
-    [NO_OFFER_JSON_LD_KEY]: buildProductPreviewJsonLd({
+    [NO_OFFER_JSON_LD_KEY]: rated(buildProductPreviewJsonLd({
       url: productCanonical,
       name: productName,
       ...(item.description ? { description: item.description } : {}),
-    }),
+    })),
   }
   : null;
 ---
@@ -239,6 +249,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
             )}
           <div class="product-detail__body">
             <h1 id="product-title" tabindex="-1">{productName}</h1>
+            {productReviews && <ProductRating rating={productReviews.rating} />}
             {summary ? <div class="product-detail__summary" data-product-summary><PortableText value={summary} components={legacyPortableTextComponents} /></div> : <p class="product-detail__description">{item.description}</p>}
             {details && !summaryLinksToDetails(summary) && <a class="product-details-link" href="#product-details">Details &amp; care <span aria-hidden="true">↓</span></a>}
             {identifiers && <p class="product-detail__identifier" data-product-sku={identifiers.sku ?? ""} hidden={!identifiers.sku}>SKU {identifiers.sku}</p>}
@@ -279,6 +290,7 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
           </div>
         </article>
         {details && <section id="product-details" tabindex="-1" class="product-details" data-product-details aria-label="Product details"><header class="product-details__heading"><p>A closer look</p><h2>Details & care</h2></header><div class="product-details__grid"><Blocks value={details} components={productDetailComponents} fallback={UnknownBlock} /></div><a class="product-details-link product-details-link--return" href="#product-title">Back to product options <span aria-hidden="true">↑</span></a></section>}
+        {productReviews && productName && <ProductReviews view={productReviews} productName={productName} />}
         <LinkedFieldNotes notes={reading} context="product" />
         {linkedProduct && !lookupUnavailable && Astro.response.status === 200 && <RelatedGear productId={linkedProduct.id}
           entries={products.entries} categories={categoryEntries.entries} checkoutAvailable={checkoutAvailable} />}

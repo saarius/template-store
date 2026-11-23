@@ -135,7 +135,7 @@ test("Commerce checkout token renders the paid order and clears the cart", async
   await expect(page.locator("[data-guest-checkout-recipient]")).toHaveText("Ada Lovelace");
   await expect(page.locator("[data-guest-checkout-address]")).toHaveText("12 Analytical Way, Portland OR 97201, US");
   await expect(page.locator("[data-guest-checkout-shipping-method]")).toHaveText("Free shipping");
-  await expect(page.locator("[data-guest-checkout-account]")).toHaveAttribute("href", "/account");
+  await expect(page.locator("[data-guest-checkout-track]")).toHaveAttribute("href", "/track-order");
   await expect(page.locator("[data-guest-checkout-return-status]")).toContainText("confirmed");
   expect(harness.counts().statusCalls).toBe(2);
   await page.screenshot({
@@ -237,7 +237,7 @@ test("the store's status route relays Commerce's paid answer to the thank-you pa
     await expect(page.locator("[data-guest-checkout-destination]")).toBeVisible();
     await expect(page.locator("[data-guest-checkout-email]")).toHaveText("synthetic@example.test");
     await expect(page.locator("[data-guest-checkout-shipping-method]")).toHaveText("Flat rate ($5.00)");
-    await expect(page.locator("[data-guest-checkout-account]")).toHaveAttribute("href", "/account");
+    await expect(page.locator("[data-guest-checkout-track]")).toHaveAttribute("href", "/track-order");
     await expect(page.locator(".guest-checkout-continue")).toHaveAttribute("href", "/");
     await expect(page.locator("[data-guest-cart-count]")).toBeHidden();
     await expect(page.locator("[data-ephemera-stamp-text]")).toHaveText(/^(PAID · STRIPE TEST|SETTLED · COMMERCE)$/u);

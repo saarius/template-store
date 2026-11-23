@@ -25,6 +25,7 @@ const {
   error = null,
 } = Astro.props;
 const { view } = page;
+const newsAvailable = process.env.BACKROADBUM_MERCHANT_PROFILE !== "1";
 // Shown disabled until Commerce publishes the store's allowed shipping countries.
 const COMING_SOON_SHIPPING_COUNTRIES = ["Canada", "United Kingdom", "Australia", "Germany", "France", "Japan"];
 // A billing address may be in every country, so its list holds each country the runtime names.
@@ -88,6 +89,12 @@ const dataName = (field: string) => field === "postalCode" ? "postal-code" : fie
         <label for="guest-cart-email">Email</label>
         <input id="guest-cart-email" name="email" data-guest-cart-email type="email" maxlength="254" autocomplete="email" value={value("email")} {...invalidAttrs("email")} />
         {fieldError("email") && <p id={errorId("email")} data-guest-cart-contact-error="email" role="alert">{fieldError("email")}</p>}
+        {newsAvailable && (
+          <label class="guest-cart-news" data-guest-cart-news-row>
+            <input type="checkbox" name="news" data-guest-cart-news checked={value("news") === "on"} />
+            Email me with news and offers
+          </label>
+        )}
         {view.needsDelivery && (
           <div class="guest-cart-delivery" data-guest-cart-delivery>
             <h2>Delivery address</h2>

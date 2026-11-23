@@ -3,7 +3,7 @@ import { hydrateServerCartForms } from "./cart-script.js";
 
 /**
  * The checkout page is a plain form the server checks and hands to Stripe; this script only hides the billing
- * fields while "same as delivery" is ticked, fills a signed-in shopper's saved address, and stops a second press.
+ * fields while "same as delivery" is ticked and stops a second press.
  */
 export function renderBilling(root: Element): void {
   const same = root.querySelector("[data-guest-cart-billing-same]");
@@ -16,8 +16,9 @@ export function hydrateServerCheckout(): void {
   const root = document.querySelector("[data-server-checkout]");
   if (!root) return;
   renderBilling(root);
-  root.querySelector("[data-guest-cart-billing-same]")?.addEventListener("change", () => renderBilling(root));
+  // Legacy Commerce 0.8 account compatibility; no saved profile is required to check out.
   void prefillShopperContact(root);
+  root.querySelector("[data-guest-cart-billing-same]")?.addEventListener("change", () => renderBilling(root));
   // A refused post comes back with its field marked: focus that field, or show the page's own alert.
   const invalidField = root.querySelector<HTMLElement>("[aria-invalid=true]");
   if (invalidField) invalidField.focus();

@@ -58,6 +58,10 @@ const qtyInputId = `guest-cart-add-qty-${product.id}`;
   .guest-cart-add button:disabled,.guest-cart-add input:disabled{opacity:.5;cursor:not-allowed}
   .guest-cart-add p{margin:.2rem 0 0;color:var(--store-muted)}
   @media(scripting:none){.guest-cart-add__step{display:none}}
+  @media(max-width:48rem){
+    .guest-cart-add__stepper input{min-height:44px}
+    .guest-cart-add button.guest-cart-add__step{min-width:44px;min-height:44px}
+  }
 </style>
 <script>
   import { hydrateServerCartForms } from "./cart-script.ts";

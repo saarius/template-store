@@ -14,7 +14,9 @@ import { pairedCommerceDescriptor, pairedCommercePin, pairedCommerceProfile, res
 import { merchantShipDescriptor } from "./scripts/lib/backroadbum-ship.mjs";
 
 import { playgroundRegistryPlugins } from "./src/features/playground-plugins/registry-plugins.mjs";
+import { PAIRED_REVIEWS_DIR_ENV, pairedReviewsDescriptor, resolvePairedReviewsDir } from "./scripts/lib/paired-reviews.mjs";
 import { commerceProfile, commerceProfileDefine } from "./src/features/commerce-profile/profiles.mjs";
+import { storeCloudflareEmail, storeEmailFrom } from "./src/features/store-email/sender.mjs";
 
 const isCloudflare =
   process.env.DINKUS_HOSTING_PROFILE === "cloudflare" ||
@@ -22,9 +24,6 @@ const isCloudflare =
 
 const commerceEntry = fileURLToPath(
   new URL("./.artifacts/source-deps/commerce/src/index.ts", import.meta.url),
-);
-const productUrlEntry = fileURLToPath(
-  new URL("./src/features/product-url-plugin/index.ts", import.meta.url),
 );
 const inventoryEntry = fileURLToPath(
   new URL("./node_modules/@dinkuskit/inventory/src/index.ts", import.meta.url),
@@ -41,6 +40,15 @@ const viteCacheDir = artifactSlotMatch
   : "node_modules/.vite";
 
 const siteUrl = process.env.EMDASH_SITE_URL?.trim() || undefined;
+// Use the starter's Cloudflare binding only on Cloudflare. Backroad Bum's Node
+// deployment keeps its existing HTTPS relay and reads credentials at runtime.
+const hostedRegistry = process.env.BACKROADBUM_HOSTED_REGISTRY === '1';
+const emailPlugins = isCloudflare ? [storeCloudflareEmail(storeEmailFrom(process.env, siteUrl))]
+  : hostedRegistry ? [{
+      id: 'backroadbum-email-relay',
+      version: '1.0.0',
+      entrypoint: fileURLToPath(new URL('./src/features/email-relay-plugin/index.ts', import.meta.url)),
+    }] : [];
 
 // Commerce runs one build, the Registry (sandboxed) one, everywhere (template-one-build-registry-20261031).
 // The native copy's development profile is gone with it.
@@ -55,7 +63,6 @@ if (process.env.DINKUS_CATALOG_PROFILE === "native-development") {
 // its owner installs Commerce from the Registry.
 // Hosted merchant installs the real signed Registry packages through EmDash admin.
 // Never shadow those IDs with build-time/local issuer overlays.
-const hostedRegistry = process.env.BACKROADBUM_HOSTED_REGISTRY === '1';
 const pairedCommerceDir = hostedRegistry ? null : resolvePairedCommerceDir(process.env);
 // The build's package names the runtime id: a pre-release pin is the beta package, a release the stable one.
 if (pairedCommerceDir && !process.env.DINKUS_COMMERCE_PROFILE) {
@@ -64,6 +71,13 @@ if (pairedCommerceDir && !process.env.DINKUS_COMMERCE_PROFILE) {
 const pairedCommerce = pairedCommerceDir
   ? await pairedCommerceDescriptor(pairedCommerceDir, commerceProfile(process.env.DINKUS_COMMERCE_PROFILE).runtimeId)
   : undefined;
+// DinkusKit Reviews runs only where DINKUS_PAIRED_REVIEWS_DIR names its build, which the browser tests' proof
+// store sets (scripts/lib/offline-e2e-environment.mjs). Local dev and every store build mount none: a store's
+// owner installs Reviews from the Registry.
+const pairedReviewsDir = pairedCommerce && !isCloudflare && process.env[PAIRED_REVIEWS_DIR_ENV]?.trim()
+  ? resolvePairedReviewsDir(process.env)
+  : null;
+const pairedReviews = pairedReviewsDir ? await pairedReviewsDescriptor(pairedReviewsDir) : undefined;
 const accessOptions = selectedRegistryAccessOptions(process.env);
 const merchantShip = hostedRegistry ? undefined : merchantShipDescriptor(process.env);
 
@@ -78,7 +92,7 @@ if (isCloudflare && !wranglerConfig) {
   );
 }
 
-// EmDash 1.4.0's sandbox() only reads the default Wrangler file. Keep a
+// EmDash 1.5.0's sandbox() still only reads the default Wrangler file. Keep a
 // dedicated deployment's runner aligned with the adapter's selected config, and
 // refuse to build a Worker that mounts Commerce without the Worker Loader it needs.
 function cloudflareSandbox() {
@@ -115,24 +129,13 @@ export default defineConfig({
             baseUrl: "/_emdash/api/media/file",
           }),
       ...(siteUrl ? { siteUrl } : {}),
+      ...(emailPlugins.length ? { plugins: emailPlugins } : {}),
       ...(accessOptions ? { auth: access(accessOptions) } : {}),
       // On Cloudflare the Worker Loader runs the installed plugins; on Node the workerd runner does, and
       // astro dev hands them to Miniflare (EmDash's documented loop: build the plugin, run the site).
       ...(isCloudflare ? { sandboxRunner: cloudflareSandbox() } : (hostedRegistry || pairedCommerce) ? { sandboxRunner: "@emdash-cms/sandbox-workerd/sandbox" } : {}),
       ...(pairedCommerce ? { sandboxed: [pairedCommerce, ...playgroundRegistryPlugins().filter(plugin => plugin.id !== pairedCommerce.id)
-        .map(plugin => merchantShip && plugin.id === merchantShip.id ? merchantShip : plugin)] } : {}),
-      plugins: [
-        {
-          id: "dinkus-template-product-urls",
-          version: "1.0.0",
-          entrypoint: productUrlEntry,
-        },
-        ...(hostedRegistry && !isCloudflare ? [{
-          id: "backroadbum-email-relay",
-          version: "1.0.0",
-          entrypoint: fileURLToPath(new URL("./src/features/email-relay-plugin/index.ts", import.meta.url)),
-        }] : []),
-      ],
+        .map(plugin => merchantShip && plugin.id === merchantShip.id ? merchantShip : plugin), ...(pairedReviews ? [pairedReviews] : [])] } : {}),
     }),
   ],
   vite: {
@@ -163,12 +166,6 @@ export default defineConfig({
         "@dinkuskit/commerce/features/checkout": fileURLToPath(
           new URL(
             "./.artifacts/source-deps/commerce/src/features/checkout/index.ts",
-            import.meta.url,
-          ),
-        ),
-        "@dinkuskit/commerce/features/customers": fileURLToPath(
-          new URL(
-            "./.artifacts/source-deps/commerce/src/features/customers/index.ts",
             import.meta.url,
           ),
         ),

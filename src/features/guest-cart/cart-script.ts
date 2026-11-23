@@ -1,5 +1,4 @@
 import { CART_COUNT_COOKIE_NAME } from "./cart-cookie-name.js";
-import { replaceCartSection } from "./cart-redraw-focus.js";
 import { GUEST_CART_MAX_QUANTITY } from "./intent.js";
 import { installStorefrontWebMcp } from "./webmcp.js";
 
@@ -64,19 +63,30 @@ async function submitAdd(form: HTMLFormElement, submitter: HTMLElement | null): 
   }
 }
 
-/** A failed enhancement still uses the captured plain form; queued, unsent changes stop on navigation. */
-function submitPlainChange(form: HTMLFormElement): false {
+/** A failed enhancement still uses the captured plain form. */
+function submitPlainChange(form: HTMLFormElement): void {
   form.hidden = true;
   document.body.append(form);
   HTMLFormElement.prototype.submit.call(form);
-  return false;
 }
 
-/** Send a captured cart-page form and replace the currently attached section, not an earlier response's node. */
-async function submitChange(form: HTMLFormElement): Promise<boolean> {
-  const section = document.querySelector("[data-server-cart]");
-  if (!section) return submitPlainChange(form);
-  section.setAttribute("aria-busy", "true");
+/** Keep focus on the same line control; if the line is gone, give the keyboard a useful next stop. */
+function replaceCartSection(section: Element, next: Element, beforeLock: Element | null = null): void {
+  const active = document.activeElement === document.body ? beforeLock : document.activeElement;
+  const line = active?.closest("[data-guest-cart-line]");
+  const control = ["data-guest-cart-qty", "data-guest-cart-update", "data-guest-cart-remove"]
+    .find((attribute) => active?.hasAttribute(attribute));
+  section.replaceWith(next);
+  if (!line || !section.contains(line) || !control) return;
+  const sameLine = Array.from(next.querySelectorAll("[data-guest-cart-line]"))
+    .find((row) => row.getAttribute("data-guest-cart-line") === line.getAttribute("data-guest-cart-line"));
+  (sameLine?.querySelector<HTMLElement>(`[${control}]`)
+    ?? next.querySelector<HTMLElement>("[data-guest-cart-empty]")
+    ?? next.querySelector<HTMLElement>("[data-guest-cart-qty]"))?.focus();
+}
+
+/** Send a captured cart-page form and replace the currently attached section. */
+async function submitChange(form: HTMLFormElement, focusBeforeLock: () => Element | null): Promise<void> {
   try {
     const response = await fetch(form.action, {
       method: "POST",
@@ -87,26 +97,11 @@ async function submitChange(form: HTMLFormElement): Promise<boolean> {
     const html = await response.text();
     const next = new DOMParser().parseFromString(html, "text/html").querySelector("[data-server-cart]");
     if (!response.ok || !next) return submitPlainChange(form);
-    const current = document.querySelector("[data-server-cart]");
-    if (current) replaceCartSection(current, next);
+    const section = document.querySelector("[data-server-cart]");
+    if (section) replaceCartSection(section, next, focusBeforeLock());
     renderCartCount();
-    return true;
   } catch {
-    return submitPlainChange(form);
-  }
-}
-
-/** An agent changed the cart: follow it in the badge and, on the cart page, redraw the cart. */
-async function cartChangedElsewhere(count: number): Promise<void> {
-  renderCartCount(count);
-  const section = document.querySelector("[data-server-cart]");
-  if (!section) return;
-  try {
-    const response = await fetch("/cart", { headers: { accept: "text/html" }, credentials: "same-origin" });
-    const next = new DOMParser().parseFromString(await response.text(), "text/html").querySelector("[data-server-cart]");
-    if (response.ok && next) replaceCartSection(section, next);
-  } catch {
-    // The next visit draws the current cart.
+    submitPlainChange(form);
   }
 }
 
@@ -124,11 +119,31 @@ export function hydrateServerCartForms(): void {
   renderCartCount();
   if (scope[BOUND]) return;
   scope[BOUND] = true;
-  installStorefrontWebMcp({ onCartChanged: (count) => void cartChangedElsewhere(count) });
-  // Each accepted form keeps its values even when a preceding response replaces its row.
-  // Send changes in submission order: overlapping HTML responses must not redraw an older cart.
-  let changes = Promise.resolve(true);
-  let pendingChanges = 0;
+  let savingChange = false;
+  let redrawAfterSave = false;
+
+  async function redrawCart(): Promise<void> {
+    const section = document.querySelector("[data-server-cart]");
+    if (!section) return;
+    if (savingChange) {
+      redrawAfterSave = true;
+      return;
+    }
+    try {
+      const response = await fetch("/cart", { headers: { accept: "text/html" }, credentials: "same-origin" });
+      const next = new DOMParser().parseFromString(await response.text(), "text/html").querySelector("[data-server-cart]");
+      // A save may have started while the refresh was fetching. Don't replace its locked controls.
+      if (savingChange) redrawAfterSave = true;
+      else if (response.ok && next) replaceCartSection(section, next);
+    } catch {
+      // The next visit draws the current cart.
+    }
+  }
+
+  installStorefrontWebMcp({ onCartChanged: (count) => {
+    renderCartCount(count);
+    void redrawCart();
+  } });
   document.addEventListener("submit", (event) => {
     const form = event.target;
     if (!(form instanceof HTMLFormElement)) return;
@@ -136,19 +151,34 @@ export function hydrateServerCartForms(): void {
       event.preventDefault();
       void submitAdd(form, (event as SubmitEvent).submitter ?? null);
     } else if (form.matches("[data-cart-change-form]")) {
+      if (savingChange) {
+        event.preventDefault();
+        return;
+      }
+      const section = document.querySelector("[data-server-cart]");
+      if (!section) return; // Let the browser submit the plain form.
       event.preventDefault();
+      savingChange = true;
+      // Capture before disabling: disabled inputs are not included in form data.
       const captured = form.cloneNode(true) as HTMLFormElement;
-      captured.action = form.action;
-      pendingChanges += 1;
-      document.querySelector("[data-server-cart]")?.setAttribute("aria-busy", "true");
-      changes = changes.then(async (continueEnhancing) => {
-        if (!continueEnhancing) return false;
-        const updated = await submitChange(captured);
-        pendingChanges -= 1;
-        const section = document.querySelector("[data-server-cart]");
-        if (pendingChanges > 0) section?.setAttribute("aria-busy", "true");
-        else section?.removeAttribute("aria-busy");
-        return updated;
+      const controls = section.querySelectorAll<HTMLInputElement | HTMLButtonElement>(
+        "[data-cart-change-form] :is([data-guest-cart-qty], button[type=submit]):enabled",
+      );
+      // Disabling the focused control can move focus to BODY. Keep its place only until another control takes focus.
+      let beforeLock = document.activeElement;
+      const forgetBeforeLock = () => { beforeLock = null; };
+      document.addEventListener("focusin", forgetBeforeLock, { once: true });
+      section.setAttribute("aria-busy", "true");
+      for (const control of controls) control.disabled = true;
+      void submitChange(captured, () => beforeLock).finally(() => {
+        document.removeEventListener("focusin", forgetBeforeLock);
+        section.removeAttribute("aria-busy");
+        for (const control of controls) control.disabled = false;
+        savingChange = false;
+        if (redrawAfterSave) {
+          redrawAfterSave = false;
+          void redrawCart();
+        }
       });
     }
   });

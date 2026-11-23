@@ -9,10 +9,6 @@ import { STORE_TITLE, readStorefrontProfile } from "../features/store-shell/inde
 import { playgroundCheckoutAdmission } from "../features/playground-checkout/index.js";
 import { playgroundCheckoutConfigured, playgroundEnvOf } from "../features/playground-checkout/payments-port.js";
 import { storeBannerText } from "../features/store-shell/checkout-copy.js";
-import {
-  isPlaygroundPreviewHost,
-  resolvePlaygroundAccountSiteOrigin,
-} from "../features/shopper-account/playground-runtime.js";
 import "../features/store-shell/global.css";
 import "../features/shopper-account/account-screen.css";
 
@@ -25,11 +21,9 @@ const checkoutAdmission = await acquireGuestCheckoutAdmission({
 const isPlayground = Boolean((Astro.locals as { __playgroundDb?: unknown }).__playgroundDb);
 const playgroundAdmission = playgroundCheckoutAdmission(isPlayground, playgroundCheckoutConfigured(playgroundEnvOf(Astro.locals)));
 const effectiveAdmission = playgroundAdmission ?? checkoutAdmission;
-// The instant demo account and captured-PIN sign-in are the playground's (shopper-accounts-playground-20261020);
-// a store running Commerce's Registry build signs shoppers in through the installed plugin itself.
-const playgroundMode = isPlayground;
-const playgroundAccountOrigin = resolvePlaygroundAccountSiteOrigin();
-const previewUnavailable = isPlayground && isPlaygroundPreviewHost(Astro.url, playgroundAccountOrigin);
+// Keep the merchant's signed Commerce 0.8 account UI without reviving the
+// retired playground's demo sessions or importing Commerce's removed customer implementation.
+const merchantMode = !isPlayground && process.env.BACKROADBUM_MERCHANT_PROFILE === '1';
 ---
 <!doctype html>
 <html lang="en">
@@ -43,12 +37,9 @@ const previewUnavailable = isPlayground && isPlaygroundPreviewHost(Astro.url, pl
     <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(Boolean(effectiveAdmission))} role="status">{storeBannerText(Boolean(effectiveAdmission))}</div>
     <StoreHeader profile={profile} />
     <main id="main-content">
-      <ShopperAccount
-        playgroundMode={playgroundMode}
-        merchantMode={!isPlayground && process.env.BACKROADBUM_MERCHANT_PROFILE === '1'}
-        emailSignInPaused={!isPlayground && isMerchantEmailSignInPaused()}
-        previewUnavailableOrigin={previewUnavailable ? playgroundAccountOrigin : undefined}
-      />
+      {merchantMode
+        ? <ShopperAccount merchantMode emailSignInPaused={isMerchantEmailSignInPaused()} />
+        : <section><h1>Find an order</h1><p><a href="/track-order">Track your order</a> using your order number and checkout email.</p></section>}
     </main>
     <StoreFooter profile={profile} />
   </body>

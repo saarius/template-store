@@ -52,7 +52,9 @@ if (Astro.request.method === "POST") {
     values = read.values;
     error = { field: null, message: page.view.checkoutReason };
   } else {
-    const started = await startServerCheckout(cartContext, read.contact);
+    // Backroad Bum has no newsletter; don't ask Commerce to record consent for it.
+    const news = process.env.BACKROADBUM_MERCHANT_PROFILE !== "1" && read.news;
+    const started = await startServerCheckout(cartContext, read.contact, news);
     if (started.ok && started.checkout.state === "paid") return Astro.redirect("/checkout/success", 303);
     const payment = started.ok ? openPaymentUrl(started) : null;
     if (payment) return Astro.redirect(payment, 303);

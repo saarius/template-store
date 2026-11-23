@@ -718,6 +718,7 @@ describe("order confirmation receipt enrichment (garment thumbnails, variants, a
       // server returns use an explicit status refresh, never a replacement start.
       "data-guest-checkout-status-retry",
       'class="guest-checkout-continue"',
+      'data-guest-checkout-track href="/track-order"',
       'data-guest-checkout-account href="/account"',
     ]) {
       expect(markup).toContain(token);
