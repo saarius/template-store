@@ -48,6 +48,18 @@ describe("native cart published product navigation", () => {
     expectRetainedFacts(page);
     expect(page.view.lines.every(line => line.productPath === null)).toBe(true);
   });
+  it.each([
+    ["pending", "attempt-1", null, true, null],
+    ["recoverable-failure", "attempt-1", null, true, null],
+    ["pending", "attempt-1", "https://checkout.stripe.com/c/pay/cs_test_fixture", true, "https://checkout.stripe.com/c/pay/cs_test_fixture"],
+    ["pending", "attempt-1", "https://shop.example.test/old-link", true, null],
+    ["pending", null, null, false, null],
+    ["paid", "attempt-1", null, false, null],
+    ["released-retry", "attempt-1", null, false, null],
+  ] as const)("derives held state separately from the payment link (%s, %s, %s)", async (state, attemptId, redirectUrl, paymentHeld, openPayment) => {
+    readCart.mockResolvedValueOnce({ ...(await readCart()), checkout: { state, attemptId, redirectUrl } });
+    expect(await loadServerCartPage(ctx, true)).toMatchObject({ paymentHeld, openPayment });
+  });
   it("does not turn missing Commerce items into CMS-backed shopping facts", async () => {
     catalog.mockResolvedValue([{ id: "fleece-m", found: false }, { id: "fleece-xl", found: false }]);
     const page = await loadServerCartPage(ctx, true);

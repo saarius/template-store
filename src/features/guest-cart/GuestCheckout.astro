@@ -47,7 +47,7 @@ const errorId = (name: string) => `guest-cart-${name.replace(/\[|\]/gu, (bracket
 const invalidAttrs = (name: string) => error && error.field === name
   ? { "aria-invalid": "true" as const, "aria-describedby": errorId(name), autofocus: true }
   : {};
-const canStart = Boolean(checkoutAdmission) && view.checkoutEnabled && !page.openPayment;
+const canStart = Boolean(checkoutAdmission) && view.checkoutEnabled && !page.paymentHeld;
 const shippingText = shippingMode === "free" ? "Free"
   : shippingMode === "flat" && shippingMinor ? formatUsdMinor(shippingMinor) : "Calculated at checkout";
 const address = (kind: "delivery" | "billing") => [
@@ -78,6 +78,13 @@ const dataName = (field: string) => field === "postalCode" ? "postal-code" : fie
   {page.error && <p data-guest-cart-status role="alert">{page.error}</p>}
   {view.empty ? <p data-guest-cart-empty tabindex="-1">Your cart is empty. <a href="/cart">Return to cart</a> or <a href="/">continue shopping</a>.</p> : (
   <div class="guest-checkout-grid">
+    {page.paymentHeld && !page.openPayment ? (
+      <div class="guest-checkout-vault">
+        <h2 class="guest-checkout-payment-status-title">Payment status</h2>
+        <p data-guest-cart-checkout-reason>Your last payment is not yet confirmed. Check its status before starting another checkout.</p>
+        <a class="guest-checkout-payment-status" data-guest-cart-payment-status href="/checkout">Check payment status</a>
+      </div>
+    ) : (
     <form class="guest-checkout-vault" method="post" action="/checkout" data-checkout-vault data-checkout-form novalidate>
       <div class="guest-checkout-vault__header">
         <h2>Contact &amp; delivery</h2>
@@ -159,10 +166,11 @@ const dataName = (field: string) => field === "postalCode" ? "postal-code" : fie
         )}
       </div>
     </form>
+    )}
     <aside class="guest-checkout-manifest" aria-labelledby="guest-checkout-manifest-title" data-checkout-manifest>
       <div class="guest-checkout-manifest__header">
         <h2 id="guest-checkout-manifest-title">Your order</h2>
-        <a href="/cart" data-checkout-edit-cart>Edit cart</a>
+        <a href="/cart" data-checkout-edit-cart>{page.paymentHeld ? "View cart" : "Edit cart"}</a>
       </div>
       <div class="guest-checkout-manifest__lines" data-guest-cart-lines>
         {view.lines.map((line) => (
@@ -253,7 +261,11 @@ const dataName = (field: string) => field === "postalCode" ? "postal-code" : fie
   .guest-checkout-actions [data-guest-cart-checkout]:not(:disabled):hover{filter:brightness(.94)}
   .guest-checkout-actions [data-guest-cart-checkout]:disabled{background:var(--store-bg);color:var(--store-muted);cursor:not-allowed}
   .guest-checkout-actions [data-guest-cart-checkout-reason]{margin:.5rem 0 0;color:var(--store-muted);line-height:1.6}
-  .guest-checkout-actions [data-guest-cart-resume]{display:inline-flex;align-items:center;min-height:48px;margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1px solid var(--store-line);border-radius:var(--radius-control);color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:.2em}
+  .guest-checkout-payment-status-title{margin:0;font-size:var(--text-xl);line-height:1.25}
+  .guest-checkout-vault > [data-guest-cart-checkout-reason]{max-width:56ch;margin:.5rem 0;color:var(--store-muted);line-height:1.6}
+  :is(.guest-checkout-actions [data-guest-cart-resume],.guest-checkout-payment-status){display:inline-flex;align-items:center;min-height:48px;margin:.4rem .6rem .4rem 0;padding:.7rem 1rem;border:1px solid var(--store-line);border-radius:var(--radius-control);color:inherit;font-weight:600;text-decoration:underline;text-underline-offset:.2em}
+  .guest-checkout-payment-status:hover{background:var(--store-surface-subtle)}
+  .guest-checkout-payment-status:focus-visible{outline:3px solid var(--store-focus-ring);outline-offset:3px}
   .guest-checkout-actions [data-guest-cart-resume][hidden]{display:none}
   .guest-checkout-manifest{grid-area:review;padding:var(--space-5);border:1px solid var(--color-border);border-radius:var(--radius-panel);background:var(--store-surface);min-width:0}
   .guest-checkout-manifest[hidden]{display:none}

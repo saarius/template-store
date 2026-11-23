@@ -19,7 +19,7 @@ const view = presentGuestCart({
   snapshots: [{ id: 'synthetic-notebook', found: true, name: 'Synthetic notebook', sku: 'SYNTHETIC-BOOK', fulfillment: 'physical', price: { listable: true, regularText: '$12.00', saleText: null, unitMinor: '1200' }, availability: { status: 'in-stock', sellable: true, listable: true } }],
   snapshotFailed: false, checkoutAdmitted: true,
 });
-const page = { view, result: { ok: false, error: { code: 'NO_CART', message: 'Synthetic fixture' } }, snapshots: null, notice: null, error: null, openPayment: null };
+const page = { view, result: { ok: false, error: { code: 'NO_CART', message: 'Synthetic fixture' } }, snapshots: null, notice: null, error: null, paymentHeld: false, openPayment: null };
 const order: ConfirmedOrderView = {
   orderNumber: '#7001', test: true,
   lines: [{ id: 'synthetic-notebook', sku: 'SYNTHETIC-BOOK', text: 'Synthetic notebook × 1', variant: null, amount: '$12.00', thumbnail: null }],
@@ -167,10 +167,28 @@ describe('native merchant journey rendering', () => {
   });
 
   it('freezes contact fields and offers the existing payment instead of another submit', async () => {
-    const html = await renderCheckout({ page: { ...page, openPayment: 'https://checkout.example.test/existing' } });
+    const html = await renderCheckout({ page: { ...page, paymentHeld: true, openPayment: 'https://checkout.example.test/existing' } });
     expect(elements(html).find(node => node.name === 'fieldset' && node.attributes['data-guest-cart-contact'] !== undefined)?.attributes).toHaveProperty('disabled');
     expect(html).toContain('href="https://checkout.example.test/existing"');
     expect(html).not.toContain('type="submit"');
+  });
+
+  it('offers a read-only status check while the cart is held without a payment link', async () => {
+    const held = { ...page, paymentHeld: true };
+    const checkout = await renderCheckout({ page: held });
+    expect(tag(checkout, 'a', 'data-guest-cart-payment-status', '').href).toBe('/checkout');
+    expect(tag(checkout, 'a', 'data-checkout-edit-cart', '').href).toBe('/cart');
+    expect(checkout).toContain('View cart');
+    expect(checkout).not.toContain('data-checkout-form');
+    expect(checkout).not.toContain('data-guest-cart-resume');
+    const container = await AstroContainer.create();
+    const cart = await container.renderToString(Cart, { props: { page: held, checkoutAdmission: {} } });
+    expect(tag(cart, 'a', 'data-guest-cart-payment-status', '').href).toBe('/cart');
+    for (const attribute of ['qty', 'update', 'remove']) {
+      expect(tag(cart, attribute === 'qty' ? 'input' : 'button', `data-guest-cart-${attribute}`, 'synthetic-notebook')).toHaveProperty('disabled');
+    }
+    expect(cart).not.toContain('data-guest-cart-proceed');
+    expect(cart).not.toContain('data-guest-cart-resume');
   });
 
   it('renders native print guidance and paid details only for a confirmed order', async () => {
