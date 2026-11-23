@@ -51,7 +51,11 @@ if (!process.argv.includes('--check')) {
           await expect(card).toBeInViewport({ ratio: 0.25 });
           await expect(card).toBeFocused();
           await page.keyboard.press('Tab');
-          await expect(page.locator(`#${displayed[index + 1].id}`)).toBeFocused();
+          const nextCard = page.locator(`#${displayed[index + 1].id}`);
+          await expect(nextCard).toBeFocused();
+          await expect(nextCard).toHaveCSS('outline-style', 'solid');
+          await expect(card).toHaveCSS('outline-style', 'none');
+          await expect(card.locator('h2,h3')).toHaveCSS('text-decoration-line', 'underline');
         }
 
         // Article-to-article links follow slug order, not the featured slot.
