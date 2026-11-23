@@ -1,0 +1,22 @@
+# Optional Stage B fence. Import ONLY inside the normal final storefront handle,
+# before reverse_proxy. Keep the site's existing basicauth @private in place.
+route {
+ @stage_b_admin {
+  remote_ip 127.0.0.1 ::1
+  path /_emdash/admin /_emdash/admin/* /_emdash/api/*
+  expression {http.auth.user.id} != null && {http.auth.user.id} != ''
+ }
+ @stage_b_assets {
+  remote_ip 127.0.0.1 ::1
+  method GET HEAD
+  path /_astro/*
+ }
+ vars @stage_b_admin stage_b_access operator
+ vars @stage_b_assets stage_b_access operator
+ @stage_b_closed not vars stage_b_access operator
+ header @stage_b_closed {
+  Cache-Control "no-store"
+  Retry-After "300"
+ }
+ respond @stage_b_closed "Backroad Bum is briefly closed for maintenance. Please try again in a few minutes." 503
+}
