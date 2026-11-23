@@ -33,11 +33,23 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('Another browser could not open the receipt');
     expect(report).toContain('This used a local inbox; Reviews is not installed');
   });
+  it('distinguishes the verified signed releases from live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const dispatch = report.match(/<article[^>]+data-signed-releases-dispatch>[\s\S]*?<\/article>/)?.[0];
+    const history = report.match(/<article[^>]+data-signed-releases-history>[\s\S]*?<\/article>/)?.[0];
+    expect(dispatch).toContain('/@dinkuskit.com/dinkus-accounts');
+    expect(dispatch).toContain('/@dinkuskit.com/dinkus-reviews');
+    expect(dispatch).toContain('Neither is installed on Backroad Bum');
+    expect(dispatch).toContain('Courier does not yet support Node scheduling');
+    expect(history).toContain('provenance and permission checks');
+    expect(history).toContain('No email was sent and no live plugin or checkout changed');
+  });
   it('links the published warm-cup note without claiming commerce changes', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const history = report.match(/<article[^>]+data-warm-cup-note-history>[\s\S]*?<\/article>/)?.[0];
     expect(history).toContain('href="/field-note-a-warm-cup-before-packing-up"');
     expect(history).toContain('price, availability and care details are unchanged');
+    expect(report).toContain('Eleven EmDash field notes · latest: <a href="/field-note-a-warm-cup-before-packing-up"');
   });
   it('reports the distinction between voiding a queued label and one sent to Commerce', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
@@ -335,7 +347,6 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('data-shade-note-dispatch');
     expect(report).toContain('data-shade-note-history');
     expect(report).toContain('/field-note-a-shady-place-to-stop');
-    expect(report).toContain('Ten EmDash field notes');
     expect(report).toContain('without inventing a protection rating or measured fit range');
     expect(report).toContain('all thirteen earlier Pages, catalog and ten Orders remain unchanged');
     expect(report).toContain('/pr-proof/shade-note/phone-dark.png');
@@ -489,7 +500,6 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('data-departure-note');
     expect(report).toContain('data-departure-note-history');
     expect(report).toContain('Previous dispatch · Prepared cart regressions');
-    expect(report).toContain('Ten EmDash field notes');
     expect(report).toContain('draft stayed off the public route, journal and search');
     expect(report).toContain('not a plugin upgrade or another checkout qualification');
     expect(report).toContain('all eleven earlier CMS page rows, catalog and ten Orders remain unchanged');
@@ -935,7 +945,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('reports the native seventh product without rewriting older catalog or recovery claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
-    expect(pulse).toContain('Seven product families, two collections and ten field notes');
+    expect(pulse).toContain('Seven product families, two collections and eleven field notes');
     expect(source).toContain('Seven EmDash-backed product families');
     expect(source).toContain('A $12 pocket notebook joins the gear shelf');
     expect(source).toContain('The six existing products and eight Orders remain unchanged');

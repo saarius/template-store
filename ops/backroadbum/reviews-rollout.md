@@ -2,6 +2,12 @@
 
 Owner Steers 9–10 authorize adoption of signed Reviews and local Courier dogfooding after bootstrap. Treat the reviews rollout separately from the same-ID Commerce server-cart cutover. Reviews accepts `order.shipped` from Commerce, not a carrier's label purchase; older completions that have no shipment-news key are not backfilled. Commerce's source emitter uses a stable event ID even on reopen/recomplete. Reviews deduplicates in its own store; Courier's `delivered` count is items handed over, not rows newly inserted.
 
+## Signed Reviews 0.1.0 · November 23
+
+[Reviews 0.1.0](https://plugins.emdashcms.com/plugins/@dinkuskit.com/dinkus-reviews) verified with provenance and installed as `r_t7rmn7qidmbmuyge` through EmDash 1.4.0 in a clean disposable loopback store. Only `email:send` was granted, no mail credentials or recipient data were provided, and an unrated product returned `rating: null`. See workspace `evidence/2026-11-23-signed-accounts-reviews/native-install.json`.
+
+Do not treat successful installation as a working review flow. The signed listing requires Commerce 0.9.0 and the template’s Courier timer and review page; the supported Courier scheduler is currently Cloudflare-only, and [Courier #3](https://github.com/dinkuskit/courier/issues/3) still tracks the Registry sender handoff. Requests and reminders start on by default. Defer the live install until the supported pairing can be tested and mail can be kept off except for the verified sandbox inbox. No live plugin, review, mail or order changed.
+
 ## Review email stop and reminder · November 23
 
 [Reviews #9](https://github.com/dinkuskit/reviews/pull/9) and [#10](https://github.com/dinkuskit/reviews/pull/10) now pair with [Template #263](https://github.com/dinkuskit/template-store/pull/263). A disposable Field Journal Node store ran the compiled Reviews bundle at its Registry ID, using synthetic shipment deliveries and a local email sink. Two link opens did not stop mail. A keyboard confirmation did; it survived restart, stopped reminders and future requests for that address regardless of capitalization, and left already-issued review links usable. A different buyer received one reminder for their remaining item only, and could still stop email after the 60-day review link expired.
