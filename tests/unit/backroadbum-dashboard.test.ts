@@ -2,6 +2,21 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports the merged cart lock, open focus review and isolated reminders-off check', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    for (const marker of ['cart-focus-followup', 'cart-reminder-off']) {
+      expect(report).toContain(`data-${marker}-dispatch`);
+      expect(report).toContain(`data-${marker}-history`);
+    }
+    expect(report).toContain('not on Backroad Bum’s live cart');
+    expect(report).toContain('the test inbox stayed empty');
+    expect(reviews).toContain('#243 merged November 22 at af90a48');
+    const focus = reviews.match(/<tr data-cart-focus-followup-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(focus).toContain('Open');
+    expect(focus).toContain('fork 0df23f1');
+    expect(focus).toContain('/pr-proof/template-pr246-dawn-focus/after-mobile.png');
+  });
   it('reports the Reviews rehearsal and Registry handoff separately from live adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
