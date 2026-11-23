@@ -33,6 +33,15 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('Another browser could not open the receipt');
     expect(report).toContain('This used a local inbox; Reviews is not installed');
   });
+  it('reports the inventory rehearsal without implying live inventory adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const dispatch = report.match(/<article[^>]+data-inventory-transfer-dispatch>[\s\S]*?<\/article>/)?.[0];
+    const history = report.match(/<article[^>]+data-inventory-transfer-history>[\s\S]*?<\/article>/)?.[0];
+    expect(dispatch).toContain('not installed on the live store');
+    expect(history).toContain('inventory/pull/73');
+    expect(history).toContain('made-up stock counts');
+    expect(history).toContain('The live catalog and checkout are unchanged');
+  });
   it('distinguishes the verified signed releases from live adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const dispatch = report.match(/<article[^>]+data-signed-releases-dispatch>[\s\S]*?<\/article>/)?.[0];
