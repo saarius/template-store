@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Save quantities before checkout · November 23
+
+Field Journal staging **ac28f9d** merges [Template #264](https://github.com/dinkuskit/template-store/pull/264) at **19ff08d**. In the compiled beta.6 store, no-script desktop and enhanced phone both saved two typed line quantities with one form POST before checkout showed $78, then removed and updated lines independently. The same build still held edits until confirmed unpaid release even after the resume link disappeared. The sandbox was loopback-only with synthetic Payments and zero orders. [Browser checks and painted views](../evidence/2026-11-23-cart-save-checkout/cycle.md).
+
+Recheck both behaviors on the final signed pairing. The hold change is still merchant staging only; #264 merged the quantity flow, not the change to payment-hold messaging. Commerce #299 and Payments #123 remained open during this rehearsal. This does not qualify a signed same-ID migration or a hosted checkout.
+
 ## Expired payment link, still-held cart · November 23
 
 The beta.6 sandbox can remove the Stripe resume link before the provider settles the attempt. In isolated Field Journal staging, the old UI invited cart edits and a new checkout during that interval even though Commerce refused mutations. `backroadbum/server-cart-prep` **6d11cd2** keeps controls disabled, preserves Resume for a valid open link, and offers a plain status check otherwise. After confirmed unpaid expiry the same cart is editable again. Both desktop/no-JS and mobile/JS lanes passed with one synthetic session each, zero orders and no external payment calls; all eight painted views passed. [Evidence](../evidence/2026-11-23-frozen-cart/cycle.md).

@@ -2,6 +2,19 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports saving quantities and the payment hold without claiming a live cart upgrade', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const dispatch = report.match(/<article[^>]+data-cart-save-checkout-dispatch>[\s\S]*?<\/article>/)?.[0];
+    const history = report.match(/<article[^>]+data-cart-held-payment-history>[\s\S]*?<\/article>/)?.[0];
+    const ledger = reviews.match(/<tr data-cart-save-checkout-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(dispatch).toContain('Only this report is live.');
+    expect(dispatch).toContain('$78 subtotal');
+    expect(history).toContain('until Commerce confirms it is unpaid');
+    expect(report).toContain('data-cart-save-checkout-history');
+    expect(ledger).toContain('template-store/pull/264');
+    expect(ledger).toContain('Not on the live cart.');
+  });
   it('distinguishes isolated Accounts relay proof from a live rollout', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const dispatch = report.match(/<article[^>]+data-accounts-relay-dispatch>[\s\S]*?<\/article>/)?.[0];
