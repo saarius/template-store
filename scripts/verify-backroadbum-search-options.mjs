@@ -67,6 +67,28 @@ if (!process.argv.includes('--check')) {
         await expect(page.locator('[data-search-results-count]')).toHaveText('2 results.');
         await expect(page.locator('[data-search-option]')).toHaveCount(2);
         await expect(page.getByRole('region', { name: 'Gear', exact: true }).getByRole('link')).toHaveCount(2);
+        for (const [size, productWasIndexed] of [['L', true], ['M', false]]) {
+          await page.goto(base + '/search?q=fleece+' + size);
+          await expect(page.locator('[data-search-results-count]')).toHaveText('2 results.');
+          const note = page.getByRole('link', { name: 'A layer within reach', exact: true });
+          await expect(note).toHaveAttribute('href', '/field-note-a-layer-within-reach');
+          const exact = page.getByRole('region', { name: 'Gear', exact: true }).getByRole('link');
+          await expect(exact).toHaveCount(1);
+          await expect(exact).toHaveAccessibleName(`Last Light Fleece Size: ${size}`);
+          await expect(exact).toHaveAccessibleDescription('In stock');
+          const href = await exact.getAttribute('href');
+          expect(href).toMatch(/^\/products\/last-light-fleece\?item=[A-Za-z0-9._-]+$/);
+          if (productWasIndexed && [[1440, 'light', false], [390, 'dark', true]].some(([w, scheme, js]) =>
+              w === width && scheme === colorScheme && js === javaScriptEnabled)) {
+            await page.evaluate(() => document.fonts.ready);
+            await page.locator('[data-search-results]').screenshot({ path: `${output}/indexed-${width}-${colorScheme}.png` });
+          }
+          await exact.focus(); await exact.press('Enter');
+          await expect(page).toHaveURL(base + href);
+          await expect(page.locator('[data-product-status]')).toHaveAttribute('data-availability-status', 'in-stock');
+          if (javaScriptEnabled) await expect(page.locator(`[data-variant-choice][value="${size}"]`)).toBeChecked();
+          else await expect(page.locator('[data-product-options-fallback] select')).toHaveValue(new URL(base + href).searchParams.get('item'));
+        }
         await page.goto(base + '/search?q=tee');
         await expect(page.getByRole('link', { name: 'Wrong Turn Tee', exact: true })).toHaveAttribute('href', '/products/wrong-turn-tee');
         await expect(page.locator('[data-search-option]')).toHaveCount(0);
@@ -77,7 +99,7 @@ if (!process.argv.includes('--check')) {
         expect(await page.getByRole('region', { name: 'Field notes & guides', exact: true }).locator('li p').count()).toBeGreaterThan(0);
         await expect(page.locator('[data-search-option-summary]')).toHaveCount(0);
         expect(errors).toEqual([]); expect(writes).toEqual([]);
-        checks.push({ width, colorScheme, javaScriptEnabled, teeHref, fleeceHref, exactSelection: true, oneDestinationPerExactMatch: true, reload: true, keyboard: true, touchTarget: true, nativeSearchPreserved: true, noOverflow: true, writes, errors });
+        checks.push({ width, colorScheme, javaScriptEnabled, teeHref, fleeceHref, exactSelection: true, oneDestinationPerExactMatch: true, reload: true, keyboard: true, touchTarget: true, nativeSearchPreserved: true, sizeAndNativeNote: true, noOverflow: true, writes, errors });
       } finally { await context.close(); }
     }
   } finally { await browser.close(); }

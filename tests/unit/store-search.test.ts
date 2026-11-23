@@ -110,7 +110,7 @@ describe('merchant store search', () => {
     const result = await loadStoreSearch('route', { search: async () => Array.from({ length: 25 }, (_, n) => hit('pages', `note-${n}`)), visibleProducts: products });
     expect(result.count).toBe(20); expect(result.limited).toBe(true);
   });
-  it('uses exact option matches only after no visible native results, without inventing a snippet', async () => {
+  it('keeps the empty-index exact option fallback without reading Commerce for ordinary native results', async () => {
     const optionMatches = vi.fn(async () => [{ slug: 'camp-mug', title: 'Camp mug', options: [{ href: '/products/camp-mug?item=mug-blue', label: 'Color: Blue', availability: 'in-stock' as const }] }]);
     const result = await loadStoreSearch('mug blue', { search: async () => [], visibleProducts: products, optionMatches });
     expect(optionMatches).toHaveBeenCalledWith('mug blue');
@@ -122,6 +122,54 @@ describe('merchant store search', () => {
     await loadStoreSearch('map', { search: async () => [hit('pages', 'field-note-map')], visibleProducts: products, optionMatches });
     await loadStoreSearch(' ', { search: vi.fn(), visibleProducts: products, optionMatches });
     expect(optionMatches).not.toHaveBeenCalled();
+  });
+  it('enriches the indexed product in place and leaves unrelated ranks and snippets intact', async () => {
+    const options = [{ href: '/products/long-way-cap?item=large', label: 'Size: L', availability: 'in-stock' as const }];
+    const optionMatches = vi.fn(async () => [{ slug: 'long-way-cap', title: 'Commerce title', options }]);
+    const result = await loadStoreSearch('cap L', { visibleProducts: products, optionMatches, search: async () => [
+      hit('products', 'camp-mug'), hit('pages', 'field-note-cap'),
+      hit('products', 'long-way-cap', { title: 'Published cap title', snippet: 'An <mark>adjustable</mark> fit.' }),
+    ] });
+    expect(optionMatches).toHaveBeenCalledWith('cap L');
+    expect(result.count).toBe(3);
+    expect(result.groups[0].items).toEqual([
+      { title: 'camp-mug', href: '/products/camp-mug', parts: [] },
+      { title: 'Published cap title', href: options[0].href, options, parts: [
+        { text: 'An ', highlighted: false }, { text: 'adjustable', highlighted: true }, { text: ' fit.', highlighted: false },
+      ] },
+    ]);
+    expect(result.groups[1].items[0].href).toBe('/field-note-cap');
+  });
+  it('finds a size hidden by an editorial-only index result, without hiding the note or doubling the gear', async () => {
+    const visibleProducts = vi.fn();
+    const match = { slug: 'long-way-cap', title: 'Long Way Cap', options: [
+      { href: '/products/long-way-cap?item=medium', label: 'Size: M', availability: 'in-stock' as const },
+    ] };
+    const search = async () => [hit('pages', 'field-note-cap')];
+    const result = await loadStoreSearch('cap M', { visibleProducts, search, optionMatches: async () => [match, match] });
+    expect(visibleProducts).not.toHaveBeenCalled();
+    expect(result.count).toBe(2);
+    expect(result.optionMatches).toEqual([match]);
+    expect(result.groups.map(group => group.items[0].href)).toEqual([match.options[0].href, '/field-note-cap']);
+    const partial = await loadStoreSearch('cap M', { visibleProducts, search,
+      optionMatches: async () => { throw Error('Commerce unavailable'); } });
+    expect(partial.state).toBe('results');
+    expect(partial.count).toBe(1);
+    expect(partial.groups[0].items[0].href).toBe('/field-note-cap');
+  });
+  it('caps the combined results but still enriches an indexed family at the limit', async () => {
+    const options = [{ href: '/products/long-way-cap?item=large', label: 'Size: L', availability: 'in-stock' as const }];
+    const result = await loadStoreSearch('size L', { visibleProducts: products, search: async () => [
+      hit('products', 'long-way-cap'), ...Array.from({ length: 18 }, (_, n) => hit('pages', `note-${n}`)),
+    ], optionMatches: async () => [
+      { slug: 'tee', title: 'Tee', options: [{ ...options[0], href: '/products/tee?item=large' }] },
+      { slug: 'fleece', title: 'Fleece', options: [{ ...options[0], href: '/products/fleece?item=large' }] },
+      { slug: 'long-way-cap', title: 'Cap', options },
+    ] });
+    expect(result.count).toBe(20);
+    expect(result.limited).toBe(true);
+    expect(result.groups[0].items.map(item => item.href)).toEqual([options[0].href, '/products/tee?item=large']);
+    expect(result.groups[1].items).toHaveLength(18);
   });
   it('keeps independent links when several members of the same family match', async () => {
     const options = [

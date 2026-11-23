@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Find the size and the field note · November 23
+An indexed fleece L result used to open Medium; a fleece M search found only its Field Note. Exact Commerce sizes now enrich existing product matches or join the reading results when the product is absent. Ordinary native matches, prices and stock remain unchanged.
+
 ## Open the size from search · November 23
 A search for tee XL used to offer a product-name link that opened Medium and a separate link that opened XL. The product name and size now form one link when only one member matches, with Commerce availability beside it. A plain gear search still opens the family, and multiple matching members remain distinct choices.
 
