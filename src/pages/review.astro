@@ -1,6 +1,7 @@
 ---
 import StoreFooter from "../features/store-shell/StoreFooter.astro";
 import StoreHeader from "../features/store-shell/StoreHeader.astro";
+import ThemeHead from "../features/store-shell/ThemeHead.astro";
 import { ReviewForm } from "../features/review-form/ui.ts";
 import { openReviewPage, reviewPageStatus, sendReviewForm } from "../features/review-form/index.js";
 import { acquireGuestCheckoutAdmission } from "../features/guest-cart/checkout-admission.js";
@@ -34,12 +35,13 @@ Astro.response.status = reviewPageStatus(view);
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="referrer" content="no-referrer" />
+    <ThemeHead />
     <title>{view.kind === "form" ? `Review ${view.productName}` : view.kind === "stop" || view.kind === "stopped" ? "Stop review emails" : "Write a review"} | {STORE_TITLE}</title>
   </head>
   <body data-storefront-profile={profile}>
     <div class="store-demo-banner" data-store-demo-banner data-checkout-available={String(Boolean(effectiveAdmission))} role="status">{storeBannerText(Boolean(effectiveAdmission))}</div>
     <StoreHeader profile={profile} />
-    <main>
+    <main id="main-content" tabindex="-1">
       <ReviewForm view={view} />
     </main>
     <StoreFooter profile={profile} />

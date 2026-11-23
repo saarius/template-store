@@ -101,6 +101,14 @@ describe("Shared StoreFooter.astro & public route mounting", () => {
     }
   });
 
+  it("uses the Field Journal appearance and skip target on private review-link pages", () => {
+    const source = readFileSync(resolve("src/pages/review.astro"), "utf8");
+    expect(source.match(/<head>[\s\S]*?<\/head>/u)?.[0]).toContain("<ThemeHead />");
+    expect(source).toContain('<main id="main-content" tabindex="-1">');
+    expect(source).toContain('headers.set("Referrer-Policy", "no-referrer")');
+    expect(source).toContain('content="noindex, nofollow"');
+  });
+
   it("keeps the adopted brand footer focused on shopping, guidance and the public experiment", () => {
     const footer = readFileSync(resolve("src/features/store-shell/StoreFooter.astro"), "utf8");
     for (const path of ['/shop', '/field-notes', '/test-store', '/dashboard/', '/shipping', '/returns']) {
