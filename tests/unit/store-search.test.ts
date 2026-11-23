@@ -115,13 +115,23 @@ describe('merchant store search', () => {
     const result = await loadStoreSearch('mug blue', { search: async () => [], visibleProducts: products, optionMatches });
     expect(optionMatches).toHaveBeenCalledWith('mug blue');
     expect(result.count).toBe(1); expect(result.state).toBe('results');
-    expect(result.groups[0].items[0]).toEqual({ title: 'Camp mug', href: '/products/camp-mug', parts: [] });
-    expect(result.optionMatches[0].options[0].href).toBe('/products/camp-mug?item=mug-blue');
+    expect(result.groups[0].items[0]).toEqual({ title: 'Camp mug', href: '/products/camp-mug?item=mug-blue', parts: [],
+      options: [{ href: '/products/camp-mug?item=mug-blue', label: 'Color: Blue', availability: 'in-stock' }] });
     optionMatches.mockClear();
     await loadStoreSearch('mug', { search: async () => [hit('products', 'camp-mug')], visibleProducts: products, optionMatches });
     await loadStoreSearch('map', { search: async () => [hit('pages', 'field-note-map')], visibleProducts: products, optionMatches });
     await loadStoreSearch(' ', { search: vi.fn(), visibleProducts: products, optionMatches });
     expect(optionMatches).not.toHaveBeenCalled();
+  });
+  it('keeps independent links when several members of the same family match', async () => {
+    const options = [
+      { href: '/products/tee?item=blue-m', label: 'Blue · M', availability: 'in-stock' as const },
+      { href: '/products/tee?item=blue-xl', label: 'Blue · XL', availability: 'out-of-stock' as const },
+    ];
+    const result = await loadStoreSearch('blue tee', { search: async () => [], visibleProducts: products,
+      optionMatches: async () => [{ slug: 'tee', title: 'Tee', options }] });
+    expect(result.count).toBe(1);
+    expect(result.groups[0].items[0]).toEqual({ title: 'Tee', href: '/products/tee', parts: [], options });
   });
   it('does not present failed option discovery as a zero-result search', async () => {
     const result = await loadStoreSearch('tee XL', { search: async () => [], visibleProducts: products, optionMatches: async () => { throw Error('Commerce unavailable'); } });
@@ -129,10 +139,16 @@ describe('merchant store search', () => {
   });
   it('bounds supplemental families and omits unsafe page destinations', async () => {
     const result = await loadStoreSearch('XL', { search: async () => [], visibleProducts: products,
-      optionMatches: async () => [{ slug: '../admin', title: 'Bad', options: [] }, ...Array.from({ length: 22 }, (_, n) => ({ slug: `tee-${n}`, title: `Tee ${n}`, options: [] }))],
+      optionMatches: async () => [
+        { slug: '../admin', title: 'Bad', options: [{ href: '/admin', label: 'XL', availability: 'in-stock' }] },
+        { slug: 'no-options', title: 'Empty', options: [] },
+        ...Array.from({ length: 22 }, (_, n) => ({ slug: `tee-${n}`, title: `Tee ${n}`,
+          options: [{ href: `/products/tee-${n}?item=tee-${n}-XL`, label: 'XL', availability: 'in-stock' as const }] })),
+      ],
     });
     expect(result.count).toBe(20); expect(result.limited).toBe(true);
-    expect(JSON.stringify(result)).not.toContain('../admin');
+    expect(result.groups[0].items[0].href).toBe('/products/tee-0?item=tee-0-XL');
+    expect(JSON.stringify(result)).not.toMatch(/\/admin|no-options/);
   });
   it('only links known collections and safe single-segment slugs', () => {
     expect(searchResultHref(hit('pages', 'home'))).toBe('/');

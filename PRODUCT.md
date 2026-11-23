@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Open the size from search · November 23
+A search for tee XL used to offer a product-name link that opened Medium and a separate link that opened XL. The product name and size now form one link when only one member matches, with Commerce availability beside it. A plain gear search still opens the family, and multiple matching members remain distinct choices.
+
 ## Find a journal section · November17
 Longer Field Notes now offer a quiet “Jump to a section” disclosure derived from their actual native chapter headings, without a parallel topic list or client script. Keyboard and script-free fragments reach the heading; native Back/reload and print keep the reading task intact. All ten articles retain their published prose, lists and reading links, and no CMS, catalog or transaction record is edited.
 

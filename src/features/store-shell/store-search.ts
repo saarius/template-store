@@ -17,6 +17,12 @@ export interface StoreSearchDependencies {
   /** Optional published opening paragraphs, not another search or match-location claim. */
   fieldNotePreviews?: (slugs: readonly string[]) => Promise<ReadonlyMap<string, string>>;
 }
+interface SearchResultItem {
+  title: string;
+  href: string;
+  parts: ReturnType<typeof renderHighlightedSnippetParts>;
+  options?: SearchOptionMatch['options'];
+}
 const scopes = [
   { collection: 'products', label: 'Gear' },
   { collection: 'categories', label: 'Collections' },
@@ -59,7 +65,7 @@ export async function loadStoreSearch(raw: string, dependencies: StoreSearchDepe
     const visible = hits.some(hit => hit.collection === 'products') ? await dependencies.visibleProducts() : new Set<string>();
     const filtered = filterStorefrontSearchHits(hits, visible).filter(hit => searchResultHref(hit) !== null);
     const fallback = !filtered.length && dependencies.optionMatches
-      ? (await dependencies.optionMatches(query)).filter(match => searchResultHref({
+      ? (await dependencies.optionMatches(query)).filter(match => match.options.length > 0 && searchResultHref({
         collection: 'products', id: match.slug, slug: match.slug, score: 0,
       }) !== null) : [];
     const optionMatches = fallback.slice(0, 20);
@@ -72,7 +78,7 @@ export async function loadStoreSearch(raw: string, dependencies: StoreSearchDepe
     if (previewSlugs.length && dependencies.fieldNotePreviews) {
       try { previews = await dependencies.fieldNotePreviews(previewSlugs); } catch { /* Titles still work. */ }
     }
-    const groups = scopes.map(scope => ({ ...scope, items: selected.filter(hit => hit.collection === scope.collection).map(hit => {
+    const groups = scopes.map(scope => ({ ...scope, items: selected.filter(hit => hit.collection === scope.collection).map<SearchResultItem>(hit => {
       const title = hit.title?.trim() || hit.slug || hit.id;
       const parts = snippetParts(hit);
       const preview = hit.collection === 'pages' && previewSlugs.includes(hit.slug ?? '')
@@ -81,7 +87,9 @@ export async function loadStoreSearch(raw: string, dependencies: StoreSearchDepe
     }) })).filter(group => group.items.length > 0);
     if (optionMatches.length) {
       groups.push({ collection: 'products', label: 'Gear', items: optionMatches.map(match => ({
-        title: match.title, href: `/products/${match.slug}`, parts: [],
+        title: match.title,
+        href: match.options.length === 1 ? match.options[0].href : `/products/${match.slug}`,
+        parts: [], options: match.options,
       })) });
     }
     return { query, groups, optionMatches, count: selected.length || optionMatches.length, limited: hits.length >= 20 || fallback.length > 20,
