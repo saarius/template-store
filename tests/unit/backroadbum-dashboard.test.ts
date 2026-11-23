@@ -2,12 +2,72 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('reports the merged cart lock, open focus review and isolated reminders-off check', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    for (const marker of ['cart-focus-followup', 'cart-reminder-off']) {
+      expect(report).toContain(`data-${marker}-dispatch`);
+      expect(report).toContain(`data-${marker}-history`);
+    }
+    expect(report).toContain('not on Backroad Bum’s live cart');
+    expect(report).toContain('the test inbox stayed empty');
+    expect(reviews).toContain('#243 merged November 22 at af90a48');
+    const focus = reviews.match(/<tr data-cart-focus-followup-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(focus).toContain('Open');
+    expect(focus).toContain('fork 0df23f1');
+    expect(focus).toContain('/pr-proof/template-pr246-dawn-focus/after-mobile.png');
+  });
+  it('reports the Reviews rehearsal and Registry handoff separately from live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const issue = 'https://github.com/dinkuskit/courier/issues/3';
+    expect(report).toContain('data-reviews-rollout-dispatch');
+    expect(report).toContain('data-courier-registry-history');
+    expect(report).toContain('data-storefront-reviews-history');
+    expect(report).toContain('the product page, not the agent feed');
+    expect(report).toContain('Reviews are not installed on Backroad Bum');
+    expect(report).toContain(issue);
+    const row = reviews.match(/<tr data-courier-registry-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(row).toContain(issue);
+    expect(row).toContain('Courier #3 is open');
+    expect(row).toContain('merged the Cloudflare timer, not a fix');
+    expect(row).toContain('No Reviews rollout on Backroad Bum');
+  });
+  it('separates the disposable upgrade rehearsal from the live storefront', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-emdash-bridge-dispatch');
+    expect(report).toContain('data-emdash-bridge-history');
+    expect(report).toContain('The live store remains on Commerce 0.8.0');
+    expect(report).toContain('with a test mail sink');
+    expect(report).toContain('data-beta5-cart-mail-dispatch');
+    expect(report).toContain('data-beta5-cart-mail-history');
+    expect(report).toContain('No external email was sent');
+    expect(reviews).toContain('template-store/pull/255');
+    expect(reviews).toContain('template-store/pull/253');
+  });
+  it('records the maintainer-ordered review refresh and dependent waits without a live upgrade claim', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-review-refresh-dispatch');
+    expect(report).toContain('data-review-refresh-history');
+    const ledger = reviews.match(/<table id="housekeeping-ledger"[\s\S]*?<\/table>/)?.[0];
+    expect(ledger).toBeDefined();
+    for (const fact of ['8743e59', 'a64d546', '45064358268/attempts/2', '64352db', '45071045667',
+      'Server-rendered shopper accounts', 'order lookup is not an account replacement']) expect(ledger).toContain(fact);
+    expect(report).toContain('data-emdash15-refresh-dispatch');
+    expect(report).toContain('data-emdash15-seed-history');
+    expect(report).toContain('The agent cycle timed out during the remaining #248 proof capture');
+    expect(report).toContain('not deployed to Backroad Bum');
+    expect(report).toContain('/pr-proof/template-pr241-refresh/after-mobile.png');
+    expect(report).toContain('no new purchase or live cart upgrade');
+  });
   it('reconciles the manual housekeeping queue without claiming signed adoption or superseded port repair', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     expect(report).toContain('data-housekeeping-dispatch');
     expect(report).toContain('data-housekeeping-history');
-    expect(report.match(/class="cycle-entry"/g)).toHaveLength(235);
+    expect(report.match(/class="cycle-entry"/g)?.length).toBeGreaterThanOrEqual(242);
     expect(report).toContain('recurring cycles remain paused');
     expect(reviews).toContain('data-housekeeping-ledger');
     expect(reviews).toContain('data-historical-review-context');
@@ -17,8 +77,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
       'dinkuskit/pull/133', 'dinkuskit/issues/132', 'template-store/pull/240']) {
       expect(reviews).toContain('https://github.com/dinkuskit/' + link);
     }
-    for (const fact of ['f03d136', 'Account-redesign hold', 'not superseded by merged #136 / 91c8201',
-      'connect-only preflight', 'Stage B and TEST1011 stay gated', 'Live signed feeds still have five rows']) expect(reviews).toContain(fact);
+    for (const fact of ['f03d136', 'Maintainers closed these on November 22', 'The maintainer chose the already-merged #136',
+      'OS-assigned ports', 'Stage B and TEST1011 stay gated', 'Live signed feeds still have five rows']) expect(reviews).toContain(fact);
   });
 
   it('archives Steer 7 exactly while making its precedence over the old push trigger clear', () => {
@@ -30,6 +90,29 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(archive).toContain('Every push to a PR starts a ClawSweeper review by itself');
     expect(archive).toContain('Post it **once per commit**');
     expect(archive).toContain('**never** while a review is queued or running');
+  });
+  it('records the cart lock as upstream proof rather than a live change', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toContain('data-cart-lock-dispatch');
+    expect(report).toContain('data-cart-lock-history');
+    expect(report).toContain('A second submit is ignored, not queued');
+    expect(report).toContain('not a live cart change');
+    expect(report).toContain('data-cart-agent-refresh-dispatch');
+    expect(report).toContain('data-cart-agent-refresh-history');
+    expect(report).toContain('/pr-proof/template-pr243-webmcp/after-mobile.png');
+    expect(report).toContain('data-courier-review-fixture-history');
+    expect(reviews).toContain('#243 at 64352db');
+  });
+  it('links the two November 22 instruction archives in order without claiming plugin adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const eighth = 'dashboard/instructions/steer-8-2026-11-22.txt';
+    const ninth = 'dashboard/instructions/steer-9-2026-11-22.txt';
+    expect(report).toContain('/' + eighth);
+    expect(report.indexOf('/' + ninth)).toBeGreaterThan(report.indexOf('/' + eighth));
+    expect(report).toContain('Neither is installed here');
+    expect(readFileSync('public/' + eighth, 'utf8')).toContain('Runtime Upgraded (`Pi v1.6.0`');
+    expect(readFileSync('public/' + ninth, 'utf8')).toContain('Expand DinkusKit Allowlist: `dinkuskit/accounts` & `dinkuskit/reviews`');
   });
   it('separates cross-tab staging evidence and reload recovery from a shipped repair', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
@@ -1010,6 +1093,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-5-2026-11-14.txt',
       '/dashboard/instructions/steer-6-2026-11-15.txt',
       '/dashboard/instructions/steer-7-2026-11-20.txt',
+      '/dashboard/instructions/steer-8-2026-11-22.txt',
+      '/dashboard/instructions/steer-9-2026-11-22.txt',
+      '/dashboard/instructions/steer-10-2026-11-22.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');

@@ -1,0 +1,10 @@
+## Owner Steer 8 — November 22, 2026
+
+### 1. Runtime Upgraded (`Pi v1.6.0` + `gpt-6.2-sol`), `ui-design` Updated (`001e5c0`) & `impeccable` Removed
+- **Pi & Model:** Upgraded `/home/agent/.local/bin/pi` from `v1.5.0` (`gpt-6.1-sol`) to **`v1.6.0`** (`/home/agent/.local/share/pi-1.6.0/pi`) configured with **`openai/gpt-6.2-sol`** (`high` thinking). Note that `Pi v1.6.0`'s `find` tool treats path patterns with `/` as relative to the search directory (use `**/...` when matching nested paths).
+- **`ui-design` (`001e5c0`) & `impeccable` Removal:** `.pi/skills/impeccable` and `/home/agent/.impeccable` have been removed completely. `.pi/skills/ui-design` is updated to `001e5c0` (adding `references/motion-and-hardening.md`, motion physics, edge-case layout hardening, and expanded anti-slop checks). Never invoke `impeccable` or `impeccable detect`; use `.pi/skills/ui-design` and `audit-dom.mjs` exclusively.
+
+### 2. Refreshed `dinkuskit.com` Browser Session (`/etc/backroadbum/dinkuskit-session.json`)
+- `/etc/backroadbum/dinkuskit-session.json` (`0600`) has been re-authenticated on `https://dinkuskit.com` (`__Secure-dk-merchant.session_token` valid for 7 days alongside existing `ship.dinkuskit.com` and `.stripe.com` cookies).
+- Continue persisting updated `context.storageState({ path: '/etc/backroadbum/dinkuskit-session.json' })` (`0600`) in `finally` whenever Playwright visits `https://dinkuskit.com`, and if more than ~4 days pass without a natural `dinkuskit.com` browser visit, perform one lightweight read-only `/account/sites` visit + `storageState` save so the rolling 7-day cookie stays fresh.
+- Archive `Owner Steer 8` under `/dashboard/instructions/` alongside `Original` and `Steer 1–7` on your next dashboard update without altering prior entries.

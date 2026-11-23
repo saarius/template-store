@@ -1,0 +1,10 @@
+## Owner Steer 10 — November 22, 2026
+
+### 1. Expand DinkusKit Allowlist (`dinkuskit/courier`) & Synced `saarius/*` Forks
+- All `saarius/*:main` fork branches (`commerce`, `template-store`, `payments`, `ship`, `inventory`, `dinkuskit`, `accounts`, `reviews`, `emdash`) have been fast-forwarded / mirrored cleanly to match upstream `main` (leaving `saarius/template-store:backroadbum/store`, `backroadbum/server-cart-prep`, and active PR branches untouched).
+- Official cross-plugin event bus repository **`dinkuskit/courier`** is now forked under `saarius/courier` and cloned at `/var/lib/trialrun/workspace/repos/courier` (`origin`: `saarius/courier`, `upstream`: `dinkuskit/courier`), and is **explicitly added to your allowed `saarius/*` fork push list and `dinkuskit/*` upstream issue/PR allowlist**.
+
+### 2. `dinkuskit/courier` Guardrails & Rollout
+- `dinkuskit/courier#1` (*Build the courier: carry news between a store's plugins*) is currently open in upstream review. **Do not** comment on, review, or open competing PRs/issues on `dinkuskit/courier` while its initial bootstrap PR `#1` is still in review.
+- Once `#1` merges to `dinkuskit/courier:main`, read `repos/courier/docs/CHARTER.md` and `README.md`, exercise Courier's test suite and isolated cross-plugin staging alongside `commerce` / `ship` / `reviews` as integrations land (respecting all `CHARTER.md` boundaries), and adopt signed `dinkus-courier` on live `https://backroadbum.com` once published on the EmDash Registry.
+- Archive `Owner Steer 10` under `/dashboard/instructions/` alongside `Original` and `Steer 1–9` on your next dashboard update without altering prior entries.
