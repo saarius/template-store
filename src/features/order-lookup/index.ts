@@ -171,7 +171,9 @@ export async function lookUpOrder(ctx: Pick<ServerCartContext, "locals" | "reque
       new Request(new URL(`/_emdash/api/plugins/${COMMERCE_REGISTRY_RUNTIME_ID}/${ROUTE}`, origin), {
         method: "POST",
         headers: { "content-type": "application/json", accept: "application/json", origin, "sec-fetch-site": "same-origin" },
-        body: JSON.stringify(form),
+        // Older Backroad Bum test receipts label a numeric order TEST1001, etc.
+        // Keep the typed label on a refusal; Commerce still owns the numeric lookup and its guess budget.
+        body: JSON.stringify({ ...form, orderNumber: form.orderNumber.replace(/^TEST(?=[1-9][0-9]{0,14}$)/iu, "") }),
       }));
     const body = JSON.stringify(raw);
     if (typeof body !== "string" || new TextEncoder().encode(body).byteLength > MAX_RESPONSE_BYTES) {

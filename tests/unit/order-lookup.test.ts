@@ -99,6 +99,19 @@ describe("order lookup page", () => {
     });
   });
 
+  it.each([
+    ["TEST1004", "1004"],
+    ["test1004", "1004"],
+    ["TEST1004X", "TEST1004X"],
+    ["TEST01004", "TEST01004"],
+  ])("passes the numeric test order to Commerce but retains the typed label (%s)", async (typed, sent) => {
+    const { ctx, calls } = page({ success: true, data: { ok: false, error: { code: "ORDER_NOT_FOUND" } } }, {
+      form: `orderNumber=${typed}&email=Pat%40Example.test`,
+    });
+    expect(await lookUpOrder(ctx)).toMatchObject({ ok: false, form: { orderNumber: typed } });
+    expect(calls[0]?.body).toEqual({ orderNumber: sent, email: "Pat@Example.test" });
+  });
+
   it("says when Commerce has limited the guesses", async () => {
     const { ctx } = page({ success: true, data: { ok: false, error: { code: "LOOKUP_LIMITED", message: "x" } } });
     expect(await lookUpOrder(ctx)).toMatchObject({ ok: false, code: "LOOKUP_LIMITED", message: "Too many tries. Try again in an hour." });

@@ -48,11 +48,12 @@ const values = refused?.form ?? { orderNumber: "", email: "" };
     </div>
   ) : (
     <>
-      <p>Enter your order number and the email you used at checkout. Your order number is in your confirmation email.</p>
+      <p>Enter the order number from your checkout receipt and the email you used at checkout.</p>
       {refused && <p class="order-lookup__alert" data-order-lookup-error={refused.code} role="alert">{refused.message}</p>}
       <form class="order-lookup__form" method="post" action="/track-order" data-order-lookup-form>
         <label for="order-lookup-number">Order number</label>
-        <input id="order-lookup-number" name="orderNumber" inputmode="numeric" autocomplete="off" required maxlength="20" value={values.orderNumber} />
+        <input id="order-lookup-number" name="orderNumber" inputmode="numeric" autocomplete="off" required maxlength="20" aria-describedby="order-lookup-number-hint" value={values.orderNumber} />
+        <small id="order-lookup-number-hint">You can paste a test order number such as TEST1234, or just enter the digits.</small>
         <label for="order-lookup-email">Email</label>
         <input id="order-lookup-email" name="email" type="email" autocomplete="email" required maxlength="254" value={values.email} />
         <button type="submit" data-order-lookup-submit>Find order</button>

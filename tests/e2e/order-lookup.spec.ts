@@ -7,6 +7,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { COMMERCE_ID, listCatalog } from "./helpers/product-page";
 
 const proofRoot = resolve("runs/order-lookup-20261122/browser");
+// Screenshots for a proof run are optional; ordinary verification exercises the form without extra renderer work.
+const captureProof = process.env.DINKUS_ORDER_LOOKUP_PROOF === "1";
 
 test("the footer's Track your order link opens a plain lookup form that keeps what was typed", async ({ page, request }, testInfo) => {
   const root = resolve(proofRoot, testInfo.project.name);
@@ -27,7 +29,8 @@ test("the footer's Track your order link opens a plain lookup form that keeps wh
   const form = page.locator("[data-order-lookup-form]");
   await expect(form).toHaveAttribute("method", "post");
   await expect(form).toHaveAttribute("action", "/track-order");
-  await page.screenshot({ path: resolve(root, "form.png"), fullPage: true });
+  await expect(page.getByLabel("Order number")).toHaveAccessibleDescription(/TEST1234/u);
+  if (captureProof) await page.screenshot({ path: resolve(root, "form.png"), fullPage: true });
 
   await page.getByLabel("Order number").fill("#999999");
   await page.getByLabel("Email").fill("nobody@example.test");
@@ -38,7 +41,7 @@ test("the footer's Track your order link opens a plain lookup form that keeps wh
   await expect(page.locator("[data-order-lookup-order]")).toHaveCount(0);
   await expect(page.getByLabel("Order number")).toHaveValue("#999999");
   await expect(page.getByLabel("Email")).toHaveValue("nobody@example.test");
-  await page.screenshot({ path: resolve(root, "refused.png"), fullPage: true });
+  if (captureProof) await page.screenshot({ path: resolve(root, "refused.png"), fullPage: true });
 });
 
 test("a lookup posted from another site never shows an order", async ({ request }) => {
@@ -70,7 +73,7 @@ for (const theme of ["light", "dark"]) {
     });
     console.log(JSON.stringify({ theme, width: page.viewportSize()!.width, ...colors }));
     expect(colors.contrast).toBeGreaterThanOrEqual(4.5);
-    if (theme === "dark") {
+    if (captureProof && theme === "dark") {
       const root = resolve(proofRoot, testInfo.project.name);
       await mkdir(root, { recursive: true });
       await page.screenshot({ path: resolve(root, "form-dark.png"), fullPage: true });
@@ -142,8 +145,9 @@ test("the installed Commerce finds one order for its number and email, and limit
   }
   const trace: unknown[] = [];
 
-  // 1. The right number (with its #) and the checkout email in other letter case: that one order.
+  // 1. Both the ordinary number and the printed TEST label reach the same Commerce order.
   expect(await lookUp(page, `#${pat.number}`, pat.email.toUpperCase())).toBe(200);
+  expect(await lookUp(page, `TEST${pat.number}`, pat.email)).toBe(200);
   const order = page.locator("[data-order-lookup-order]");
   await expect(order).toBeVisible();
   await expect(order).toHaveAttribute("data-order-lookup-order", String(pat.number));
@@ -155,11 +159,12 @@ test("the installed Commerce finds one order for its number and email, and limit
   await expect(page.locator("[data-order-lookup-address]")).toContainText("Pat Shopper");
   await expect(page.locator("[data-order-lookup-address]")).toContainText("1 Lookup Way");
   expect(await page.content()).not.toContain("pi_");
-  await page.screenshot({ path: resolve(root, "found.png"), fullPage: true });
-  trace.push({ step: "right pair", orderNumber: `#${pat.number}`, email: pat.email.toUpperCase(), status: 200, shown: [await page.getByRole("heading", { level: 1 }).innerText(), ...(await order.innerText()).split("\n").filter(Boolean)] });
+  if (captureProof) await page.screenshot({ path: resolve(root, "found.png"), fullPage: true });
+  trace.push({ step: "right pair (plain and TEST label)", status: 200, shown: [await page.getByRole("heading", { level: 1 }).innerText(), ...(await order.innerText()).split("\n").filter(Boolean)] });
 
-  // 2. The same number with another shopper's email: the one not-found answer, and nothing of the order.
-  expect(await lookUp(page, String(pat.number), sam.email)).toBe(422);
+  // 2. The same TEST number with another shopper's email gives the one not-found answer.
+  expect(await lookUp(page, `TEST${pat.number}`, sam.email)).toBe(422);
+  await expect(page.getByLabel("Order number")).toHaveValue(`TEST${pat.number}`);
   await expect(page.locator("[data-order-lookup-error]")).toHaveText("No order matches that order number and email. Check both and try again.");
   await expect(page.locator("[data-order-lookup-order]")).toHaveCount(0);
   expect(await page.content()).not.toContain("Pat Shopper");
@@ -170,12 +175,14 @@ test("the installed Commerce finds one order for its number and email, and limit
   const origin = new URL(page.url()).origin;
   for (const guess of ["a", "b", "c", "d", "e"]) {
     const email = `${guess}.${tag}@example.test`;
+    // Printed TEST and digits-only labels share Commerce's same numeric budget.
+    const orderNumber = guess === "a" ? `TEST${sam.number}` : String(sam.number);
     const refusal = await page.request.post("/track-order", {
-      headers: { origin }, form: { orderNumber: String(sam.number), email },
+      headers: { origin }, form: { orderNumber, email },
     });
     expect(refusal.status()).toBe(422);
     await refusal.dispose();
-    trace.push({ step: "wrong guess", orderNumber: String(sam.number), email, status: 422 });
+    trace.push({ step: "wrong guess", orderNumber, email, status: 422 });
   }
   const limited = await page.request.post("/track-order", {
     headers: { origin }, form: { orderNumber: String(sam.number), email: sam.email },
