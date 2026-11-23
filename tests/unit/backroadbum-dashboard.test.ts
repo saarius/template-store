@@ -33,6 +33,14 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('Another browser could not open the receipt');
     expect(report).toContain('This used a local inbox; Reviews is not installed');
   });
+  it('reports Commerce delete recovery as a disposable test', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const history = report.match(/<article[^>]+data-delete-recovery-history>[\s\S]*?<\/article>/)?.[0];
+    expect(history).toContain('commerce/pull/301');
+    expect(history).toContain('all three SKUs could be reused');
+    expect(history).toContain('The fixture order and another published product were unchanged');
+    expect(history).toContain('no live product was deleted');
+  });
   it('reports the inventory rehearsal without implying live inventory adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const dispatch = report.match(/<article[^>]+data-inventory-transfer-dispatch>[\s\S]*?<\/article>/)?.[0];
