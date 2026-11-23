@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Expired payment link, still-held cart · November 23
+
+The beta.6 sandbox can remove the Stripe resume link before the provider settles the attempt. In isolated Field Journal staging, the old UI invited cart edits and a new checkout during that interval even though Commerce refused mutations. `backroadbum/server-cart-prep` **6d11cd2** keeps controls disabled, preserves Resume for a valid open link, and offers a plain status check otherwise. After confirmed unpaid expiry the same cart is editable again. Both desktop/no-JS and mobile/JS lanes passed with one synthetic session each, zero orders and no external payment calls; all eight painted views passed. [Evidence](../evidence/2026-11-23-frozen-cart/cycle.md).
+
+Keep this off live. Retest on the paired starter after Template #264 and relevant Commerce #299/Payments #123 changes, then report upstream if still reproducible on unchanged main. Before Stage B, verify the signed same-ID release with the paired storefront: valid resume, held without a link, and editable only after authoritative unpaid release. This synthetic proof does not qualify hosted payment or the once-only TEST1011 purchase.
+
 ## Original receipts and ten archived Orders on beta.6 · November 23
 
 From a completed private backup, the isolated checkout rehearsal verified ten media files and staged only selected Commerce and published CMS data. The disposable database ran EmDash 1.4→1.5 migrations, including 095. A source-built Commerce beta.6 mount at the original ID recovered both saved receipts with their totals, numbers, TEST badges and tracking; it preserved the new cart and original browser files. The no-script Track your order form recovered all ten printed test numbers with their matching checkout emails. A pause stopped new cart/checkout requests without blocking the old receipt. No signed installation, hosted payment or shopper account migration was exercised.
