@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Retained receipt on Commerce beta.6 · November 23
+
+An isolated EmDash 1.5 site reads two synthetic attempts created by the actual Commerce 0.8 kernel. The Field Journal wrapper recovered the unchanged paid receipt at $32 (current catalog would total $28) with the canonical number and TEST badge from [Commerce #286](https://github.com/dinkuskit/commerce/pull/286); pending stayed unconfirmed. Reading left the new cart and both saved attempts unchanged. The later kernel replay with simulated Payments reconciled each original attempt without creating a replacement session. Four browser contexts and four painted audit views passed; the static audit embeds only authored fixture art and public shop fonts.
+
+See `evidence/2026-11-23-retained-beta6/`. The merchant branch still pins beta.5 for its whole-store pairing. This is a source sandbox mount around the actual receipt page/wrapper, not a signed same-ID update, a hosted payment, or a renewed run with the original merchant browser files.
+
 ## Printed test numbers in Track your order · November 23
 
 The off-live Field Journal lookup accepts the `TEST` number printed on a Backroad Bum receipt as well as the digits alone. Both spellings go through the same Commerce lookup and share its five-guess limit. The form points to the checkout receipt rather than promising delivery of confirmation mail. A staged beta.5 sandbox returned HTTP 200 for a match, 422 without revealing another order, and 429 after five mixed-format mismatches; the no-script form passed at 390px and 1440px. See `evidence/2026-11-23-lookup-audit/`.
