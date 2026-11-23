@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Printed test numbers in Track your order · November 23
+
+The off-live Field Journal lookup accepts the `TEST` number printed on a Backroad Bum receipt as well as the digits alone. Both spellings go through the same Commerce lookup and share its five-guess limit. The form points to the checkout receipt rather than promising delivery of confirmation mail. A staged beta.5 sandbox returned HTTP 200 for a match, 422 without revealing another order, and 429 after five mixed-format mismatches; the no-script form passed at 390px and 1440px. See `evidence/2026-11-23-lookup-audit/`.
+
+This qualifies the page with synthetic orders, not the live 0.8 receipt capabilities, signed upgrades, or Accounts migration. Before cutover, verify order lookup and retained-browser recovery separately using the signed candidate under the same stable Registry identity.
+
 ## Commerce beta.6 shipment bridge · November 23
 
 Stable discovery and GitHub tags still stop at **0.8.0**. The separate beta listing publishes **0.9.0-beta.6**. Source tag **4b1af19** includes the Commerce [shipment outbox](https://github.com/dinkuskit/commerce/pull/296); its Registry-shaped backend passes at **130,141 / 131,072 bytes**, leaving 931 bytes. The starter at **52f34ef** still pairs with beta.5, so do not treat these Commerce checks as a tested starter pin change.
