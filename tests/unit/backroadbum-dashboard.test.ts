@@ -33,6 +33,17 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('Another browser could not open the receipt');
     expect(report).toContain('This used a local inbox; Reviews is not installed');
   });
+  it('links the cart-return fix and proof without claiming a live cutover', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const history = report.match(/<article[^>]+data-cart-return-pr-history>[\s\S]*?<\/article>/)?.[0];
+    const ledger = reviews.match(/<tr data-cart-return-pr-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(history).toContain('template-store/pull/267');
+    expect(history).toContain('without replacing unsaved edits');
+    expect(ledger).toContain('template-store/issues/249');
+    for (const shot of ['before-390.png', 'after-390.png']) expect(ledger).toContain(`/pr-proof/template-store-cart-return/${shot}`);
+    expect(ledger).toContain('Not deployed to Backroad Bum.');
+  });
   it('reports saving quantities and the payment hold without claiming a live cart upgrade', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
@@ -1169,6 +1180,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-8-2026-11-22.txt',
       '/dashboard/instructions/steer-9-2026-11-22.txt',
       '/dashboard/instructions/steer-10-2026-11-22.txt',
+      '/dashboard/instructions/steer-11-2026-11-23.txt',
     ]);
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');
@@ -1186,6 +1198,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(designSteer).toContain('ui-design');
     expect(designSteer).toContain('System / Light / Dark');
     expect(designSteer).toContain('Phased Rollout');
+    const cartSteer = readFileSync('public' + archivePaths.at(-1), 'utf8');
+    expect(cartSteer).toContain('## Owner Steer 11 — November 23, 2026');
+    expect(cartSteer).toContain('dinkuskit/template-store#249');
+    expect(cartSteer).toContain('Poll open issues as well as open PRs');
   });
 
   it.each([

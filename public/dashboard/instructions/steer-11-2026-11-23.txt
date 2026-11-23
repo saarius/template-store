@@ -1,0 +1,20 @@
+## Owner Steer 11 — November 23, 2026
+
+### 1. Immediate Maintainer Spec (`dinkuskit/template-store#249`) & Open-Issue Comment Polling
+- **Immediate priority — implement approved owner spec on `dinkuskit/template-store#249`:** Read `saariuslystoned`'s comment (`2026-11-23T03:44:51Z`) on your open issue `dinkuskit/template-store#249` (*Returning to a server cart after another tab changes it keeps stale rows and totals*) and ship the exact requested 4-step fix from current `dinkuskit/template-store:main`:
+  1. In `cart-script.ts`, on the cart page only (when `[data-server-cart]` exists), call the existing `redrawCart()` in two cases: on `pageshow` when `event.persisted` is `true` or the navigation entry type is `back_forward`, and on `visibilitychange` to `visible`. Keep the badge refresh on every page as it is now; other pages make zero cart fetches.
+  2. Skip the redraw while a save holds the lock (`redrawCart` already defers it) and while any quantity field has a typed value that hasn't been saved (`input.value !== input.defaultValue`).
+  3. Add one focused browser test: change the cart in a second tab, return to the first, and verify that the drawn lines and subtotal match `/cart.js`.
+  4. Verify on Node 24 (`typecheck`, unit/workflow tests, Registry build, targeted Playwright + Steer 3 `/pr-proof/` Before/After proof) and open the PR from current `main` closing `#249`.
+- **Poll open issues as well as open PRs every cycle:** At the start of each cycle, check for new maintainer comments across **all open `dinkuskit/*` issues you authored** (`gh search issues --owner dinkuskit --author saarius --state open --json repository,number,commentsCount,updatedAt`) in addition to open PRs so maintainer specs and questions on issues (`#249`, `courier#3`, etc.) are picked up immediately.
+
+### 2. ClawSweeper Pickup Check (`dinkuskit/template-store#266`)
+- GitHub Actions `review / relay` (`ClawSweeper queue admit accepted`) only confirms webhook relay, not that ClawSweeper posted a pickup comment. Per Steer 7, whenever `>10 minutes` have passed since pushing a PR commit and the PR still has **no `"ClawSweeper picked this up"` comment and no ClawSweeper review** for that commit (currently true on `dinkuskit/template-store#266` head `42a1917`), post **one** standalone `@clawsweeper re-review` comment (at most once per commit, never while an active pickup/review is running).
+
+### 3. Close Superseded Open Issues (`template-store#234`, `#236`, `#238` & Stale Issues)
+- Upstream `dinkuskit/template-store:main` (`src/pages/account.astro`, `accounts-v1-scope-20261121`) has retired the legacy client-JS `/account` surface in favor of `/track-order` and incoming server-rendered `dinkus-accounts`. Close your superseded legacy `/account` issues `dinkuskit/template-store#234`, `#236`, and `#238` cleanly with a brief note referencing `accounts-v1-scope-20261121` / `dinkuskit/accounts` (matching closed PRs `#235`, `#237`, `#239`). Also audit your older open `template-store` issues (`#221`, `#224`, `#242`) against current `dinkuskit/template-store:main` and close any issue already superseded or resolved upstream with exact commit/PR evidence.
+
+### 4. Curb Repetitive Stage B Cutover Rehearsals While Waiting on Registry Releases
+- Stage B rollback/dependency-pairing (`f960934`), Caddy maintenance fencing, and `0.8.0 → 0.9.0-beta.6` / `#299` SQLite & receipt rehearsals are already verified. **Stop running repetitive Stage B cutover/rollback dry-run variations** while `dinkus-commerce` on the EmDash Registry remains `0.8.0` and `dinkus-accounts`, `dinkus-reviews`, and `dinkus-courier` remain unpublished.
+- While Registry versions are unchanged, spend cycles on: (a) maintainer follow-ups and high-signal upstream fixes (`#249`, `#266`, `courier#3`), (b) dogfooding genuinely **new** upstream `main` commits when a `dinkuskit/*` repo advances, and (c) meaningful **Backroad Bum storefront, catalog, and Field Notes editorial evolution** on `https://backroadbum.com`.
+- Archive `Owner Steer 11` under `/dashboard/` instructions alongside `Original` and `Steer 1–10` on your next dashboard update without altering prior entries.
