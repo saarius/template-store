@@ -109,6 +109,14 @@ class RuntimeRecoveryTests(unittest.TestCase):
         self.assertFalse(any('EnvironmentFile' in arg for arg in command))
         self.assertFalse(any('ENCRYPTION_KEY=' in arg for arg in command))
 
+    def test_pinned_drill_mounts_compiled_files_without_using_live_links(self):
+        command = recovery.unit_command(pathlib.Path('/synthetic/copy'), pathlib.Path('/synthetic/release'),
+                                        'synthetic-unit', 'net:[123]', pinned_launcher=True)
+        self.assertIn('--setenv=BACKROADBUM_RESTORE_PINNED_LAUNCHER=1', command)
+        self.assertIn('BindReadOnlyPaths=/synthetic/release/server:/var/lib/backroadbum/restored-release/server '
+                      '/synthetic/release/client:/var/lib/backroadbum/restored-release/client', command)
+        self.assertIn('PrivateNetwork=yes', command)
+
     def create_release(self, name):
         release = self.root / 'releases' / name
         (release / 'server').mkdir(parents=True)

@@ -2,36 +2,11 @@
 // to this disposable release and its selected dependency tree.
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readlinkSync, realpathSync } from 'node:fs';
-import { registerHooks } from 'node:module';
-import { basename, isAbsolute, relative, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { basename } from 'node:path';
+import { pinRuntimeModules, strictlyUnder } from './start-pinned-store.mjs';
+import { startStore } from './start-store.mjs';
 
 const root = '/var/lib/backroadbum';
-const launcher = new URL('./start-store.mjs', import.meta.url);
-
-export function strictlyUnder(root, path) {
-  const child = relative(root, path);
-  return child !== '' && child !== '..' && !child.startsWith('..' + sep) && !isAbsolute(child);
-}
-
-export function pinRecoveryModules(release, dependencies, launcherPath) {
-  return registerHooks({
-    resolve(specifier, context, nextResolve) {
-      const resolved = nextResolve(specifier, context);
-      if (resolved.url.startsWith('file:')) {
-        const file = realpathSync(fileURLToPath(resolved.url));
-        // A nested node_modules in the release would make the selected lane
-        // ambiguous. Aside from the shared launcher, only bundle files and
-        // actual files from the selected dependency tree are allowed.
-        const inBundle = strictlyUnder(release, file) && !relative(release, file).split(sep).includes('node_modules');
-        if (!inBundle && file !== launcherPath && !strictlyUnder(dependencies, file)) {
-          throw new Error('Recovery runtime resolved a file outside the selected release and dependency tree.');
-        }
-      }
-      return resolved;
-    },
-  });
-}
 
 export function confirmRecoveryWorkerd(runtimePid, dependencies) {
   assert.ok(Number.isSafeInteger(runtimePid) && runtimePid > 1, 'Valid runtime process required');
@@ -56,8 +31,7 @@ if (import.meta.main) {
     assert.equal(existsSync(`${root}/current`), false);
     const release = realpathSync(`${root}/restored-release`);
     const dependencies = realpathSync(`${root}/node_modules`);
-    pinRecoveryModules(release, dependencies, realpathSync(fileURLToPath(launcher)));
-    const { startStore } = await import(launcher.href);
+    pinRuntimeModules(release, dependencies);
     await startStore(`${release}/server/entry.mjs`);
   } catch {
     console.error('Isolated recovery startup refused.');

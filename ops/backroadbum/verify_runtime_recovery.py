@@ -43,8 +43,15 @@ def restore_runtime_copy(archive, destination):
     return inspect_asset_copy(destination)
 
 
-def unit_command(destination, release, unit, host_namespace):
+def unit_command(destination, release, unit, host_namespace, pinned_launcher=False):
     """The live data root is hidden; no host private config or external network is available."""
+    mounts = f'{release}:{ROOT}/restored-release'
+    flags = []
+    if pinned_launcher:
+        # Use the unmodified compiled files, with the rehearsal link beside them
+        # rather than changing the retained release or production current.
+        mounts = ' '.join(f'{release / part}:{ROOT}/restored-release/{part}' for part in ('server', 'client'))
+        flags.append('--setenv=BACKROADBUM_RESTORE_PINNED_LAUNCHER=1')
     return ['sudo', '-n', 'systemd-run', '--quiet', '--pipe', '--wait', '--collect',
             '--service-type=exec', f'--unit={unit}',
             '-p', 'User=agent', '-p', f'WorkingDirectory={REPO}',
@@ -53,11 +60,11 @@ def unit_command(destination, release, unit, host_namespace):
             '-p', 'RuntimeMaxSec=150', '-p', 'TimeoutStopSec=10', '-p', 'KillMode=control-group',
             '-p', 'MemoryMax=850M', '-p', 'TasksMax=160',
             '-p', f'BindPaths={destination}:{ROOT}',
-            '-p', f'BindReadOnlyPaths={release}:{ROOT}/restored-release',
+            '-p', f'BindReadOnlyPaths={mounts}',
             '-p', f'ReadWritePaths={ROOT}',
             '-p', 'InaccessiblePaths=/etc/backroadbum /etc/trialrun /var/lib/trialrun/state /var/lib/trialrun/sessions',
             '--setenv=NODE_ENV=production', '--setenv=BACKROADBUM_RESTORE_DRILL=1',
-            f'--setenv=BACKROADBUM_RESTORE_HOST_NET={host_namespace}',
+            f'--setenv=BACKROADBUM_RESTORE_HOST_NET={host_namespace}', *flags,
             '/opt/node/bin/node', str(REPO / 'ops/backroadbum/verify-runtime-recovery.mjs')]
 
 
@@ -85,7 +92,7 @@ def dependency_tree(path=None):
     return target
 
 
-def verify_archive(archive, release_id=None, dependencies=None):
+def verify_archive(archive, release_id=None, dependencies=None, pinned_launcher=False):
     # Host artifacts are deliberate inputs, not claimed to have come from the archive.
     release = retained_release(release_id)
     tree = dependency_tree(dependencies)
@@ -94,11 +101,19 @@ def verify_archive(archive, release_id=None, dependencies=None):
     with tempfile.TemporaryDirectory(prefix='.brb-runtime-recovery-', dir=REPO.parent.parent) as temp:
         destination = pathlib.Path(temp) / 'restored'
         media = restore_runtime_copy(archive, destination)
-        (destination / 'restored-release').mkdir(mode=0o700)
-        (destination / 'node_modules').symlink_to(tree, target_is_directory=True)
+        bundle = destination / 'restored-release'
+        bundle.mkdir(mode=0o700)
+        if pinned_launcher:
+            for part in ('server', 'client'):
+                (bundle / part).mkdir(mode=0o700)
+            (bundle / 'node_modules').symlink_to(tree, target_is_directory=True)
+            (destination / 'drill-current').symlink_to('restored-release', target_is_directory=True)
+        # Preserve the old resolution path in the pinned drill to detect a
+        # mistaken fallback, including when the selected tree is incomplete.
+        (destination / 'node_modules').symlink_to(dependency_tree() if pinned_launcher else tree, target_is_directory=True)
         (destination / '.runtime-recovery').write_text('backroadbum.runtime-recovery/v1\n')
         try:
-            result = subprocess.run(unit_command(destination, release, unit, host_namespace),
+            result = subprocess.run(unit_command(destination, release, unit, host_namespace, pinned_launcher),
                                     capture_output=True, text=True, timeout=180)
             if result.returncode != 0:
                 raise RuntimeError('runtime_drill_refused')
@@ -106,6 +121,7 @@ def verify_archive(archive, release_id=None, dependencies=None):
             if (report.get('schema') != 'backroadbum.runtime-recovery-check/v1' or
                     report.get('outboundNetwork') != 'isolated' or report.get('businessRowsUnchanged') is not True or
                     report.get('dependencyResolutionGuard') is not True or report.get('workerdFromDependencyTree') is not True or
+                    (pinned_launcher and report.get('pinnedLauncher') is not True) or
                     not re.fullmatch(r'[a-f0-9]{64}', report.get('businessCollectionsSha256') or '')):
                 raise RuntimeError('runtime_report_refused')
             report['retainedRelease'] = release.name
@@ -125,6 +141,8 @@ if __name__ == '__main__':
     parser.add_argument('--release', metavar='RELEASE_ID', help='Retained deployment to boot instead of current')
     parser.add_argument('--dependencies', metavar='NODE_MODULES', type=pathlib.Path,
                         help='Use this separately installed node_modules tree under the workspace instead of the primary tree')
+    parser.add_argument('--pinned-launcher', action='store_true',
+                        help='Rehearse the candidate serving launcher with a release-local dependency link')
     args = parser.parse_args()
     os.umask(0o077)
     if not args.check:
@@ -133,7 +151,7 @@ if __name__ == '__main__':
         parser.exit(1, 'An explicit private archive is required.\n')
     else:
         try:
-            print(json.dumps(verify_archive(args.archive, args.release, args.dependencies)))
+            print(json.dumps(verify_archive(args.archive, args.release, args.dependencies, args.pinned_launcher)))
         except (Exception, KeyboardInterrupt):
             # Never relay runtime logs, keys, rows, archive paths or subprocess exceptions.
             parser.exit(1, 'Isolated runtime recovery check failed; live files were not replaced.\n')
