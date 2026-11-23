@@ -37,8 +37,9 @@ try {
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', origin + '/' + source.slug);
       await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', source.sections[0].text);
       const more = page.getByRole('navigation', { name: 'Read another note', exact: true });
-      const index = notes.indexOf('/' + source.slug);
-      const onward = [notes[(index + 1) % notes.length], notes[(index + 2) % notes.length]];
+      const ordered = [...notes].sort((a, b) => a.localeCompare(b));
+      const index = ordered.indexOf('/' + source.slug);
+      const onward = [ordered[(index + 1) % ordered.length], ordered[(index + 2) % ordered.length]];
       assert.deepEqual(await more.getByRole('link').evaluateAll(links => links.map(a => a.getAttribute('href'))), onward);
       await fits();
       if (javaScriptEnabled) {
@@ -56,7 +57,7 @@ try {
       await expect(page.locator('.field-note-footer')).toBeHidden();
       await expect(page.locator('.field-note__print-source')).toBeVisible();
       await page.emulateMedia({ media: 'screen' });
-      await page.locator('.field-note__back').click(); await expect(page).toHaveURL(origin + '/field-notes');
+      await page.locator('.field-note__back').click(); await expect(page).toHaveURL(`${origin}/field-notes#journal-${source.slug}`);
       await page.goto(origin + '/search?q=' + encodeURIComponent(source.searchTerm));
       const searchLink = page.getByRole('region', { name: 'Field notes & guides' }).getByRole('link', { name: source.title, exact: true });
       await expect(searchLink).toBeVisible(); await searchLink.click(); await expect(page.locator('h1')).toHaveText(source.title);

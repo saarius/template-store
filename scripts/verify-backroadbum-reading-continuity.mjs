@@ -29,8 +29,33 @@ if (!process.argv.includes('--check')) {
         const page = await context.newPage();
         page.on('pageerror', error => errors.push(error.message));
         expect((await page.goto(`${base}/field-notes`)).status()).toBe(200);
-        const notes = await page.locator('.brb-story-link').evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.querySelector('h2').textContent })));
-        expect(notes.length).toBeGreaterThan(2);
+        const journal = page.locator('.field-index .brb-story-link');
+        const displayed = await journal.evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.querySelector('h2,h3').textContent, id: link.id })));
+        expect(displayed.length).toBeGreaterThan(2);
+        for (const { id, href } of displayed) expect(id).toBe(`journal-${href.slice(1)}`);
+        expect(new Set(displayed.map(note => note.id)).size).toBe(displayed.length);
+        const feature = page.locator('#latest-field-note [data-journal-feature]');
+        await expect(feature).toHaveCount(1);
+        await expect(feature).toHaveAttribute('id', displayed[0].id);
+
+        // Explicit returns, not browser history, should land on either kind of entry.
+        for (const index of [0, displayed.length - 2]) {
+          const { id, href, title } = displayed[index];
+          const card = page.locator(`#${id}`);
+          await card.press('Enter');
+          await expect(page).toHaveURL(base + href);
+          await expect(page.locator('h1')).toHaveText(title);
+          await page.getByRole('link', { name: 'Back to field notes', exact: true }).press('Enter');
+          await expect(page).toHaveURL(`${base}/field-notes#${id}`);
+          await expect(page.locator(':target')).toHaveAttribute('id', id);
+          await expect(card).toBeInViewport({ ratio: 0.25 });
+          await expect(card).toBeFocused();
+          await page.keyboard.press('Tab');
+          await expect(page.locator(`#${displayed[index + 1].id}`)).toBeFocused();
+        }
+
+        // Article-to-article links follow slug order, not the featured slot.
+        const notes = displayed.map(({ href, title }) => ({ href, title })).sort((a, b) => a.href.localeCompare(b.href));
         const articles = [];
         for (const [index, note] of notes.entries()) {
           console.log(`Inspect ${note.href}`);
@@ -69,7 +94,7 @@ if (!process.argv.includes('--check')) {
         expect((await page.goto(`${base}/field-note-not-published`)).status()).toBe(404);
         await expect(page.locator('.field-note-footer')).toHaveCount(0);
         expect(errors).toEqual([]); expect(writes).toEqual([]); expect(checkouts).toEqual([]);
-        results.push({ javaScriptEnabled, colorScheme, width, visited, articles, keyboardRoundTrip: true, browserErrors: errors.length, writes: writes.length, checkoutRequests: checkouts.length });
+        results.push({ javaScriptEnabled, colorScheme, width, visited, articles, keyboardRoundTrip: true, featuredAndArchiveReturn: true, browserErrors: errors.length, writes: writes.length, checkoutRequests: checkouts.length });
       } finally { await context.close(); }
     }
   } finally { await browser.close(); }

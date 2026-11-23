@@ -91,7 +91,7 @@ try {
         await expect(page.locator('h1')).toHaveText(source.title);
       }
       await page.locator('.field-note__back').click();
-      await expect(page).toHaveURL(base + '/field-notes');
+      await expect(page).toHaveURL(`${base}/field-notes#journal-${source.slug}`);
       await page.goto(base + '/search?q=' + encodeURIComponent(source.searchTerm ?? 'signal'));
       await page.getByRole('region', { name: 'Field notes & guides', exact: true }).getByRole('link', { name: source.title, exact: true }).click();
       await expect(page).toHaveURL(base + '/' + source.slug);

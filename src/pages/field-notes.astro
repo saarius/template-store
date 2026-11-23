@@ -12,16 +12,18 @@ if (!journal) Astro.response.status = 503;
     <img class="brb-photo" src="/backroad/forest.jpg" alt="A still lake reflecting the surrounding forest and mountains" width="1600" height="1067" fetchpriority="high" decoding="async" /></header>
     {!journal ? <div role="status"><h2>The notes couldn’t load.</h2><p>Try reloading this page in a moment. You can still <a href="/shop">browse the gear</a>.</p></div>
       : journal.latest || journal.archive.length ? <div class="field-index">
-        {journal.latest && <a id="latest-field-note" class="brb-story-link field-feature" data-journal-feature href={`/${journal.latest.slug}`} aria-labelledby="field-feature-title">
-          <p class="field-kicker">Latest field note</p>
-          <h2 id="field-feature-title">{journal.latest.title}</h2>
-          {journal.latest.excerpt && <p class="field-excerpt">{journal.latest.excerpt}</p>}
-          <span class="field-read">Read the note &rarr;</span>
-        </a>}
+        {journal.latest && <div id="latest-field-note">
+          <a id={`journal-${journal.latest.slug}`} class="brb-story-link field-feature" data-journal-feature href={`/${journal.latest.slug}`} aria-labelledby="field-feature-title">
+            <p class="field-kicker">Latest field note</p>
+            <h2 id="field-feature-title">{journal.latest.title}</h2>
+            {journal.latest.excerpt && <p class="field-excerpt">{journal.latest.excerpt}</p>}
+            <span class="field-read">Read the note &rarr;</span>
+          </a>
+        </div>}
         {journal.archive.length > 0 && <section aria-labelledby="field-archive-title">
           <h2 id="field-archive-title" class="field-archive-title">{journal.latest ? 'More field notes' : 'Published field notes'}</h2>
           <div class="field-archive">
-            {journal.archive.map(note => <a class="brb-story-link" href={`/${note.slug}`} aria-labelledby={`${note.slug}-title`}>
+            {journal.archive.map(note => <a id={`journal-${note.slug}`} class="brb-story-link" href={`/${note.slug}`} aria-labelledby={`${note.slug}-title`}>
               <h3 id={`${note.slug}-title`}>{note.title}</h3>
               {note.excerpt && <p class="field-excerpt">{note.excerpt}</p>}
               <span class="field-read">Read the note &rarr;</span>
@@ -41,6 +43,8 @@ if (!journal) Astro.response.status = 503;
 .brb-photo{aspect-ratio:4/3;object-position:50% 60%;border-radius:var(--radius-card)}
 .field-index,.field-archive{display:grid;gap:var(--space-7)}
 .field-index .brb-story-link{margin:0;padding:var(--space-5) 0 0;min-width:0;overflow-wrap:anywhere}
+.field-index .brb-story-link,#latest-field-note{scroll-margin-block-start:var(--space-7)}
+.field-index .brb-story-link:target:not(:focus-visible){outline:2px solid var(--color-ring);outline-offset:4px;border-radius:var(--radius-card)}
 .field-index h2,.field-index h3{line-height:1.25;margin:0 0 var(--space-3);text-wrap:balance}
 .field-index h3{font-size:var(--text-xl)}
 .field-index .brb-story-link:is(:hover,:focus-visible) :is(h2,h3){text-decoration:underline;text-underline-offset:.16em}

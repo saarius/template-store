@@ -37,9 +37,9 @@ const title = data?.title?.trim() || "Page not found";
 const profile = readStorefrontProfile();
 const note = layout.length === 0 ? fieldNote(entry) : null;
 const context = getRequestContext();
-// Keep native inline-editor metadata and unpublished previews out of this projection.
-const reading = note && !context?.preview && !context?.editMode && !getEditMeta(content)
-  ? fieldNoteSections(content) : null;
+const publicNote = note && !context?.preview && !context?.editMode && !getEditMeta(content) ? note : null;
+const journalLink = publicNote ? `/field-notes#journal-${publicNote.slug}` : '/field-notes';
+const reading = publicNote ? fieldNoteSections(content) : null;
 const textComponents = reading ? { ...legacyPortableTextComponents, block: FieldNoteBlock } : legacyPortableTextComponents;
 const testGuide = Boolean(entry && slug === "test-store" && layout.length === 0);
 // Continue through the published journal; an optional read must not hide the article.
@@ -66,7 +66,7 @@ const canonical = entry ? canonicalUrl(`/${slug}`, Astro.site, Astro.url) : null
     <main id="main-content" class:list={["cms-page", { "field-note": Boolean(note), "cms-reading": Boolean(note) || testGuide, "cms-page--missing": !entry }]} data-cms-page={entry ? slug : undefined}>
       {entry ? (
         <>
-          {note && <><a class="field-note__back" href="/field-notes">Back to field notes</a><p class="field-note__kicker">From the field journal</p></>}
+          {note && <><a class="field-note__back" href={journalLink}>Back to field notes</a><p class="field-note__kicker">From the field journal</p></>}
           {layout.length === 0 && <h1 class="cms-page__title">{title}</h1>}
           {reading && <FieldNoteSections sections={reading.sections} />}
           {layout.length > 0 ? (

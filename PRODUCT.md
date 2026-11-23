@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Keep your place in Field Notes · November 23
+Back to field notes now returns to the entry you just read rather than the top of the journal. The link works with a keyboard or with JavaScript off, and still lands on the same note if it moves from the featured slot into the archive.
+
 ## The stock message follows the size · November 23
 A direct link to the tee’s sold-out XL left a stale warning after choosing in-stock Medium. The stock line and Add control now describe the selected size without a contradictory product-wide warning. A store-wide checkout pause still has its own explanation.
 

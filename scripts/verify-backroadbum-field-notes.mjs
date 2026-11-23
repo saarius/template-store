@@ -16,7 +16,7 @@ try {
     page.on('request', request => { if (/\/api\/checkout\//.test(request.url())) checkoutRequests.push(new URL(request.url()).pathname); });
     const fits = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     expect((await page.goto(base + '/field-notes')).status()).toBe(200);
-    const notes = await page.locator('.brb-story-link').evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.querySelector('h2').textContent })));
+    const notes = await page.locator('.brb-story-link').evaluateAll(links => links.map(link => ({ href: link.getAttribute('href'), title: link.querySelector('h2,h3').textContent })));
     expect(notes.length).toBeGreaterThanOrEqual(4);
     expect(notes.some(note => note.href === '/field-note-wet-gear-reset')).toBe(true);
     expect(notes.some(note => note.href === '/field-note-lunch-stop')).toBe(true);
@@ -28,7 +28,8 @@ try {
       expect(note.href).toMatch(/^\/field-note-[a-z0-9-]+$/);
       expect((await page.goto(base + note.href)).status()).toBe(200);
       await expect(page.locator('h1')).toHaveText(note.title);
-      await expect(page.locator('.field-note__back')).toHaveAttribute('href', '/field-notes');
+      const journalLink = `/field-notes#journal-${note.href.slice(1)}`;
+      await expect(page.locator('.field-note__back')).toHaveAttribute('href', journalLink);
       const more = page.getByRole('navigation', { name: 'Read another note', exact: true });
       await expect(more.getByRole('link')).toHaveCount(Math.min(notes.length - 1, 2));
       await expect(more.locator(`a[href="${note.href}"]`)).toHaveCount(0);
@@ -49,7 +50,7 @@ try {
       }
       await page.goto(base + note.href);
       await page.locator('.field-note__back').click();
-      await expect(page).toHaveURL(base + '/field-notes');
+      await expect(page).toHaveURL(base + journalLink);
     }
     await page.goto(base + '/search?q=picnic');
     await page.getByRole('region', { name: 'Field notes & guides' }).getByRole('link', { name: 'A lunch stop worth taking', exact: true }).click();
