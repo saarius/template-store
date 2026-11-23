@@ -64,7 +64,7 @@ try {
     await page.goto(origin + '/categories/slow-camp');
     assert.equal(await page.locator('[data-collection-reading]').count(), absent ? 0 : 1);
     if (!absent) assert.deepEqual(await page.locator('[data-collection-reading] li a').evaluateAll(nodes => nodes.map(node => node.getAttribute('href'))),
-      ['/field-note-a-layer-within-reach', '/field-note-after-a-road-day'], 'Fleece and shared tote supply native Slow camp relationships');
+      ['/field-note-a-layer-within-reach', '/field-note-a-warm-cup-before-packing-up'], 'Fleece and mug supply the first two published Slow camp relationships');
     assert((await page.locator('[data-commerce-product]').count()) > 0);
     assert.equal((await page.goto(origin + '/categories/not-a-real-collection')).status(), 404);
     assert.equal(await page.locator('[data-collection-reading]').count(), 0);

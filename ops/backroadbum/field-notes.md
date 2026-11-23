@@ -1,6 +1,11 @@
 # Native Field Notes
 
-Ten notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+Eleven notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+
+## Warm cup · November 23
+`seed/backroadbum-warm-cup-note.json` records four chapters, a three-step pack-out list and two used links. The published note gives the Creekside Camp Mug its first reading match; Slow camp’s two-note shelf now shows the fleece and mug notes, while the reset remains in the journal and linked from the tote.
+
+Run `node scripts/verify-backroadbum-authored-note.mjs --check --source=backroadbum-warm-cup-note.json` for the read-only manuscript, search, print and linked reading checks. The protected warm-cup authoring and paragraph-correction guards are complete; never replay either. Check the complete block sequence, including empty blocks, before publishing another article; filtering empty blocks can hide an accidental spacing paragraph. Evidence: `evidence/2026-11-23-field-note-discovery/`.
 
 ## Chapter navigation · November17
 The merchant presentation derives sections from real non-list native h2 blocks. Two or more chapters expose a closed native disclosure; heading fragments are focusable with scripts off and hidden from print. Titles remain plain text in navigation while EmDash retains marks/alignment in the article; duplicate titles get distinct position-based targets. This is request-local projection, not a CMS save, topic taxonomy or permanent-link promise after reordering. Non-note/policy/layout pages retain their own renderer.

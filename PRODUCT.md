@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## One last warm drink · November 23
+The eleventh Field Note offers a simple end-of-camp ritual: pour a small drink from what you brought, then pack the cup and scraps out. It gives the Creekside Camp Mug and Slow camp a natural reading link without changing buying facts or making heat-retention claims.
+
 ## Find the size and the field note · November 23
 An indexed fleece L result used to open Medium; a fleece M search found only its Field Note. Exact Commerce sizes now enrich existing product matches or join the reading results when the product is absent. Ordinary native matches, prices and stock remain unchanged.
 

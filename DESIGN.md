@@ -85,6 +85,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 ## Prepared native-cart product links · November17 (off live)
 The future server cart restores the existing merchant convention: each public product name is one underlined, keyboard-focusable link back to that exact member, not an entirely clickable card. Reuse Field Journal ink/underline, a44px minimum target and the rust focus ring; keep quantity/Remove tasks separate. Published CMS paths are optional enrichment only: missing, ambiguous, unsafe or failed joins leave plain headings and unchanged Commerce prices. This belongs to `backroadbum/server-cart-prep`, not the serving0.8cart or an upstream starter redesign.
 
+## Warm cup reading · November 23
+Use the existing four-chapter article, native ordered list and print treatment. The mug and Slow camp shelves use the real inline product link, not a manually promoted product card. Keep the stationary-pour and pack-out guidance in the prose, with no performance badge or new controls.
+
 ## Journal section navigation · November17
 Articles with at least two real, non-list native h2 chapters gain a closed “Jump to a section” disclosure between title and opening prose. Keep the existing DM Sans tools/Fraunces reading hierarchy, quiet dividers,48px summary,44px links and8px internal gaps; the disclosure is not a second hero or a sticky sidebar. Ordinary fragments focus the chapter with the existing rust ring and a40px scroll margin, work without scripts, and remain outside paper output. Chapter titles come from plain native spans; marks, alignment, lists, inline links and all article content stay in EmDash's renderer. Position-based fragment IDs are a same-render navigation aid, not a promise of permanent section URLs after editorial reordering; other CMS pages gain no navigation.
 

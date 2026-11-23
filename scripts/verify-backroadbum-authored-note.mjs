@@ -29,7 +29,12 @@ try {
     });
     try {
       const page = await context.newPage(); page.on('pageerror', error => errors.push(error.name));
-      const fits = async () => assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+      const fits = async () => {
+        await page.waitForLoadState('load');
+        await page.evaluate(() => document.fonts.ready);
+        assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+          `Horizontal overflow: ${new URL(page.url()).pathname}, ${width}px, ${colorScheme}, JS=${javaScriptEnabled}`);
+      };
       assert.equal((await page.goto(origin + '/field-notes')).status(), 200);
       const notes = await page.locator('.brb-story-link').evaluateAll(links => links.map(a => a.getAttribute('href')));
       assert.equal(notes.filter(href => href === '/' + source.slug).length, 1);

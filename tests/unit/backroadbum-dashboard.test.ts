@@ -33,6 +33,12 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('Another browser could not open the receipt');
     expect(report).toContain('This used a local inbox; Reviews is not installed');
   });
+  it('links the published warm-cup note without claiming commerce changes', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const history = report.match(/<article[^>]+data-warm-cup-note-history>[\s\S]*?<\/article>/)?.[0];
+    expect(history).toContain('href="/field-note-a-warm-cup-before-packing-up"');
+    expect(history).toContain('price, availability and care details are unchanged');
+  });
   it('reports the distinction between voiding a queued label and one sent to Commerce', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const history = report.match(/<article[^>]+data-ship-label-void-history>[\s\S]*?<\/article>/)?.[0];
