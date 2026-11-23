@@ -4,17 +4,18 @@ import { describe, expect, it } from 'vitest';
 describe('Backroad Bum dashboard route boundaries', () => {
   it('separates the staged printed lookup and retained receipt from the live store', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
-    for (const marker of ['retained-beta6', 'printed-test-lookup', 'beta6-outbox']) {
+    for (const marker of ['field-journal-beta6', 'retained-beta6', 'printed-test-lookup', 'beta6-outbox']) {
       expect(report).toContain(`data-${marker}-history`);
     }
     expect(report).toContain('data-retained-beta6-dispatch');
     expect(report).toContain('/pr-proof/retained-beta6/receipt-390-dark.png');
     expect(report).toContain('Neither change is live.');
     const staging = report.match(/<div data-server-cart-staging>[\s\S]*?<\/div>/)?.[0];
+    expect(staging).toContain('now pairs with Commerce beta.6');
     expect(staging).toContain('commerce/pull/286');
     expect(staging).toContain('The live cart still uses signed Commerce 0.8.0.');
   });
-  it('reports the merged cart lock, open focus review and isolated reminders-off check', () => {
+  it('reports the merged cart lock and focus fix and isolated reminders-off check', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     for (const marker of ['cart-focus-followup', 'cart-reminder-off']) {
@@ -25,7 +26,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('the test inbox stayed empty');
     expect(reviews).toContain('#243 merged November 22 at af90a48');
     const focus = reviews.match(/<tr data-cart-focus-followup-ledger>[\s\S]*?<\/tr>/)?.[0];
-    expect(focus).toContain('Open');
+    expect(focus).toContain('Merged November 23 · 8a5341c');
+    expect(focus).toContain('Adopted in Field Journal staging only.');
     expect(focus).toContain('fork 0df23f1');
     expect(focus).toContain('/pr-proof/template-pr246-dawn-focus/after-mobile.png');
   });

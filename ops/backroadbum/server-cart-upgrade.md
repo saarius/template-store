@@ -1,10 +1,16 @@
 # Qualifying a future server-cart upgrade
 
+## Whole Field Journal storefront on source-built beta.6 · November 23
+
+`backroadbum/server-cart-prep` merges Template #246 and now pins Commerce `4b1af19` / `0.9.0-beta.6` with EmDash 1.5. On a local canonical HTTPS fixture, the built store used only copied published CMS/media/catalog data. Plain 1440px and enhanced 390px browsers in both themes added the mug and sale bandana, updated and removed lines, retained a Secure HttpOnly cart and showed $54 after reload. Enhanced Update and Remove restored focus; checkout refused without a test payment connection. No Orders, hosted settings or shopper state were copied or created. See `evidence/2026-11-23-beta6-merchant/` for 592-file typecheck, 83 cart units, 83 dashboard units, the 130,141-byte Registry bundle and eight strict painted views.
+
+Build the rehearsal with the canonical hostname as well as sending that hostname through the local proxy: a loopback build `siteUrl` paired with canonical browser requests returned `cart_error=UNAVAILABLE`, resolved by rebuilding without relaxing origin checks. The stock proof seed timed out in global setup here; the successful check used the compiled Node storefront. This is not a full matrix, signed update, original merchant receipt, Accounts or hosted-payment check. Stable discovery remains 0.8.0, so keep Stage B and TEST1011 gated.
+
 ## Retained receipt on Commerce beta.6 · November 23
 
 An isolated EmDash 1.5 site reads two synthetic attempts created by the actual Commerce 0.8 kernel. The Field Journal wrapper recovered the unchanged paid receipt at $32 (current catalog would total $28) with the canonical number and TEST badge from [Commerce #286](https://github.com/dinkuskit/commerce/pull/286); pending stayed unconfirmed. Reading left the new cart and both saved attempts unchanged. The later kernel replay with simulated Payments reconciled each original attempt without creating a replacement session. Four browser contexts and four painted audit views passed; the static audit embeds only authored fixture art and public shop fonts.
 
-See `evidence/2026-11-23-retained-beta6/`. The merchant branch still pins beta.5 for its whole-store pairing. This is a source sandbox mount around the actual receipt page/wrapper, not a signed same-ID update, a hosted payment, or a renewed run with the original merchant browser files.
+See `evidence/2026-11-23-retained-beta6/`. At that checkpoint the merchant branch still pinned beta.5 for its whole-store pairing. This is a source sandbox mount around the actual receipt page/wrapper, not a signed same-ID update, a hosted payment, or a renewed run with the original merchant browser files.
 
 ## Printed test numbers in Track your order · November 23
 
