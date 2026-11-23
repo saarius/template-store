@@ -1,5 +1,5 @@
 import { filterStorefrontSearchHits, renderHighlightedSnippetParts } from './search-visibility.js';
-import type { SearchOptionMatch } from './variant-search.js';
+import { mayAskForSize, type SearchOptionMatch } from './variant-search.js';
 
 export interface StoreSearchHit {
   collection: string;
@@ -12,7 +12,7 @@ export interface StoreSearchHit {
 export interface StoreSearchDependencies {
   search: (query: string) => Promise<readonly StoreSearchHit[]>;
   visibleProducts: () => Promise<ReadonlySet<string>>;
-  /** Exact public option fallback only after the native index has no visible hits. */
+  /** Exact public options on published, Commerce-visible products. */
   optionMatches?: (query: string) => Promise<readonly SearchOptionMatch[]>;
   /** Optional published opening paragraphs, not another search or match-location claim. */
   fieldNotePreviews?: (slugs: readonly string[]) => Promise<ReadonlyMap<string, string>>;
@@ -23,6 +23,7 @@ interface SearchResultItem {
   parts: ReturnType<typeof renderHighlightedSnippetParts>;
   options?: SearchOptionMatch['options'];
 }
+const resultLimit = 20;
 const scopes = [
   { collection: 'products', label: 'Gear' },
   { collection: 'categories', label: 'Collections' },
@@ -64,12 +65,29 @@ export async function loadStoreSearch(raw: string, dependencies: StoreSearchDepe
     const hits = await dependencies.search(query);
     const visible = hits.some(hit => hit.collection === 'products') ? await dependencies.visibleProducts() : new Set<string>();
     const filtered = filterStorefrontSearchHits(hits, visible).filter(hit => searchResultHref(hit) !== null);
-    const fallback = !filtered.length && dependencies.optionMatches
-      ? (await dependencies.optionMatches(query)).filter(match => match.options.length > 0 && searchResultHref({
-        collection: 'products', id: match.slug, slug: match.slug, score: 0,
-      }) !== null) : [];
-    const optionMatches = fallback.slice(0, 20);
-    const selected = filtered.slice(0, 20);
+    const selected = filtered.slice(0, resultLimit);
+    const indexedProducts = new Set(selected.filter(hit => hit.collection === 'products').map(hit => hit.slug || hit.id));
+    const matches = new Map<string, SearchOptionMatch>();
+    const additions: SearchOptionMatch[] = [];
+    let optionsLimited = false;
+    if (dependencies.optionMatches && (!selected.length || mayAskForSize(query))) {
+      let candidates: readonly SearchOptionMatch[] = [];
+      try { candidates = await dependencies.optionMatches(query); }
+      catch (error) {
+        // Existing native results are still useful if optional enrichment fails.
+        if (!selected.length) throw error;
+      }
+      for (const match of candidates) {
+        if (!match.options.length || matches.has(match.slug) || !searchResultHref({
+          collection: 'products', id: match.slug, slug: match.slug, score: 0,
+        })) continue;
+        if (!indexedProducts.has(match.slug)) {
+          if (selected.length + additions.length >= resultLimit) { optionsLimited = true; continue; }
+          additions.push(match);
+        }
+        matches.set(match.slug, match);
+      }
+    }
     const previewSlugs = [...new Set(selected.filter(hit => hit.collection === 'pages' &&
       /^field-note-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(hit.slug ?? '') && snippetParts(hit).length === 0)
       .map(hit => hit.slug!))];
@@ -78,22 +96,31 @@ export async function loadStoreSearch(raw: string, dependencies: StoreSearchDepe
     if (previewSlugs.length && dependencies.fieldNotePreviews) {
       try { previews = await dependencies.fieldNotePreviews(previewSlugs); } catch { /* Titles still work. */ }
     }
-    const groups = scopes.map(scope => ({ ...scope, items: selected.filter(hit => hit.collection === scope.collection).map<SearchResultItem>(hit => {
-      const title = hit.title?.trim() || hit.slug || hit.id;
-      const parts = snippetParts(hit);
-      const preview = hit.collection === 'pages' && previewSlugs.includes(hit.slug ?? '')
-        ? compactSearchPreview(previews.get(hit.slug!) ?? '') : '';
-      return { title, href: searchResultHref(hit)!, parts: parts.length || !preview ? parts : [{ text: preview, highlighted: false }] };
-    }) })).filter(group => group.items.length > 0);
-    if (optionMatches.length) {
-      groups.push({ collection: 'products', label: 'Gear', items: optionMatches.map(match => ({
+    const groups = scopes.map(scope => {
+      const items = selected.filter(hit => hit.collection === scope.collection).map<SearchResultItem>(hit => {
+        const slug = hit.slug || hit.id;
+        const title = hit.title?.trim() || slug;
+        const parts = snippetParts(hit);
+        const preview = hit.collection === 'pages' && hit.slug && previewSlugs.includes(hit.slug)
+          ? compactSearchPreview(previews.get(hit.slug) ?? '') : '';
+        const options = hit.collection === 'products' ? matches.get(slug)?.options : undefined;
+        return {
+          title,
+          href: options?.length === 1 ? options[0].href : searchResultHref(hit)!,
+          parts: parts.length || !preview ? parts : [{ text: preview, highlighted: false }],
+          ...(options ? { options } : {}),
+        };
+      });
+      if (scope.collection === 'products') items.push(...additions.map(match => ({
         title: match.title,
         href: match.options.length === 1 ? match.options[0].href : `/products/${match.slug}`,
         parts: [], options: match.options,
-      })) });
-    }
-    return { query, groups, optionMatches, count: selected.length || optionMatches.length, limited: hits.length >= 20 || fallback.length > 20,
-      state: selected.length || optionMatches.length ? 'results' as const : 'empty' as const };
+      })));
+      return { ...scope, items };
+    }).filter(group => group.items.length > 0);
+    const count = selected.length + additions.length;
+    return { query, groups, optionMatches: [...matches.values()], count, limited: hits.length >= resultLimit || optionsLimited,
+      state: count ? 'results' as const : 'empty' as const };
   } catch {
     // A failed index or Commerce visibility lookup is not an empty catalog.
     return { ...empty, state: 'unavailable' as const };

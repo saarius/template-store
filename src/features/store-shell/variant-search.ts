@@ -9,8 +9,15 @@ export interface SearchOptionMatch {
 
 const words = (value: string): string[] => value.normalize('NFKC').toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
 
+/** Cheap lookup gate for nonempty index results, not a list of offered sizes. */
+export function mayAskForSize(query: string): boolean {
+  const tokens = words(query);
+  return tokens.some(token => /^(?:xs|s|m|l|x{1,4}l|[2-6]xl)$/.test(token)) ||
+    (tokens.length > 1 && tokens.includes('size'));
+}
+
 /**
- * A narrow fallback, not a second content index: all query words must match one
+ * A narrow Commerce projection, not a second content index: all query words must match one
  * member, and a complete option value must be present. The caller
  * supplies only listable Commerce members linked to published, visible CMS pages.
  * Never combine the size of one member with the color of its sibling.

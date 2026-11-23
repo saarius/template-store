@@ -7,7 +7,7 @@ import { availabilityLabels } from '../features/commerce-catalog/index.js';
 import { loadStoreSearch, type StoreSearchHit } from '../features/store-shell/store-search.js';
 import { fieldNotes } from '../features/store-shell/field-notes.js';
 
-// Share one fresh signed projection if filtering and the empty-index fallback both need it.
+// Share one fresh signed projection for visibility and any exact-option results.
 let catalog: ReturnType<typeof loadSearchProductCatalog> | undefined;
 const productCatalog = () => catalog ??= loadSearchProductCatalog(
   { runtime: Astro.locals.emdash, request: Astro.request }, process.env, { throwOnUnavailable: true },
@@ -63,7 +63,7 @@ if (results.state === 'unavailable') Astro.response.status = 503;
         <p>Looking for a read instead? <a href="/field-notes">Open the field notes</a>.</p>
       </div> : <>
         <p class="search-summary" data-search-results-count>{results.count} {results.count === 1 ? 'result' : 'results'}{results.limited ? ' shown. Try a more specific search to narrow the list.' : '.'}</p>
-        {results.optionMatches.length > 0 && <p class="search-summary" data-search-option-summary>Matched product options. Follow a size or option to see its details.</p>}
+        {results.optionMatches.length > 0 && <p class="search-summary" data-search-option-summary>Matched options open with that choice selected.</p>}
         {results.groups.map(group => <section class="search-group" aria-label={group.label}>
           <h3>{group.label}</h3>
           <ul>{group.items.map((item, index) => {
@@ -78,12 +78,12 @@ if (results.state === 'unavailable') Astro.response.status = 503;
                 <span class="search-exact-status" id={statusId}>{availabilityLabels[exact.availability] ?? 'Availability unavailable'}</span>
               </> : <>
                 <a href={item.href}>{item.title}</a>
-                {item.parts.length > 0 && <p>{item.parts.map(part => part.highlighted ? <mark>{part.text}</mark> : part.text)}</p>}
                 {item.options?.map(option => <div class="search-option" data-search-option>
                   <a href={option.href} aria-label={`${option.label} — ${item.title}. ${availabilityLabels[option.availability] ?? 'Availability unavailable'}`}>{option.label}</a>
                   <span>{availabilityLabels[option.availability] ?? 'Availability unavailable'}</span>
                 </div>)}
               </>}
+              {item.parts.length > 0 && <p>{item.parts.map(part => part.highlighted ? <mark>{part.text}</mark> : part.text)}</p>}
             </li>;
           })}</ul>
         </section>)}
