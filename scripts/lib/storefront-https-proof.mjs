@@ -176,7 +176,7 @@ export async function proveStorefrontHTTPS({ browser, expect, origin, assertBusi
     }
     assert.deepEqual(errors, []);
     assertBusiness();
-    reports.push({ javaScriptEnabled, canonicalHTTPS: true, fullStorefront: true, families: 7, realSalePrice: true, secureHttpOnlyCookie: true, foreignOriginRefused: true, realAddAndChangeForms: true, reloadQuantity: 3, blankQuantityPreserved: true, foreignBrowserIsolated: true, unavailableWithoutPayments: true });
+    reports.push({ javaScriptEnabled, canonicalHTTPS: true, fullStorefront: true, families: 7, mugSubtotalAtThree: '$54.00', secureHttpOnlyCookie: true, foreignOriginRefused: true, realAddAndChangeForms: true, reloadQuantity: 3, blankQuantityPreserved: true, foreignBrowserIsolated: true, unavailableWithoutPayments: true });
     await context.close();
   }
   return reports;

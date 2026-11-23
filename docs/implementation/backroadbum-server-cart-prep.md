@@ -2,7 +2,13 @@
 
 November 15, 2026. `backroadbum/server-cart-prep` merges upstream/main167d736 downstream into merchant7df906f, pins Commerce beta2 b460433, and carries proposed Template240's four source changes without merging that unaccepted PR. It is not eligible for production, an upstream PR, or a signed-plugin upgrade.
 
-## Current continuity · November17, 07:00UTC
+## Retained receipts and historical lookup · November 23
+
+The private rehearsal uses the current Commerce pin and staging EmDash dependencies. Build that exact upstream tag, stamp the beta version for the Registry-format build, then restore only the stamp changes so the checker sees clean source. Rehydrate the staging dependencies with `pnpm install --frozen-lockfile`. Pass `--check --candidate=<built checkout> --archive=<completed 0600 backup>` inside the operator's loopback-only namespace; add `--storefront` for the full merchant routes, the plain-form test of all ten Orders and pause/limiter checks. The bounded archive importer checks database integrity and media hashes without extracting the key ring. The checker copies no private settings into the fixture and deletes the restored inputs before starting the sandbox. The separate sandbox DB receives selected rows at EmDash 1.4, then runs the EmDash 1.5 migrations.
+
+The checker reads only the two fixed original browser files. It loads the canonical checkout/cart data without any cookies, never saves browser state or private HTML/images, and starts every server with live paths hidden. On beta.6, two saved receipts pass all four phone/desktop theme combinations; all ten printed `TEST` numbers match their original amounts and status at `/track-order` with scripting off. Pausing new checkout leaves the original receipt readable. Evidence: `evidence/2026-11-23-original-retained-beta6/archive-storefront.json`; optional painted artifacts apply only to the separate public cart lane. This does not qualify a signed upgrade or hosted payment.
+
+## Earlier continuity · November17, 07:00UTC
 
 Merge `8f4be9b` brings in live703a42e's nine-note content and reporting without replacing native checkout with its legacy retry implementation. Candidate9996119 repairs cold sold-out selected-member controls ([Template247](https://github.com/dinkuskit/template-store/issues/247)); fresh signed Registry-beta2 proof covers all seven families/eleven members in plain and enhanced cart journeys, with no Payments binding. Current557-file Astro check,1271units,13 rendered cases,120workflows/two skips, source Registry gate and four-view cart/product/dashboard audits pass; the attempted full local browser wrapper exhausted its first-admin dev-server child and was stopped after650seconds, so no complete matrix/crawl or live upgrade is claimed. Evidence: `evidence/2026-11-17-prep-continuity/`; public effective-price projections do not yet qualify a Regular/Sale pair.
 

@@ -1,38 +1,49 @@
 #!/usr/bin/env node
 /** Private operator qualification. Run ONLY in a loopback-only network namespace.
- * Copies selected merchant rows into disposable SQLite, never production settings,
- * users, hosted consents or Payments. Uses original browser state without saving it.
+ * Reads one verified recovery archive, never the live DB/uploads. Only selected
+ * rows reach the sandbox; no users, settings, hosted consents or Payments.
+ * Uses original retained browser state without saving it.
  * Source-built sandbox mount, NOT a signed installation or a live upgrade.
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { spawnQualificationProcess as spawn, stopQualificationProcess as stop } from './lib/qualification-process.mjs';
 import { createHash } from 'node:crypto';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync, chmodSync } from 'node:fs';
+import { copyFileSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync, chmodSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { createServer } from 'node:https';
 import http from 'node:http';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { copyPublicContent, isolatedServerCommand, proveStorefrontHTTPS, localHTTPS } from './lib/storefront-https-proof.mjs';
+import { pairedCommercePin } from './lib/paired-commerce.mjs';
 
 const PRIMARY = '/var/lib/trialrun/workspace/repos/template-store';
+const BACKUPS = '/var/lib/backroadbum/backups/';
 const ORIGIN = 'https://backroadbum.com';
 const ID = 'r_gshdrqaldna3r7sn';
 const FILES = [['field-book-test-browser.json', 1009], ['shopper-email-test-browser.json', 1010]];
 const COLLECTIONS = ['catalog_items', 'catalog_media', 'product_pages', 'orders', 'order_numbers', 'checkout_carts', 'checkout_guest_capabilities'];
+const CHECKOUT_STORAGE = 'dinkus.guest-checkout.v1';
+const CART_STORAGE = 'dinkus.guest-cart.v1';
 const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+const digestFile = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 const pause = ms => new Promise(done => setTimeout(done, ms));
 
 export function options(args) {
   if (!args.length) return null;
   const storefront = args.includes('--storefront');
-  assert.equal(args.length, storefront ? 3 : 2);
+  assert.equal(args.length, storefront ? 4 : 3);
   assert.equal(args.filter(x => x === '--check').length, 1);
-  assert.ok(args.every(x => x === '--check' || x === '--storefront' || x.startsWith('--candidate=')));
+  assert.ok(args.every(x => x === '--check' || x === '--storefront' || x.startsWith('--candidate=') || x.startsWith('--archive=')));
   const candidate = args.find(x => x.startsWith('--candidate='))?.slice(12);
-  assert.ok(candidate);
-  return { candidate: resolve(candidate), storefront };
+  const archive = args.find(x => x.startsWith('--archive='))?.slice(10);
+  assert.ok(candidate && isPrivateArchivePath(archive));
+  return { candidate: resolve(candidate), archive, storefront };
+}
+
+export function isPrivateArchivePath(path) {
+  return typeof path === 'string' && path.startsWith(BACKUPS) && /^[0-9]{8}T[0-9]{6}\.[0-9]{6}Z\.tar\.gz$/u.test(path.slice(BACKUPS.length));
 }
 
 export function assertIsolated(interfaces, routes, unprivilegedPort) {
@@ -46,10 +57,70 @@ export function safeMediaKey(key) {
     !key.startsWith('/') && !key.split('/').some(x => !x || x === '.' || x === '..') && /^[a-zA-Z0-9._/-]+$/.test(key);
 }
 
-export async function qualify({ candidate, storefront = false }) {
+/** Keep the original receipt data verbatim, but never load unrelated site state or cookies. */
+export function retainedOnly(storageState) {
+  const entries = storageState.origins.filter(x => x.origin === ORIGIN);
+  assert.equal(entries.length, 1);
+  const localStorage = entries[0].localStorage.filter(x => [CHECKOUT_STORAGE, CART_STORAGE].includes(x.name));
+  assert.equal(new Set(localStorage.map(x => x.name)).size, localStorage.length);
+  const checkout = localStorage.find(x => x.name === CHECKOUT_STORAGE);
+  assert.ok(typeof checkout?.value === 'string' && checkout.value.length > 0);
+  return { cookies: [], origins: [{ origin: ORIGIN, localStorage: localStorage.map(({ name, value }) => ({ name, value })) }] };
+}
+
+const formatMoney = value => new Intl.NumberFormat('en-US', { style: 'currency', currency: value.currency }).format(Number(value.minor) / 100);
+
+// Use the actual server form, not a storage query or fixture route. Never persist
+// lookup HTML, the response body, or the original contact data.
+async function proveHistoricalLookup(browser, expect, orders) {
+  const context = await browser.newContext({ javaScriptEnabled: false, ignoreHTTPSErrors: true, viewport: { width: 390, height: 900 } });
+  try {
+    const page = await context.newPage();
+    page.setDefaultTimeout(15_000);
+    let matched = 0;
+    for (const order of orders) {
+      const email = order.paidOrder.contactSnapshot?.contact?.email;
+      assert.ok(typeof email === 'string' && email.trim());
+      const start = await page.goto(ORIGIN + '/track-order');
+      assert.equal(start.status(), 200);
+      assert.equal(await page.locator('[data-order-lookup-order]').count(), 0);
+      const form = page.locator('[data-order-lookup-form]');
+      await form.getByLabel('Order number').fill(`TEST${order.number}`);
+      await form.getByLabel('Email').fill(email.trim());
+      const reply = page.waitForResponse(r => r.request().method() === 'POST' && r.url() === ORIGIN + '/track-order');
+      await form.getByRole('button', { name: 'Find order' }).press('Enter');
+      const response = await reply;
+      assert.equal(response.status(), 200);
+      assert.match(response.headers()['cache-control'], /no-store/);
+      const found = page.locator('[data-order-lookup-order]');
+      await expect(found).toHaveCount(1);
+      await expect(found).toHaveAttribute('data-order-lookup-order', String(order.number));
+      await expect(found.locator('[data-order-lookup-status]')).toHaveAttribute('data-order-lookup-status', order.completed ? 'completed' : 'processing');
+      await expect(found.locator('[data-order-lookup-totals] .total dd')).toHaveText(formatMoney(order.paidOrder.total));
+      assert.equal(await found.locator('[data-order-lookup-line]').count(), order.paidOrder.lines.length);
+      if (order.completed?.tracking) {
+        assert.ok((await found.locator('[data-order-lookup-tracking]').textContent())?.includes(order.completed.tracking));
+      }
+      matched++;
+    }
+    return { ordersMatched: matched, originalTotalsAndStatus: true, matchedTrackingWhenPresent: true, plainForm: true, noStore: true };
+  } finally { await context.close(); }
+}
+
+async function loadEmDash(root) {
+  const require = createRequire(join(root, 'package.json'));
+  const { Kysely, sql } = await import(pathToFileURL(require.resolve('kysely')).href);
+  const { createDialect } = await import(pathToFileURL(require.resolve('emdash/db/sqlite')).href);
+  const { runMigrations, getExactMigrationStatus } = await import(pathToFileURL(require.resolve('emdash/db')).href);
+  const { version } = JSON.parse(readFileSync(join(root, 'node_modules/emdash/package.json'), 'utf8'));
+  return { open: file => new Kysely({ dialect: createDialect({ url: `file:${file}` }) }), sql, runMigrations, getExactMigrationStatus, version };
+}
+
+export async function qualify({ candidate, archive, storefront = false }) {
   let stage = 'isolation admission';
-  const artifacts = process.env.BACKROADBUM_QUALIFICATION_ARTIFACTS;
-  let site, db, source, server, tls, assets, browser, linkedPeers, staged;
+  // Original receipts never produce captures. This output is for the separate, public-only cart lane.
+  const artifacts = storefront ? process.env.BACKROADBUM_QUALIFICATION_ARTIFACTS : undefined;
+  let site, db, source, server, tls, assets, browser, staged;
   const originalUmask = process.umask(0o077);
   try {
     if (artifacts) {
@@ -62,39 +133,54 @@ export async function qualify({ candidate, storefront = false }) {
       return result.stdout.trim();
     };
     assertIsolated(JSON.parse(command('ip', ['-j', 'link'])).map(x => x.ifname).sort(), JSON.parse(command('ip', ['-j', 'route'])), readFileSync('/proc/sys/net/ipv4/ip_unprivileged_port_start', 'utf8'));
+    stage = 'exact candidate and runtime admission';
+    const merchant = resolve(import.meta.dirname, '..');
+    const pin = pairedCommercePin(merchant);
     const git = (...args) => command('git', ['-C', candidate, ...args]);
     assert.equal(git('status', '--porcelain'), '');
     const head = git('rev-parse', 'HEAD');
-    assert.equal(head, git('rev-parse', 'v0.9.0-beta.2^{commit}'));
-    const merchant = resolve(import.meta.dirname, '..');
-    // Imported merchant files resolve their own tsconfig peers. Reuse installed
-    // primary dependencies without copying or deleting that serving directory.
-    if (!existsSync(join(merchant, 'node_modules'))) {
-      linkedPeers = join(merchant, 'node_modules');
-      symlinkSync(join(PRIMARY, 'node_modules'), linkedPeers, 'dir');
-    }
-    const require = createRequire(join(PRIMARY, 'package.json'));
-    const { Kysely, sql } = await import(pathToFileURL(require.resolve('kysely')).href);
-    const { createDialect } = await import(pathToFileURL(require.resolve('emdash/db/sqlite')).href);
-    const { runMigrations } = await import(pathToFileURL(require.resolve('emdash/db')).href);
+    assert.equal(head, pin.commit);
+    assert.equal(head, git('rev-parse', `refs/tags/${pin.tag}^{commit}`));
+    const bundle = join(candidate, 'dist/sandbox/plugin.mjs');
+    const descriptorPath = join(candidate, 'dist/sandbox/index.mjs');
+    const descriptor = (await import(pathToFileURL(descriptorPath).href)).default;
+    assert.equal(descriptor.version, pin.tag.slice(1));
+    const candidateBundleSHA256 = digestFile(bundle);
+    const require = createRequire(join(merchant, 'package.json'));
     const Database = require('better-sqlite3');
     const { chromium, expect } = require('@playwright/test');
-    mkdirSync(join(PRIMARY, 'runs'), { recursive: true });
-    site = mkdtempSync(join(PRIMARY, 'runs', 'private-retained-'));
+    const oldEmDash = await loadEmDash(PRIMARY);
+    const nextEmDash = await loadEmDash(merchant);
+    assert.equal(nextEmDash.version, JSON.parse(readFileSync(join(merchant, 'package.json'), 'utf8')).dependencies.emdash);
+    assert.notEqual(oldEmDash.version, nextEmDash.version);
+    mkdirSync(join(merchant, 'runs'), { recursive: true });
+    site = mkdtempSync(join(merchant, 'runs', 'private-retained-'));
     const file = join(site, 'private.sqlite');
-    db = new Kysely({ dialect: createDialect({ url: `file:${file}` }) });
-    await runMigrations(db);
+    db = oldEmDash.open(file);
+    await oldEmDash.runMigrations(db);
     chmodSync(file, 0o600);
-    stage = 'selected read-only merchant snapshot';
-    source = new Database('/var/lib/backroadbum/content.db', { readonly: true, fileMustExist: true });
+    stage = 'verify and stage the selected recovery archive';
+    assert.ok(isPrivateArchivePath(archive));
+    const restore = join(site, 'archive-input');
+    // Reuse the bounded importer. It checks SQLite and media hashes and never
+    // extracts the encryption ring or any retired transport credentials.
+    const recovery = JSON.parse(command('python3', ['-B', '-c',
+      'import json, sys\nsys.path.insert(0, sys.argv[1])\nfrom verify_upload_recovery import restore_asset_copy, inspect_asset_copy\nrestore_asset_copy(sys.argv[2], sys.argv[3])\nprint(json.dumps(inspect_asset_copy(sys.argv[3])))',
+      join(PRIMARY, 'ops/backroadbum'), archive, restore]));
+    assert.equal(recovery.integrity, 'ok');
+    assert.equal(recovery.mediaSizeAndHash, 'ok');
+    assert.equal(recovery.privateConfigurationExtracted, false);
+    stage = 'select read-only merchant rows from the archive';
+    source = new Database(join(restore, 'content.db'), { readonly: true, fileMustExist: true });
     source.pragma('query_only = ON'); source.exec('BEGIN');
     const originalRows = source.prepare('SELECT * FROM _plugin_storage WHERE plugin_id=? ORDER BY collection,id').all(ID).filter(x => COLLECTIONS.includes(x.collection));
     const baseline = digest(originalRows.map(({ collection, id, data, revision }) => ({ collection, id, data, revision })));
-    for (const row of originalRows) await db.insertInto('_plugin_storage').values(row).execute();
-    const contentCounts = storefront ? await copyPublicContent(source, db, sql) : null;
     const originalKeys = new Set(originalRows.map(x => `${x.collection}:${x.id}`));
     const orders = originalRows.filter(x => x.collection === 'orders').map(x => JSON.parse(x.data));
-    assert.equal(orders.length, 10);
+    assert.deepEqual(orders.map(x => x.number).sort((a, b) => a - b), Array.from({ length: 10 }, (_, i) => 1001 + i));
+    assert.ok(orders.every(x => x.paidOrder?.mode === 'test'), 'Copy only the ten test Orders');
+    for (const row of originalRows) await db.insertInto('_plugin_storage').values(row).execute();
+    const contentCounts = storefront ? await copyPublicContent(source, db, oldEmDash.sql) : null;
     const mediaIds = new Set(originalRows.filter(x => x.collection === 'catalog_media').flatMap(x => {
       const data = JSON.parse(x.data); return [data.image, ...(data.gallery ?? [])].flatMap(x => x?.mediaId ? [x.mediaId] : []);
     }));
@@ -106,23 +192,31 @@ export async function qualify({ candidate, storefront = false }) {
       await db.insertInto('media').values(row).execute();
       const target = join(site, 'uploads', row.storage_key);
       mkdirSync(resolve(target, '..'), { recursive: true });
-      copyFileSync(join('/var/lib/backroadbum/uploads', row.storage_key), target);
+      copyFileSync(join(restore, 'uploads', row.storage_key), target);
     }
     await db.insertInto('options').values({ name: 'emdash:site_url', value: JSON.stringify(ORIGIN) }).execute();
     const originals = FILES.map(([name, number]) => {
       const path = join('/etc/backroadbum/operator', name);
-      assert.equal(statSync(path).mode & 0o777, 0o600);
+      const info = lstatSync(path);
+      assert.ok(info.isFile() && (info.mode & 0o777) === 0o600 && info.size < 2 * 1024 * 1024);
       const bytes = readFileSync(path); assert.ok(bytes.length < 2 * 1024 * 1024);
-      const storageState = JSON.parse(bytes);
-      const origin = storageState.origins.filter(x => x.origin === ORIGIN);
-      assert.equal(origin.length, 1);
-      const retained = origin[0].localStorage.filter(x => x.name === 'dinkus.guest-checkout.v1');
-      assert.equal(retained.length, 1);
-      const retention = JSON.parse(retained[0].value);
+      const storageState = retainedOnly(JSON.parse(bytes));
+      const retention = JSON.parse(storageState.origins[0].localStorage.find(x => x.name === CHECKOUT_STORAGE).value);
       const order = orders.find(x => x.number === number); assert.ok(order);
       return { path, bytes, storageState, retention, number, order };
     });
     source.exec('ROLLBACK'); source.close(); source = null;
+    rmSync(restore, { recursive: true });
+    await db.destroy(); db = null;
+    stage = 'migrate the disposable EmDash database';
+    db = nextEmDash.open(file);
+    const needsMigration = await nextEmDash.getExactMigrationStatus(db);
+    assert.ok(needsMigration.pending.includes('095_plugin_storage_unique_scope'));
+    const { applied } = await nextEmDash.runMigrations(db);
+    assert.deepEqual(applied, needsMigration.pending);
+    const current = await nextEmDash.getExactMigrationStatus(db);
+    assert.deepEqual(current.pending, []);
+    assert.deepEqual(current.unknownApplied, []);
     await db.destroy(); db = null;
     stage = 'build actual merchant page and wrapper';
     mkdirSync(join(site, 'src/pages/api/checkout'), { recursive: true });
@@ -137,26 +231,26 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import emdash, { local } from 'emdash/astro';
 import { sqlite } from 'emdash/db';
-import descriptor from ${JSON.stringify(pathToFileURL(join(candidate, 'dist/sandbox/index.mjs')).href)};
+import descriptor from ${JSON.stringify(pathToFileURL(descriptorPath).href)};
 export default defineConfig({output:'server',adapter:node({mode:'standalone'}),trailingSlash:'never',
   ${storefront ? `srcDir:${JSON.stringify(join(merchant, 'src'))},` : ''}
   integrations:[react(),emdash({database:sqlite({url:${JSON.stringify(`file:${file}`)}}),
     storage:local({directory:${JSON.stringify(join(site, 'uploads'))},baseUrl:'/_emdash/api/media/file'}),
     siteUrl:${JSON.stringify(ORIGIN)},sandboxRunner:'@emdash-cms/sandbox-workerd/sandbox',
-    sandboxed:[{...descriptor,id:${JSON.stringify(ID)},entrypoint:${JSON.stringify(join(candidate, 'dist/sandbox/plugin.mjs'))}}]})],
-  vite:{define:{__DINKUS_COMMERCE_PROFILE__:JSON.stringify('stable')},resolve:{alias:${JSON.stringify(Object.fromEntries(['checkout', 'customers', 'orders', 'structured-data', 'feeds', 'store-policies'].map(name => [`@dinkuskit/commerce/features/${name}`, join(candidate, 'dist/features', name, 'index.js')]).concat([['@dinkuskit/commerce', join(candidate, 'dist/index.js')]])))}},server:{fs:{allow:[${JSON.stringify(PRIMARY)},${JSON.stringify(merchant)},${JSON.stringify(candidate)}]}}},devToolbar:{enabled:false}});
+    sandboxed:[{...descriptor,id:${JSON.stringify(ID)},entrypoint:${JSON.stringify(bundle)}}]})],
+  vite:{define:{__DINKUS_COMMERCE_PROFILE__:JSON.stringify('stable')},resolve:{alias:${JSON.stringify(Object.fromEntries(['checkout', 'orders', 'structured-data', 'feeds', 'store-policies'].map(name => [`@dinkuskit/commerce/features/${name}`, join(candidate, 'dist/features', name, 'index.js')]).concat([['@dinkuskit/commerce', join(candidate, 'dist/index.js')]])))}},server:{fs:{allow:[${JSON.stringify(merchant)},${JSON.stringify(candidate)}]}}},devToolbar:{enabled:false}});
 `);
     command('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', join(site, 'key.pem'), '-out', join(site, 'cert.pem'), '-days', '1', '-subj', '/CN=backroadbum.com', '-addext', 'subjectAltName=DNS:backroadbum.com']);
     const env = { PATH: process.env.PATH, HOME: process.env.HOME, NODE_OPTIONS: '--max-old-space-size=1000', NODE_ENV: 'production',
       EMDASH_SITE_URL: ORIGIN, BACKROADBUM_MERCHANT_PROFILE: '1', BACKROADBUM_RECOVERY_PROTOCOL: 'cart-v1', BACKROADBUM_CHECKOUT_ENABLED: '1', HOST: '127.0.0.1', PORT: '4398',
       NO_PROXY: '*', no_proxy: '*' };
-    const build = spawnSync(process.execPath, [join(PRIMARY, 'node_modules/astro/bin/astro.mjs'), 'build'], { cwd: site, env, encoding: 'utf8', timeout: 180_000 });
+    const build = spawnSync(process.execPath, [join(merchant, 'node_modules/astro/bin/astro.mjs'), 'build'], { cwd: site, env, encoding: 'utf8', timeout: 180_000 });
     if (artifacts) writeFileSync(join(artifacts, 'build.log'), (build.stdout ?? '') + (build.stderr ?? ''), { mode: 0o600 });
     assert.equal(build.status, 0);
     const launch = (enabled = '1') => {
       const serverEnv = { ...env, BACKROADBUM_CHECKOUT_ENABLED: enabled };
-      const [file, args] = storefront ? isolatedServerCommand(site, serverEnv, join(site, 'dist/server/entry.mjs')) : [process.execPath, [join(site, 'dist/server/entry.mjs')]];
-      return spawn(file, args, { cwd: site, detached: true, env: serverEnv, stdio: 'ignore' });
+      const [file, args] = isolatedServerCommand(site, serverEnv, join(site, 'dist/server/entry.mjs'));
+      return spawn(file, args, { cwd: site, env: serverEnv, stdio: 'ignore' });
     };
     server = launch();
     stage = 'local HTTPS runtime';
@@ -182,7 +276,6 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),t
     stage = 'original-browser receipt recovery';
     browser = await chromium.launch({ args: ['--host-resolver-rules=MAP backroadbum.com 127.0.0.1', '--no-proxy-server'] });
     const reports = [];
-    let paintedSnapshot = false;
     for (const original of originals) for (const width of [390, 1440]) for (const colorScheme of ['light', 'dark']) {
       const context = await browser.newContext({ viewport: { width, height: 900 }, colorScheme, storageState: original.storageState, ignoreHTTPSErrors: true });
       const page = await context.newPage(); page.setDefaultTimeout(30_000);
@@ -213,9 +306,10 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),t
       const receipt = page.locator('[data-retained-order]');
       await expect(receipt).toBeVisible();
       const paid = original.order.paidOrder;
-      await expect(receipt.locator('.guest-checkout-order-heading')).toContainText(paid.orderId.replace(/^order:/u, ''));
+      await expect(receipt.locator('h2')).toHaveText(`Order #${original.number}`);
+      await expect(receipt.locator('.guest-checkout-test-badge')).toHaveText('TEST');
       const text = await receipt.innerText();
-      assert.ok(text.includes(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(paid.total.minor) / 100)));
+      assert.ok(text.includes(formatMoney(paid.total)));
       assert.ok(text.includes(`${paid.lines[0].name} × ${paid.lines[0].quantity}`));
       const image = receipt.locator('img');
       await expect(image).toHaveCount(1);
@@ -230,25 +324,6 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),t
       await expect(receipt.locator('[data-guest-checkout-order-items]')).toBeVisible();
       await expect(receipt.locator('[data-guest-checkout-order-totals]')).toBeVisible();
       await page.emulateMedia({ media: 'screen' });
-      if (artifacts && !paintedSnapshot && width === 1440 && colorScheme === 'light') {
-        // Paint-only clone: remove all scripts and private receipt/contact/tracking
-        // before writing anything. Actual browser assertions above use original facts.
-        const html = await page.evaluate(() => {
-          const copy = document.documentElement.cloneNode(true);
-          copy.querySelectorAll('script').forEach(x => x.remove());
-          copy.querySelector('.guest-checkout-order-heading h2').textContent = 'Earlier demo order';
-          const destination = copy.querySelector('.guest-checkout-destination');
-          if (destination) destination.innerHTML = '<h3>Shipping &amp; confirmation details</h3><p>Example shopper</p><p>Address withheld for review</p>';
-          const fulfillment = copy.querySelector('.guest-checkout-fulfillment');
-          if (fulfillment) fulfillment.innerHTML = '<h3>Order status</h3><p>Completed</p><p>Carrier: USPS</p><p>Tracking number: DEMO-TRACKING</p>';
-          copy.querySelectorAll('[src]').forEach(x => { const src = x.getAttribute('src'); if (src.startsWith('https://backroadbum.com/')) x.setAttribute('src', src.slice('https://backroadbum.com'.length)); });
-          copy.querySelector('head').insertAdjacentHTML('afterbegin', '<base href="http://127.0.0.1:4399/">');
-          return '<!doctype html>' + copy.outerHTML;
-        });
-        for (const secret of [original.retention.capability, paid.orderId, paid.receiptId, paid.contactSnapshot?.contact?.email, original.order.completed?.tracking].filter(Boolean)) assert.ok(!html.includes(secret));
-        writeFileSync(join(artifacts, 'redacted-painted.html'), html, { mode: 0o600 });
-        paintedSnapshot = true;
-      }
       const tab = await context.newPage(); await tab.goto(ORIGIN);
       await tab.evaluate(() => localStorage.removeItem('dinkus.guest-checkout.v1'));
       await expect(receipt).toBeHidden(); await expect(page.locator('[data-retained-status]')).toContainText('changed in another tab');
@@ -258,12 +333,16 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),t
       assert.deepEqual(readFileSync(original.path), original.bytes);
       assert.equal(business(), baseline);
       reports.push({ order: `TEST${original.number}`, width, colorScheme, originalStateLoaded: true, sourceSandboxHTTP: true,
-        frozenTotalAndItem: true, actualMediaLoaded: true, completionTrackingEqual: true, print: true,
+        canonicalNumberAndTestBadge: true, frozenTotalAndItem: true, actualMediaLoaded: true, completionTrackingEqual: true, print: true,
         crossTabRevocation: true, originalFileUnchanged: true, newCartCookieUnchanged: true, onlyStatusPosts: true, noOverflow: true });
       await context.close();
     }
     let storefrontProof = null;
+    let historicalLookup = null;
     if (storefront) {
+      stage = 'plain-form historical order lookup';
+      historicalLookup = await proveHistoricalLookup(browser, expect, orders);
+      assert.equal(business(), baseline);
       stage = 'whole storefront HTTPS';
       storefrontProof = await proveStorefrontHTTPS({ browser, expect, origin: ORIGIN,
         assertBusiness: () => assert.equal(business(), baseline), artifacts });
@@ -292,12 +371,18 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),t
     }
     await browser.close(); browser = null;
     assert.equal(business(), baseline);
-    const addedRecords = staged.prepare('SELECT collection,id FROM _plugin_storage WHERE plugin_id=?').all(ID).filter(x => !originalKeys.has(`${x.collection}:${x.id}`));
-    assert.ok(addedRecords.every(x => storefront && ['checkout_carts', 'checkout_guest_capabilities'].includes(x.collection)));
+    const lookupCollection = 'order_lookup_guesses';
+    const addedRecords = staged.prepare('SELECT collection,id,data FROM _plugin_storage WHERE plugin_id=?').all(ID).filter(x => !originalKeys.has(`${x.collection}:${x.id}`));
+    assert.ok(addedRecords.every(x => storefront && ['checkout_carts', 'checkout_guest_capabilities', lookupCollection].includes(x.collection)));
+    if (historicalLookup) {
+      const counters = addedRecords.filter(x => x.collection === lookupCollection);
+      assert.ok(counters.length >= orders.length && counters.every(x => JSON.parse(x.data).tries === 0));
+      historicalLookup.successfulGuessesReturned = true;
+    }
     staged.close(); staged = null;
     let audit = null;
-    if (artifacts && paintedSnapshot) {
-      stage = 'redacted painted audit';
+    if (artifacts) {
+      stage = 'public cart and checkout audit';
       // A loopback HTTP asset proxy avoids granting the audit browser trust in the
       // temporary certificate. Only already-public media/styles/fonts are requested.
       assets = http.createServer((request, response) => {
@@ -307,19 +392,7 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),t
         upstream.on('error', () => { response.writeHead(502); response.end(); }); upstream.end();
       });
       await new Promise((done, fail) => { assets.once('error', fail); assets.listen(4399, '127.0.0.1', done); });
-      const checked = await new Promise((done, fail) => {
-        const child = spawn(process.execPath, ['/var/lib/trialrun/workspace/.pi/skills/ui-design/scripts/audit-dom.mjs', join(artifacts, 'redacted-painted.html'), '--screenshots', join(artifacts, 'audit')], {
-          detached: true, stdio: ['ignore', 'pipe', 'ignore'], env: { PATH: process.env.PATH, HOME: process.env.HOME } });
-        let stdout = '';
-        child.stdout.on('data', chunk => { stdout += chunk; });
-        const timer = setTimeout(() => { void stop(child); }, 120_000);
-        child.on('error', error => { clearTimeout(timer); fail(error); });
-        child.on('exit', status => { clearTimeout(timer); done({ status, stdout }); });
-      });
-      writeFileSync(join(artifacts, 'audit.md'), checked.stdout ?? '', { mode: 0o600 });
-      assert.equal(checked.status, 0);
-      assert.match(checked.stdout, /0 error\(s\), 0 warning\(s\)/);
-      if (storefront) for (const surface of ['cart', 'checkout']) {
+      for (const surface of ['cart', 'checkout']) {
         const result = await new Promise((done, fail) => {
           const child = spawn(process.execPath, ['/var/lib/trialrun/workspace/.pi/skills/ui-design/scripts/audit-dom.mjs', join(artifacts, `${surface}-painted.html`), '--screenshots', join(artifacts, `${surface}-audit`)], {
             detached: true, stdio: ['ignore', 'pipe', 'ignore'], env: { PATH: process.env.PATH, HOME: process.env.HOME } });
@@ -331,14 +404,17 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),t
         writeFileSync(join(artifacts, `${surface}-audit.md`), result.stdout, { mode: 0o600 });
         assert.equal(result.status, 0); assert.match(result.stdout, /0 error\(s\), 0 warning\(s\)/);
       }
-      audit = 'painted DOM clones: 390/1440 Light/Dark clean; actual facts asserted before cloning';
+      audit = 'public cart and checkout only: 390/1440 Light/Dark clean';
     }
-    return { checkedAt: new Date().toISOString(), candidate: head, candidateBundleSHA256: createHash('sha256').update(readFileSync(join(candidate, 'dist/sandbox/plugin.mjs'))).digest('hex'),
+    assert.equal(digestFile(bundle), candidateBundleSHA256);
+    return { checkedAt: new Date().toISOString(), candidate: head, candidateVersion: descriptor.version, candidateBundleSHA256,
+      emdash: { before: oldEmDash.version, after: nextEmDash.version, applied }, privateReceiptCapturesWritten: false,
       scope: storefront ? 'All merchant src routes/middleware + selected published CMS/catalog/orders + original saved states; source sandbox on isolated local canonical HTTPS, not production configuration' : 'Actual merchant row subset + original browser state + source-built sandbox + merchant page/wrapper; isolated local canonical HTTPS',
       copiedCollections: COLLECTIONS, mediaFiles: media.length, canonicalOrders: orders.length, hostedConsentsCopied: false,
+      source: { verifiedRecoveryArchive: true, readyMediaVerified: recovery.readyMediaVerified, liveDatabaseOpened: false },
       paymentsMounted: false, network: 'loopback-only namespace; canonical hostname resolved locally', businessUnchanged: true,
-      signedInstallation: false, appliedUpgrade: false, paintedAudit: audit, contexts: reports, contentCounts, storefrontProof,
-      newRecordsOnlyCartCapabilities: true };
+      signedInstallation: false, appliedUpgrade: false, paintedAudit: audit, contexts: reports, contentCounts, storefrontProof, historicalLookup,
+      newRecordsRestrictedToCartAndLookupCounters: true };
   } catch (error) {
     const line = /qualify-backroadbum-installed-retained\.mjs:(\d+):\d+/.exec(error.stack ?? '')?.[1] ?? 'unknown';
     const category = ['AssertionError', 'SyntaxError', 'TypeError', 'Error'].includes(error.name) ? error.name : 'Error';
@@ -349,14 +425,15 @@ export default defineConfig({output:'server',adapter:node({mode:'standalone'}),t
     throw new Error(`Private installed recovery failed at ${stage} (checker line ${line}; ${category}${protocol}${safeCode}${helperLine ? `; helper line ${helperLine}` : ''})`);
   } finally {
     await browser?.close();
-    if (assets) await new Promise(done => assets.close(done));
-    if (tls) await new Promise(done => tls.close(done));
+    for (const listener of [assets, tls]) if (listener) {
+      listener.closeAllConnections();
+      await new Promise(done => listener.close(done));
+    }
     await stop(server);
     staged?.close();
     if (source?.open) { try { source.exec('ROLLBACK'); } catch {} source.close(); }
     await db?.destroy();
     if (site) rmSync(site, { recursive: true, force: true });
-    if (linkedPeers) rmSync(linkedPeers);
     process.umask(originalUmask);
   }
 }
@@ -365,6 +442,6 @@ if (import.meta.main) {
   try {
     const input = options(process.argv.slice(2));
     if (input) console.log(JSON.stringify(await qualify(input), null, 2));
-    else console.log('No action. Private operator check requires --check --candidate=<built beta2> in a loopback-only network namespace.');
+    else console.log('No action. Private operator check requires --check --candidate=<built pinned Commerce> --archive=<completed recovery archive> in a loopback-only network namespace.');
   } catch (error) { console.error(error.message.startsWith('Private installed') ? error.message : 'Invalid check arguments or missing isolation'); process.exitCode = 1; }
 }

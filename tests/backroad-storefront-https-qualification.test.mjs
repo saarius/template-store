@@ -8,10 +8,11 @@ import { options } from '../scripts/qualify-backroadbum-installed-retained.mjs';
 import { copyPublicContent, copyPublicProductMembership, isolatedServerCommand, PUBLIC_CONTENT_TABLES } from '../scripts/lib/storefront-https-proof.mjs';
 
 test('whole storefront is an explicit extra scope, not the default retained read', () => {
-  assert.equal(options(['--check', '--candidate=/source']).storefront, false);
-  assert.equal(options(['--check', '--storefront', '--candidate=/source']).storefront, true);
-  for (const args of [['--storefront', '--candidate=/source'], ['--check', '--storefront', '--storefront'],
-    ['--check', '--candidate=/source', '--arbitrary-mode']]) assert.throws(() => options(args));
+  const archive = '--archive=/var/lib/backroadbum/backups/20261123T042007.391546Z.tar.gz';
+  assert.equal(options(['--check', '--candidate=/source', archive]).storefront, false);
+  assert.equal(options(['--check', '--storefront', '--candidate=/source', archive]).storefront, true);
+  for (const args of [['--storefront', '--candidate=/source', archive], ['--check', '--storefront', '--storefront', archive],
+    ['--check', '--candidate=/source', '--arbitrary-mode', archive]]) assert.throws(() => options(args));
 });
 
 test('server hides both hardcoded operational directories before dropping root', () => {

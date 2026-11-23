@@ -34,7 +34,9 @@ test('the armed retained/storefront checker uses managed scopes for servers and 
   const source = readFileSync(new URL('../scripts/qualify-backroadbum-installed-retained.mjs', import.meta.url), 'utf8');
   assert.match(source, /spawnQualificationProcess as spawn, stopQualificationProcess as stop/);
   assert.ok(!source.includes('process.kill('));
-  assert.equal((source.match(/\bspawn\(/g) ?? []).length, 3);
+  assert.equal((source.match(/\bspawn\(/g) ?? []).length, 2);
+  assert.match(source, /const \[file, args\] = isolatedServerCommand\(site, serverEnv,/);
+  assert.doesNotMatch(source, /\.(?:screenshot|storageState|content|pdf)\s*\(/);
 });
 
 test('never stops a foreign process handle; missing process and repeated no-op are safe', async () => {
