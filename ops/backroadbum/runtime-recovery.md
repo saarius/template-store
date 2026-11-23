@@ -1,17 +1,18 @@
 # Isolated store-runtime recovery
 
-The opt-in drill boots an existing private archive with the **current deployed code and primary dependencies**. It is a local runtime rehearsal, not a second live store, a self-contained backup, a provider test or a promotion procedure. The daily backup timer still performs the cheaper offline media check only.
+The opt-in drill boots an existing private archive with the **current or a named retained release and the primary dependency tree**. It is a local runtime rehearsal, not a second live store, a self-contained backup, a provider test or a promotion procedure. The daily backup timer still performs the cheaper offline media check only.
 
 From the primary template-store checkout, on this systemd host with Node 24 and passwordless agent sudo:
 
 ```sh
 python3 ops/backroadbum/verify_runtime_recovery.py
 python3 ops/backroadbum/verify_runtime_recovery.py --check --archive PRIVATE_ARCHIVE
+python3 ops/backroadbum/verify_runtime_recovery.py --check --archive PRIVATE_ARCHIVE --release RETAINED_RELEASE_ID
 python3 -m unittest discover -s ops/backroadbum -p test_runtime_recovery.py -v
 node --test ops/backroadbum/test_runtime_recovery.mjs
 ```
 
-Choose one completed 0600 archive under the private backups directory. Without `--check` nothing starts; an explicit archive is required. Success emits one aggregate `backroadbum.runtime-recovery-check/v1` JSON report. Failure emits a fixed message; runtime logs, archive contents, key IDs, decrypted connections and rows are never relayed.
+Choose one completed 0600 archive under the private backups directory. Without `--check` nothing starts; an explicit archive is required. `--release` takes a retained deployment ID (`YYYYMMDDTHHMMSSZ`), not a path or symlink. Omit it to boot the current release. Success emits one aggregate `backroadbum.runtime-recovery-check/v1` JSON report with `retainedRelease`; selection never repoints `current`. Failure emits a fixed message; runtime logs, archive contents, key IDs, decrypted connections and rows are never relayed.
 
 ## Isolation and scope
 
@@ -19,7 +20,13 @@ Choose one completed 0600 archive under the private backups directory. Without `
 - A transient agent-owned systemd service bind-mounts the copy **over the live data path inside its own mount namespace**, with the deployed release read-only. Live private configuration, controller state/sessions and the agent home are hidden. The remaining host filesystem is read-only; temporary runtime files stay private.
 - `PrivateNetwork=yes` gives the process and its workerd descendants a different network namespace with loopback only. Neither hosted services nor the live storefront are reachable. The child refuses execution outside that namespace or without its restored-copy marker and hidden-live-path checks. It uses the archived ring, never the live environment file.
 - The HTTP reader admits only six named public pages, the installed Commerce public catalog, the passive agent JSON feed, archived media, up to 32 published/undeleted Field Notes derived from the restored CMS, and the anonymous EmDash admin redirect. Unsafe, duplicate or over-limit note routes refuse the drill; arbitrary pages/APIs and query capabilities remain inadmissible. It follows no redirects and performs no POST, checkout preparation/start, connection, quote, label or completion action. Every ready media file is checked offline; one is also served over HTTP and hash-checked.
-- Final scoped CMS/business rows, **all plugin storage** (including saved carts/capabilities) and media rows must match their preboot copies. The aggregate report includes all six scoped collection counts, Field Note HTTP checks and actual agent-feed family/member counts; it emits no records or private identities. Runtime shutdown must drain successfully; systemd bounds all descendants, memory and elapsed time. The parent stops the unit before removing private temporary data, including after failure/interruption.
+- Final scoped CMS/business rows, **all plugin storage** (including saved carts/capabilities) and media rows must match their preboot copies. The aggregate report includes all six scoped collection counts, `businessCollectionsSha256`, Field Note HTTP checks and actual agent-feed family/member counts; it emits no records or private identities. To compare an archive with the baseline from `node scripts/inspect-backroadbum-business.mjs --check`, hash the baseline’s `collections` object in emitted order with `jq -cj .collections BASELINE | sha256sum` (`-j` omits the newline). Compare that digest to the report; this is not a whole-database checksum. Runtime shutdown must drain successfully; systemd bounds all descendants, memory and elapsed time. The parent stops the unit before removing private temporary data, including after failure/interruption.
+
+## Verified November 23, 2026
+
+The same completed 10:35 UTC archive booted both the current release `20261123T103500Z` and the previous retained release `20261123T100414Z`. Both served ten archived Field Notes and the seven-family, eleven-member agent feed, checked ten ready media files and one media response, decrypted three archived plugin settings, retained ten Orders and stopped cleanly. The live release pointer and business digests did not change. Eight Python tests and seven Node tests passed; evidence is in `evidence/2026-11-23-cutover-recovery/` in the operator workspace.
+
+These releases share the current primary dependencies. This drill did not replace the serving database, revert EmDash migrations, restore unit configuration or exercise hosted callbacks. See the [Stage B rollback plan](server-cart-upgrade.md#stage-b-rollback-point--before-the-maintenance-window) before changing the dependency tree or upgrading Commerce.
 
 ## Verified November 16, 2026
 

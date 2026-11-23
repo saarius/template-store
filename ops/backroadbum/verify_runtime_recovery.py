@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 import pathlib
+import re
 import subprocess
 import tarfile
 import tempfile
@@ -60,11 +61,24 @@ def unit_command(destination, release, unit, host_namespace):
             '/opt/node/bin/node', str(REPO / 'ops/backroadbum/verify-runtime-recovery.mjs')]
 
 
-def verify_archive(archive):
-    # Host artifacts are deliberate inputs, not claimed to have come from the archive.
-    release = (ROOT / 'current').resolve(strict=True)
-    if release.parent != ROOT / 'releases' or not (release / 'server/entry.mjs').is_file():
+def retained_release(release_id=None):
+    releases = ROOT / 'releases'
+    if release_id is None:
+        release = (ROOT / 'current').resolve(strict=True)
+    else:
+        if not re.fullmatch(r'[0-9]{8}T[0-9]{6}Z', release_id):
+            raise RuntimeError('runtime_release_refused')
+        release = releases / release_id
+    if (release.parent != releases or not re.fullmatch(r'[0-9]{8}T[0-9]{6}Z', release.name) or
+            release.resolve(strict=True) != release):
         raise RuntimeError('runtime_release_refused')
+    regular_file(release / 'server/entry.mjs')
+    return release
+
+
+def verify_archive(archive, release_id=None):
+    # Host artifacts are deliberate inputs, not claimed to have come from the archive.
+    release = retained_release(release_id)
     host_namespace = os.readlink('/proc/self/ns/net')
     unit = 'backroadbum-restore-' + uuid.uuid4().hex[:12]
     with tempfile.TemporaryDirectory(prefix='.brb-runtime-recovery-', dir=REPO.parent.parent) as temp:
@@ -80,8 +94,10 @@ def verify_archive(archive):
                 raise RuntimeError('runtime_drill_refused')
             report = json.loads(result.stdout)
             if (report.get('schema') != 'backroadbum.runtime-recovery-check/v1' or
-                    report.get('outboundNetwork') != 'isolated' or report.get('businessRowsUnchanged') is not True):
+                    report.get('outboundNetwork') != 'isolated' or report.get('businessRowsUnchanged') is not True or
+                    not re.fullmatch(r'[a-f0-9]{64}', report.get('businessCollectionsSha256') or '')):
                 raise RuntimeError('runtime_report_refused')
+            report['retainedRelease'] = release.name
             report['readyMediaVerified'] = media['readyMediaVerified']
             report['restoredUploadFiles'] = media['restoredUploadFiles']
             return report
@@ -94,6 +110,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true')
     parser.add_argument('--archive', type=pathlib.Path)
+    parser.add_argument('--release', metavar='RELEASE_ID', help='Retained deployment to boot instead of current')
     args = parser.parse_args()
     os.umask(0o077)
     if not args.check:
@@ -102,7 +119,7 @@ if __name__ == '__main__':
         parser.exit(1, 'An explicit private archive is required.\n')
     else:
         try:
-            print(json.dumps(verify_archive(args.archive)))
+            print(json.dumps(verify_archive(args.archive, args.release)))
         except (Exception, KeyboardInterrupt):
             # Never relay runtime logs, keys, rows, archive paths or subprocess exceptions.
             parser.exit(1, 'Isolated runtime recovery check failed; live files were not replaced.\n')

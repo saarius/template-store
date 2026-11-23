@@ -147,12 +147,13 @@ export async function inspectRuntimeCopy() {
     for (let n = 0; n < 110 && !exited; n++) await delay(100);
     assert.equal(exited?.code, 0, 'Restored runtime must drain cleanly');
     assert.deepEqual(snapshot(), before, 'Runtime reads and shutdown must retain all scoped business rows');
+    const business = Object.entries(before).filter(([, value]) => value.source !== 'runtime-table');
     return { schema: 'backroadbum.runtime-recovery-check/v1', checkedAt: new Date().toISOString(),
       outboundNetwork: 'isolated', liveFilesReplaced: false, hostPrivateConfigurationHidden: true,
       archivedCredentialDecryption: credentials.decryption, encryptedPlugins: credentials.encryptedPlugins,
       pages, fieldNotePagesVerified: fieldNotePaths.length, agentCatalog,
-      businessCollectionsRetained: Object.fromEntries(Object.entries(before)
-        .filter(([, value]) => value.source !== 'runtime-table').map(([name, value]) => [name, value.count])),
+      businessCollectionsRetained: Object.fromEntries(business.map(([name, value]) => [name, value.count])),
+      businessCollectionsSha256: createHash('sha256').update(JSON.stringify(Object.fromEntries(business))).digest('hex'),
       catalogProducts: catalog.data.products.length, catalogRegistryRuntime: 'ok',
       mediaHttpAndHash: 'ok', anonymousAdminRequiresSignIn: true, adminSignInTested: false,
       businessRowsUnchanged: true, allPluginStorageAndMediaRowsUnchanged: true,

@@ -109,24 +109,49 @@ class RuntimeRecoveryTests(unittest.TestCase):
         self.assertFalse(any('EnvironmentFile' in arg for arg in command))
         self.assertFalse(any('ENCRYPTION_KEY=' in arg for arg in command))
 
-    def test_parent_stops_unit_and_removes_private_copy_on_success_failure_and_timeout(self):
-        release = self.root / 'releases/current-code'
+    def create_release(self, name):
+        release = self.root / 'releases' / name
         (release / 'server').mkdir(parents=True)
         (release / 'server/entry.mjs').write_text('// synthetic code, never executed')
+        return release
+
+    def test_retained_release_rejects_path_aliases_and_linked_entries(self):
+        release = self.create_release('20261123T103500Z')
         (self.root / 'current').symlink_to(release, target_is_directory=True)
+        (release.parent / '20261123T100000Z').symlink_to(release, target_is_directory=True)
+        linked = self.create_release('20261123T101500Z')
+        (linked / 'server/entry.mjs').unlink()
+        (linked / 'server/entry.mjs').symlink_to(release / 'server/entry.mjs')
+        with patch.object(recovery, 'ROOT', self.root):
+            self.assertEqual(recovery.retained_release(), release)
+            for invalid in ('', str(release), '../' + release.name, '20261123T100000Z',
+                            '20261123T101500Z', '20261123T101000Z'):
+                with self.subTest(invalid=invalid), self.assertRaises((RuntimeError, FileNotFoundError)):
+                    recovery.retained_release(invalid)
+
+    def test_parent_stops_unit_and_removes_private_copy_on_success_failure_and_timeout(self):
+        current = self.create_release('20261123T103500Z')
+        release = self.create_release('20261123T100000Z')
+        (self.root / 'current').symlink_to(current, target_is_directory=True)
         repo = self.root / 'workspace/repos/template-store'
         repo.mkdir(parents=True)
         report = {'schema': 'backroadbum.runtime-recovery-check/v1', 'outboundNetwork': 'isolated',
-                  'businessRowsUnchanged': True}
+                  'businessRowsUnchanged': True, 'businessCollectionsSha256': 'a' * 64}
         success = subprocess.CompletedProcess([], 0, json.dumps(report), '')
+        missing_digest = subprocess.CompletedProcess([], 0, json.dumps({**report, 'businessCollectionsSha256': ''}), '')
         failure = subprocess.CompletedProcess([], 1, 'private-never-relay', 'private-never-relay')
         timeout = subprocess.TimeoutExpired('synthetic', 1, output='private-never-relay')
-        for outcome in [success, failure, timeout]:
+        for outcome in [success, missing_digest, failure, timeout]:
             with self.subTest(outcome=type(outcome).__name__), patch.object(recovery, 'ROOT', self.root), \
                     patch.object(recovery, 'REPO', repo), patch.object(recovery.subprocess, 'run') as run:
                 run.side_effect = [outcome, subprocess.CompletedProcess([], 0, '', '')]
                 if outcome is success:
-                    self.assertEqual(recovery.verify_archive(self.archive)['readyMediaVerified'], 1)
+                    result = recovery.verify_archive(self.archive, release.name)
+                    self.assertEqual(result['readyMediaVerified'], 1)
+                    self.assertEqual(result['retainedRelease'], release.name)
+                    self.assertIn(f'BindReadOnlyPaths={release}:{self.root}/restored-release',
+                                  run.call_args_list[0].args[0])
+                    self.assertEqual((self.root / 'current').resolve(), current)
                 else:
                     with self.assertRaises(Exception):
                         recovery.verify_archive(self.archive)

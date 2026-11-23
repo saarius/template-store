@@ -879,11 +879,14 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('separates opt-in archived runtime proof from unattended media checks and remaining recovery gaps', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const coverage = source.match(/<div><dt>Recovery coverage<\/dt>[\s\S]*?<\/div>/)?.[0];
-    expect(coverage).toContain('ready media sizes/hashes automatically');
-    expect(coverage).toContain('opt-in runtime drill');
-    expect(coverage).toContain('private network namespace');
-    expect(coverage).toContain('current deployed code/dependencies reused, not restored from backup');
-    expect(coverage).toContain('admin sign-in, hosted authorization and off-host recovery unverified');
+    const dispatch = source.match(/<article[^>]+data-cutover-recovery-dispatch>[\s\S]*?<\/article>/)?.[0];
+    const history = source.match(/<article[^>]+data-cutover-recovery-history>[\s\S]*?<\/article>/)?.[0];
+    expect(coverage).toContain('Backups check ready media sizes and hashes automatically.');
+    expect(coverage).toContain('both retained storefront releases opened the same archive in isolation');
+    expect(coverage).toContain('Both used the installed dependency tree.');
+    expect(coverage).toContain('Admin sign-in, hosted authorization and off-host recovery were not tested.');
+    expect(dispatch).toContain('The live store was not rolled back');
+    expect(history).toContain('switching only the release cannot undo a database migration');
     expect(source).toContain('An existing private archive now boots');
   });
   it('separates starter contrast repair from adaptive merchant surfaces and real account activity', () => {
