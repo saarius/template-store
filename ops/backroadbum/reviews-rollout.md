@@ -2,6 +2,12 @@
 
 Owner Steers 9–10 authorize adoption of signed Reviews and local Courier dogfooding after bootstrap. Treat the reviews rollout separately from the same-ID Commerce server-cart cutover. Reviews accepts `order.shipped` from Commerce, not a carrier's label purchase; older completions that have no shipment-news key are not backfilled. Commerce's source emitter uses a stable event ID even on reopen/recomplete. Reviews deduplicates in its own store; Courier's `delivered` count is items handed over, not rows newly inserted.
 
+## Review email stop and reminder · November 23
+
+[Reviews #9](https://github.com/dinkuskit/reviews/pull/9) and [#10](https://github.com/dinkuskit/reviews/pull/10) now pair with [Template #263](https://github.com/dinkuskit/template-store/pull/263). A disposable Field Journal Node store ran the compiled Reviews bundle at its Registry ID, using synthetic shipment deliveries and a local email sink. Two link opens did not stop mail. A keyboard confirmation did; it survived restart, stopped reminders and future requests for that address regardless of capitalization, and left already-issued review links usable. A different buyer received one reminder for their remaining item only, and could still stop email after the 60-day review link expired.
+
+Staging **463b381** also applies the saved Field Journal appearance before the footer loads and restores the header’s skip target on `/review`. The page still uses `no-store`, `no-referrer` and noindex. See `evidence/2026-11-23-cycle-0642/cycle.md` for browser and painted proof. This rehearsal invoked the actual due-task executor after moving only fixture deadlines; it does not prove automatic scheduling, Courier sender resolution, signed install, ratings in the agent feed or real email delivery. The store still runs without Reviews.
+
 ## Before enabling email on Backroad Bum
 
 - Verify the signed artifacts and the intended Commerce sender ID in the actual install. A configured plugin can be reached at `dinkus-commerce`, but the live stable Registry namespace is `r_gshdrqaldna3r7sn`; the separate beta package must not become the live sender. Rehearse the pair with the Registry mount, not just configured plugin IDs. [Courier #3](https://github.com/dinkuskit/courier/issues/3) has the reproduced failure and the configured-source control. Local evidence: `evidence/2026-11-22-commerce-review-bridge/` in the operator workspace.
