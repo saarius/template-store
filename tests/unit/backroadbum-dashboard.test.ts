@@ -87,6 +87,19 @@ describe('Backroad Bum dashboard route boundaries', () => {
     for (const shot of ['before-390.png', 'after-390.png']) expect(ledger).toContain(`/pr-proof/template-store-cart-return/${shot}`);
     expect(ledger).toContain('Not deployed to Backroad Bum.');
   });
+  it('distinguishes the proposed starter size-warning fix from the live theme fix', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const history = report.match(/<article[^>]+data-starter-variant-notice-history>[\s\S]*?<\/article>/)?.[0];
+    const ledger = reviews.match(/<tr data-starter-variant-notice-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(history).toContain('template-store/pull/268');
+    expect(history).toContain('if checkout is unavailable');
+    expect(ledger).toContain('Open for review');
+    expect(ledger).toContain('equivalent Backroad Bum fix is already live');
+    for (const shot of ['before-390.png', 'after-390.png']) {
+      expect(ledger).toContain(`/pr-proof/template-store-variant-purchase-notice/${shot}`);
+    }
+  });
   it('reports saving quantities and the payment hold without claiming a live cart upgrade', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
