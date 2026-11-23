@@ -12,7 +12,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
     }
     const hold = reviews.match(/<tr data-starter-payment-hold-ledger>[\s\S]*?<\/tr>/)?.[0];
     expect(hold).toContain('template-store/issues/265');
-    expect(hold).toContain('No pull request or live cart change');
+    expect(hold).toContain('template-store/pull/266');
+    expect(hold).toContain('Not deployed to Backroad Bum');
+    expect(report).toContain('data-held-payment-receipt-dispatch');
+    expect(report).toContain('data-held-payment-receipt-history');
+    expect(report).toContain('Another browser could not open the receipt');
     expect(report).toContain('This used a local inbox; Reviews is not installed');
   });
   it('reports saving quantities and the payment hold without claiming a live cart upgrade', () => {
