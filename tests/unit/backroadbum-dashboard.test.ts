@@ -16,6 +16,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(hold).toContain('Not deployed to Backroad Bum');
     expect(report).toContain('data-held-payment-receipt-dispatch');
     expect(report).toContain('data-held-payment-receipt-history');
+    const merchant = report.match(/<article[^>]+data-field-journal-held-return-history>[\s\S]*?<\/article>/)?.[0];
+    expect(merchant).toContain('commit/16e89e6');
+    expect(merchant).toContain('simulated Payments');
+    expect(merchant).toContain('The live checkout is unchanged.');
+    expect(hold).toContain('Field Journal pairing');
     expect(report).toContain('Another browser could not open the receipt');
     expect(report).toContain('This used a local inbox; Reviews is not installed');
   });
