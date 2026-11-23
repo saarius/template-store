@@ -28,7 +28,7 @@ import { getPickUp, postAdd, postChange, postStop, postUpdate, postUpdateForm } 
 import { loadCheckoutReturn } from "../../src/features/guest-cart/server-return.js";
 
 type Line = { catalogItemId: string; quantity: number };
-type Attempt = { attemptId: string; state: "pending" | "paid" | "released-retry"; redirectUrl: string | null; order?: Record<string, unknown> };
+type Attempt = { attemptId: string; state: "pending" | "paid" | "released-retry" | "recoverable-failure"; redirectUrl: string | null; order?: Record<string, unknown> };
 
 /** A stand-in for Commerce's public guest routes: prepare, cart (read or versioned replace) and start. */
 function fakeCommerce() {
@@ -523,6 +523,18 @@ describe("thank-you page", () => {
       .toEqual({ kind: "confirming", refreshUrl: "/checkout/success?check=1", refreshSeconds: 3 });
     expect(await loadCheckoutReturn(context(commerce, jar, { url: "https://shop.test/checkout/success?check=10" }))).toEqual({ kind: "slow" });
     expect(await loadCheckoutReturn(context(commerce, jar, { url: "https://shop.test/checkout/success?check=abc" }))).toEqual({ kind: "slow" });
+  });
+
+  it("keeps an unresolved attempt held until Commerce confirms the outcome", async () => {
+    const commerce = fakeCommerce();
+    const jar = fakeCookies();
+    await addToServerCart(context(commerce, jar), { catalogItemId: "item_hat", quantity: 1 });
+    const cart = commerce.carts.get("cap1")!;
+    cart.attempt = { attemptId: "att_1", state: "recoverable-failure", redirectUrl: null };
+    const check = () => loadCheckoutReturn(context(commerce, jar, { url: "https://shop.test/checkout/success" }));
+    expect(await check()).toEqual({ kind: "held" });
+    cart.attempt = { attemptId: "att_1", state: "released-retry", redirectUrl: null };
+    expect(await check()).toEqual({ kind: "not-paid", redirect: "/cart?cart_error=NOT_PAID" });
   });
 
   it("sends an unpaid return back to the cart with the items kept, and has no order without the cookie", async () => {

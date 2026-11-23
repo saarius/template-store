@@ -180,19 +180,28 @@ describe('native merchant journey rendering', () => {
   it('offers a read-only status check while the cart is held without a payment link', async () => {
     const held = { ...page, paymentHeld: true };
     const checkout = await renderCheckout({ page: held });
-    expect(tag(checkout, 'a', 'data-guest-cart-payment-status', '').href).toBe('/checkout');
+    expect(tag(checkout, 'a', 'data-guest-cart-payment-status', '').href).toBe('/checkout/success');
     expect(tag(checkout, 'a', 'data-checkout-edit-cart', '').href).toBe('/cart');
     expect(checkout).toContain('View cart');
     expect(checkout).not.toContain('data-checkout-form');
     expect(checkout).not.toContain('data-guest-cart-resume');
     const container = await AstroContainer.create();
     const cart = await container.renderToString(Cart, { props: { page: held, checkoutAdmission: {} } });
-    expect(tag(cart, 'a', 'data-guest-cart-payment-status', '').href).toBe('/cart');
+    expect(tag(cart, 'a', 'data-guest-cart-payment-status', '').href).toBe('/checkout/success');
     for (const attribute of ['qty', 'update', 'remove']) {
       expect(tag(cart, attribute === 'qty' ? 'input' : 'button', `data-guest-cart-${attribute}`, 'synthetic-notebook')).toHaveProperty('disabled');
     }
     expect(cart).not.toContain('data-guest-cart-proceed');
     expect(cart).not.toContain('data-guest-cart-resume');
+  });
+
+  it('lets the shopper check an unresolved payment again or return to the held cart', async () => {
+    const html = await renderReceipt({ kind: 'held' });
+    expect(html).toContain('Payment not confirmed');
+    expect(tag(html, 'a', 'data-guest-checkout-status-retry', '').href).toBe('/checkout/success');
+    expect(tag(html, 'a', 'data-guest-checkout-back-to-cart', '').href).toBe('/cart');
+    expect(html).not.toContain('Continue shopping');
+    expect(html).not.toContain('Track your order');
   });
 
   it('renders native print guidance and paid details only for a confirmed order', async () => {
@@ -211,7 +220,7 @@ describe('native merchant journey rendering', () => {
 
   it.each([
     { kind: 'confirming', refreshUrl: '/checkout/success?check=2', refreshSeconds: 3 },
-    { kind: 'slow' }, { kind: 'no-cart' }, { kind: 'unavailable' },
+    { kind: 'slow' }, { kind: 'held' }, { kind: 'no-cart' }, { kind: 'unavailable' },
   ] satisfies CheckoutReturn[])('never paints paid or print details in $kind', async result => {
     const html = await renderReceipt(result);
     expect(html).toContain(`data-guest-checkout-return-state="${result.kind}"`);

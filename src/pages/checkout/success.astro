@@ -46,7 +46,7 @@ if (result.kind === "not-paid") return Astro.redirect(result.redirect, 303);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Order confirmation | {STORE_TITLE}</title>
+    <title>{result.kind === "held" ? "Payment status" : "Order confirmation"} | {STORE_TITLE}</title>
     {result.kind === "confirming" && <meta http-equiv="refresh" content={`${result.refreshSeconds};url=${result.refreshUrl}`} />}
   </head>
   <body data-storefront-profile={profile} data-receipt-page>

@@ -38,7 +38,7 @@ const canCheckout = view.checkoutEnabled && !page.paymentHeld;
       ) : (
         <>
           <p data-guest-cart-checkout-reason>Your last payment is not yet confirmed. The cart stays on hold until we know how it ended.</p>
-          <a data-guest-cart-payment-status href="/cart">Check payment status</a>
+          <a data-guest-cart-payment-status href="/checkout/success">Check payment status</a>
         </>
       )}
     </div>

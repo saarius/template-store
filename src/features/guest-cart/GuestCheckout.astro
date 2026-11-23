@@ -82,7 +82,7 @@ const dataName = (field: string) => field === "postalCode" ? "postal-code" : fie
       <div class="guest-checkout-vault">
         <h2 class="guest-checkout-payment-status-title">Payment status</h2>
         <p data-guest-cart-checkout-reason>Your last payment is not yet confirmed. Check its status before starting another checkout.</p>
-        <a class="guest-checkout-payment-status" data-guest-cart-payment-status href="/checkout">Check payment status</a>
+        <a class="guest-checkout-payment-status" data-guest-cart-payment-status href="/checkout/success">Check payment status</a>
       </div>
     ) : (
     <form class="guest-checkout-vault" method="post" action="/checkout" data-checkout-vault data-checkout-form novalidate>
