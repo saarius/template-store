@@ -4,7 +4,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
-import { COMMERCE_ID, openProductsList } from "./helpers/product-page";
+import { COMMERCE_ID, listCatalog } from "./helpers/product-page";
 
 const proofRoot = resolve("runs/order-lookup-20261122/browser");
 
@@ -115,10 +115,16 @@ test("the installed Commerce finds one order for its number and email, and limit
   test.setTimeout(180_000);
   const root = resolve(proofRoot, testInfo.project.name);
   await mkdir(root, { recursive: true });
-  // The installed Commerce builds its storage indexes on a fresh store's first admin requests.
-  const admin = await browser.newPage();
-  await openProductsList(admin);
-  await admin.close();
+  // Bootstrap the sandbox via the authenticated API. Rendering the whole admin
+  // is unrelated to lookup and competes with the shopper page for dev-server heap.
+  const admin = await browser.newContext();
+  try {
+    const signedIn = await admin.request.get("/_emdash/api/auth/dev-bypass?redirect=/_emdash/api/content/products");
+    expect(signedIn.ok()).toBe(true);
+    await listCatalog(admin.request);
+  } finally {
+    await admin.close();
+  }
   expect(existsSync(DATABASE)).toBe(true);
   // One pair of orders per browser project, so desktop and mobile runs never share an order number or an email.
   const base = testInfo.project.name.includes("mobile") ? 7200 : 7100;
@@ -159,17 +165,27 @@ test("the installed Commerce finds one order for its number and email, and limit
   expect(await page.content()).not.toContain("Pat Shopper");
   trace.push({ step: "same number, another email", orderNumber: String(pat.number), email: sam.email, status: 422 });
 
-  // 3. Five wrong emails for Sam's number lock it: even Sam's own email is refused, before anything is shown.
+  // 3. Exercise the fixed synthetic guesses over HTTP to avoid reloading the dev client
+  // between writes. Check the server-rendered limit response, not a client-side message.
+  const origin = new URL(page.url()).origin;
   for (const guess of ["a", "b", "c", "d", "e"]) {
     const email = `${guess}.${tag}@example.test`;
-    expect(await lookUp(page, String(sam.number), email)).toBe(422);
+    const refusal = await page.request.post("/track-order", {
+      headers: { origin }, form: { orderNumber: String(sam.number), email },
+    });
+    expect(refusal.status()).toBe(422);
+    await refusal.dispose();
     trace.push({ step: "wrong guess", orderNumber: String(sam.number), email, status: 422 });
   }
-  expect(await lookUp(page, String(sam.number), sam.email)).toBe(429);
-  await expect(page.locator("[data-order-lookup-error]")).toHaveText("Too many tries. Try again in an hour.");
-  await expect(page.locator("[data-order-lookup-order]")).toHaveCount(0);
-  expect(await page.content()).not.toContain("Sam Shopper");
-  await page.screenshot({ path: resolve(root, "limited.png"), fullPage: true });
+  const limited = await page.request.post("/track-order", {
+    headers: { origin }, form: { orderNumber: String(sam.number), email: sam.email },
+  });
+  expect(limited.status()).toBe(429);
+  const limitedHtml = await limited.text();
+  expect(limitedHtml).toContain("Too many tries. Try again in an hour.");
+  expect(limitedHtml).not.toContain("data-order-lookup-order=");
+  expect(limitedHtml).not.toContain("Sam Shopper");
+  await limited.dispose();
   trace.push({ step: "right pair after 5 wrong tries", orderNumber: String(sam.number), email: sam.email, status: 429 });
   const guesses = rows<{ data: string }>(`SELECT data FROM _plugin_storage WHERE plugin_id = ${sql(COMMERCE_RUNTIME_ID)} AND collection = 'order_lookup_guesses'`)
     .map((row) => JSON.parse(row.data) as { tries?: number });
