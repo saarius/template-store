@@ -2,6 +2,19 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes the held-cart issue and local Reviews proof from live adoption', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    for (const marker of ['starter-payment-hold', 'review-mail-stop']) {
+      expect(report).toContain(`data-${marker}-dispatch`);
+      expect(report).toContain(`data-${marker}-history`);
+      expect(reviews).toContain(`data-${marker}-ledger`);
+    }
+    const hold = reviews.match(/<tr data-starter-payment-hold-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(hold).toContain('template-store/issues/265');
+    expect(hold).toContain('No pull request or live cart change');
+    expect(report).toContain('This used a local inbox; Reviews is not installed');
+  });
   it('reports saving quantities and the payment hold without claiming a live cart upgrade', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
