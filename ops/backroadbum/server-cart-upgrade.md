@@ -1,5 +1,13 @@
 # Qualifying a future server-cart upgrade
 
+## Commerce beta.6 shipment bridge · November 23
+
+Stable discovery and GitHub tags still stop at **0.8.0**. The separate beta listing publishes **0.9.0-beta.6**. Source tag **4b1af19** includes the Commerce [shipment outbox](https://github.com/dinkuskit/commerce/pull/296); its Registry-shaped backend passes at **130,141 / 131,072 bytes**, leaving 931 bytes. The starter at **52f34ef** still pairs with beta.5, so do not treat these Commerce checks as a tested starter pin change.
+
+In one disposable database, the 0.8.0 host kept an already completed order and a processing order. The beta.6 bridge on EmDash 1.4 left both rows unchanged until the merchant completed the processing order through Orders. After the move to EmDash 1.5 the compiled outbox exposed only that later completion, preserved both paid snapshots and returned no events after its bookmark. The first final host ran out of V8 heap; replaying just that phase with 1200 MiB against the same database passed. No live orders, hosted postage, Reviews delivery or signed same-ID update were exercised. See `evidence/2026-11-23-commerce-beta6/` in the operator workspace.
+
+For the Field Journal merge, start with the starter’s merged cart lock and deferred refresh, then reapply only merchant presentation, product links and receipt compatibility. Keep the legacy shopper account working until the signed replacement is qualified; the lookup is a separate task. Never substitute the starter’s Cloudflare sender for the current Node HTTPS relay. Courier’s [Registry sender binding](https://github.com/dinkuskit/courier/issues/3) and supported Node scheduling remain separate from the outbox, and neither blocks read-only order lookup. Install no beta ID over the stable merchant.
+
 ## Cutover checks for the new starter · November 22
 
 - [Template #257](https://github.com/dinkuskit/template-store/pull/257) uses EmDash's **Go live** setting for search indexing. Backroad Bum currently returns `X-Robots-Tag: noindex, nofollow` on the home page and public feed. Preserve that behavior in staging and after upgrades; do not toggle indexing as a checkout step. Stripe must independently stay in TEST mode.
