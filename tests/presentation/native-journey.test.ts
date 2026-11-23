@@ -95,9 +95,13 @@ describe('native merchant journey rendering', () => {
     if (linked) expect(links[0].attributes.href).toBe('/products/field-book?item=synthetic-notebook');
     else expect(html).toMatch(/<h2[^>]*>Synthetic notebook<\/h2>/u);
     expect(html).toContain('$12.00');
-    expect(tag(html, 'form', 'data-cart-change-form', '')).toMatchObject({ method: 'post', action: '/cart/change' });
+    expect(tag(html, 'form', 'id', 'guest-cart-form')).toMatchObject({ method: 'post', action: '/cart/update' });
+    expect(tag(html, 'form', 'action', '/cart/change').method).toBe('post');
     expect(tag(html, 'input', 'name', 'id').value).toBe('synthetic-notebook');
-    expect(tag(html, 'input', 'data-guest-cart-qty', 'synthetic-notebook').value).toBe('1');
+    expect(tag(html, 'input', 'data-guest-cart-qty', 'synthetic-notebook')).toMatchObject({ form: 'guest-cart-form', name: 'updates[synthetic-notebook]', value: '1' });
+    expect(tag(html, 'button', 'data-guest-cart-update', 'synthetic-notebook')).toMatchObject({ form: 'guest-cart-form', type: 'submit' });
+    expect(tag(html, 'button', 'data-guest-cart-checkout', '')).toMatchObject({ form: 'guest-cart-form', name: 'checkout', value: '1', type: 'submit' });
+    expect(tag(html, 'button', 'data-guest-cart-remove', 'synthetic-notebook')).not.toHaveProperty('form');
   });
 
   it('renders named shipping and billing controls with native autocomplete and country choices', async () => {

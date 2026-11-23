@@ -44,6 +44,8 @@ const canCheckout = view.checkoutEnabled && !page.paymentHeld;
     </div>
   )}
   {view.empty && <p data-guest-cart-empty tabindex="-1">Your cart is empty. <a href="/shop">Explore the gear</a>.</p>}
+  {/* Update and Check out share the quantities in this native form; Remove is independent. */}
+  <form id="guest-cart-form" method="post" action="/cart/update" data-cart-change-form data-guest-cart-form></form>
   <div data-guest-cart-lines>
     {view.lines.map((line) => (
       <article data-guest-cart-line={line.id}>
@@ -62,13 +64,12 @@ const canCheckout = view.checkoutEnabled && !page.paymentHeld;
           {line.availabilityLabel && <p data-commerce-availability>{line.availabilityLabel}</p>}
           {line.reason && <p data-guest-cart-line-reason={line.reasonCode ?? ""}>{line.reason}</p>}
         </div>
-        <form class="guest-cart-qty" method="post" action="/cart/change" data-cart-change-form>
-          <input type="hidden" name="id" value={line.id} />
+        <div class="guest-cart-qty">
           <label for={`guest-cart-qty-${line.id}`}>Quantity</label>
-          <input id={`guest-cart-qty-${line.id}`} name="quantity" data-guest-cart-qty={line.id} type="number" inputmode="numeric"
+          <input form="guest-cart-form" id={`guest-cart-qty-${line.id}`} name={`updates[${line.id}]`} data-guest-cart-qty={line.id} type="number" inputmode="numeric"
             required min="1" max={String(GUEST_CART_MAX_QUANTITY)} aria-label={`Quantity for ${line.name}`} value={String(line.quantity)} disabled={page.paymentHeld} />
-          <button type="submit" data-guest-cart-update={line.id} disabled={page.paymentHeld}>Update</button>
-        </form>
+          <button type="submit" form="guest-cart-form" data-guest-cart-update={line.id} disabled={page.paymentHeld}>Update</button>
+        </div>
         <form method="post" action="/cart/change" data-cart-change-form>
           <input type="hidden" name="id" value={line.id} />
           <input type="hidden" name="quantity" value="0" />
@@ -81,7 +82,7 @@ const canCheckout = view.checkoutEnabled && !page.paymentHeld;
   {!page.paymentHeld && (
     <div class="guest-cart-checkout">
       {canCheckout ? (
-        <a class="guest-cart-checkout__go" data-guest-cart-checkout data-guest-cart-proceed href="/checkout">{view.checkoutLabel}</a>
+        <button type="submit" form="guest-cart-form" name="checkout" value="1" class="guest-cart-checkout__go" data-guest-cart-checkout data-guest-cart-proceed>{view.checkoutLabel}</button>
       ) : (
         <>
           <button type="button" data-guest-cart-checkout data-guest-cart-proceed disabled>{checkoutAdmission ? view.checkoutLabel : GUEST_CHECKOUT_LABEL}</button>
@@ -128,8 +129,8 @@ const canCheckout = view.checkoutEnabled && !page.paymentHeld;
   [data-guest-cart-line-reason]{color:var(--store-muted);line-height:1.5}
   .guest-cart-qty{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;margin:.25rem 0 0;min-width:0}
   [data-guest-cart-qty]{width:8rem;max-width:100%;min-height:48px;padding:.45rem .55rem;border:1px solid var(--store-line);border-radius:var(--radius-control);font:inherit;background:var(--store-surface);color:var(--store-ink)}
-  [data-guest-cart-line] form button{min-height:48px;padding:.6rem .9rem;border:1px solid var(--store-line);border-radius:var(--radius-control);background:var(--store-surface);color:var(--store-ink);font:inherit;font-weight:600;cursor:pointer}
-  [data-guest-cart-line] form button:hover,[data-guest-cart-qty]:hover{border-color:var(--store-accent);background:var(--store-surface-subtle)}
+  [data-guest-cart-line] button{min-height:48px;padding:.6rem .9rem;border:1px solid var(--store-line);border-radius:var(--radius-control);background:var(--store-surface);color:var(--store-ink);font:inherit;font-weight:600;cursor:pointer}
+  [data-guest-cart-line] button:not(:disabled):hover,[data-guest-cart-qty]:not(:disabled):hover{border-color:var(--store-accent);background:var(--store-surface-subtle)}
   [data-guest-cart-line] form:last-child{grid-column:1/-1;justify-self:start}
   [data-guest-cart-line] button:disabled,[data-guest-cart-qty]:disabled{opacity:.5;cursor:not-allowed}
   [data-guest-cart-qty]:focus-visible,[data-guest-cart-line] button:focus-visible,[data-guest-cart-resume]:focus-visible,[data-guest-cart-payment-status]:focus-visible,[data-guest-cart-empty]:focus-visible{outline:3px solid var(--store-focus-ring);outline-offset:3px}
