@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('separates the staged printed lookup and retained receipt from the live store', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    for (const marker of ['retained-beta6', 'printed-test-lookup', 'beta6-outbox']) {
+      expect(report).toContain(`data-${marker}-history`);
+    }
+    expect(report).toContain('data-retained-beta6-dispatch');
+    expect(report).toContain('/pr-proof/retained-beta6/receipt-390-dark.png');
+    expect(report).toContain('Neither change is live.');
+    const staging = report.match(/<div data-server-cart-staging>[\s\S]*?<\/div>/)?.[0];
+    expect(staging).toContain('commerce/pull/286');
+    expect(staging).toContain('The live cart still uses signed Commerce 0.8.0.');
+  });
   it('reports the merged cart lock, open focus review and isolated reminders-off check', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
