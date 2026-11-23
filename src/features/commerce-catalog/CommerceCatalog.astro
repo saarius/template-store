@@ -4,11 +4,14 @@ import { catalogCardAvailability, type PublicCommerceProduct } from "./index.js"
 import ProductMedia from "./ProductMedia.astro";
 import { demoPlaceholderImage } from "../playground/demo-products.js";
 import { catalogNoticeText } from "../store-shell/checkout-copy.js";
+import { collectionProductPath } from "../store-shell/product-collection.js";
 interface Props {
   products: PublicCommerceProduct[];
   unavailable?: boolean;
   /** Commerce item id -> published EmDash product page path. */
   productPaths?: ReadonlyMap<string, string>;
+  /** Carry the current collection into native card links, not into product facts. */
+  collectionSlug?: string;
   /** Installed checkout admission; the footnote stays quiet when checkout works. */
   checkoutAvailable?: boolean;
   heading?: string;
@@ -16,7 +19,7 @@ interface Props {
   /** Fit inside an existing page container rather than adding another set of gutters. */
   contained?: boolean;
 }
-const { products, unavailable = false, productPaths = new Map(), checkoutAvailable = false,
+const { products, unavailable = false, productPaths = new Map(), collectionSlug, checkoutAvailable = false,
   heading = "Shop", emptyMessage = "No products are listed yet.", contained = false } = Astro.props;
 const notice = catalogNoticeText({ unavailable, productCount: products.length, checkoutAvailable });
 ---
@@ -24,12 +27,13 @@ const notice = catalogNoticeText({ unavailable, productCount: products.length, c
   <header class="shop-catalog__heading"><h2 id="commerce-catalog">{heading}</h2>{!unavailable && products.length > 0 && <p>{products.length} {products.length === 1 ? 'good' : 'goods'} for the road</p>}</header>
   {unavailable ? <p role="alert">The product catalog is temporarily unavailable. Please try again shortly.</p> : products.length === 0 ? <p data-commerce-empty>{emptyMessage}</p> : <div class="shop-grid">
     {products.map(product => {
-      const href = productPaths.get(product.id);
+      const path = productPaths.get(product.id);
+      const href = path && collectionSlug ? collectionProductPath(path, collectionSlug) : path;
       // Names and descriptions stay local even if a product appears in two shelves.
       const cardId = `commerce-card-${crypto.randomUUID()}`;
       const availability = catalogCardAvailability(product);
       const body = <>
-      <ProductMedia image={product.image} productId={product.id} fallbackSrc={demoPlaceholderImage(product.sku, href?.split("/").pop())} fallbackAlt={`${product.name} placeholder image`} />
+      <ProductMedia image={product.image} productId={product.id} fallbackSrc={demoPlaceholderImage(product.sku, path?.split("/").pop())} fallbackAlt={`${product.name} placeholder image`} />
       <div class="shop-card__body">
         <h3 id={href ? `${cardId}-title` : undefined}>{product.name}</h3>
         <div class="shop-card__facts" id={href ? `${cardId}-facts` : undefined}>

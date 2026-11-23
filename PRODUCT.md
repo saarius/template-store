@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Back to the collection you chose · November 23
+A tote opened from Slow camp used to point back to Road day, and the bandana did the reverse. The breadcrumb now returns shoppers to the collection they opened, even after choosing a size without JavaScript. Direct links still use the default collection, and prices, availability and canonical product URLs stay unchanged.
+
 ## The same latest note · November 23
 The journal index now leads with the same native EmDash publication as the home page. The story appears once, older notes keep their relative order, and undated notes remain browsable without being called latest.
 

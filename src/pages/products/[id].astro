@@ -24,6 +24,7 @@ import { availabilityLabels } from "../../features/commerce-catalog/index.js";
 import { demoPlaceholderImage } from "../../features/playground/demo-products.js";
 import { variantPickerView, NO_OFFER_JSON_LD_KEY, type VariantPickerMember } from "../../features/store-shell/variant-picker.js";
 import { productSelection } from "../../features/store-shell/product-selection.js";
+import { resolveProductCollection } from "../../features/store-shell/product-collection.js";
 import { productIdentifiers } from "../../features/store-shell/product-identifiers.js";
 import { summaryLinksToDetails } from "../../features/store-shell/product-details-link.js";
 import { STORE_TITLE, categoryPath, loadStorefrontRouteContext, productPath } from "../../features/store-shell/index.js";
@@ -61,9 +62,8 @@ const item = collections.flatMap((group) => group.items).find((candidate) => pro
     category: "",
     availabilitySource: linkedSource,
   });
-const category = linked?.categorySlugs[0]
-  ? collections.find((group) => group.slug === linked.categorySlugs[0])
-  : undefined;
+const browseCollection = resolveProductCollection(linked?.categorySlugs ?? [], Astro.url.searchParams);
+const category = collections.find((group) => group.slug === browseCollection.slug);
 if (!item) Astro.response.status = 404;
 // The page's own words: a rich summary beside the price and optional sections
 // below it (template-rich-product-page-20261027). Price and stock stay Commerce's.
@@ -255,7 +255,8 @@ const variantJsonLd = productJsonLd && linkedProduct && item && productName && v
             {variantMembers.length > 0 && <>
               <script type="application/json" data-variant-members set:html={jsonLdScript(variantMembers)} />
               <noscript>
-                <form method="get" action={productCanonical} class="product-options-fallback" data-product-options-fallback>
+                <form method="get" action={productPath(item.id)} class="product-options-fallback" data-product-options-fallback>
+                  {browseCollection.context && category && <input type="hidden" name="collection" value={category.slug} />}
                   <label for="product-option">View a product option</label>
                   <p>Load an option to see its current price and availability. Saving items to your cart needs JavaScript.</p>
                   <select id="product-option" name="item" required>

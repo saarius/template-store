@@ -33,7 +33,7 @@ const checkoutAvailable = Boolean(await acquireGuestCheckoutAdmission({ runtime:
   </header> : <div class="missing-collection"><MissingPageContent title="That collection isn’t here." description="It may have moved or is no longer published. Search the store or browse the current gear below." /></div>}
   {category && <>
     <CollectionNav collections={groups} total={products.length} current={category.slug} unavailable={unavailable} />
-    <CommerceCatalog products={category.products} productPaths={paths} unavailable={unavailable} checkoutAvailable={checkoutAvailable} heading="In this collection" emptyMessage="No gear in this collection right now. Browse all gear above for something to take along." />
+    <CommerceCatalog products={category.products} productPaths={paths} collectionSlug={category.slug} unavailable={unavailable} checkoutAvailable={checkoutAvailable} heading="In this collection" emptyMessage="No gear in this collection right now. Browse all gear above for something to take along." />
     <CollectionFieldNotes notes={reading} />
   </>}
 </BackroadPage>
