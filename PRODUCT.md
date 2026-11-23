@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## The same latest note · November 23
+The journal index now leads with the same native EmDash publication as the home page. The story appears once, older notes keep their relative order, and undated notes remain browsable without being called latest.
+
 ## Pick up the latest note · November 23
 The home page now points directly to the latest published note in addition to the complete journal. The title and short preview come from EmDash, not a separate staff-maintained list, and editing an older note does not move it ahead of a newer publication.
 

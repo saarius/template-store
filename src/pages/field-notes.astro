@@ -1,20 +1,34 @@
 ---
 import { getEmDashCollection } from 'emdash';
 import BackroadPage from '../features/store-shell/BackroadPage.astro';
-import { fieldNotes, type FieldNote } from '../features/store-shell/field-notes.js';
-let notes: FieldNote[] = [];
-let unavailable = false;
-try {
-  const { entries } = await getEmDashCollection<'pages', Record<string, unknown>>('pages', { status: 'published' });
-  notes = fieldNotes(entries);
-} catch { unavailable = true; Astro.response.status = 503; }
+import { journalFieldNotes } from '../features/store-shell/field-notes.js';
+const journal = await getEmDashCollection<'pages', Record<string, unknown>>('pages', { status: 'published' })
+  .then(({ entries, error }) => error ? null : journalFieldNotes(entries))
+  .catch(() => null);
+if (!journal) Astro.response.status = 503;
 ---
 <BackroadPage title="Field notes" description="Practical notes for unhurried weekends: packing, planning and taking care of the places you visit.">
   <section class="brb-page field-notes-page"><header class="field-intro"><div><p class="field-kicker">The field journal</p><h1>Leave a little room<br />for the long way.</h1><p class="lead">Practical notes for unhurried weekends. Less conquering the outdoors. More paying attention to it.</p></div>
     <img class="brb-photo" src="/backroad/forest.jpg" alt="A still lake reflecting the surrounding forest and mountains" width="1600" height="1067" fetchpriority="high" decoding="async" /></header>
-    <section class="field-index" aria-label="Published field notes">
-      {unavailable ? <div role="status"><h2>The notes couldn’t load.</h2><p>Try reloading this page in a moment. You can still <a href="/shop">browse the gear</a>.</p></div> : notes.length > 0 ? notes.map((note, index) => <a class="brb-story-link" href={`/${note.slug}`} aria-labelledby={`${note.slug}-title`}><span class="field-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><div><h2 id={`${note.slug}-title`}>{note.title}</h2>{note.excerpt && <p>{note.excerpt}</p>}<span class="field-read">Read the note &rarr;</span></div></a>) : <p>No field notes are published yet. <a href="/shop">Take a look at the gear</a> while we get the next one ready.</p>}
-    </section>
+    {!journal ? <div role="status"><h2>The notes couldn’t load.</h2><p>Try reloading this page in a moment. You can still <a href="/shop">browse the gear</a>.</p></div>
+      : journal.latest || journal.archive.length ? <div class="field-index">
+        {journal.latest && <a id="latest-field-note" class="brb-story-link field-feature" data-journal-feature href={`/${journal.latest.slug}`} aria-labelledby="field-feature-title">
+          <p class="field-kicker">Latest field note</p>
+          <h2 id="field-feature-title">{journal.latest.title}</h2>
+          {journal.latest.excerpt && <p class="field-excerpt">{journal.latest.excerpt}</p>}
+          <span class="field-read">Read the note &rarr;</span>
+        </a>}
+        {journal.archive.length > 0 && <section aria-labelledby="field-archive-title">
+          <h2 id="field-archive-title" class="field-archive-title">{journal.latest ? 'More field notes' : 'Published field notes'}</h2>
+          <div class="field-archive">
+            {journal.archive.map(note => <a class="brb-story-link" href={`/${note.slug}`} aria-labelledby={`${note.slug}-title`}>
+              <h3 id={`${note.slug}-title`}>{note.title}</h3>
+              {note.excerpt && <p class="field-excerpt">{note.excerpt}</p>}
+              <span class="field-read">Read the note &rarr;</span>
+            </a>)}
+          </div>
+        </section>}
+      </div> : <p>No field notes are published yet. <a href="/shop">Take a look at the gear</a> while we get the next one ready.</p>}
     <p class="photo-credit">Forest photograph via <a href="https://images.unsplash.com/photo-1473448912268-2022ce9509d8" rel="noopener">Unsplash</a>. Product designs and field notes by Backroad Bum.</p>
   </section>
 </BackroadPage>
@@ -25,13 +39,16 @@ try {
 .field-intro h1{font-size:clamp(2.25rem,1.3rem + 3vw,3.75rem);max-width:16ch}
 .field-intro .lead{max-width:43ch;margin-bottom:0}
 .brb-photo{aspect-ratio:4/3;object-position:50% 60%;border-radius:var(--radius-card)}
-.field-index{display:grid;gap:var(--space-7)}
-.field-index .brb-story-link{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--space-4);margin:0;padding:var(--space-5) 0 0}
-.field-index .brb-story-link h2{font-size:var(--text-xl);line-height:1.25;margin:0 0 var(--space-3)}
-.field-index .brb-story-link p{color:var(--store-muted);margin:0 0 var(--space-4)}
-.field-index .brb-story-link:first-child{border:1px solid var(--color-border);padding:var(--space-5);border-radius:var(--radius-panel);background:var(--store-surface)}
-.field-number{font-size:var(--text-sm);font-variant-numeric:tabular-nums;color:var(--store-muted)}
+.field-index,.field-archive{display:grid;gap:var(--space-7)}
+.field-index .brb-story-link{margin:0;padding:var(--space-5) 0 0;min-width:0;overflow-wrap:anywhere}
+.field-index h2,.field-index h3{line-height:1.25;margin:0 0 var(--space-3);text-wrap:balance}
+.field-index h3{font-size:var(--text-xl)}
+.field-index .brb-story-link:is(:hover,:focus-visible) :is(h2,h3){text-decoration:underline;text-underline-offset:.16em}
+.field-index .field-excerpt{color:var(--store-muted);margin:0 0 var(--space-4);max-width:58ch;text-wrap:pretty}
+.field-index .field-feature{border:1px solid var(--color-border);padding:var(--space-5);border-radius:var(--radius-panel);background:var(--store-surface)}
+.field-index .field-feature h2{font-size:var(--text-3xl);max-width:26ch}
+.field-archive-title{font-size:var(--text-2xl)}
 .field-read{font-size:var(--text-sm);font-weight:600}
 .photo-credit{font-size:var(--text-sm);color:var(--store-muted);margin-top:var(--space-8)}.photo-credit a{color:inherit}
-@media(min-width:60rem){.field-intro{grid-template-columns:minmax(0,1fr) minmax(0,1.618fr);gap:var(--space-8)}.field-index{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-8)}.field-index .brb-story-link:first-child{grid-column:1/-1;grid-template-columns:4rem minmax(0,1fr);padding:var(--space-7)}.field-index .brb-story-link:first-child h2{font-size:var(--text-3xl)}}
+@media(min-width:60rem){.field-intro{grid-template-columns:minmax(0,1fr) minmax(0,1.618fr);gap:var(--space-8)}.field-index,.field-archive{gap:var(--space-8)}.field-archive{grid-template-columns:repeat(2,minmax(0,1fr))}.field-index .field-feature{padding:var(--space-7)}}
 </style>

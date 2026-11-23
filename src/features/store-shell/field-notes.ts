@@ -35,7 +35,16 @@ export function latestFieldNote(entries: readonly DatedPageEntry[]): FieldNote |
   return { ...latest, excerpt: `${boundary > 0 ? clip.slice(0, boundary) : clip.slice(0, 180)}…` };
 }
 
-/** Continue in the index's stable slug order, then wrap once. The caller supplies
+/** The latest published note leads the journal once. Keep the other entries in
+ * the existing browsing order, including older notes without a publication date.
+ */
+export function journalFieldNotes(entries: readonly DatedPageEntry[]) {
+  const published = entries.filter(entry => entry.data.status === 'published');
+  const latest = latestFieldNote(published);
+  return { latest, archive: fieldNotes(published).filter(note => note.slug !== latest?.slug) };
+}
+
+/** Continue in stable slug order, then wrap once. The caller supplies
  * published-only entries; this is a reading sequence, not relevance or chronology.
  */
 export function nextFieldNotes(entries: readonly PageEntry[], currentSlug: string): FieldNote[] {

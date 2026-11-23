@@ -1,17 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { fieldNote, fieldNotes, latestFieldNote, nextFieldNotes } from '../../src/features/store-shell/field-notes.js';
+import { fieldNote, fieldNotes, journalFieldNotes, latestFieldNote, nextFieldNotes } from '../../src/features/store-shell/field-notes.js';
 
 const intro = (text: string) => ({ _type: 'block', style: 'normal', children: [{ _type: 'span', text }] });
 describe('EmDash field-note navigation', () => {
   it('names each whole-row link from its published heading without hiding its excerpt', () => {
     const source = readFileSync('src/pages/field-notes.astro', 'utf8');
+    expect(source).toContain('aria-labelledby="field-feature-title"');
+    expect(source).toContain('<h2 id="field-feature-title">{journal.latest.title}</h2>');
     expect(source).toContain('aria-labelledby={`${note.slug}-title`}');
-    expect(source).toContain('<h2 id={`${note.slug}-title`}>{note.title}</h2>');
-    expect(source).toContain('{note.excerpt && <p>{note.excerpt}</p>}');
-    // Only the decorative ordinal is hidden, never the published title or excerpt.
-    expect(source.match(/aria-hidden=/g)).toHaveLength(1);
-    expect(source).toContain('class="field-number" aria-hidden="true"');
+    expect(source).toContain('<h3 id={`${note.slug}-title`}>{note.title}</h3>');
+    expect(source).toContain('{note.excerpt && <p class="field-excerpt">{note.excerpt}</p>}');
+    expect(source).not.toContain('aria-hidden');
     expect(source).not.toContain('tabindex');
   });
   it('uses published CMS titles and prose, without seed text or commerce facts', () => {
@@ -50,7 +50,18 @@ describe('EmDash field-note navigation', () => {
     expect(latestFieldNote([older, latest, ...excluded])).toEqual({ slug: latest.id, title: 'Newer', excerpt: 'Start here.' });
     expect(latestFieldNote(excluded)).toBeNull();
   });
-  it('breaks publication ties by slug and bounds only the home excerpt', () => {
+  it('shares the home lead without duplicating it or disturbing the archive order', () => {
+    const old = { id: 'field-note-c', data: { title: 'Older', status: 'published', publishedAt: '2026-11-15', updatedAt: '2026-11-24' } };
+    const undated = { id: 'field-note-a', data: { title: 'Undated', status: 'published' } };
+    const latest = { id: 'field-note-z', data: { title: 'Latest', status: 'published', publishedAt: '2026-11-23' } };
+    const draft = { id: 'field-note-draft', data: { ...latest.data, status: 'draft', publishedAt: '2026-11-24' } };
+    const entries = [old, undated, latest, draft];
+    expect(journalFieldNotes(entries)).toEqual({ latest: latestFieldNote(entries), archive: [fieldNote(undated), fieldNote(old)] });
+    expect(journalFieldNotes([undated, draft])).toEqual({ latest: null, archive: [fieldNote(undated)] });
+    expect(journalFieldNotes([latest, draft])).toEqual({ latest: fieldNote(latest), archive: [] });
+    expect(journalFieldNotes([draft])).toEqual({ latest: null, archive: [] });
+  });
+  it('breaks publication ties by slug and bounds the shared latest-note excerpt', () => {
     const prose = 'field notebook '.repeat(18).trim();
     const data = { title: 'A note', status: 'published', publishedAt: '2026-11-23', content: [intro(prose)] };
     const entries = [{ id: 'field-note-b', data }, { id: 'field-note-a', data }];
