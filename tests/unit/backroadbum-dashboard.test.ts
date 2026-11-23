@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 describe('Backroad Bum dashboard route boundaries', () => {
   it('separates the staged printed lookup and retained receipt from the live store', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
-    for (const marker of ['field-journal-beta6', 'retained-beta6', 'printed-test-lookup', 'beta6-outbox']) {
+    for (const marker of ['archived-orders-beta6', 'field-journal-beta6', 'retained-beta6', 'printed-test-lookup', 'beta6-outbox']) {
       expect(report).toContain(`data-${marker}-history`);
     }
     expect(report).toContain('data-retained-beta6-dispatch');
@@ -12,6 +12,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain('Neither change is live.');
     const staging = report.match(/<div data-server-cart-staging>[\s\S]*?<\/div>/)?.[0];
     expect(staging).toContain('now pairs with Commerce beta.6');
+    expect(staging).toContain('In a private copy, both original saved receipts recovered');
+    expect(staging).toContain('found all ten earlier test orders');
     expect(staging).toContain('commerce/pull/286');
     expect(staging).toContain('The live cart still uses signed Commerce 0.8.0.');
   });

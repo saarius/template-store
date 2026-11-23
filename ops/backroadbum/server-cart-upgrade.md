@@ -1,5 +1,11 @@
 # Qualifying a future server-cart upgrade
 
+## Original receipts and ten archived Orders on beta.6 · November 23
+
+From a completed private backup, the isolated checkout rehearsal verified ten media files and staged only selected Commerce and published CMS data. The disposable database ran EmDash 1.4→1.5 migrations, including 095. A source-built Commerce beta.6 mount at the original ID recovered both saved receipts with their totals, numbers, TEST badges and tracking; it preserved the new cart and original browser files. The no-script Track your order form recovered all ten printed test numbers with their matching checkout emails. A pause stopped new cart/checkout requests without blocking the old receipt. No signed installation, hosted payment or shopper account migration was exercised.
+
+Run the private checker from `backroadbum/server-cart-prep` with its installed dependencies, the exact clean built Commerce pin and `--check --candidate=<built-checkout> --archive=<completed-backup>` in the loopback-only namespace described below. Add `--storefront` for order lookup and gate checks. The checker never opens the serving database or mounts its uploads/config; original browser keys are loaded selectively and never exported. Evidence: `evidence/2026-11-23-original-retained-beta6/archive-storefront.json`. Use synthetic captures for public visual proof.
+
 ## Whole Field Journal storefront on source-built beta.6 · November 23
 
 `backroadbum/server-cart-prep` merges Template #246 and now pins Commerce `4b1af19` / `0.9.0-beta.6` with EmDash 1.5. On a local canonical HTTPS fixture, the built store used only copied published CMS/media/catalog data. Plain 1440px and enhanced 390px browsers in both themes added the mug and sale bandana, updated and removed lines, retained a Secure HttpOnly cart and showed $54 after reload. Enhanced Update and Remove restored focus; checkout refused without a test payment connection. No Orders, hosted settings or shopper state were copied or created. See `evidence/2026-11-23-beta6-merchant/` for 592-file typecheck, 83 cart units, 83 dashboard units, the 130,141-byte Registry bundle and eight strict painted views.
