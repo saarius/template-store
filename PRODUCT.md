@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## The stock message follows the size · November 23
+A direct link to the tee’s sold-out XL left a stale warning after choosing in-stock Medium. The stock line and Add control now describe the selected size without a contradictory product-wide warning. A store-wide checkout pause still has its own explanation.
+
 ## Back to the collection you chose · November 23
 A tote opened from Slow camp used to point back to Road day, and the bandana did the reverse. The breadcrumb now returns shoppers to the collection they opened, even after choosing a size without JavaScript. Direct links still use the default collection, and prices, availability and canonical product URLs stay unchanged.
 

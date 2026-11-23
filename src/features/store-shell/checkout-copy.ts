@@ -47,15 +47,16 @@ export function catalogNoticeText(input: {
     : "Product browsing is available. Checkout is unavailable right now.";
 }
 
-/**
- * Whether a Commerce-linked product on a shipping storefront can be bought
- * right now: the page offers a cart, checkout is admitted, and the product (or
- * its selected variant) is sellable.
- */
-export function linkedProductPurchasable(input: {
+/** Page-wide checkout guidance, separate from the current option’s live status. */
+export function linkedProductPurchaseNotice(input: {
   offersCart: boolean;
   checkoutAvailable: boolean;
+  hasOptions: boolean;
   sellable: boolean;
-}): boolean {
-  return input.offersCart && input.checkoutAvailable && input.sellable;
+}): string | null {
+  if (!input.checkoutAvailable) return "Checkout is unavailable right now, so this product can't be bought.";
+  if (!input.offersCart || (!input.hasOptions && !input.sellable)) return "This product can't be bought right now.";
+  // The picker and Add to cart already explain the selected member. A static
+  // product-wide warning would outlive that selection and contradict both.
+  return null;
 }

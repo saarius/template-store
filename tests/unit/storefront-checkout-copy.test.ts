@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   catalogGuidanceCopy,
   catalogNoticeText,
-  linkedProductPurchasable,
+  linkedProductPurchaseNotice,
   storeBannerText,
 } from "../../src/features/store-shell/checkout-copy.js";
 
@@ -62,18 +62,27 @@ describe("storefront checkout wording", () => {
     expect(readFileSync("src/pages/index.astro", "utf8")).toContain("checkoutAvailable={checkoutAvailable} />");
   });
 
-  it("a linked product is purchasable only with a cart, admitted checkout and a sellable item", () => {
-    expect(linkedProductPurchasable({ offersCart: true, checkoutAvailable: true, sellable: true })).toBe(true);
-    expect(linkedProductPurchasable({ offersCart: false, checkoutAvailable: true, sellable: true })).toBe(false);
-    expect(linkedProductPurchasable({ offersCart: true, checkoutAvailable: false, sellable: true })).toBe(false);
-    expect(linkedProductPurchasable({ offersCart: true, checkoutAvailable: true, sellable: false })).toBe(false);
+  it("keeps checkout closure visible regardless of selected option or page cart support", () => {
+    for (const hasOptions of [true, false]) for (const sellable of [true, false]) for (const offersCart of [true, false]) {
+      expect(linkedProductPurchaseNotice({ offersCart, checkoutAvailable: false, hasOptions, sellable })).toContain("Checkout is unavailable");
+    }
+  });
+
+  it("with admitted checkout, explains page-level restrictions but leaves member status to the picker", () => {
+    const purchase = { offersCart: true, checkoutAvailable: true };
+    expect(linkedProductPurchaseNotice({ ...purchase, hasOptions: false, sellable: true })).toBeNull();
+    expect(linkedProductPurchaseNotice({ ...purchase, hasOptions: false, sellable: false })).toBe("This product can't be bought right now.");
+    for (const sellable of [true, false]) {
+      expect(linkedProductPurchaseNotice({ ...purchase, hasOptions: true, sellable })).toBeNull();
+      expect(linkedProductPurchaseNotice({ ...purchase, offersCart: false, hasOptions: true, sellable })).not.toBeNull();
+    }
   });
 
   it("product page drops the editorial-preview notice for buyable Commerce products", () => {
     const page = readFileSync("src/pages/products/[id].astro", "utf8");
     // Linked products are handled before the editorial-preview branch, which is
     // left only for entries with no Commerce product behind them.
-    const linkedBranch = page.indexOf(": linkedProduct ? (purchasable ? null :");
+    const linkedBranch = page.indexOf(": linkedProduct ? (purchaseNotice &&");
     const previewBranch = page.indexOf("This is an editorial preview. It is not purchasable.");
     expect(linkedBranch).toBeGreaterThan(0);
     expect(previewBranch).toBeGreaterThan(linkedBranch);
@@ -153,7 +162,7 @@ describe("checkout review before contact", () => {
   it("keeps one editable summary before contact and the payment action in source order", () => {
     const markup = readFileSync("src/features/guest-cart/GuestCheckout.astro", "utf8");
     const summary = markup.indexOf('data-checkout-manifest hidden');
-    const contact = markup.indexOf('data-checkout-vault>');
+    const contact = markup.search(/<form\b[^>]*\bdata-checkout-vault(?=[\s>])/);
     const payment = markup.indexOf('data-checkout-payment-handoff>');
     expect(summary).toBeGreaterThan(0);
     expect(contact).toBeGreaterThan(summary);
