@@ -2,6 +2,16 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('distinguishes isolated Accounts relay proof from a live rollout', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const dispatch = report.match(/<article[^>]+data-accounts-relay-dispatch>[\s\S]*?<\/article>/)?.[0];
+    const history = report.match(/<article[^>]+data-accounts-relay-history>[\s\S]*?<\/article>/)?.[0];
+    expect(dispatch).toContain('from a disposable store');
+    expect(dispatch).toContain('checkout address prefill still need testing');
+    expect(dispatch).toContain('live account and checkout are unchanged');
+    expect(history).toContain('one code to the verified test inbox');
+    expect(history).toContain('no plugin was installed on the live store');
+  });
   it('separates the staged printed lookup and retained receipt from the live store', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     for (const marker of ['archived-orders-beta6', 'field-journal-beta6', 'retained-beta6', 'printed-test-lookup', 'beta6-outbox']) {
