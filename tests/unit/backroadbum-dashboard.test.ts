@@ -2,6 +2,15 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('keeps staged feed coverage and local catalog reads separate from live exports', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const dispatch = report.match(/<article[^>]+data-beta6-feed-dispatch>[\s\S]*?<\/article>/)?.[0];
+    const history = report.match(/<article[^>]+data-beta6-feed-history>[\s\S]*?<\/article>/)?.[0];
+    expect(dispatch).toContain('up from five in the live exports');
+    expect(dispatch).toContain('href="/feeds/agent-catalog.json"');
+    expect(history).toContain('kept a draft out of all three formats');
+    expect(history).toContain('no shared deployment or enrollment');
+  });
   it('distinguishes the held-cart issue and local Reviews proof from live adoption', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

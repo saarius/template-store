@@ -1,5 +1,13 @@
 # Agent catalog dogfooding
 
+## Feed cutover rehearsal · November 23
+
+Field Journal preparation `16e89e6` and compiled Commerce `0.9.0-beta.6` export eleven Google XML and eleven Meta CSV rows from the same seven families/eleven members that live agent JSON describes. The live signed 0.8.0 exports still have five rows. [Commerce #282](https://github.com/dinkuskit/commerce/pull/282) and [Template #244](https://github.com/dinkuskit/template-store/pull/244) are merged and present in the tested source pairing. All six member URLs selected the correct size, price, stock and Add state on plain desktop and enhanced phone. All ten image URLs returned images. A disposable County Line Field Book draft disappeared from all three feeds; quoted, multiline text round-tripped and restoration reproduced the original exports. These public contracts expose effective prices, not a Regular/Sale pair or child SKUs; no shipping quote was inferred.
+
+The bundled catalog Worker at `9cffb17` passed 22 checks against the live HTTPS agent feed with disposable D1 admission. Default exact lookup excludes the sold-out Tee XL; an explicit unavailable lookup returns it, while Fleece XL remains buyable on backorder. Wrong-origin/503 responses preserve last-good data until it becomes stale, and a fresh real read restores it. No shared catalog or external channel enrollment occurred.
+
+Evidence: workspace `evidence/2026-11-23-beta6-feed-parity/{feed-parity,staged,worker-live}.json`. Repeat the three-format and selected-URL checks on the exact signed same-ID upgrade; this is source rehearsal, not Registry install or live feed repair.
+
 ## Queue reconciliation · November 21
 
 Commerce **#280/#282** merged November18 and closed **#279/#281**; DinkusKit **#130** merged the same day. The catalog-dogfood branch now includes upstream **a84c69f** and passes its focused catalog tests; no shared Worker deployment or new feed enrollment occurred. Template **#244** remains clean/green at **f03d136** after the November18 requested script removal and non-rebased main merge; it is untouched in this pass.
