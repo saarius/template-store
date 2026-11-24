@@ -213,6 +213,27 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(lifecycle).toContain('template-store/issues/269');
     expect(reviews).toMatch(/<tr data-agent-rating-ledger>.*Issue #269.*Open November 24.*No cross-store filter/);
   });
+  it('records the five plugin proposals without claiming they are deployed', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const dispatch = report.split('data-dispatch-archive')[0];
+    expect(dispatch).toContain('data-ship-history-dispatch');
+    expect(dispatch).toContain('the live Ship plugin is unchanged');
+    expect(dispatch).not.toContain('data-reviews-lifecycle-dispatch');
+    for (const [marker, pull] of [
+      ['ship-history', 'ship/pull/105'], ['reviews-queue', 'reviews/pull/12'], ['payments-country', 'payments/pull/126'],
+      ['ship-settings', 'ship/pull/104'], ['accounts-envelope', 'accounts/pull/6'],
+    ]) {
+      const row = reviews.match(new RegExp(`<tr data-${marker}-ledger>[^\\n]+`))?.[0];
+      expect(row).toContain(pull);
+      expect(row).toContain('Open');
+      const entry = report.match(new RegExp(`<article[^>]+data-${marker}-history>[^\\n]+`))?.[0];
+      expect(entry).toContain(pull);
+    }
+    const bugs = readFileSync('public/dashboard/emdash-bugs.txt', 'utf8');
+    expect(bugs).toContain('## 17. The native table pager loses focus at the final page');
+    expect(bugs).not.toContain('evidence/2026-11-24-ship-label-history');
+  });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');

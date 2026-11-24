@@ -112,4 +112,16 @@ Updated November 17, 2026. No EmDash upstream issue, PR or comment has been open
 - Merchant workaround: use the public `emdashComponents.block` component and derive its props through Astro's ComponentProps, retaining the native renderer. A focused seven-file Astro check passes with zero findings, and the actual built journal retains its native text/list/link output. No EmDash patch or upstream contact.
 - Evidence: `evidence/2026-11-17-journal-sections/{typecheck-retry.log,typecheck-focused-final.log,emdash-ui-exports.txt}` and the merchant FieldNoteBlock wrapper. Human review should confirm the duplicate-name export behavior with a minimal independent consumer before reporting.
 
+## 15. Classic Block Kit warning text and the empty select label miss contrast
+- EmDash Admin/Blocks 1.5.0 Classic, November 24. Render Payments' first-time business-country form after Finish setup. In Chromium, the stock alert text paints at 4.00:1 in Light, and the empty-select label at 2.58:1 Light / 3.78:1 Dark.
+- The shared stylesheet sets both colors. Put meaningful instructions outside the placeholder while the standard theme is used. The new correction in Payments #126 passes 4.5:1 in either scheme. This was an isolated rendering, not a live admin audit.
+
+## 16. A long word in a Reviews detail can overflow the page
+- EmDash Admin/Blocks 1.5.0 Classic and the Reviews 0.1.0 backend, November 24. Open a pending review containing a 160-character unbroken word. At 390px, the detail widened the document to 2,114px. Literal markup remained text.
+- The shared Section renderer lacks a wrapping rule for long words in this layout. Use a wider viewport or scroll to read the original; do not truncate the stored review. Isolated rendering only; no CMS change.
+
+## 17. The native table pager loses focus at the final page
+- EmDash Admin/Blocks 1.5.0 Classic, November 24. Keyboard-activate Load more in a Ship Label history fixture with 51 sample labels. When the last row appears with no next cursor, focus drops to the document body. The button measures 60×15px; the table, not the document, scrolls horizontally on a phone.
+- The shared table removes its pagination button when the cursor runs out. Use Tab to reach the next control after the update. Ship #105 repairs a separate return path from an order, not shared table behavior. Isolated rendering only; no CMS change or report outside this ledger.
+
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.
