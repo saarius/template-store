@@ -14,6 +14,14 @@ Do not treat successful installation as a working review flow. The signed listin
 
 Staging **463b381** also applies the saved Field Journal appearance before the footer loads and restores the header’s skip target on `/review`. The page still uses `no-store`, `no-referrer` and noindex. See `evidence/2026-11-23-cycle-0642/cycle.md` for browser and painted proof. This rehearsal invoked the actual due-task executor after moving only fixture deadlines; it does not prove automatic scheduling, Courier sender resolution, signed install, ratings in the agent feed or real email delivery. The store still runs without Reviews.
 
+## Courier sender resolution · November 24
+
+[Courier #4](https://github.com/dinkuskit/courier/pull/4) proposes matching an installed private outbox by its active Registry slug, failing closed on ambiguity unless the store explicitly pins an installed sender. Fresh EmDash 1.4.0 has the Registry slug column, and Backroad Bum’s active Commerce state already records `dinkus-commerce`. The PR’s initial 1.4 fixture had no matching rows: its updates created none. A local fixture-only upsert passed all 49 tests including automatic delivery, collision refusal and explicit pinning. See the [maintainer feedback](https://github.com/dinkuskit/courier/pull/4#issuecomment-7122141903) and `evidence/2026-11-24-courier-sender-resolution/`. This is not a merged fix, a signed Commerce/Reviews pairing, or Node scheduling support.
+
+## Courier sender resolution · November 24
+
+[Courier #4](https://github.com/dinkuskit/courier/pull/4) proposes matching an installed private outbox by its active Registry slug, failing closed on ambiguity unless the store explicitly pins an installed sender. Fresh EmDash 1.4.0 has the Registry slug column, and Backroad Bum’s active Commerce state already records `dinkus-commerce`. The PR’s initial 1.4 fixture had no matching rows: its updates created none. A local fixture-only upsert passed all 49 tests including automatic delivery, collision refusal and explicit pinning. See the [maintainer feedback](https://github.com/dinkuskit/courier/pull/4#issuecomment-7122141903) and `evidence/2026-11-24-courier-sender-resolution/`. This is not a merged fix, a signed Commerce/Reviews pairing, or Node scheduling support.
+
 ## Before enabling email on Backroad Bum
 
 - Verify the signed artifacts and the intended Commerce sender ID in the actual install. A configured plugin can be reached at `dinkus-commerce`, but the live stable Registry namespace is `r_gshdrqaldna3r7sn`; the separate beta package must not become the live sender. Rehearse the pair with the Registry mount, not just configured plugin IDs. [Courier #3](https://github.com/dinkuskit/courier/issues/3) has the reproduced failure and the configured-source control. Local evidence: `evidence/2026-11-22-commerce-review-bridge/` in the operator workspace.

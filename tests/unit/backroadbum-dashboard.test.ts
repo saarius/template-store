@@ -108,21 +108,25 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const ledger = reviews.match(/<tr data-starter-variant-notice-ledger>[\s\S]*?<\/tr>/)?.[0];
     expect(history).toContain('template-store/pull/268');
     expect(history).toContain('if checkout is unavailable');
-    expect(ledger).toContain('Queued behind #267');
+    expect(ledger).toContain('Merged November 24');
+    expect(ledger).toContain('commit/b1a405a');
     expect(ledger).toContain('equivalent Backroad Bum fix is already live');
     for (const shot of ['before-390.png', 'after-390.png']) {
       expect(ledger).toContain(`/pr-proof/template-store-variant-purchase-notice/${shot}`);
     }
   });
-  it('reports the review queue in maintainer order and distinguishes review from merge', () => {
+  it('keeps the contribution rows stable and distinguishes exact-head review from merge', () => {
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const ledger = reviews.match(/<table id="housekeeping-ledger"[\s\S]*?<\/table>/)?.[0] ?? '';
     const candidateRows = [...ledger.matchAll(/<tr data-(starter-payment-hold|cart-return-pr|starter-variant-notice)-ledger>/g)].map(match => match[1]);
     expect(candidateRows).toEqual(['starter-payment-hold', 'cart-return-pr', 'starter-variant-notice']);
     expect(ledger).toContain('commit/626a68e');
-    expect(ledger).toContain('commit/305dc3e');
-    expect(ledger).toContain('prior head');
-    expect(ledger).toContain('Queued behind #267');
+    const refreshed = ledger.match(/<tr data-cart-return-pr-ledger>[\s\S]*?<\/tr>/)?.[0];
+    expect(refreshed).toMatch(/Open at .*commit\/951480a/);
+    expect(refreshed).toContain('45319155420/attempts/2');
+    expect(refreshed).toContain('45325141302');
+    expect(refreshed).toContain('no findings on the new head');
+    for (const shot of ['before-390.png', 'after-390.png']) expect(refreshed).toContain(`/pr-proof/template-store-cart-redraw-order/${shot}`);
   });
   it('reports saving quantities and the payment hold without claiming a live cart upgrade', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
@@ -190,9 +194,16 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toContain(issue);
     const row = reviews.match(/<tr data-courier-registry-ledger>[\s\S]*?<\/tr>/)?.[0];
     expect(row).toContain(issue);
-    expect(row).toContain('Courier #3 is open');
-    expect(row).toContain('merged the Cloudflare timer, not a fix');
+    expect(row).toContain('courier/pull/4');
+    expect(row).toContain('Open proposal');
+    expect(row).toContain('after creating the missing test installation record');
+    expect(row).toContain('a Cloudflare timer, not Node scheduling');
     expect(row).toContain('No Reviews rollout on Backroad Bum');
+    const dispatch = report.match(/<article[^>]+data-courier-sender-resolution-dispatch>[\s\S]*?<\/article>/)?.[0];
+    expect(dispatch).toContain('In a disposable EmDash test store');
+    expect(dispatch).toContain('Reviews and its mail remain off');
+    const checked = report.match(/<article[^>]+data-courier-sender-resolution-history>[\s\S]*?<\/article>/)?.[0];
+    expect(checked).toContain('all 49 local tests passed without changing Courier’s code');
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
