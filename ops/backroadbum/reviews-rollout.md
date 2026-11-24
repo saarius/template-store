@@ -16,11 +16,7 @@ Staging **463b381** also applies the saved Field Journal appearance before the f
 
 ## Courier sender resolution · November 24
 
-[Courier #4](https://github.com/dinkuskit/courier/pull/4) proposes matching an installed private outbox by its active Registry slug, failing closed on ambiguity unless the store explicitly pins an installed sender. Fresh EmDash 1.4.0 has the Registry slug column, and Backroad Bum’s active Commerce state already records `dinkus-commerce`. The PR’s initial 1.4 fixture had no matching rows: its updates created none. A local fixture-only upsert passed all 49 tests including automatic delivery, collision refusal and explicit pinning. See the [maintainer feedback](https://github.com/dinkuskit/courier/pull/4#issuecomment-7122141903) and `evidence/2026-11-24-courier-sender-resolution/`. This is not a merged fix, a signed Commerce/Reviews pairing, or Node scheduling support.
-
-## Courier sender resolution · November 24
-
-[Courier #4](https://github.com/dinkuskit/courier/pull/4) proposes matching an installed private outbox by its active Registry slug, failing closed on ambiguity unless the store explicitly pins an installed sender. Fresh EmDash 1.4.0 has the Registry slug column, and Backroad Bum’s active Commerce state already records `dinkus-commerce`. The PR’s initial 1.4 fixture had no matching rows: its updates created none. A local fixture-only upsert passed all 49 tests including automatic delivery, collision refusal and explicit pinning. See the [maintainer feedback](https://github.com/dinkuskit/courier/pull/4#issuecomment-7122141903) and `evidence/2026-11-24-courier-sender-resolution/`. This is not a merged fix, a signed Commerce/Reviews pairing, or Node scheduling support.
+[Courier #4](https://github.com/dinkuskit/courier/pull/4) merged at `9016d1e`, closing #3. It matches an installed private outbox by its active Registry slug and fails closed on ambiguity unless the store pins an installed sender. Backroad Bum’s active Commerce metadata already records `dinkus-commerce`. The 1.4 fixture originally updated rows it had not created; the maintainer’s upsert passed [CI on EmDash 1.4 and 1.5](https://github.com/dinkuskit/courier/actions/runs/45330251889). Initial reproduction: `evidence/2026-11-24-courier-sender-resolution/`. Next, repeat the compiled Commerce→Reviews handoff with the merged Courier. A merged fix does not establish the signed pairing or Node scheduling.
 
 ## Before enabling email on Backroad Bum
 

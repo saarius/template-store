@@ -122,10 +122,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(candidateRows).toEqual(['starter-payment-hold', 'cart-return-pr', 'starter-variant-notice']);
     expect(ledger).toContain('commit/626a68e');
     const refreshed = ledger.match(/<tr data-cart-return-pr-ledger>[\s\S]*?<\/tr>/)?.[0];
-    expect(refreshed).toMatch(/Open at .*commit\/951480a/);
+    expect(refreshed).toMatch(/Merged November 24 .*commit\/c5f1ff8.*issue closed/);
     expect(refreshed).toContain('45319155420/attempts/2');
     expect(refreshed).toContain('45325141302');
-    expect(refreshed).toContain('no findings on the new head');
+    expect(refreshed).toContain('Not deployed to Backroad Bum');
     for (const shot of ['before-390.png', 'after-390.png']) expect(refreshed).toContain(`/pr-proof/template-store-cart-redraw-order/${shot}`);
   });
   it('reports saving quantities and the payment hold without claiming a live cart upgrade', () => {
@@ -195,15 +195,19 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const row = reviews.match(/<tr data-courier-registry-ledger>[\s\S]*?<\/tr>/)?.[0];
     expect(row).toContain(issue);
     expect(row).toContain('courier/pull/4');
-    expect(row).toContain('Open proposal');
-    expect(row).toContain('after creating the missing test installation record');
-    expect(row).toContain('a Cloudflare timer, not Node scheduling');
+    expect(row).toMatch(/Merged November 24 .*commit\/9016d1e.*issue closed/);
+    expect(row).toContain('CI passed on EmDash 1.4 and 1.5');
+    expect(row).toContain('for Cloudflare, not Node');
     expect(row).toContain('No Reviews rollout on Backroad Bum');
     const dispatch = report.match(/<article[^>]+data-courier-sender-resolution-dispatch>[\s\S]*?<\/article>/)?.[0];
     expect(dispatch).toContain('In a disposable EmDash test store');
     expect(dispatch).toContain('Reviews and its mail remain off');
     const checked = report.match(/<article[^>]+data-courier-sender-resolution-history>[\s\S]*?<\/article>/)?.[0];
     expect(checked).toContain('all 49 local tests passed without changing Courier’s code');
+    const current = report.match(/<article[^>]+data-cart-and-courier-merges-history>[\s\S]*?<\/article>/)?.[0];
+    expect(current).toContain('zero shipping for an all-digital basket');
+    expect(current).toContain('refused missing or invalid shipping settings');
+    expect(current).toContain('No product, payment or plugin changed on the live store.');
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
