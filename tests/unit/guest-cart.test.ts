@@ -220,7 +220,7 @@ describe("guest cart quantity mutation", () => {
     expect(addToCartAstro).toContain('.guest-cart-add__single:has([data-guest-cart-ready="1"]):not([hidden]){display:flex');
     expect(addToCartAstro).toContain("data-add-to-cart-requirement");
     expect(productPageAstro).toContain('data-product-options-fallback');
-    expect(productPageAstro).toContain('method="get" action={productCanonical}');
+    expect(productPageAstro).toContain('method="get" action={productPath(item.id)}');
     expect(productPageAstro).toContain('picker.dataset.variantPickerReady = "1"');
     expect(addToCartAstro).toContain("data-add-to-cart-sellable");
     expect(productPageAstro).toContain("<AddToCart product={cartProduct} variants={variants} selectionRequired={selection.stale} />");

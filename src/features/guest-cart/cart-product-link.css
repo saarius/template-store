@@ -1,0 +1,23 @@
+/* The name remains the only link in a line. Grow its hit area without
+   linking the image, prices or neighboring quantity controls. */
+[data-guest-cart] [data-guest-cart-product-link] {
+  display: inline-grid;
+  align-content: center;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  color: inherit;
+  text-underline-offset: .15em;
+}
+
+@media (hover: hover) {
+  [data-guest-cart] [data-guest-cart-product-link]:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+[data-guest-cart] [data-guest-cart-product-link]:active {
+  text-decoration-color: var(--store-accent);
+  text-decoration-thickness: 2px;
+}

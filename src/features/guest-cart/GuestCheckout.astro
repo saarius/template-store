@@ -1,6 +1,7 @@
 ---
 import { GUEST_CHECKOUT_LABEL, GUEST_CHECKOUT_REASON, GUEST_CHECKOUT_READY_LABEL } from "./index.js";
 import type { GuestCheckoutAdmission } from "./index.js";
+import "./cart-product-link.css";
 
 interface Props {
   checkoutAdmission?: GuestCheckoutAdmission | null;
@@ -225,8 +226,6 @@ const BILLING_COUNTRIES = Array.from({ length: 26 * 26 }, (_, i) => String.fromC
   .guest-checkout :global(.guest-cart-line-media img){display:block;width:100%;height:100%;object-fit:cover}
   .guest-checkout :global([data-guest-cart-thumbnail-placeholder]){display:grid;place-items:center;height:100%;margin:0;color:var(--store-muted);text-align:center}
   .guest-checkout :global([data-guest-cart-line-copy]){grid-column:2/-1;min-width:0}
-  .guest-checkout :global([data-guest-cart-product-link]){color:inherit;text-underline-offset:.15em}
-  .guest-checkout :global([data-guest-cart-product-link]:hover){text-decoration-thickness:2px}
   .guest-checkout :global([data-guest-cart-line] h2){font-family:var(--font-sans);font-weight:600;font-size:1rem;line-height:1.4;margin:0 0 .4rem}
   .guest-checkout :global([data-guest-cart-line] p){margin:.25rem 0;font-size:.92rem}
   .guest-checkout :global(.price){display:flex;gap:.5rem;flex-wrap:wrap;font-size:1.05rem}

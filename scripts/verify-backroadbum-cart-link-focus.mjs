@@ -48,8 +48,12 @@ try {
         const link = page.locator('[data-guest-cart-product-link]');
         await expect(link).toHaveText(initial.name);
         await expect(page.locator('[data-guest-cart-subtotal-amount]')).toHaveText(initial.price.regularText);
+        const target = await link.boundingBox();
+        expect(target.width).toBeGreaterThanOrEqual(44);
+        expect(target.height).toBeGreaterThanOrEqual(44);
         // Save the actual node, not just a selector that could find a replacement.
         await link.evaluate(node => { globalThis.__cartProductLink = node; });
+        await page.keyboard.press('Tab');
         await link.focus();
         const previous = reads;
         await page.evaluate(() => window.dispatchEvent(new Event('focus')));
@@ -63,6 +67,7 @@ try {
         await expect(page.locator('[data-guest-cart-subtotal-amount]')).toHaveText(changedText);
         await expect(link).toBeFocused();
         expect(await link.evaluate(node => node === globalThis.__cartProductLink)).toBe(true);
+        expect(await link.evaluate(node => getComputedStyle(node).outlineStyle)).toBe('solid');
         expect(await stored()).toBe(original);
         // The next Tab follows the same native DOM order into Quantity.
         await link.press('Tab');
@@ -76,6 +81,7 @@ try {
         await page.locator('[data-guest-cart-qty]').fill('1');
         expect(await stored()).toBe(original);
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+        await page.evaluate(() => document.fonts.ready);
         await page.screenshot({ path: `${output}/${path.slice(1)}-${width}-${colorScheme}.png`, fullPage: true });
         if (process.argv.includes('--freeze-for-audit') && width === 1440 && colorScheme === 'light') {
           // Opt-in inert public fixture for the DOM auditor; never save storage,
@@ -91,7 +97,7 @@ try {
           });
           await writeFile(`${output}/${path.slice(1)}-audit.html`, html);
         }
-        results.push({ width, colorScheme, path, unchangedRefreshKeepsNodeAndFocus: true,
+        results.push({ width, colorScheme, path, target: { width: target.width, height: target.height }, unchangedRefreshKeepsNodeAndFocus: true,
           changedFactsKeepNodeAndFocus: true, tabContinuesToQuantity: true,
           invalidDraftPreserved: true, savedIntentUnchanged: true, noOverflow: true });
       }
