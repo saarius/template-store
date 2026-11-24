@@ -1,5 +1,11 @@
 # Agent catalog dogfooding
 
+## Hosted exclusion · November 24
+
+Public `search_catalog` and exact-URL `lookup_catalog` at `catalog.dinkuskit.com` both returned Backroad Bum while checkout still reported `mode: test`. [DinkusKit #155](https://github.com/dinkuskit/dinkuskit/issues/155) asks the hosted operator to verify the canonical `https://backroadbum.com` exclusion; the effective binding and root cause are not observable from these reads. No remote enrollment/configuration, store settings or feed were changed. Preserve the public feeds and test connection; after the operator confirms a change, check that search and exact lookup no longer return this seller and all three feeds still return 200.
+
+Separately, a local compiled Worker replayed the fleece XL's previously observed $60 sale/backorder → sold-out state with $68 M/L. Main matched both a $60 buyable-only search after sell-out and an empty $61–$67 range. Fork `saarius/dinkuskit:fix/catalog-variant-price-eligibility` **ed01486** fixes both and preserves the backorder, sold-out opt-in and inclusive-bound controls; no upstream PR or shared deployment yet. Evidence: operator workspace `evidence/2026-11-24-catalog-refresh/cycle.md`.
+
 ## Feed cutover rehearsal · November 23
 
 Field Journal preparation `16e89e6` and compiled Commerce `0.9.0-beta.6` export eleven Google XML and eleven Meta CSV rows from the same seven families/eleven members that live agent JSON describes. The live signed 0.8.0 exports still have five rows. [Commerce #282](https://github.com/dinkuskit/commerce/pull/282) and [Template #244](https://github.com/dinkuskit/template-store/pull/244) are merged and present in the tested source pairing. All six member URLs selected the correct size, price, stock and Add state on plain desktop and enhanced phone. All ten image URLs returned images. A disposable County Line Field Book draft disappeared from all three feeds; quoted, multiline text round-tripped and restoration reproduced the original exports. These public contracts expose effective prices, not a Regular/Sale pair or child SKUs; no shipping quote was inferred.
