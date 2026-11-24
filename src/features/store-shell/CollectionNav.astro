@@ -3,7 +3,8 @@ import type { ShopCollection } from './backroad-collections.js';
 import { canonicalCategoryPath } from './product-routes.js';
 interface Props { collections: ShopCollection[]; total: number; current?: string; unavailable?: boolean }
 const { collections, total, current, unavailable = false } = Astro.props;
-const visible = collections.filter(collection => collection.products.length > 0 || collection.slug === current);
+// Published collection pages still exist when Commerce cannot supply their members.
+const visible = unavailable ? collections : collections.filter(collection => collection.products.length > 0 || collection.slug === current);
 ---
 <nav class="collection-nav" aria-label="Shop collections">
   <a href="/shop" aria-current={!current ? 'page' : undefined}>All gear {!unavailable && <span>({total})</span>}</a>

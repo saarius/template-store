@@ -9,6 +9,7 @@ import CollectionNav from '../features/store-shell/CollectionNav.astro';
 import { acquireGuestCheckoutAdmission } from '../features/guest-cart/checkout-admission.js';
 let unavailable = false;
 const products = await readCommerceCatalog({ runtime: Astro.locals.emdash, request: Astro.request }).catch(() => { unavailable = true; return []; });
+if (unavailable) Astro.response.headers.set('Cache-Control', 'no-store');
 const entries = await getEmDashCollection<'products', Record<string, unknown>>('products', { status: 'published' });
 const categories = await getEmDashCollection<'categories', Record<string, unknown>>('categories', { status: 'published' });
 const { groups, paths } = shopCollections(await hydrateProductCollectionMembership(entries.entries), categories.entries, products);

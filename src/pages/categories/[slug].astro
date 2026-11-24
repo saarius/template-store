@@ -19,6 +19,7 @@ const { groups, paths } = shopCollections(await hydrateProductCollectionMembersh
 const matched = groups.find(group => group.slug === Astro.params.slug);
 const category = matched ? await orderShopCollection(matched, paths) : undefined;
 if (!category) Astro.response.status = 404;
+else if (unavailable) Astro.response.headers.set('Cache-Control', 'no-store');
 const context = getRequestContext();
 const reading = await loadCollectionFieldNotes(new Set(category?.products.flatMap(product => paths.get(product.id) ? [paths.get(product.id)!] : []) ?? []),
   Boolean(context?.preview || context?.editMode),
