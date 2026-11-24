@@ -115,6 +115,7 @@ Updated November 17, 2026. No EmDash upstream issue, PR or comment has been open
 ## 15. Classic Block Kit warning text and the empty select label miss contrast
 - EmDash Admin/Blocks 1.5.0 Classic, November 24. Render Payments' first-time business-country form after Finish setup. In Chromium, the stock alert text paints at 4.00:1 in Light, and the empty-select label at 2.58:1 Light / 3.78:1 Dark.
 - The shared stylesheet sets both colors. Put meaningful instructions outside the placeholder while the standard theme is used. The new correction in Payments #126 passes 4.5:1 in either scheme. This was an isolated rendering, not a live admin audit.
+- Ship setup recovery independently measured 4.00:1 for the Light warning banner. Ship #109 uses the stock default banner for those notices instead of adding plugin styles. This does not repair the shared warning variant.
 
 ## 16. A long word in a Reviews detail can overflow the page
 - EmDash Admin/Blocks 1.5.0 Classic and the Reviews 0.1.0 backend, November 24. Open a pending review containing a 160-character unbroken word. At 390px, the detail widened the document to 2,114px. Literal markup remained text.
@@ -127,5 +128,9 @@ Updated November 17, 2026. No EmDash upstream issue, PR or comment has been open
 ## 18. A Classic select can push a phone form offscreen
 - EmDash Admin/Blocks 1.5.0 Classic, November 24. Open a sample Ship TEST order with sandbox and practice label options at 390px. The stock practice label made the document 408px wide, and the sandbox label also overflowed.
 - The shared trigger sizes itself to its label without shrinking. Ship #107 shortens both labels and keeps the explanation outside the control; both phone appearances then fit. Isolated renderer only, not a live admin audit. No CMS change or upstream contact.
+
+## 19. Workerd control FD startup depends on the binary version
+- EmDash 1.5.0, sandbox-workerd 0.9.7 and Node 24.22.2 on Linux, November 24. Start the standalone runner with the Reviews 0.1.0 backend and Workerd 1.20260730.1. Its control descriptor write returned Invalid argument, then the runner timed out before the first plugin route.
+- Workerd 1.20260930.2 worked in the same disposable fixture. The lower-level cause is unconfirmed and the live runner was not changed. Confirm dependency selection and reproduce independently before reporting.
 
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.

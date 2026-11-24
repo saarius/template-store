@@ -216,11 +216,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('records the five plugin proposals without claiming they are deployed', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
-    const dispatch = report.split('data-dispatch-archive')[0];
-    expect(dispatch).toContain('data-owner-setup-guide-dispatch');
-    expect(dispatch).toContain('the hosted guide has not changed');
-    expect(dispatch).not.toContain('data-ship-history-dispatch');
-    expect(report.split('data-dispatch-archive')[1]).toContain('data-ship-history-dispatch');
+    const [, archive] = report.split('data-dispatch-archive');
+    expect(archive).toContain('data-owner-setup-guide-dispatch');
+    expect(archive).toContain('the hosted guide has not changed');
+    expect(archive).toContain('data-ship-history-dispatch');
     for (const [marker, pull] of [
       ['ship-history', 'ship/pull/105'], ['reviews-queue', 'reviews/pull/12'], ['payments-country', 'payments/pull/126'],
       ['ship-settings', 'ship/pull/104'], ['accounts-envelope', 'accounts/pull/6'],
@@ -251,6 +250,26 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toContain('the cause has not been verified');
     expect(reviews).toContain('a maintainer rerun was requested');
     expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 18. A Classic select can push a phone form offscreen');
+  });
+  it('reports the evening findings without implying deployment or external submission', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const dispatch = report.match(/<article[^>]+data-google-backorder-date-dispatch>[^\n]+/)?.[0];
+    expect(dispatch).toContain('Nothing was submitted to Google');
+    for (const [marker, link] of [
+      ['google-backorder-date', 'commerce/issues/308'], ['coupon-remove-draft', 'template-store/pull/273'],
+      ['reviews-sender-attempts', 'reviews/issues/13'], ['ship-setup-recovery-pr', 'ship/pull/109'],
+      ['dev-cms-listener', 'dinkuskit/pull/159'],
+    ]) {
+      expect(reviews.match(new RegExp(`<tr data-${marker}-ledger>[^\\n]+`))?.[0]).toContain(link);
+      expect(report.match(new RegExp(`<article[^>]+data-${marker}-history>[^\\n]+`))?.[0]).toContain(link);
+    }
+    expect(reviews).toMatch(/data-agent-rating-ledger.*eaf1870.*one second/);
+    expect(reviews).toMatch(/data-ship-recovery-session-ledger.*0495196.*does not buy a label/);
+    const bugs = readFileSync('public/dashboard/emdash-bugs.txt', 'utf8');
+    expect(bugs).toMatch(/Ship setup recovery independently measured 4\.00:1/);
+    expect(bugs).toMatch(/## 19\. Workerd control FD startup depends on the binary version/);
+    expect(bugs).toContain('the live runner was not changed');
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
