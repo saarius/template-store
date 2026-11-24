@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Keep reading when gear search is unavailable · November 24
+If Commerce cannot verify a matching product, search keeps independently matching Field Notes and collections and explains why gear is missing. With no usable results, it reports an outage rather than suggesting a different spelling. This was checked with Commerce disabled in a disposable copy, not during a live failure.
+
 ## A place for the small things · November 24
 A native Field Note shows how a spare cloth can keep small items visible at a picnic table. It introduces the Switchback Bandana without making it a requirement or a performance claim. The bandana and both collections now link back to the note; all earlier stories remain published.
 

@@ -63,14 +63,21 @@ export async function loadStoreSearch(raw: string, dependencies: StoreSearchDepe
   if (query.length < 2) return { ...empty, state: 'short' as const };
   try {
     const hits = await dependencies.search(query);
-    const visible = hits.some(hit => hit.collection === 'products') ? await dependencies.visibleProducts() : new Set<string>();
+    let visible: ReadonlySet<string> = new Set();
+    let visibilityUnavailable = false;
+    if (hits.some(hit => hit.collection === 'products')) {
+      try { visible = await dependencies.visibleProducts(); }
+      catch { visibilityUnavailable = true; }
+    }
+    // Fail closed on unverified gear, not on independently published reading and collections.
     const filtered = filterStorefrontSearchHits(hits, visible).filter(hit => searchResultHref(hit) !== null);
     const selected = filtered.slice(0, resultLimit);
+    if (visibilityUnavailable && !selected.length) return { ...empty, state: 'unavailable' as const };
     const indexedProducts = new Set(selected.filter(hit => hit.collection === 'products').map(hit => hit.slug || hit.id));
     const matches = new Map<string, SearchOptionMatch>();
     const additions: SearchOptionMatch[] = [];
     let optionsLimited = false;
-    if (dependencies.optionMatches && (!selected.length || mayAskForSize(query))) {
+    if (!visibilityUnavailable && dependencies.optionMatches && (!selected.length || mayAskForSize(query))) {
       let candidates: readonly SearchOptionMatch[] = [];
       try { candidates = await dependencies.optionMatches(query); }
       catch (error) {
@@ -120,7 +127,7 @@ export async function loadStoreSearch(raw: string, dependencies: StoreSearchDepe
     }).filter(group => group.items.length > 0);
     const count = selected.length + additions.length;
     return { query, groups, optionMatches: [...matches.values()], count, limited: hits.length >= resultLimit || optionsLimited,
-      state: count ? 'results' as const : 'empty' as const };
+      state: visibilityUnavailable ? 'partial' as const : count ? 'results' as const : 'empty' as const };
   } catch {
     // A failed index or Commerce visibility lookup is not an empty catalog.
     return { ...empty, state: 'unavailable' as const };

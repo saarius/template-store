@@ -62,6 +62,9 @@ if (results.state === 'unavailable') Astro.response.status = 503;
         <p>No matches this time. Try a shorter phrase, check the spelling or <a href="/shop">browse all gear</a>.</p>
         <p>Looking for a read instead? <a href="/field-notes">Open the field notes</a>.</p>
       </div> : <>
+        {results.state === 'partial' && <p class="search-catalog-notice" data-search-catalog-notice>
+          <strong>Gear results are temporarily unavailable.</strong> You can still browse the matches below or try your search again in a moment.
+        </p>}
         <p class="search-summary" data-search-results-count>{results.count} {results.count === 1 ? 'result' : 'results'}{results.limited ? ' shown. Try a more specific search to narrow the list.' : '.'}</p>
         {results.optionMatches.length > 0 && <p class="search-summary" data-search-option-summary>Matched options open with that choice selected.</p>}
         {results.groups.map(group => <section class="search-group" aria-label={group.label}>
@@ -112,6 +115,7 @@ if (results.state === 'unavailable') Astro.response.status = 503;
   .search-message,.search-matches{margin-top:var(--space-8);border-top:1px solid var(--color-border);padding-top:var(--space-7)}
   .search-page .search-message h2,.search-page .search-matches>h2{font-size:var(--text-xl);margin:0 0 var(--space-3);overflow-wrap:anywhere}
   .search-message p,.search-matches p{max-width:65ch}
+  .search-catalog-notice{margin:0 0 var(--space-5);padding:var(--space-4);border-radius:var(--radius-control);background:var(--store-surface-subtle);color:var(--store-ink)}
   .search-ideas,.search-browse{display:flex;flex-wrap:wrap;gap:.75rem 1.5rem}
   .search-ideas{margin-top:1.25rem}
   .search-ideas a,.search-browse a{display:inline-flex;align-items:center;min-height:44px;padding:.5rem 0}

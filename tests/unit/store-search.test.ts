@@ -101,10 +101,38 @@ describe('merchant store search', () => {
     const failed = await loadStoreSearch('mug', { search: async () => [hit('products', 'camp-mug')], visibleProducts: async () => { throw Error('commerce'); } });
     expect(failed.state).toBe('unavailable'); expect(failed.count).toBe(0); expect(failed.groups).toEqual([]);
   });
+  it('keeps published notes and collections when matched gear cannot be verified', async () => {
+    const visibleProducts = vi.fn(async () => { throw Error('commerce'); });
+    const optionMatches = vi.fn(async () => [{ slug: 'camp-mug', title: 'Unverified option', options: [
+      { href: '/products/camp-mug?item=large', label: 'Size: L', availability: 'in-stock' as const },
+    ] }]);
+    const fieldNotePreviews = vi.fn(async () => new Map([['field-note-mug', 'A note about the mug.']]));
+    const result = await loadStoreSearch('mug L', { visibleProducts, optionMatches, fieldNotePreviews, search: async () => [
+      hit('products', 'camp-mug', { title: 'Unverified indexed title' }),
+      hit('pages', 'field-note-mug'), hit('categories', 'slow-camp'), hit('pages', '../hidden'),
+    ] });
+    expect(result.state).toBe('partial');
+    expect(result.count).toBe(2);
+    expect(result.groups.map(group => group.collection)).toEqual(['categories', 'pages']);
+    expect(result.groups[1].items[0]).toEqual({ title: 'field-note-mug', href: '/field-note-mug', parts: [
+      { text: 'A note about the mug.', highlighted: false },
+    ] });
+    expect(visibleProducts).toHaveBeenCalledOnce();
+    expect(optionMatches).not.toHaveBeenCalled();
+    expect(result.optionMatches).toEqual([]);
+    expect(JSON.stringify(result)).not.toMatch(/Unverified|hidden/);
+  });
   it('does not call Commerce when only editorial results matched', async () => {
     const visibleProducts = vi.fn();
     const result = await loadStoreSearch('route', { search: async () => [hit('pages', 'field-note-route')], visibleProducts });
     expect(result.state).toBe('results'); expect(visibleProducts).not.toHaveBeenCalled();
+  });
+  it('does not call a verified empty catalog a partial outage', async () => {
+    const result = await loadStoreSearch('mug', { visibleProducts: async () => new Set(), search: async () => [
+      hit('products', 'retired-mug'), hit('pages', 'field-note-mug'),
+    ] });
+    expect(result.state).toBe('results');
+    expect(result.groups.map(group => group.collection)).toEqual(['pages']);
   });
   it('bounds results and names a limited list without claiming a total', async () => {
     const result = await loadStoreSearch('route', { search: async () => Array.from({ length: 25 }, (_, n) => hit('pages', `note-${n}`)), visibleProducts: products });
