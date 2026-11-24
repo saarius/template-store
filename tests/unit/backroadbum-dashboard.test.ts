@@ -2,6 +2,18 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 describe('Backroad Bum dashboard route boundaries', () => {
+  it('puts just one dispatch and the history link before the closed archive', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const latest = report.match(/<section id="history"><h2>Latest work<\/h2>([\s\S]*?)<\/section>/)?.[1] ?? '';
+    const boundary = '<details class="dashboard-dispatch-archive" data-dispatch-archive>';
+    expect(latest.split(boundary)).toHaveLength(2);
+    const [current, archive] = latest.split(boundary);
+    expect(current.match(/<article\b/g)).toHaveLength(1);
+    expect(current).toContain('href="/dashboard/history#history"');
+    expect(archive.trimStart()).toMatch(/^<summary>Earlier dispatches<\/summary>/);
+    expect(archive).toContain('data-journal-return-dispatch');
+    expect(archive).toContain('Earlier dispatches &amp; verification context');
+  });
   it('keeps staged feed coverage and local catalog reads separate from live exports', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const dispatch = report.match(/<article[^>]+data-beta6-feed-dispatch>[\s\S]*?<\/article>/)?.[0];
