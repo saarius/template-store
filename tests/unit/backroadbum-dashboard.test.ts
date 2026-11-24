@@ -208,6 +208,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(current).toContain('zero shipping for an all-digital basket');
     expect(current).toContain('refused missing or invalid shipping settings');
     expect(current).toContain('No product, payment or plugin changed on the live store.');
+    const lifecycle = report.match(/<article[^>]+data-reviews-lifecycle-history>[\s\S]*?<\/article>/)?.[0];
+    expect(lifecycle).toContain('Reviews email stayed off on Backroad Bum');
+    expect(lifecycle).toContain('template-store/issues/269');
+    expect(reviews).toMatch(/<tr data-agent-rating-ledger>.*Issue #269.*Open November 24.*No cross-store filter/);
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
@@ -1274,7 +1278,12 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-9-2026-11-22.txt',
       '/dashboard/instructions/steer-10-2026-11-22.txt',
       '/dashboard/instructions/steer-11-2026-11-23.txt',
+      '/dashboard/instructions/steer-12-2026-11-24.txt',
     ]);
+    const dogfoodSteer = readFileSync('public' + archivePaths[12], 'utf8');
+    expect(dogfoodSteer).toContain('## Owner Steer 12 — November 24, 2026');
+    expect(dogfoodSteer).toContain('Four High-Yield DinkusKit Surfaces');
+    expect(source).toContain('Steer 12 prioritizes hands-on DinkusKit testing');
     const steer = readFileSync('public' + archivePaths[2], 'utf8');
     expect(steer).toContain('## Owner Steer 2 — November 11, 2026');
     expect(steer).toContain('clean pushed branch and local verification is complete');
@@ -1291,7 +1300,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(designSteer).toContain('ui-design');
     expect(designSteer).toContain('System / Light / Dark');
     expect(designSteer).toContain('Phased Rollout');
-    const cartSteer = readFileSync('public' + archivePaths.at(-1), 'utf8');
+    const cartSteer = readFileSync('public' + archivePaths[11], 'utf8');
     expect(cartSteer).toContain('## Owner Steer 11 — November 23, 2026');
     expect(cartSteer).toContain('dinkuskit/template-store#249');
     expect(cartSteer).toContain('Poll open issues as well as open PRs');
