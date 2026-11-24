@@ -1,0 +1,23 @@
+{
+  "slug": "field-note-a-place-for-the-small-things",
+  "title": "A place for the small things",
+  "searchTerm": "small things",
+  "productPath": "/products/switchback-bandana",
+  "collectionPath": "/categories/road-day",
+  "sections": [
+    { "style": "normal", "text": "The picnic table has a split just wide enough to swallow a pencil stub. Spread out a cloth and set the small things you’re using on it. When it’s time to leave, you’ll have one place to look." },
+    { "style": "h2", "text": "Make one little landing spot" },
+    { "style": "normal", "text": "Pick the dry end of the table, away from lunch and the path between the bench and the car. Fold the cloth down to the space you actually need. A color that contrasts with what you set down makes a pencil, a clip or a loose lens cap easier to see." },
+    { "style": "normal", "text": "Give a loose corner a weight from something you’ve already unpacked. If the wind keeps catching it, skip the cloth and leave the small things in a zipped pouch. You don’t need another thing to chase." },
+    { "style": "h2", "text": "Keep the keys out of the ritual" },
+    { "style": "normal", "text": "A cloth works for things that are in use, not things you can’t afford to lose. Give keys and a wallet a pocket that closes. Keep the cloth away from hot cookware, and use a different one for hands or dishes if this one has been on a dirty table." },
+    { "style": "h2", "text": "Use the cloth you brought" },
+    { "style": "normal", "text": "The ", "link": { "text": "Switchback Bandana", "href": "/products/switchback-bandana" }, "after": " is our illustrated cotton design. An old handkerchief works for this just as well. If the cloth picks up grit, fold the dirty side inward until you can wash and dry it at home." },
+    { "style": "normal", "text": "When you unload, put the cloth where you’ll find it for the next stop. ", "link": { "text": "The reset after a road day", "href": "/field-note-after-a-road-day" }, "after": " has a way to do that without emptying every bag on the floor." },
+    { "style": "h2", "text": "Clear the square before you go" },
+    { "style": "normal", "listItem": "number", "text": "Put the pencil, clip and lens cap back where they belong, one at a time." },
+    { "style": "normal", "listItem": "number", "text": "Lift the cloth and look underneath it and along the bench. Take any scraps or wrappers with you." },
+    { "style": "normal", "listItem": "number", "text": "Fold the cloth last. Check the keys are in their pocket before you walk away." },
+    { "style": "normal", "text": "The last sweep takes less time than looking for a lens cap in the gravel." }
+  ]
+}

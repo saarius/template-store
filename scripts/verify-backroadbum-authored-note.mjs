@@ -48,8 +48,11 @@ try {
       for (const b of source.sections.filter(b => b.link)) await expect(body.getByRole('link', { name: b.link.text, exact: true })).toHaveAttribute('href', b.link.href);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', origin + '/' + source.slug);
       await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', source.sections[0].text);
-      const index = notes.indexOf('/' + source.slug);
-      const onward = [notes[(index + 1) % notes.length], notes[(index + 2) % notes.length]];
+      // The index features the newest note first; article-to-article links
+      // continue in stable slug order, independent of that featured slot.
+      const sequence = notes.toSorted((a, b) => a.localeCompare(b));
+      const index = sequence.indexOf('/' + source.slug);
+      const onward = [sequence[(index + 1) % sequence.length], sequence[(index + 2) % sequence.length]];
       assert.deepEqual(await page.getByRole('navigation', { name: 'Read another note', exact: true }).getByRole('link').evaluateAll(links => links.map(a => a.getAttribute('href'))), onward);
       await fits(); await page.evaluate(() => document.fonts.ready);
       if (javaScriptEnabled) { await body.locator('ol').scrollIntoViewIfNeeded(); await page.screenshot({ path: new URL(`list-${width}-${colorScheme}.png`, out).pathname }); }

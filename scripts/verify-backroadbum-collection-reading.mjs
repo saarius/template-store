@@ -37,10 +37,10 @@ try {
       const items = shelf.locator('li a');
       assert.equal(await items.count(), 2);
       assert.deepEqual(await items.evaluateAll(nodes => nodes.map(node => node.getAttribute('href'))),
-        ['/field-note-a-page-from-the-road', '/field-note-a-shady-place-to-stop']);
+        ['/field-note-a-page-from-the-road', '/field-note-a-place-for-the-small-things']);
       await shelf.scrollIntoViewIfNeeded();
       if (captures) await page.screenshot({ path: `${captures}/reading-${width}-${colorScheme}-${javaScriptEnabled ? 'js' : 'native'}.png` });
-      for (const [note, product] of [['A page from the road', 'county-line-field-book'], ['A shady place to stop', 'long-way-cap']]) {
+      for (const [note, product] of [['A page from the road', 'county-line-field-book'], ['A place for the small things', 'switchback-bandana']]) {
         const link = shelf.getByRole('link', { name: note, exact: true });
         assert((await link.boundingBox()).height >= 44);
         await link.focus();
@@ -64,7 +64,7 @@ try {
     await page.goto(origin + '/categories/slow-camp');
     assert.equal(await page.locator('[data-collection-reading]').count(), absent ? 0 : 1);
     if (!absent) assert.deepEqual(await page.locator('[data-collection-reading] li a').evaluateAll(nodes => nodes.map(node => node.getAttribute('href'))),
-      ['/field-note-a-layer-within-reach', '/field-note-a-warm-cup-before-packing-up'], 'Fleece and mug supply the first two published Slow camp relationships');
+      ['/field-note-a-layer-within-reach', '/field-note-a-place-for-the-small-things'], 'Fleece and bandana supply the first two published Slow camp relationships');
     assert((await page.locator('[data-commerce-product]').count()) > 0);
     assert.equal((await page.goto(origin + '/categories/not-a-real-collection')).status(), 404);
     assert.equal(await page.locator('[data-collection-reading]').count(), 0);

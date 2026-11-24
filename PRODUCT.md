@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## A place for the small things · November 24
+A native Field Note shows how a spare cloth can keep small items visible at a picnic table. It introduces the Switchback Bandana without making it a requirement or a performance claim. The bandana and both collections now link back to the note; all earlier stories remain published.
+
 ## Keep your place in Field Notes · November 23
 Back to field notes now returns to the entry you just read rather than the top of the journal. The link works with a keyboard or with JavaScript off, and still lands on the same note if it moves from the featured slot into the archive.
 

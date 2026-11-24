@@ -1,6 +1,9 @@
 # Native Field Notes
 
-Eleven notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+Twelve notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+
+## Small things · November 24
+`seed/backroadbum-small-things-note.json` records four chapters, a three-step table sweep and two links. Native draft and published reloads match all 14 blocks, including the closing paragraph. The bandana and both collections link back; the earlier cap and mug notes remain on their product pages and in the journal. Run `node scripts/verify-backroadbum-authored-note.mjs --check --source=backroadbum-small-things-note.json` to verify public reading, search and print. The protected `small-things-note.json` authoring guard is complete; do not replay. Workspace evidence: `evidence/2026-11-24-small-things/`.
 
 ## Warm cup · November 23
 `seed/backroadbum-warm-cup-note.json` records four chapters, a three-step pack-out list and two used links. The published note gives the Creekside Camp Mug its first reading match; Slow camp’s two-note shelf now shows the fleece and mug notes, while the reset remains in the journal and linked from the tote.
@@ -29,7 +32,7 @@ Product pages now reuse the collection shelf’s exact used native-link relation
 
 ## Bounded authoring
 - Take a current backup and `node scripts/inspect-backroadbum-business.mjs --check` before editing. For a new note, record a unique operation guard in `/etc/backroadbum/operator/` with mode0600; refuse an existing guard/slug rather than recreating an uncertain save.
-- Use the native Pages editor for Title/slug, headings, ordered lists and inline links. Save one draft, reload, and compare all native blocks, styles, list items and link destinations with the manuscript. Never assign the editor DOM or write CMS tables directly.
+- Use the native Pages editor for Title/slug, headings, ordered lists and inline links. Save one draft, reload, and compare all stored blocks, styles, list items and applied links with the manuscript. The editor may add an empty caret paragraph after a final list; distinguish this editor-only affordance from an empty saved block. Never assign the editor DOM or write CMS tables directly.
 - Confirm the draft route is404 and absent from the public journal and matching search. This store's Pages editor currently exposes no Preview button; its admin `supportsPreview` flag follows collection support. A scriptless manuscript-in-shell audit can inspect provisional content geometry, but a local file can use fallback fonts and is not actual CMS preview or final typography proof.
 - Publish once through the native confirmation, then reload the saved page and inspect published/no-draft state. On uncertainty, read back before considering another mutation. Keep the guard's completed phase; never replay a historical authoring driver.
 - Audit the real article at390/1440 in Light/Dark, inspect captures, and check script-off links, published index/search, onward reading and print media. Keep screenshots/PDFs and one-off operation drivers outside git.
