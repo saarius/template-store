@@ -34,7 +34,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const hold = reviews.match(/<tr data-starter-payment-hold-ledger>[\s\S]*?<\/tr>/)?.[0];
     expect(hold).toContain('template-store/issues/265');
     expect(hold).toContain('template-store/pull/266');
-    expect(hold).toContain('Not deployed to Backroad Bum');
+    expect(hold).toContain('not deployed');
     expect(report).toContain('data-held-payment-receipt-dispatch');
     expect(report).toContain('data-held-payment-receipt-history');
     const merchant = report.match(/<article[^>]+data-field-journal-held-return-history>[\s\S]*?<\/article>/)?.[0];
@@ -78,7 +78,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const history = report.match(/<article[^>]+data-warm-cup-note-history>[\s\S]*?<\/article>/)?.[0];
     expect(history).toContain('href="/field-note-a-warm-cup-before-packing-up"');
     expect(history).toContain('price, availability and care details are unchanged');
-    expect(report).toContain('Eleven EmDash field notes · latest: <a href="/field-note-a-warm-cup-before-packing-up"');
+    const editorial = report.match(/<div data-editorial-directory>[\s\S]*?<\/div>/)?.[0];
+    expect(editorial).toContain('href="/field-notes#latest-field-note"');
+    expect(editorial).not.toContain('/field-note-a-warm-cup-before-packing-up');
   });
   it('reports the distinction between voiding a queued label and one sent to Commerce', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
@@ -106,11 +108,21 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const ledger = reviews.match(/<tr data-starter-variant-notice-ledger>[\s\S]*?<\/tr>/)?.[0];
     expect(history).toContain('template-store/pull/268');
     expect(history).toContain('if checkout is unavailable');
-    expect(ledger).toContain('Open for review');
+    expect(ledger).toContain('Queued behind #267');
     expect(ledger).toContain('equivalent Backroad Bum fix is already live');
     for (const shot of ['before-390.png', 'after-390.png']) {
       expect(ledger).toContain(`/pr-proof/template-store-variant-purchase-notice/${shot}`);
     }
+  });
+  it('reports the review queue in maintainer order and distinguishes review from merge', () => {
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const ledger = reviews.match(/<table id="housekeeping-ledger"[\s\S]*?<\/table>/)?.[0] ?? '';
+    const candidateRows = [...ledger.matchAll(/<tr data-(starter-payment-hold|cart-return-pr|starter-variant-notice)-ledger>/g)].map(match => match[1]);
+    expect(candidateRows).toEqual(['starter-payment-hold', 'cart-return-pr', 'starter-variant-notice']);
+    expect(ledger).toContain('commit/626a68e');
+    expect(ledger).toContain('commit/305dc3e');
+    expect(ledger).toContain('prior head');
+    expect(ledger).toContain('Queued behind #267');
   });
   it('reports saving quantities and the payment hold without claiming a live cart upgrade', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
