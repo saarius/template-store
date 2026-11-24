@@ -124,4 +124,8 @@ Updated November 17, 2026. No EmDash upstream issue, PR or comment has been open
 - EmDash Admin/Blocks 1.5.0 Classic, November 24. Keyboard-activate Load more in a Ship Label history fixture with 51 sample labels. When the last row appears with no next cursor, focus drops to the document body. The button measures 60×15px; the table, not the document, scrolls horizontally on a phone.
 - The shared table removes its pagination button when the cursor runs out. Use Tab to reach the next control after the update. Ship #105 repairs a separate return path from an order, not shared table behavior. Isolated rendering only; no CMS change or report outside this ledger.
 
+## 18. A Classic select can push a phone form offscreen
+- EmDash Admin/Blocks 1.5.0 Classic, November 24. Open a sample Ship TEST order with sandbox and practice label options at 390px. The stock practice label made the document 408px wide, and the sandbox label also overflowed.
+- The shared trigger sizes itself to its label without shrinking. Ship #107 shortens both labels and keeps the explanation outside the control; both phone appearances then fit. Isolated renderer only, not a live admin audit. No CMS change or upstream contact.
+
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.

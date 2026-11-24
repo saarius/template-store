@@ -211,15 +211,16 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const lifecycle = report.match(/<article[^>]+data-reviews-lifecycle-history>[\s\S]*?<\/article>/)?.[0];
     expect(lifecycle).toContain('Reviews email stayed off on Backroad Bum');
     expect(lifecycle).toContain('template-store/issues/269');
-    expect(reviews).toMatch(/<tr data-agent-rating-ledger>.*Issue #269.*Open November 24.*No cross-store filter/);
+    expect(reviews).toMatch(/<tr data-agent-rating-ledger>.*PR #270.*Issue #269.*Open · CI passed.*No cross-store filter/);
   });
   it('records the five plugin proposals without claiming they are deployed', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const dispatch = report.split('data-dispatch-archive')[0];
-    expect(dispatch).toContain('data-ship-history-dispatch');
-    expect(dispatch).toContain('the live Ship plugin is unchanged');
-    expect(dispatch).not.toContain('data-reviews-lifecycle-dispatch');
+    expect(dispatch).toContain('data-owner-setup-guide-dispatch');
+    expect(dispatch).toContain('the hosted guide has not changed');
+    expect(dispatch).not.toContain('data-ship-history-dispatch');
+    expect(report.split('data-dispatch-archive')[1]).toContain('data-ship-history-dispatch');
     for (const [marker, pull] of [
       ['ship-history', 'ship/pull/105'], ['reviews-queue', 'reviews/pull/12'], ['payments-country', 'payments/pull/126'],
       ['ship-settings', 'ship/pull/104'], ['accounts-envelope', 'accounts/pull/6'],
@@ -233,6 +234,23 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const bugs = readFileSync('public/dashboard/emdash-bugs.txt', 'utf8');
     expect(bugs).toContain('## 17. The native table pager loses focus at the final page');
     expect(bugs).not.toContain('evidence/2026-11-24-ship-label-history');
+  });
+  it('reports the new upstream batch without claiming live changes', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    for (const [marker, contribution] of [
+      ['owner-setup-guide', 'dinkuskit/pull/157'], ['ship-finish-setup', 'ship/issues/108'],
+      ['stripe-recovery-guide', 'payments/pull/127'], ['ship-recovery-session', 'ship/pull/107'],
+      ['agent-rating-fix', 'template-store/pull/270'], ['catalog-variant-price', 'dinkuskit/pull/156'],
+      ['hosted-catalog-exclusion', 'dinkuskit/issues/155'], ['ship-button-contrast', 'ship/pull/106'],
+    ]) {
+      const rowMarker = marker === 'agent-rating-fix' ? 'agent-rating' : marker;
+      expect(reviews.match(new RegExp(`<tr data-${rowMarker}-ledger>[^\\n]+`))?.[0]).toContain(contribution);
+      expect(report.match(new RegExp(`<article[^>]+data-${marker}-history>[^\\n]+`))?.[0]).toContain(contribution);
+    }
+    expect(reviews).toContain('the cause has not been verified');
+    expect(reviews).toContain('a maintainer rerun was requested');
+    expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 18. A Classic select can push a phone form offscreen');
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
