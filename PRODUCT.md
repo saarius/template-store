@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## The passenger gets a say · November 24
+The thirteenth Field Note starts with two different ideas about lunch. It gives both people a way to shape the route and call for a safe stop, with links to the offline-planning and roadside-shade notes. There’s no gear pitch.
+
 ## Keep the collection links when gear is unavailable · November 24
 Shop, Road day and Slow camp remain connected when Commerce cannot supply a catalog. Keep the published collection names but hide counts and product cards until the catalog can be read again. A disposable copy reproduced this failure; no live catalog edit was needed.
 

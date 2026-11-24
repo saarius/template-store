@@ -1,0 +1,21 @@
+{
+  "slug": "field-note-the-passenger-gets-a-say",
+  "title": "The passenger gets a say",
+  "searchTerm": "passenger",
+  "sections": [
+    { "style": "normal", "text": "You packed lunch for a pullout by the creek. Your passenger was picturing lunch at an actual table. Better to find that out in the driveway than after forty minutes of gravel." },
+    { "style": "h2", "text": "Trade one want and one limit" },
+    { "style": "normal", "text": "Try ‘I’d like to get away from the highway, but I want to be back before dinner.’ Then let the other person go. A restroom, a shorter stretch on rough road, or a place where someone can comfortably get out of the car is part of the plan, not a footnote." },
+    { "style": "normal", "text": "Pick a stop that fits both answers. If it doesn’t exist on this route, change the route. The point of taking the back way isn’t to make somebody endure it." },
+    { "style": "h2", "text": "Share the map before you move" },
+    { "style": "normal", "text": "If your passenger wants to navigate, agree on the next useful landmark and the route back to pavement while parked. ", "link": { "text": "Before the signal drops", "href": "/field-note-before-the-signal-drops" }, "after": " covers what to save ahead of time. Nobody has to take a shift with the map; set up the route while stopped if they’d rather look out the window." },
+    { "style": "normal", "text": "Missed a turn? Keep going to a safe, legal place to stop. An extra mile is easier to undo than a sudden maneuver." },
+    { "style": "h2", "text": "Both people can call a stop" },
+    { "style": "normal", "text": "‘Next safe stop, please’ is enough. There’s no need to make a case for a stretch or some quiet. ", "link": { "text": "A shady place to stop", "href": "/field-note-a-shady-place-to-stop" }, "after": " starts with picking a place that keeps the road and its entrances clear." },
+    { "style": "h2", "text": "Check in at the first stop" },
+    { "style": "normal", "listItem": "number", "text": "Ask one real question: more gravel, a shorter loop, or home?" },
+    { "style": "normal", "listItem": "number", "text": "Give the answer time. Don’t ask with the engine already running." },
+    { "style": "normal", "listItem": "number", "text": "Set the next leg together while parked. If the shorter option wins, take it without keeping score." },
+    { "style": "normal", "text": "Sometimes you end up at a picnic table closer to town. You still get to eat lunch together." }
+  ]
+}

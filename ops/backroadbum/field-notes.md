@@ -1,6 +1,9 @@
 # Native Field Notes
 
-Twelve notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+Thirteen notes are published as EmDash Pages. `field-note-*` slugs, published native titles and opening paragraphs drive the journal, search previews and onward reading; files under `seed/` record authorship, not runtime content.
+
+## Passenger note · November 24
+`seed/backroadbum-passenger-note.json` records the four chapters, three check-in prompts and two links to older notes. The exact draft was private before the native publication; the public article has no product association. Run `node scripts/verify-backroadbum-authored-note.mjs --check --source=backroadbum-passenger-note.json` for script-on/off journal, search, native blocks and print checks. The protected `passenger-note.json` authoring guard is complete; do not replay. Evidence: `evidence/2026-11-24-passenger-note/`.
 
 ## Small things · November 24
 `seed/backroadbum-small-things-note.json` records four chapters, a three-step table sweep and two links. Native draft and published reloads match all 14 blocks, including the closing paragraph. The bandana and both collections link back; the earlier cap and mug notes remain on their product pages and in the journal. Run `node scripts/verify-backroadbum-authored-note.mjs --check --source=backroadbum-small-things-note.json` to verify public reading, search and print. The protected `small-things-note.json` authoring guard is complete; do not replay. Workspace evidence: `evidence/2026-11-24-small-things/`.

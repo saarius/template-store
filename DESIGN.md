@@ -86,6 +86,9 @@ Allocate roughly 60% canvas, 30% surfaces/photographic structure and no more tha
 ## Prepared native-cart product links · November17 (off live)
 The future server cart restores the existing merchant convention: each public product name is one underlined, keyboard-focusable link back to that exact member, not an entirely clickable card. Reuse Field Journal ink/underline, a44px minimum target and the rust focus ring; keep quantity/Remove tasks separate. Published CMS paths are optional enrichment only: missing, ambiguous, unsafe or failed joins leave plain headings and unchanged Commerce prices. This belongs to `backroadbum/server-cart-prep`, not the serving0.8cart or an upstream starter redesign.
 
+## Passenger note · November 24
+Use the existing four-chapter article and closing ordered list. The two inline links lead to other Field Notes rather than a shopping shelf; keep them in the prose and in print. The journal and homepage feature the publication through their shared native latest-note rule.
+
 ## Small things reading · November 24
 Keep the existing article hierarchy: one opening paragraph, four native headings and a short numbered closing sweep. The bandana is an ordinary inline reference, not a second call to action. Its native relationship supplies the standard reading link; no new card, control or text style.
 
