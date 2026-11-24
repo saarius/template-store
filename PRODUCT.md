@@ -1,6 +1,9 @@
 # Backroad Bum
 <!-- impeccable:product-schema 1 -->
 
+## Keep the collection links when gear is unavailable · November 24
+Shop, Road day and Slow camp remain connected when Commerce cannot supply a catalog. Keep the published collection names but hide counts and product cards until the catalog can be read again. A disposable copy reproduced this failure; no live catalog edit was needed.
+
 ## Keep reading when gear search is unavailable · November 24
 If Commerce cannot verify a matching product, search keeps independently matching Field Notes and collections and explains why gear is missing. With no usable results, it reports an outage rather than suggesting a different spelling. This was checked with Commerce disabled in a disposable copy, not during a live failure.
 
