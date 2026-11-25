@@ -275,7 +275,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-catalog-long-filter-dispatch.*dinkuskit\/pull\/166.*The shared catalog did not change/);
+    expect(overview).toMatch(/data-coupon-refused-pay-dispatch.*coupons\/pull\/32.*live checkout is unchanged/);
+    expect(archive).toMatch(/data-catalog-long-filter-dispatch.*dinkuskit\/pull\/166.*The shared catalog did not change/);
+    expect(report).toMatch(/data-coupon-refused-pay-history.*coupons\/pull\/32.*No Stripe payment was made/);
+    expect(reviews).toMatch(/data-coupon-refused-pay-ledger.*2edb7c9.*Staging only/);
     expect(archive).toMatch(/data-merchant-settings-stale-dispatch.*commerce\/pull\/320.*keeps the draft/);
     expect(report).toMatch(/data-catalog-long-filter-history.*disposable index, not the shared catalog/);
     expect(reviews).toMatch(/data-catalog-long-filter-ledger.*a5da8aa.*No shared deployment/);
@@ -1361,7 +1364,13 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-10-2026-11-22.txt',
       '/dashboard/instructions/steer-11-2026-11-23.txt',
       '/dashboard/instructions/steer-12-2026-11-24.txt',
+      '/dashboard/instructions/steer-13-2026-11-25.txt',
     ]);
+    const queueSteer = readFileSync('public' + archivePaths[13], 'utf8');
+    expect(queueSteer).toContain('Owner Steer 13 — November 25, 2026');
+    expect(queueSteer).toContain('Open-PR Queue Pacing');
+    expect(queueSteer).toContain('[owner account email redacted]');
+    expect(queueSteer).not.toMatch(/@gmail\.com/i);
     const dogfoodSteer = readFileSync('public' + archivePaths[12], 'utf8');
     expect(dogfoodSteer).toContain('## Owner Steer 12 — November 24, 2026');
     expect(dogfoodSteer).toContain('Four High-Yield DinkusKit Surfaces');
