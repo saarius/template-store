@@ -137,4 +137,8 @@ Updated November 17, 2026. No EmDash upstream issue, PR or comment has been open
 - EmDash and Blocks 1.6.0, November 25. Open a product’s Pricing & stock panel and select On backorder. Expected ship date is visible but the native date input is unnamed in Chromium’s accessibility tree.
 - The renderer emits a sibling label without a for attribute and a date input without any accessible naming attribute. The two are not associated. Use the visible label to identify the field for now; the Commerce price-recovery fix does not repair the renderer. Verified in an isolated panel mount, not the older live admin. No CMS patch or upstream contact.
 
+## 21. The sandbox exposes email access without a sender
+- EmDash 1.6.0 / sandbox-workerd 0.9.8, November 25. Run the signed Reviews 0.1.0 backend with no email transport. The configured permission exposes the email API, but the host refuses delivery. Reviews used all three attempts for a request and then for a reminder; adding a sender afterward did not recover either message in the fixture.
+- The sandbox does not expose a stable typed distinction between no sender and a delivery failure. Verify the sender before enabling automatic review mail; do not rely on private exception wording. Backroad Bum’s review mail stays off. No EmDash report or patch was made.
+
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.

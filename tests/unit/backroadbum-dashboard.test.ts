@@ -275,7 +275,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-backorder-price-draft-dispatch.*dinkuskit\/commerce\/pull\/317.*until the price saves/);
+    expect(overview).toMatch(/data-merchant-settings-stale-dispatch.*commerce\/pull\/320.*keeps the draft/);
+    expect(archive).toMatch(/data-backorder-price-draft-dispatch.*dinkuskit\/commerce\/pull\/317.*until the price saves/);
     expect(archive).toMatch(/data-catalog-test-mode-dispatch.*test checkout remains open/);
     expect(archive).toContain('data-google-backorder-date-dispatch');
     expect(reviews).toMatch(/data-backorder-price-draft-ledger.*78a375d.*Not deployed/);
@@ -284,7 +285,11 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-catalog-test-mode-history.*All three public feeds remain available/);
     expect(report).toMatch(/data-signed-rating-projection-history.*not a mail or scheduling test/);
     expect(reviews).toMatch(/data-ship-unavailable-rate-ledger.*ship\/issues\/110.*no carrier calls/);
-    expect(reviews).toMatch(/data-google-channel-ledger.*commerce\/issues\/311.*no feed submission/);
+    expect(reviews).toMatch(/data-google-channel-ledger.*commerce\/issues\/311.*commerce\/pull\/319.*no feed submission/);
+    expect(reviews).toMatch(/data-merchant-settings-stale-ledger.*5833153.*Not deployed/);
+    expect(report).toMatch(/data-google-rss-channel-history.*the live feed is unchanged/);
+    expect(report).toMatch(/data-reviews-sender-16-history.*no live mail was sent/);
+    expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 21. The sandbox exposes email access without a sender');
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
