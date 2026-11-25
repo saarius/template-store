@@ -278,7 +278,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(overview).toMatch(/data-coupon-refused-pay-dispatch.*coupons\/pull\/32.*live checkout is unchanged/);
     expect(archive).toMatch(/data-catalog-long-filter-dispatch.*dinkuskit\/pull\/166.*The shared catalog did not change/);
     expect(report).toMatch(/data-coupon-refused-pay-history.*coupons\/pull\/32.*No Stripe payment was made/);
-    expect(reviews).toMatch(/data-coupon-refused-pay-ledger.*2edb7c9.*Staging only/);
+    expect(reviews).toMatch(/data-coupon-refused-pay-ledger.*2edb7c9.*Merged November 25.*3efb6c1.*Staging only/);
+    expect(reviews).toMatch(/data-coupon-late-payment-ledger.*e27655d.*coupons\/issues\/33.*remains open.*Staging only/);
+    expect(reviews).toMatch(/data-template-google-backorder-ledger.*836b8dd.*Not deployed or submitted/);
+    expect(reviews).toMatch(/data-receipt-lookup-ledger.*da48200.*Not deployed/);
     expect(archive).toMatch(/data-merchant-settings-stale-dispatch.*commerce\/pull\/320.*keeps the draft/);
     expect(report).toMatch(/data-catalog-long-filter-history.*disposable index, not the shared catalog/);
     expect(reviews).toMatch(/data-catalog-long-filter-ledger.*a5da8aa.*No shared deployment/);
@@ -293,7 +296,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-signed-rating-projection-history.*not a mail or scheduling test/);
     expect(reviews).toMatch(/data-ship-unavailable-rate-ledger.*ship\/issues\/110.*no carrier calls/);
     expect(reviews).toMatch(/data-google-channel-ledger.*commerce\/issues\/311.*commerce\/pull\/319.*no feed submission/);
-    expect(reviews).toMatch(/data-merchant-settings-stale-ledger.*5833153.*Not deployed/);
+    expect(reviews).toMatch(/data-merchant-settings-stale-ledger.*5cf32ca.*CI passed.*Not deployed/);
+    expect(reviews).toMatch(/data-google-channel-ledger.*21abc86.*CI passed.*storefront still needs/);
     expect(report).toMatch(/data-google-rss-channel-history.*the live feed is unchanged/);
     expect(report).toMatch(/data-reviews-sender-16-history.*no live mail was sent/);
     expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 21. The sandbox exposes email access without a sender');
