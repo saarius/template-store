@@ -211,9 +211,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const lifecycle = report.match(/<article[^>]+data-reviews-lifecycle-history>[\s\S]*?<\/article>/)?.[0];
     expect(lifecycle).toContain('Reviews email stayed off on Backroad Bum');
     expect(lifecycle).toContain('template-store/issues/269');
-    expect(reviews).toMatch(/<tr data-agent-rating-ledger>.*PR #270.*Issue #269.*Open · CI passed.*No cross-store filter/);
+    expect(reviews).toMatch(/<tr data-agent-rating-ledger>.*PR #270.*Issue #269.*Merged upstream.*Not on Backroad Bum/);
   });
-  it('records the five plugin proposals without claiming they are deployed', () => {
+  it('records the five plugin contributions without claiming they are deployed', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [, archive] = report.split('data-dispatch-archive');
@@ -226,7 +226,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     ]) {
       const row = reviews.match(new RegExp(`<tr data-${marker}-ledger>[^\\n]+`))?.[0];
       expect(row).toContain(pull);
-      expect(row).toContain('Open');
+      expect(row).toContain(['ship-history', 'payments-country', 'ship-settings'].includes(marker) ? 'Merged upstream' : 'Open');
       const entry = report.match(new RegExp(`<article[^>]+data-${marker}-history>[^\\n]+`))?.[0];
       expect(entry).toContain(pull);
     }
@@ -247,8 +247,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
       expect(reviews.match(new RegExp(`<tr data-${rowMarker}-ledger>[^\\n]+`))?.[0]).toContain(contribution);
       expect(report.match(new RegExp(`<article[^>]+data-${marker}-history>[^\\n]+`))?.[0]).toContain(contribution);
     }
-    expect(reviews).toContain('the cause has not been verified');
-    expect(reviews).toContain('a maintainer rerun was requested');
+    expect(reviews).toMatch(/data-hosted-catalog-exclusion-ledger.*Closed by merged #163.*not found/);
+    expect(reviews).toMatch(/data-catalog-variant-price-ledger.*Merged upstream.*922e34a/);
     expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 18. A Classic select can push a phone form offscreen');
   });
   it('reports the evening findings without implying deployment or external submission', () => {
@@ -265,11 +265,22 @@ describe('Backroad Bum dashboard route boundaries', () => {
       expect(report.match(new RegExp(`<article[^>]+data-${marker}-history>[^\\n]+`))?.[0]).toContain(link);
     }
     expect(reviews).toMatch(/data-agent-rating-ledger.*eaf1870.*one second/);
-    expect(reviews).toMatch(/data-ship-recovery-session-ledger.*0495196.*does not buy a label/);
+    expect(reviews).toMatch(/data-ship-recovery-session-ledger.*6796227.*does not buy a label/);
     const bugs = readFileSync('public/dashboard/emdash-bugs.txt', 'utf8');
     expect(bugs).toMatch(/Ship setup recovery independently measured 4\.00:1/);
     expect(bugs).toMatch(/## 19\. Workerd control FD startup depends on the binary version/);
     expect(bugs).toContain('the live runner was not changed');
+  });
+  it('reports observed catalog exclusion separately from test checkout and upstream fixes', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const [overview, archive] = report.split('data-dispatch-archive');
+    expect(overview).toMatch(/data-catalog-test-mode-dispatch.*test checkout remains open/);
+    expect(archive).toContain('data-google-backorder-date-dispatch');
+    expect(report).toMatch(/data-catalog-test-mode-history.*All three public feeds remain available/);
+    expect(report).toMatch(/data-signed-rating-projection-history.*not a mail or scheduling test/);
+    expect(reviews).toMatch(/data-ship-unavailable-rate-ledger.*ship\/issues\/110.*no carrier calls/);
+    expect(reviews).toMatch(/data-google-channel-ledger.*commerce\/issues\/311.*no feed submission/);
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');

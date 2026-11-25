@@ -22,6 +22,12 @@ Staging **463b381** also applies the saved Field Journal appearance before the f
 
 [Reviews #13](https://github.com/dinkuskit/reviews/issues/13) tracks a signed-byte-matched 0.1.0 request that became permanently failed after three manually executed hourly ticks with no selected `email:deliver` provider. Configuring the sink after two ticks sent once; configuring it after three sent nothing. Reviews did not show its waiting-for-sender notice. EmDash 1.4.0 and 1.5.0 matched under Workerd. The disposable fixture results are in `evidence/2026-11-24-reviewed-fulfillment-dogfood/cycle.md` in the operator workspace. No real mail or live change.
 
+## Published rating in the agent feed · November 25
+
+[Template Store #270](https://github.com/dinkuskit/template-store/pull/270) is merged. Exact Template main `8cce9dc` under EmDash 1.5.0 mounted the Reviews `v0.1.0` backend byte-identical to the previously provenance-verified download, with isolated paired Commerce. A buyer’s four-star review appeared on the product page and added only `{value:4, scale_min:1, scale_max:5, count:1}` to the uncached public agent row. Hiding it restored the entire original row. See `evidence/2026-11-25-post-merge/{rating-browser.log,reviews-backend.sha256,known-signed.sha256}`.
+
+The Chromium test used a synthetic already-asked order and the proof-store Registry ID, not a new native signed install or an automatic mail/scheduler test. Live Reviews and Stage B remain unchanged; this closes the earlier local feed projection gap, not release readiness.
+
 ## Before enabling email on Backroad Bum
 
 - Verify the signed artifacts and the intended Commerce sender ID in the actual install. A configured plugin can be reached at `dinkus-commerce`, but the live stable Registry namespace is `r_gshdrqaldna3r7sn`; the separate beta package must not become the live sender. Rehearse the pair with the Registry mount, not just configured plugin IDs. [Courier #3](https://github.com/dinkuskit/courier/issues/3) has the reproduced failure and the configured-source control. Local evidence: `evidence/2026-11-22-commerce-review-bridge/` in the operator workspace.

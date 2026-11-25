@@ -1,5 +1,23 @@
 # Agent catalog dogfooding
 
+## Shared catalog exclusion verified · November 25, 01:38 UTC
+
+[DinkusKit #163](https://github.com/dinkuskit/dinkuskit/pull/163) merged at `8d7f10f` and closed #155. Hosted search no longer shows Backroad Bum; exact fleece URL lookup and product detail report `not_found`. All three public feed bodies are still served, and checkout remains test/open/supported. The hosted reads confirm the outcome, not the precise deployed revision or bindings. No hosted or store configuration was changed here.
+
+On exact merged main, 15 catalog tests and 46 compiled Worker proof checks passed. Nine further checks used the real HTTPS feed with disposable D1: missing settings and Test made no feed request; local live eligibility indexed seven families and eleven items; changing back to Test removed cached IDs on product detail or the next scheduled refresh. Evidence: `evidence/2026-11-25-catalog-test-mode/{hosted-check,worker-store-mode}.json`.
+
+## Shared catalog exclusion verified · November 25, 01:38 UTC
+
+[DinkusKit #163](https://github.com/dinkuskit/dinkuskit/pull/163) merged at `8d7f10f` and closed #155. Hosted search no longer shows Backroad Bum; exact fleece URL lookup and product detail report `not_found`. All three public feed bodies are still served, and checkout remains test/open/supported. The hosted reads confirm the outcome, not the precise deployed revision or bindings. No hosted or store configuration was changed here.
+
+On exact merged main, 15 catalog tests and 46 compiled Worker proof checks passed. Nine further checks used the real HTTPS feed with disposable D1: missing settings and Test made no feed request; local live eligibility indexed seven families and eleven items; changing back to Test removed cached IDs on product detail or the next scheduled refresh. Evidence: `evidence/2026-11-25-catalog-test-mode/{hosted-check,worker-store-mode}.json`.
+
+## Merged catalog budget qualification · November 24, 23:55 UTC
+
+[DinkusKit #156](https://github.com/dinkuskit/dinkuskit/pull/156) merged at `922e34a`. On exact upstream main, 15 catalog unit tests, 42 native compiled Worker checks, and 28 Backroad Bum checks passed. The separate Backroad Bum fixture makes four actual HTTPS feed reads; only local admission and the injected failure and $60 XL sale/backorder-to-sold-out transitions are synthetic. The gap between $60 and $68 stays empty, and an exact $68 budget keeps the two buyable sizes during the sold-out replay.
+
+This is local verification, not deployment evidence. [DinkusKit #163](https://github.com/dinkuskit/dinkuskit/pull/163), the separate test-store exclusion change for #155, was open with green CI at this check. Wait for confirmed hosted deployment before certifying search and exact-lookup exclusion. Evidence: `evidence/2026-11-24-late-review/{catalog-native.log,worker-live.json,156-merged.json,163.json}`.
+
 ## Hosted exclusion · November 24
 
 Public `search_catalog` and exact-URL `lookup_catalog` at `catalog.dinkuskit.com` both returned Backroad Bum while checkout still reported `mode: test`. [DinkusKit #155](https://github.com/dinkuskit/dinkuskit/issues/155) asks the hosted operator to verify the canonical `https://backroadbum.com` exclusion; the effective binding and root cause are not observable from these reads. No remote enrollment/configuration, store settings or feed were changed. Preserve the public feeds and test connection; after the operator confirms a change, check that search and exact lookup no longer return this seller and all three feeds still return 200.
