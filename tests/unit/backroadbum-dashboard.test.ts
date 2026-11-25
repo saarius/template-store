@@ -275,7 +275,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-coupon-refused-pay-dispatch.*coupons\/pull\/32.*live checkout is unchanged/);
+    expect(overview).toMatch(/data-catalog-lookup-price-dispatch.*dinkuskit\/pull\/169.*GitHub checks passed.*shared catalog is unchanged/);
+    expect(archive).toMatch(/data-coupon-refused-pay-dispatch.*coupons\/pull\/32.*live checkout is unchanged/);
+    expect(report).toMatch(/data-catalog-lookup-price-history.*\$13\.99.*\$14.*not been deployed/);
+    expect(reviews).toMatch(/data-catalog-bound-ledger.*02da39d.*CI passed.*No shared deployment/);
     expect(archive).toMatch(/data-catalog-long-filter-dispatch.*dinkuskit\/pull\/166.*The shared catalog did not change/);
     expect(report).toMatch(/data-coupon-refused-pay-history.*coupons\/pull\/32.*No Stripe payment was made/);
     expect(reviews).toMatch(/data-coupon-refused-pay-ledger.*2edb7c9.*Merged November 25.*3efb6c1.*Staging only/);
