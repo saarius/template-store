@@ -1,5 +1,11 @@
 # Shopper email setup
 
+## Store emails rollout gate · November 25, 2026
+
+Signed `dinkus-email@0.1.0` verified and installed in a disposable EmDash 1.6.0 / sandbox-workerd 0.9.8 store. Courier delivered synthetic paid and shipped news from source-built Commerce; the first synthetic Administrator received the two TEST emails in memory, not the checkout address. This was an explicit scheduler tick, not proof of a deployed minute timer. No external mail or live write.
+
+Keep Store emails off until the live EmDash 1.6.0 / stable Commerce 0.9.x / Courier pairing, the verified sender and minute scheduler, and `shopper-test@backroadbum.com` as first Administrator are all confirmed. Keep abandoned-cart marketing Off. With no configured provider, Workerd presents mail access anyway and consumes all five attempts; adding a working sender does not resend failed rows. See workspace `evidence/2026-11-25-email-local-dogfood/cycle.md` and [the shared availability report](https://github.com/dinkuskit/reviews/issues/13#issuecomment-7166493330).
+
 ## Accounts replacement rehearsal · November 23, 2026
 
 Source-built `dinkus-accounts` at `0143b6e` (10,202-byte Registry-format bundle) passed typecheck, 22 units and seven workerd/D1 tests. In a separate built Node/EmDash 1.5 fixture, the unmodified merchant `email:deliver` handler sent one OTP to the verified inbox. A fixture-only first refusal returned `EMAIL_UNAVAILABLE` and did not block immediate retry. Real MX delivery, wrong/padded/replayed code handling, address validation and save/restart/clear, and sign-out revocation all passed through EmDash’s public dispatcher. The consumed message was cleared and the disposable DB removed.
