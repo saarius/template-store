@@ -1,5 +1,9 @@
 # Agent catalog dogfooding
 
+## D1 filter-list limit · November 25
+
+[DinkusKit #165](https://github.com/dinkuskit/dinkuskit/issues/165) records a bundled Worker HTTP 500 on 101 seller IDs. [PR #166](https://github.com/dinkuskit/dinkuskit/pull/166), `saarius/dinkuskit:fix/catalog-d1-search-lists` **a5da8aa**, returns all seven Backroad Bum products for the same request and passes the native check with the matching seller last of 1,000. The fixture reads the real HTTPS feed but uses disposable D1 admission. All 37 repository verification stages passed across serial runs on Node 24.22.0 (workspace `evidence/2026-11-25-catalog-d1-pr/verify-summary.txt`). GitHub CI and review are separate; no hosted catalog changes or deployment.
+
 ## Shared catalog exclusion verified · November 25, 01:38 UTC
 
 [DinkusKit #163](https://github.com/dinkuskit/dinkuskit/pull/163) merged at `8d7f10f` and closed #155. Hosted search no longer shows Backroad Bum; exact fleece URL lookup and product detail report `not_found`. All three public feed bodies are still served, and checkout remains test/open/supported. The hosted reads confirm the outcome, not the precise deployed revision or bindings. No hosted or store configuration was changed here.

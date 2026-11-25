@@ -275,11 +275,15 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-merchant-settings-stale-dispatch.*commerce\/pull\/320.*keeps the draft/);
+    expect(overview).toMatch(/data-catalog-long-filter-dispatch.*dinkuskit\/pull\/166.*The shared catalog did not change/);
+    expect(archive).toMatch(/data-merchant-settings-stale-dispatch.*commerce\/pull\/320.*keeps the draft/);
+    expect(report).toMatch(/data-catalog-long-filter-history.*disposable index, not the shared catalog/);
+    expect(reviews).toMatch(/data-catalog-long-filter-ledger.*a5da8aa.*No shared deployment/);
+    expect(reviews).toMatch(/data-payments-unchecked-ledger.*e74785a.*Not deployed/);
     expect(archive).toMatch(/data-backorder-price-draft-dispatch.*dinkuskit\/commerce\/pull\/317.*until the price saves/);
     expect(archive).toMatch(/data-catalog-test-mode-dispatch.*test checkout remains open/);
     expect(archive).toContain('data-google-backorder-date-dispatch');
-    expect(reviews).toMatch(/data-backorder-price-draft-ledger.*78a375d.*Not deployed/);
+    expect(reviews).toMatch(/data-backorder-price-draft-ledger.*commerce\/pull\/317.*Not deployed/);
     expect(reviews).toMatch(/data-google-backorder-date-ledger.*Closed by merged.*commerce\/pull\/313/);
     expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 20. Block Kit date input has no accessible name');
     expect(report).toMatch(/data-catalog-test-mode-history.*All three public feeds remain available/);
