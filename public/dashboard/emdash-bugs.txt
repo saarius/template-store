@@ -133,4 +133,8 @@ Updated November 17, 2026. No EmDash upstream issue, PR or comment has been open
 - EmDash 1.5.0, sandbox-workerd 0.9.7 and Node 24.22.2 on Linux, November 24. Start the standalone runner with the Reviews 0.1.0 backend and Workerd 1.20260730.1. Its control descriptor write returned Invalid argument, then the runner timed out before the first plugin route.
 - Workerd 1.20260930.2 worked in the same disposable fixture. The lower-level cause is unconfirmed and the live runner was not changed. Confirm dependency selection and reproduce independently before reporting.
 
+## 20. Block Kit date input has no accessible name
+- EmDash and Blocks 1.6.0, November 25. Open a product’s Pricing & stock panel and select On backorder. Expected ship date is visible but the native date input is unnamed in Chromium’s accessibility tree.
+- The renderer emits a sibling label without a for attribute and a date input without any accessible naming attribute. The two are not associated. Use the visible label to identify the field for now; the Commerce price-recovery fix does not repair the renderer. Verified in an isolated panel mount, not the older live admin. No CMS patch or upstream contact.
+
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.

@@ -275,8 +275,12 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-catalog-test-mode-dispatch.*test checkout remains open/);
+    expect(overview).toMatch(/data-backorder-price-draft-dispatch.*dinkuskit\/commerce\/pull\/317.*until the price saves/);
+    expect(archive).toMatch(/data-catalog-test-mode-dispatch.*test checkout remains open/);
     expect(archive).toContain('data-google-backorder-date-dispatch');
+    expect(reviews).toMatch(/data-backorder-price-draft-ledger.*78a375d.*Not deployed/);
+    expect(reviews).toMatch(/data-google-backorder-date-ledger.*Closed by merged.*commerce\/pull\/313/);
+    expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 20. Block Kit date input has no accessible name');
     expect(report).toMatch(/data-catalog-test-mode-history.*All three public feeds remain available/);
     expect(report).toMatch(/data-signed-rating-projection-history.*not a mail or scheduling test/);
     expect(reviews).toMatch(/data-ship-unavailable-rate-ledger.*ship\/issues\/110.*no carrier calls/);
