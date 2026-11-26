@@ -30,6 +30,12 @@ November 25: [the EmDash 1.6 replay](https://github.com/dinkuskit/reviews/issues
 
 The Chromium test used a synthetic already-asked order and the proof-store Registry ID, not a new native signed install or an automatic mail/scheduler test. Live Reviews and Stage B remain unchanged; this closes the earlier local feed projection gap, not release readiness.
 
+## TEST orders in Reviews · November 26
+
+[Reviews #16](https://github.com/dinkuskit/reviews/issues/16): Commerce marks the event `test: true`, but signed Reviews 0.1.0 still sends an unmarked review request to the checkout address and can count the resulting Verified buyer review in public ratings. In disposable staging, a one-star TEST review changed a five-star product rating to 3.0. A local inbox-screening prototype preserved ordinary shipments and Courier's bookmark. Evidence: `evidence/2026-11-26-review-mail-lifecycle/`.
+
+For the Backroad Bum rollout, keep public practice orders out of the external review-mail and public-rating paths. Recheck a mixed TEST/ordinary shipment batch with the actual signed pairing before enabling automatic requests. If a store already queued or published test reviews, check them against the source orders before any remediation; the Reviews rows do not retain the TEST flag. The prototype does not clean historical data and is not deployed.
+
 ## Before enabling email on Backroad Bum
 
 - Verify the signed artifacts and the intended Commerce sender ID in the actual install. A configured plugin can be reached at `dinkus-commerce`, but the live stable Registry namespace is `r_gshdrqaldna3r7sn`; the separate beta package must not become the live sender. Rehearse the pair with the Registry mount, not just configured plugin IDs. [Courier #3](https://github.com/dinkuskit/courier/issues/3) has the reproduced failure and the configured-source control. Local evidence: `evidence/2026-11-22-commerce-review-bridge/` in the operator workspace.
