@@ -143,4 +143,8 @@ Updated November 17, 2026. No EmDash upstream issue, PR or comment has been open
 - The sandbox does not expose a stable typed distinction between no sender and a delivery failure. Verify the sender before enabling automatic review mail; do not rely on private exception wording. Backroad Bum’s review mail stays off. No EmDash report or patch was made.
 - Signed Store emails 0.1.0 on the same runtime also exhausted five confirmation attempts without a sender and did not show its setup warning. Restoring a working sink recovered a pending row, but not an exhausted row. See the isolated comparison in https://github.com/dinkuskit/reviews/issues/13#issuecomment-7166493330.
 
+## 22. An email hook timeout does not establish a refused handoff
+- EmDash 1.6.0 / sandbox-workerd 0.9.8, November 26. Hold a local sender past the five-second email hook deadline, then accept the waiting TEST confirmation. Signed Store emails 0.1.0 reports a retry and hands the same confirmation over a second time after its one-minute backoff. The memory sink accepts both; a prompt refusal followed by retry accepts only one.
+- The host races the sender against a timeout without cancelling it. Check the sender’s own evidence before manually resending; a timeout does not prove the message was refused. Backroad Bum has not enabled Store emails. Isolated evidence: https://github.com/dinkuskit/email/issues/7. No CMS patch, EmDash contact or external mail.
+
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.
