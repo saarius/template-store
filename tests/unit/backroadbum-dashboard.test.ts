@@ -275,7 +275,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-catalog-lookup-price-dispatch.*dinkuskit\/pull\/169.*GitHub checks passed.*shared catalog is unchanged/);
+    expect(overview).toMatch(/data-coupon-payment-refusal-dispatch.*In staging.*template-store\/issues\/282.*timeout/);
+    expect(archive).toMatch(/data-catalog-lookup-price-dispatch.*dinkuskit\/pull\/169.*GitHub checks passed.*shared catalog is unchanged/);
     expect(archive).toMatch(/data-coupon-refused-pay-dispatch.*coupons\/pull\/32.*live checkout is unchanged/);
     expect(report).toMatch(/data-catalog-lookup-price-history.*\$13\.99.*\$14.*not been deployed/);
     expect(reviews).toMatch(/data-catalog-bound-ledger.*02da39d.*CI passed.*No shared deployment/);
@@ -283,7 +284,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-coupon-refused-pay-history.*coupons\/pull\/32.*No Stripe payment was made/);
     expect(reviews).toMatch(/data-coupon-refused-pay-ledger.*2edb7c9.*Merged November 25.*3efb6c1.*Staging only/);
     expect(reviews).toMatch(/data-coupon-late-payment-ledger.*e27655d.*coupons\/issues\/33.*remains open.*Staging only/);
-    expect(reviews).toMatch(/data-template-google-backorder-ledger.*836b8dd.*Not deployed or submitted/);
+    expect(reviews).toMatch(/data-template-google-backorder-ledger.*836b8dd.*default Commerce pin still lacks.*Not deployed or submitted/);
     expect(reviews).toMatch(/data-receipt-lookup-ledger.*da48200.*Not deployed/);
     expect(archive).toMatch(/data-merchant-settings-stale-dispatch.*commerce\/pull\/320.*keeps the draft/);
     expect(report).toMatch(/data-catalog-long-filter-history.*disposable index, not the shared catalog/);
@@ -299,11 +300,21 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-signed-rating-projection-history.*not a mail or scheduling test/);
     expect(reviews).toMatch(/data-ship-unavailable-rate-ledger.*ship\/issues\/110.*no carrier calls/);
     expect(reviews).toMatch(/data-google-channel-ledger.*commerce\/issues\/311.*commerce\/pull\/319.*no feed submission/);
-    expect(reviews).toMatch(/data-merchant-settings-stale-ledger.*5cf32ca.*CI passed.*Not deployed/);
+    expect(reviews).toMatch(/data-merchant-settings-stale-ledger.*5cf32ca.*Merged November 26.*dbf620b.*Not deployed/);
     expect(reviews).toMatch(/data-google-channel-ledger.*21abc86.*CI passed.*storefront still needs/);
     expect(report).toMatch(/data-google-rss-channel-history.*the live feed is unchanged/);
     expect(report).toMatch(/data-reviews-sender-16-history.*no live mail was sent/);
     expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 21. The sandbox exposes email access without a sender');
+  });
+  it('keeps the latest eligibility, tracking, and settlement checks off-live', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toMatch(/data-coupon-payment-refusal-history.*Both paths used a simulated payment service/);
+    expect(report).toMatch(/data-coupon-settlement-history.*53 seeded paid orders.*318 holds.*did not consume/);
+    expect(report).toMatch(/data-rss-round-trip-history.*unpushed; the public feed is unchanged/);
+    expect(reviews).toMatch(/data-email-tracking-correction-ledger.*email\/issues\/6.*signed Email 0\.1\.0.*Not installed here/);
+    expect(reviews).toMatch(/data-ship-delivery-offset-ledger.*ship\/pull\/115.*ca23cdea.*Simulated carrier; not deployed/);
+    expect(reviews).toMatch(/data-coupon-renewal-ledger.*coupons\/pull\/35.*a61211f.*Staging only/);
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
