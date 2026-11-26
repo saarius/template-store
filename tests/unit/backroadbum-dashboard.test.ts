@@ -275,7 +275,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-coupon-payment-refusal-dispatch.*In staging.*template-store\/issues\/282.*timeout/);
+    expect(overview).toMatch(/data-zero-order-dispatch.*In staging.*one receipt without opening a payment session.*only a local test inbox/);
+    expect(archive).toMatch(/data-coupon-payment-refusal-dispatch.*In staging.*template-store\/issues\/282.*timeout/);
     expect(archive).toMatch(/data-catalog-lookup-price-dispatch.*dinkuskit\/pull\/169.*GitHub checks passed.*shared catalog is unchanged/);
     expect(archive).toMatch(/data-coupon-refused-pay-dispatch.*coupons\/pull\/32.*live checkout is unchanged/);
     expect(report).toMatch(/data-catalog-lookup-price-history.*\$13\.99.*\$14.*not been deployed/);
@@ -313,8 +314,20 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-coupon-settlement-history.*53 seeded paid orders.*318 holds.*did not consume/);
     expect(report).toMatch(/data-rss-round-trip-history.*unpushed; the public feed is unchanged/);
     expect(reviews).toMatch(/data-email-tracking-correction-ledger.*email\/issues\/6.*signed Email 0\.1\.0.*Not installed here/);
-    expect(reviews).toMatch(/data-ship-delivery-offset-ledger.*ship\/pull\/115.*ca23cdea.*Simulated carrier; not deployed/);
+    expect(reviews).toMatch(/data-ship-delivery-offset-ledger.*ship\/pull\/115.*4553012.*Simulated carrier; not deployed/);
     expect(reviews).toMatch(/data-coupon-renewal-ledger.*coupons\/pull\/35.*a61211f.*Staging only/);
+  });
+  it('keeps new coupon and Ship findings distinct from the completed $0 order', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toMatch(/data-zero-order-history.*one TEST order.*without a payment session.*without using up either code.*exactly one confirmation/);
+    expect(report).toMatch(/data-coupon-destination-refusal-history.*before Commerce made a checkout attempt.*fresh code.*issuecomment-7184316666/);
+    expect(report).toMatch(/data-cart-email-late-history.*paid for or emptied.*commerce\/issues\/323.*unchanged/);
+    expect(reviews).toMatch(/data-coupon-payment-refusal-ledger.*hadn't started a session.*unsupported destination.*uncertain payment still needs its hold/);
+    expect(reviews).toMatch(/data-ship-postage-settings-ledger.*ship\/pull\/117.*5ee7d07.*not deployed/);
+    expect(reviews).toMatch(/data-ship-label-retry-address-ledger.*ship\/pull\/116.*9aefb88.*two overlapping retries.*not deployed/);
+    expect(reviews).toMatch(/data-ship-quoted-services-ledger.*ship\/pull\/111.*bdf83dc.*ship-pr111-practice-return\/after-390-dark\.png.*Not deployed/);
+    expect(reviews).toMatch(/data-cart-email-late-ledger.*commerce\/issues\/323.*automated cart mail is off here/);
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
