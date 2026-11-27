@@ -275,8 +275,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-order-shipping-readiness-dispatch.*one printed book and two downloads.*live store is unchanged/);
-    expect(archive.trimStart()).toMatch(/^>\s*<summary>Earlier dispatches<\/summary>\s*<article[^>]+data-review-rating-recovery-dispatch/);
+    expect(overview).toMatch(/data-coupon-disabled-dispatch.*\$20.*\$15.*template-store\/issues\/286.*No payment was made/);
+    expect(archive.trimStart()).toMatch(/^>\s*<summary>Earlier dispatches<\/summary>\s*<article[^>]+data-order-shipping-readiness-dispatch/);
+    expect(archive).toMatch(/data-order-shipping-readiness-dispatch.*one printed book and two downloads.*live store is unchanged/);
     expect(archive).toMatch(/data-review-rating-recovery-dispatch.*In staging.*reported success.*reviews\/issues\/15.*recovery path after reload/);
     expect(archive).toMatch(/data-zero-order-dispatch.*In staging.*one receipt without opening a payment session.*only a local test inbox/);
     expect(archive).toMatch(/data-coupon-payment-refusal-dispatch.*In staging.*template-store\/issues\/282.*timeout/);
@@ -338,8 +339,19 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-instructions-index-history.*href="\/dashboard\/instructions\/".*original address/);
     expect(report).toMatch(/data-late-payment-cart-read-history.*commerce\/issues\/324.*no second payment/);
     expect(reviews).toMatch(/data-review-rating-recovery-ledger.*reviews\/issues\/15.*No live incident/);
-    expect(reviews).toMatch(/data-late-payment-cart-read-ledger.*commerce\/issues\/324.*commerce\/pull\/325.*e095987.*Simulated payment; not deployed/);
+    expect(reviews).toMatch(/data-late-payment-cart-read-ledger.*commerce\/issues\/324.*commerce\/pull\/325.*21daadd.*Simulated payment; not deployed/);
     expect(reviews).toMatch(/data-catalog-refresh-order-ledger.*dinkuskit\/issues\/170.*no shared deployment/);
+  });
+  it('distinguishes checkout drafts and plugin scheduler rehearsals from live rollout', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toMatch(/data-coupon-disabled-history.*template-store\/issues\/286.*Removing the code alone opens nothing/);
+    expect(reviews).toMatch(/data-coupon-disabled-ledger.*before-390\.png.*after-390\.png.*Not a pull request or a release/);
+    expect(reviews).toMatch(/data-checkout-phone-required-ledger.*template-store\/issues\/285.*current Commerce pin.*Not deployed/);
+    expect(report).toMatch(/data-signed-releases-state.*not on Backroad Bum.*history\/#signed-shipment-mail/);
+    expect(report).toMatch(/id="signed-shipment-mail" data-signed-shipment-mail-history.*Reviews queued.*Store emails refused.*Neither plugin sent mail/);
+    expect(report).toMatch(/data-node-scheduler-warmup-history.*first request initialized EmDash.*did not test automatic Courier delivery/);
+    expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toMatch(/## 24\. A warm Cloudflare timer can miss plugin reactivation/);
   });
   it('keeps the paid parcel fix, packing display and test-only evidence distinct', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');

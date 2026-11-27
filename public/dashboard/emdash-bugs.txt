@@ -153,4 +153,8 @@ Updated November 27, 2026. No EmDash upstream issue, PR or comment has been open
 - EmDash 1.6.0 with Astro 7.1.3, Node 24.22.2 and sandbox-workerd 0.9.8, November 27. In isolated staging, two already-due tasks for signed Store emails and Reviews stayed idle for 65 seconds with the listener up and no HTTP requests. One successful robots.txt request initialized EmDash; both tasks then ran once and saved their next scheduled times. Only a synthetic local sink received mail.
 - The scheduler belongs to the lazily initialized EmDash runtime, not the listener. A TCP check is not enough: warm the CMS with a real route and verify task progress before relying on recurrence after a restart. This does not supply DinkusKit Courier’s separate Node timer. No production change, CMS patch or EmDash contact.
 
+## 24. A warm Cloudflare timer can miss plugin reactivation
+- EmDash 1.6.0 with Workerd 1.20260930.2, November 27. A local built Cloudflare Worker delivered one shipment. After the receiver was reactivated in the fixture database, two scheduled runs reported success without delivering the next shipment or moving the receiver’s bookmark. Restarting the Worker delivered it once. No live Cloudflare service or email delivery was tested.
+- The scheduled path used a stale plugin-state snapshot; refreshing it before Courier also recovered the waiting shipment in the fixture. Verify actual delivery after reactivation, not just the timer status. Related EmDash work: https://github.com/emdash-cms/emdash/pull/4825. No CMS patch or EmDash contact.
+
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.
