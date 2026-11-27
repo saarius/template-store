@@ -306,7 +306,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(reviews).toMatch(/data-ship-unavailable-rate-ledger.*ship\/issues\/110.*no carrier calls/);
     expect(reviews).toMatch(/data-google-channel-ledger.*commerce\/issues\/311.*commerce\/pull\/319.*no feed submission/);
     expect(reviews).toMatch(/data-merchant-settings-stale-ledger.*5cf32ca.*Merged November 26.*dbf620b.*Not deployed/);
-    expect(reviews).toMatch(/data-google-channel-ledger.*21abc86.*CI passed.*storefront still needs/);
+    expect(reviews).toMatch(/data-google-channel-ledger.*39a8b71.*CI passed.*storefront still needs/);
     expect(report).toMatch(/data-google-rss-channel-history.*the live feed is unchanged/);
     expect(report).toMatch(/data-reviews-sender-16-history.*no live mail was sent/);
     expect(readFileSync('public/dashboard/emdash-bugs.txt', 'utf8')).toContain('## 21. The sandbox exposes email access without a sender');
@@ -329,8 +329,10 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-cart-email-late-history.*paid for or emptied.*commerce\/issues\/323.*unchanged/);
     expect(reviews).toMatch(/data-coupon-payment-refusal-ledger.*hadn't started a session.*unsupported destination.*uncertain payment still needs its hold/);
     expect(reviews).toMatch(/data-ship-postage-settings-ledger.*ship\/pull\/117.*2d0e849.*already empty.*not deployed/);
-    expect(reviews).toMatch(/data-ship-label-retry-address-ledger.*ship\/pull\/116.*f6cfde5.*busy response only offers to reopen.*ship-pr116-busy-form\/after-390-dark\.png.*not deployed/);
-    expect(reviews).toMatch(/data-ship-quoted-services-ledger.*ship\/pull\/111.*4046d80.*ship-pr111-quote-recovery\/after-receipt-390-dark\.png.*ship-pr111-price-drafts\/after-practice-return-390-dark\.png.*Not deployed/);
+    expect(reviews).toMatch(/data-ship-label-retry-address-ledger.*ship\/pull\/116.*3e4d501.*without buying one.*ship-pr116\/recovery-after-390-dark\.png.*not deployed/);
+    expect(reviews).toMatch(/data-ship-quoted-services-ledger.*ship\/pull\/111.*123ddfe.*Practice is refused on non-TEST orders.*ship-pr111\/check-after-390-dark\.png.*Not deployed/);
+    expect(report).toMatch(/data-merchant-session-history.*dinkuskit\/issues\/171.*off-live fix/);
+    expect(reviews).toMatch(/data-merchant-session-ledger.*dinkuskit\/issues\/171.*dinkuskit\/pull\/172.*b156cb6.*Not deployed/);
     expect(reviews).toMatch(/data-cart-email-late-ledger.*commerce\/issues\/323.*automated cart mail is off here/);
   });
   it('links current reports without claiming a live incident or fix', () => {
@@ -1171,7 +1173,7 @@ describe('Backroad Bum dashboard route boundaries', () => {
   it('reports the native seventh product without rewriting older catalog or recovery claims', () => {
     const source = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const pulse = readFileSync('src/features/experiment-report/DashboardPulse.astro', 'utf8');
-    expect(pulse).toContain('Seven product families, two collections and eleven field notes');
+    expect(pulse).toContain('Seven product families, two collections and thirteen field notes');
     expect(source).toContain('Seven EmDash-backed product families');
     expect(source).toContain('A $12 pocket notebook joins the gear shelf');
     expect(source).toContain('The six existing products and eight Orders remain unchanged');
@@ -1433,7 +1435,13 @@ describe('Backroad Bum dashboard route boundaries', () => {
       '/dashboard/instructions/steer-11-2026-11-23.txt',
       '/dashboard/instructions/steer-12-2026-11-24.txt',
       '/dashboard/instructions/steer-13-2026-11-25.txt',
+      '/dashboard/instructions/steer-14-2026-11-27.txt',
     ]);
+    const sessionSteer = readFileSync('public' + archivePaths[14], 'utf8');
+    expect(sessionSteer).toContain('Owner Steer 14 — November 27, 2026');
+    expect(sessionSteer).toContain('Upstream SSR `Set-Cookie` Bug');
+    expect(sessionSteer).toContain('[exact timestamp redacted]');
+    expect(sessionSteer).not.toMatch(/https?:\/\/[^\s/]+:[^\s/]+@/i);
     const queueSteer = readFileSync('public' + archivePaths[13], 'utf8');
     expect(queueSteer).toContain('Owner Steer 13 — November 25, 2026');
     expect(queueSteer).toContain('Open-PR Queue Pacing');
