@@ -149,4 +149,8 @@ Updated November 27, 2026. No EmDash upstream issue, PR or comment has been open
 - EmDash 1.6.0 / sandbox-workerd 0.9.8, November 26. Hold a local sender past the five-second email hook deadline, then accept the waiting TEST confirmation. Signed Store emails 0.1.0 reports a retry and hands the same confirmation over a second time after its one-minute backoff. The memory sink accepts both; a prompt refusal followed by retry accepts only one.
 - The host races the sender against a timeout without cancelling it. Check the sender’s own evidence before manually resending; a timeout does not prove the message was refused. Backroad Bum has not enabled Store emails. Isolated evidence: https://github.com/dinkuskit/email/issues/7. No CMS patch, EmDash contact or external mail.
 
+## 23. Standalone Node starts listening before it starts the scheduler
+- EmDash 1.6.0 with Astro 7.1.3, Node 24.22.2 and sandbox-workerd 0.9.8, November 27. In isolated staging, two already-due tasks for signed Store emails and Reviews stayed idle for 65 seconds with the listener up and no HTTP requests. One successful robots.txt request initialized EmDash; both tasks then ran once and saved their next scheduled times. Only a synthetic local sink received mail.
+- The scheduler belongs to the lazily initialized EmDash runtime, not the listener. A TCP check is not enough: warm the CMS with a real route and verify task progress before relying on recurrence after a restart. This does not supply DinkusKit Courier’s separate Node timer. No production change, CMS patch or EmDash contact.
+
 Owner Steer1 prioritizes the hosted DinkusKit customer flow. This ledger does not justify further local service replicas, publication to EmDash or a speculative framework backlog.

@@ -36,6 +36,12 @@ The Chromium test used a synthetic already-asked order and the proof-store Regis
 
 For the Backroad Bum rollout, keep public practice orders out of the external review-mail and public-rating paths. Recheck a mixed TEST/ordinary shipment batch with the actual signed pairing before enabling automatic requests. If a store already queued or published test reviews, check them against the source orders before any remediation; the Reviews rows do not retain the TEST flag. The prototype does not clean historical data and is not deployed.
 
+## Node plugin recurrence and cold start · November 27
+
+Signed Reviews and Store emails 0.1.0 enrolled their hourly and minute tasks on install, without an Admin visit. In disposable EmDash 1.6.0/Workerd staging, real Node timers sent from the local queue across restart and a second natural minute. That followed an explicit Courier handoff; with the timer running but no Courier handoff, neither plugin received an order. Only synthetic local sinks received messages.
+
+A separate standalone Node build with overdue work did not run either task for 65 seconds after it began listening. One request to `robots.txt` initialized EmDash and both jobs ran once. The deploy probe already visits `/shop`; also verify scheduler progress after startup before relying on any new unattended jobs. No live recurrence or automatic Node Courier is qualified. See `evidence/2026-11-27-node-recurring/cycle.md` in the operator workspace.
+
 ## Before enabling email on Backroad Bum
 
 - Verify the signed artifacts and the intended Commerce sender ID in the actual install. A configured plugin can be reached at `dinkus-commerce`, but the live stable Registry namespace is `r_gshdrqaldna3r7sn`; the separate beta package must not become the live sender. Rehearse the pair with the Registry mount, not just configured plugin IDs. [Courier #3](https://github.com/dinkuskit/courier/issues/3) has the reproduced failure and the configured-source control. Local evidence: `evidence/2026-11-22-commerce-review-bridge/` in the operator workspace.
