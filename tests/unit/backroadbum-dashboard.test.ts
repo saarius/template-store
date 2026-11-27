@@ -14,6 +14,31 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(archive).toContain('data-journal-return-dispatch');
     expect(archive).toContain('Earlier dispatches &amp; verification context');
   });
+  it('links the latest staging report and archives the previous dispatch', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const [current, archive] = report.split('<details class="dashboard-dispatch-archive" data-dispatch-archive>');
+    expect(current).toContain('data-shipping-zip-dispatch');
+    expect(current).toContain('href="/dashboard/history#shipping-zip"');
+    expect(current).not.toContain('data-coupon-disabled-dispatch');
+    expect(archive).toContain('data-coupon-disabled-dispatch');
+    expect(report).toContain('id="shipping-zip" data-shipping-zip-history');
+  });
+  it.each([
+    ['shipping-zip', 'commerce/issues/329', /No fix is deployed/, /Staging only/],
+    ['zero-total-confirmation', 'template-store/issues/287', /without showing the revised basket/, /No payment session/],
+    ['unknown-label-cancellation', 'ship/issues/119', /no live carrier behavior is inferred/, /No live labels/],
+    ['late-review-invitation', 'reviews/issues/17', /automatic review mail remains off/, /No external mail/],
+  ])('links the open %s report without claiming a live incident or fix', (slug, issue, historyBoundary, ledgerBoundary) => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    const history = report.match(new RegExp(`<article[^>]+data-${slug}-history>[\\s\\S]*?</article>`))?.[0];
+    const ledger = reviews.match(new RegExp(`<tr data-${slug}-ledger>[\\s\\S]*?</tr>`))?.[0];
+    expect(history).toContain(issue);
+    expect(history).toMatch(historyBoundary);
+    expect(ledger).toContain(issue);
+    expect(ledger).toContain('Open ·');
+    expect(ledger).toMatch(ledgerBoundary);
+  });
   it('keeps staged feed coverage and local catalog reads separate from live exports', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const dispatch = report.match(/<article[^>]+data-beta6-feed-dispatch>[\s\S]*?<\/article>/)?.[0];
@@ -275,8 +300,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-coupon-disabled-dispatch.*\$20.*\$15.*template-store\/issues\/286.*No payment was made/);
-    expect(archive.trimStart()).toMatch(/^>\s*<summary>Earlier dispatches<\/summary>\s*<article[^>]+data-order-shipping-readiness-dispatch/);
+    expect(overview).toMatch(/data-shipping-zip-dispatch.*a four-digit U\.S\. delivery ZIP.*without another payment/);
+    expect(archive.trimStart()).toMatch(/^>\s*<summary>Earlier dispatches<\/summary>\s*<article[^>]+data-coupon-disabled-dispatch/);
+    expect(archive).toMatch(/data-coupon-disabled-dispatch.*\$20.*\$15.*template-store\/issues\/286.*No payment was made/);
     expect(archive).toMatch(/data-order-shipping-readiness-dispatch.*one printed book and two downloads.*live store is unchanged/);
     expect(archive).toMatch(/data-review-rating-recovery-dispatch.*In staging.*reported success.*reviews\/issues\/15.*recovery path after reload/);
     expect(archive).toMatch(/data-zero-order-dispatch.*In staging.*one receipt without opening a payment session.*only a local test inbox/);
