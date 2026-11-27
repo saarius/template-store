@@ -275,7 +275,9 @@ describe('Backroad Bum dashboard route boundaries', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
     const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
     const [overview, archive] = report.split('data-dispatch-archive');
-    expect(overview).toMatch(/data-review-rating-recovery-dispatch.*In staging.*reported success.*reviews\/issues\/15.*recovery path after reload/);
+    expect(overview).toMatch(/data-order-shipping-readiness-dispatch.*one printed book and two downloads.*live store is unchanged/);
+    expect(archive.trimStart()).toMatch(/^>\s*<summary>Earlier dispatches<\/summary>\s*<article[^>]+data-review-rating-recovery-dispatch/);
+    expect(archive).toMatch(/data-review-rating-recovery-dispatch.*In staging.*reported success.*reviews\/issues\/15.*recovery path after reload/);
     expect(archive).toMatch(/data-zero-order-dispatch.*In staging.*one receipt without opening a payment session.*only a local test inbox/);
     expect(archive).toMatch(/data-coupon-payment-refusal-dispatch.*In staging.*template-store\/issues\/282.*timeout/);
     expect(archive).toMatch(/data-catalog-lookup-price-dispatch.*dinkuskit\/pull\/169.*GitHub checks passed.*shared catalog is unchanged/);
@@ -326,8 +328,8 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-cart-email-late-history.*paid for or emptied.*commerce\/issues\/323.*unchanged/);
     expect(reviews).toMatch(/data-coupon-payment-refusal-ledger.*hadn't started a session.*unsupported destination.*uncertain payment still needs its hold/);
     expect(reviews).toMatch(/data-ship-postage-settings-ledger.*ship\/pull\/117.*2d0e849.*already empty.*not deployed/);
-    expect(reviews).toMatch(/data-ship-label-retry-address-ledger.*ship\/pull\/116.*9e4c514.*different label attempt requires fresh confirmation.*not deployed/);
-    expect(reviews).toMatch(/data-ship-quoted-services-ledger.*ship\/pull\/111.*0441ec6.*ship-pr111-price-drafts\/after-practice-return-390-dark\.png.*Not deployed/);
+    expect(reviews).toMatch(/data-ship-label-retry-address-ledger.*ship\/pull\/116.*f6cfde5.*busy response only offers to reopen.*ship-pr116-busy-form\/after-390-dark\.png.*not deployed/);
+    expect(reviews).toMatch(/data-ship-quoted-services-ledger.*ship\/pull\/111.*4046d80.*ship-pr111-quote-recovery\/after-receipt-390-dark\.png.*ship-pr111-price-drafts\/after-practice-return-390-dark\.png.*Not deployed/);
     expect(reviews).toMatch(/data-cart-email-late-ledger.*commerce\/issues\/323.*automated cart mail is off here/);
   });
   it('links current reports without claiming a live incident or fix', () => {
@@ -336,8 +338,21 @@ describe('Backroad Bum dashboard route boundaries', () => {
     expect(report).toMatch(/data-instructions-index-history.*href="\/dashboard\/instructions\/".*original address/);
     expect(report).toMatch(/data-late-payment-cart-read-history.*commerce\/issues\/324.*no second payment/);
     expect(reviews).toMatch(/data-review-rating-recovery-ledger.*reviews\/issues\/15.*No live incident/);
-    expect(reviews).toMatch(/data-late-payment-cart-read-ledger.*commerce\/issues\/324.*Simulated payment; not deployed/);
+    expect(reviews).toMatch(/data-late-payment-cart-read-ledger.*commerce\/issues\/324.*commerce\/pull\/325.*e095987.*Simulated payment; not deployed/);
     expect(reviews).toMatch(/data-catalog-refresh-order-ledger.*dinkuskit\/issues\/170.*no shared deployment/);
+  });
+  it('keeps the paid parcel fix, packing display and test-only evidence distinct', () => {
+    const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
+    const reviews = readFileSync('src/features/experiment-report/DashboardReviews.astro', 'utf8');
+    expect(report).toMatch(/data-order-shipping-readiness-history.*local change.*merchant display, not the.*separate Ship handoff/);
+    expect(reviews).toMatch(/data-paid-ship-lines-ledger.*commerce\/issues\/326.*commerce\/pull\/327.*9bf0479.*Previously sent versions are not resent/);
+    expect(reviews).toMatch(/data-coupon-dollar-amount-ledger.*coupons\/issues\/37.*coupons\/pull\/38.*1afef56.*keeps the input for correction.*Not deployed/);
+    expect(reviews).toMatch(/data-inventory-pack-release-ledger.*inventory\/pull\/74.*58aeee5.*No hosted Inventory or migration/);
+    expect(reviews).toMatch(/data-review-test-orders-ledger.*reviews\/issues\/16.*not installed here/);
+    expect(reviews).toMatch(/data-order-email-timeout-ledger.*email\/issues\/7.*No external mail/);
+    const bugs = readFileSync('public/dashboard/emdash-bugs.txt', 'utf8');
+    expect(bugs).toContain('the listener and Workerd disappeared');
+    expect(bugs).toContain('3.89:1 on the native Orders TEST warning in a disposable install');
   });
   it('separates the disposable upgrade rehearsal from the live storefront', () => {
     const report = readFileSync('src/features/experiment-report/DashboardReport.astro', 'utf8');
